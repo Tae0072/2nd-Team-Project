@@ -13,6 +13,7 @@
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-06 | 강태오 | 초기 작성 — 4개 서비스 DB 분리, ChromaDB 별도, Kafka 이벤트 연결 |
 | v1.1 | 2026-05-06 | 강태오 | **3차 검토 결과 25항목 일괄 패치** — PROMPT_TEMPLATES UK 정정 / AI_TURNS·AI_SESSIONS 추적 컬럼 추가 / JOURNAL_EVENTS sequence 메커니즘 / utf8mb4 표준 / MEDIUMTEXT / email 재가입 정책 / DRAFT 명칭 분리 / 토픽 표 보강 (Schema subject·DLQ) / Schema Registry 명시 / NOTIFICATION 정책 / Flyway / Outbox v1.0 한계 / event_data 예시 / 다이어그램 보강 |
+| v1.1.1 | 2026-05-06 | 강태오 | 03번 v1.1 동기화 — § 1.1 다이어그램에 Auth Redis-WS (refresh blacklist), Bible Redis-Cache 분리 표기 / § 2.3 REFRESH_TOKENS Redis blacklist 정책 노트 추가 |
 
 ---
 
@@ -42,17 +43,24 @@
 │ Service          │  │ Service          │  │ Service          │  │ Service          │
 │                  │  │                  │  │                  │  │                  │
 │ MySQL: auth_db   │  │ MySQL: bible_db  │  │ MySQL: ai_db     │  │ MySQL: journal_db│
-│                  │  │ + Redis 캐시      │  │ + ChromaDB       │  │                  │
+│ + Redis-WS       │  │ + Redis-Cache    │  │ + ChromaDB       │  │                  │
+│  (refresh        │  │  (passage 24h    │  │                  │  │                  │
+│   blacklist)     │  │   TTL)           │  │                  │  │                  │
 │ - USERS          │  │ - BOOKS          │  │ - PROMPT_TEMPLATE│  │ - JOURNALS       │
 │ - REFRESH_TOKENS │  │ - KR_BIBLE       │  │ - AI_SESSIONS    │  │ - JOURNAL_EVENTS │
 │ - OAUTH_LINKS    │  │ - EN_BIBLE       │  │ - AI_TURNS       │  │                  │
 │                  │  │ - COMMENTARIES   │  │ (벡터: ChromaDB) │  │                  │
 └──────────────────┘  └──────────────────┘  └──────────────────┘  └──────────────────┘
 
-┌──────────────────┐  ┌──────────────────┐
-│ API Gateway      │  │ BFF Aggregator   │   ← DB 없음 (stateless·집계)
-│ (DB 없음)         │  │ (DB 없음)         │
-└──────────────────┘  └──────────────────┘
+┌──────────────────┐  ┌──────────────────────────┐
+│ API Gateway      │  │ BFF Aggregator           │   ← DB 없음
+│ (DB 없음)         │  │ + Redis-WS               │     (Auth와 같은 인스턴스 공유,
+│                  │  │  (WS 세션 레지스트리)     │      keyspace prefix로 격리)
+└──────────────────┘  └──────────────────────────┘
+
+  ※ Redis 인스턴스 분리 — 03번 § 1.1:
+     - Redis-Cache: Bible 전용 (cache:* prefix)
+     - Redis-WS:    Auth refresh blacklist (auth:*) + BFF WS 세션 (ws:*)
 
          ↓ 이벤트                 ↑ 컨슈머
    ┌─────────────────────────────────────────────────┐
@@ -170,6 +178,8 @@ ADR 후보 0010.
 | expires_at | DATETIME(6) | N | — | | 만료 시각 (기본 14일) |
 | revoked_at | DATETIME(6) | Y | NULL | | 폐기 시각 (로그아웃·재발급·rotation 시) |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | BaseEntity |
+
+> **Refresh Blacklist (Redis-WS):** 로그아웃·rotation 시 `auth:refresh:revoked:{jti}` key 등록 (TTL = refresh 만료까지). DB의 `revoked_at` 컬럼은 감사용, 실시간 차단은 Redis로. **Access Token은 blacklist 없음** — 만료(30분)까지 유효.
 
 **Token Rotation 정책 (v1.0):** Refresh 호출 시 기존 토큰 `revoked_at` 세팅 + 새 토큰 발급. 만료된 토큰은 야간 배치로 hard delete (90일 보관).
 
