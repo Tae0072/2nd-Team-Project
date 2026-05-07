@@ -1,0 +1,27 @@
+openapi: 3.1.0
+info:
+  title: QT-AI Bible Service
+  version: 0.1.0
+  description: |
+    Owner: 김태혁
+
+    ⚠️ **W0 placeholder** — info 블록만 있는 골격. W1 (5/18~22)에 김태혁이 endpoint·schema·example 작성 예정.
+    정답은 04번 § 5. 본 yaml은 그 박제를 OpenAPI로 변환한 것.
+  contact:
+    name: 김태혁 (Bible Service Owner)
+    email: TBD@example.com
+servers:
+  - url: https://api.qtai.app
+    description: Production (via Gateway)
+  - url: http://localhost:4012
+    description: Local Prism mock (bible)
+tags:
+  - name: bible
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}

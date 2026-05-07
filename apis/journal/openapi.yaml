@@ -1,0 +1,27 @@
+openapi: 3.1.0
+info:
+  title: QT-AI Journal Service
+  version: 0.1.0
+  description: |
+    Owner: 이승욱
+
+    ⚠️ **W0 placeholder** — info 블록만 있는 골격. W1 (5/18~22)에 이승욱이 endpoint·schema·example 작성 예정.
+    정답은 04번 § 7. 본 yaml은 그 박제를 OpenAPI로 변환한 것.
+  contact:
+    name: 이승욱 (Journal Service Owner)
+    email: TBD@example.com
+servers:
+  - url: https://api.qtai.app
+    description: Production (via Gateway)
+  - url: http://localhost:4014
+    description: Local Prism mock (journal)
+tags:
+  - name: journal
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}

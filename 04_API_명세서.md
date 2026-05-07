@@ -1,7 +1,7 @@
-# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.1
+# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
 
-> **문서 버전:** v1.1
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 3차 검토 36항목 일괄 패치)
+> **문서 버전:** v1.2
+> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1) / 2026-05-07 (v1.2 — 외부 검토 9항목 일괄 패치)
 > **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.1.1](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.1](./03_아키텍처_정의서.md)
 > **W1 Lock-in 산출물:** 본 문서 + `apis/{service}/openapi.yaml` × 5 (Spectral lint 통과 + Prism mock 가동) — 03번 § 2.2
 > **목적:** 6명이 W1 종료 시점에 동일한 API 계약 위에서 병렬로 코드를 작성할 수 있도록 모든 endpoint·DTO·에러·페이로드를 박제. 한 번 동결되면 W2 이후 수정은 ADR 발행 + 영향 범위 PR 일괄 동시 머지로만.
@@ -14,6 +14,7 @@
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-06 | 강태오 | 초기 작성 — 5 service OpenAPI 골격 + 공통 표준 (헤더·에러·페이징·CORS·Rate Limit) + Gateway 라우팅 표 + SSE/WebSocket 페이로드 + Spectral 룰 + Prism mock 가동 절차 + 1차 실패 패턴 ↔ API 가드레일 매핑 |
 | v1.1 | 2026-05-06 | 강태오 | **3차 검토 36항목 일괄 패치** — 필수 12 (도메인 에러 코드 5개 추가 / `PageResponse<T>` Custom DTO / Rate Limiter Spring Cloud Gateway 내장 / logout 인증 ❌ / DELETE 본문 → POST /me/deactivate / OAuth JWK 직접 검증 / `/passages` 흐름 통일 BFF→Bible 3개 직접 / WS STOMP CONNECT 헤더 / yaml info.contact / Spectral 룰 함수 정정 / servers↔포트 일관 / 503 Custom Mapper) + 일관성 12 (dashboard 5 service 정확화 / activeSession 정책 / Refresh Rotation race / PATCH idempotency_key 자동 / SSE schema / wildcard 의도 / Pod 다중 다이어그램 / SYSTEM 마스킹 schema / SSE 라이브러리 fix / 금지 filter / Spring SSE 표준 / consumer group / events 02번 정합) + 선택 12 (Slack #qtai-api / PASSWORD_TOO_WEAK / SSE close 정책 / epoch_minute 분 경계 / 알림 type 확장 / wss/ws 환경별 / SpringDoc 자동생성 안 씀 / .spectral.yaml 위치 / Mock 검증 도구 / OAS 3.1 의존성 매트릭스 / Hot 100 정의 / Idempotency-Key UX) |
+| v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 2.10 Rate Limiter yaml 정정 (login `replenishRate=1, burstCapacity=5` — 분 단위 정확 5/min은 Spring Cloud Gateway 초 단위 한계로 불가, Bucket4j v1.1 검토) / § 3 Gateway 라우팅 표 `/ws/**` 인증 ❌ (BFF가 STOMP CONNECT 검증) / § 5 + § 8.2 `/bible/today` 모순 제거 (BFF 자체 정적 매핑 단일화) / § 6.7 AI 컨슈머 + § 7.8 Journal 발행에 `journal.creation.failed` 추가 (Saga 보상) / § 10.2 STOMP 인증 흐름 강화 (Gateway 패스스루 + BFF 검증 책임 명시) |
 
 ---
 
@@ -368,7 +369,7 @@ public PageResponse<JournalSummary> list(@PageableDefault Pageable pageable, ...
 | Auth `/auth/login` | 5 req/min | client IP (brute-force 방지) |
 | Auth `/auth/register` | 3 req/min | client IP |
 
-**구현 (v1.1 정확화):** **Spring Cloud Gateway 내장 `RedisRateLimiter`** (Lua 스크립트 기반 토큰 버킷). Bucket4j는 별도 라이브러리이며 v1.0에는 사용하지 않음.
+**구현 (v1.1 정확화 → v1.2 yaml 정정):** **Spring Cloud Gateway 내장 `RedisRateLimiter`** (Lua 스크립트 기반 토큰 버킷). Bucket4j는 별도 라이브러리이며 v1.0에는 사용하지 않음.
 
 ```yaml
 spring:
@@ -380,7 +381,11 @@ spring:
           filters:
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 5    # tokens/sec → /min로 환산 (실제는 1초 5개 token bucket)
+                # ⭐ v1.2 정정 — login 5/min 정확 구현은 Spring Cloud Gateway RedisRateLimiter(초 단위)로 불가능.
+                # v1.0 절충: replenishRate=1 (초당 1 토큰), burstCapacity=5 (최초 5회 burst).
+                # 결과: 5초 동안 5회 발사 가능 → 이후 1초당 1회. brute-force 충분 방지 (5초당 5회 ≪ 분당 60회).
+                # 분 단위 정확 5/min: Bucket4j (초·분·시간 유연) 또는 Custom Lua script. v1.1 검토.
+                redis-rate-limiter.replenishRate: 1
                 redis-rate-limiter.burstCapacity: 5
                 key-resolver: "#{@ipAddressKeyResolver}"
 ```
@@ -430,7 +435,7 @@ spring:
 | ai-list | `/api/v1/ai/sessions` | GET | ai-service | ✅ | |
 | journal | `/api/v1/journals/**` | GET, PATCH, DELETE | journal-service | ✅ | |
 | me | `/api/v1/me/**` | GET | bff-aggregator | ✅ | 대시보드 |
-| ws | `/ws/**` | WebSocket | bff-aggregator | ✅ | STOMP 패스스루 |
+| ws | `/ws/**` | WebSocket | bff-aggregator | ❌ ⭐ | v1.2 — Gateway 단순 패스스루 (HTTP handshake에는 JWT 헤더 없음). BFF가 STOMP CONNECT 프레임 헤더 검증 (§ 10.2) |
 | health | `/actuator/health` | GET | gateway 자체 | ❌ | |
 
 ⭐ = v1.1 변경
@@ -1027,6 +1032,7 @@ data: [DONE]
 | 토픽 | Consumer Group | 동작 |
 | --- | --- | --- |
 | `user.deactivated` | `ai-service-user-deactivation-consumer` | 해당 user의 IN_PROGRESS 세션 → status=ABANDONED 마킹 |
+| `journal.creation.failed` ⭐v1.2 | `ai-service-saga-compensation-consumer` | AI_SESSIONS.status='COMPLETED_NO_JOURNAL' 마킹 (Saga 보상 — 03번 § 6.1) |
 
 ---
 
@@ -1210,6 +1216,7 @@ data: [DONE]
 | `journal.created` | `journal.created` | AI 세션 컨슈머가 DRAFT 생성 시 (AFTER_COMMIT) | `ai.session.completed:{session_id}` |
 | `journal.updated` | `journal.updated` | PATCH (AFTER_COMMIT) | `journal.update:{ULID}` |
 | `journal.deleted` | `journal.deleted` | DELETE (AFTER_COMMIT) | `journal.delete:{journal_id}:{epoch_ms}` |
+| `journal.creation.failed` ⭐v1.2 | `journal.creation.failed` | `ai.session.completed` 컨슈머 영구 실패 시 @DltHandler에서 발행 (Saga 보상) | `journal.creation.failed:{session_id}` |
 
 ### 7.9 컨슈머 토픽
 
@@ -1241,7 +1248,7 @@ data: [DONE]
 1. **Auth Service** `/auth/me` → `user` (id, nickname)
 2. **Journal Service** `/journals?size=5&sort=createdAt,desc` → `recentJournals` + `stats.journalCount`
 3. **AI Service** `/ai/sessions?status=IN_PROGRESS&size=1&sort=updatedAt,desc` → `activeSession` (가장 최근 1개) + `stats.completedSessions` (별도 count query)
-4. **Bible Service** `/bible/today` (v1.1 endpoint, v1.0은 BFF가 정적 책 추천 로직) → `todayPassage`
+4. **BFF 자체 정적 매핑** → `todayPassage` (v1.2 정정 — § 5에 Bible Service `/bible/today` endpoint 없음. v1.0은 BFF가 수정 정적 테이블 조회 (요일별 추천 또는 Hot 100 random 1개). v1.1 Bible Service에 endpoint 추가 검토)
 
 > **`activeSession` 정책 (v1.1):** 사용자가 다중 passage로 세션 동시 진행 가능하지만 대시보드는 **가장 최근 updatedAt IN_PROGRESS 세션 1개**만 노출. 전체 목록은 `/api/v1/ai/sessions` 따로 호출.
 
@@ -1462,6 +1469,11 @@ spring:
 [클라이언트] WS connect: wss://api.qtai.app/ws/notifications     (prod)
                         ws://localhost:8080/ws/notifications     (dev)
 
+[Gateway]  WS handshake (HTTP GET + Upgrade) → 인증 ❌ 단순 패스스루
+           ⭐ v1.2 — Gateway는 WebSocket handshake에 JWT 필터 적용 X (§ 3 라우팅 표)
+           ✋ handshake는 GET HTTP이고 STOMP CONNECT 프레임은 아직 도착 전이라
+              JWT 헤더가 없음. 이 단계에 인증 강제 시 401로 연결 차단됨.
+
 [클라이언트] STOMP CONNECT 프레임:
   CONNECT
   accept-version:1.2
@@ -1470,12 +1482,12 @@ spring:
   
   ^@
 
-[Gateway]  WS handshake → BFF로 패스스루 (STOMP 프레임은 Gateway가 inspect 안 함)
 [BFF]      STOMP CONNECT 수신 → Authorization 헤더 검증 (RS256 공개키)
-           → Redis-WS 등록:
+           성공 시 → Redis-WS 등록:
              SADD ws:session:{user_id} {session_id}
              SET  ws:session:{session_id}:meta {"user_id":..., "podName":...} EX 86400
-           → CONNECTED 프레임 응답
+           실패 시 → STOMP ERROR 프레임 발행 + WS 종료
+           성공 완료 시 → CONNECTED 프레임 응답
 ```
 
 > **wss vs ws (v1.1):** prod는 wss (TLS 종료는 ingress 또는 Gateway), dev는 ws OK.

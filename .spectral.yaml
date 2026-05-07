@@ -1,0 +1,37 @@
+extends:
+  - "spectral:oas"
+rules:
+  # 모든 endpoint operationId 필수
+  operation-operationId: error
+
+  # 모든 endpoint summary 필수
+  operation-description: warn
+  operation-summary: error
+
+  # 모든 4xx/5xx 응답에 application/problem+json 사용 (v1.1 truthy 함수)
+  problem-json-on-errors:
+    description: 4xx/5xx 응답은 application/problem+json + ProblemDetail 사용
+    severity: error
+    given: $.paths[*][*].responses[?(@property.match(/^[45]/))].content
+    then:
+      field: "application/problem+json"
+      function: truthy
+
+  # 인증 필요 endpoint는 security 명시
+  operation-security-defined: error
+
+  # snake_case 금지 (응답 본문 필드는 camelCase)
+  schema-property-camelcase:
+    description: schema property는 camelCase
+    severity: warn
+    given: $..properties[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[a-z][a-zA-Z0-9]*$'
+
+  # 모든 schema에 example 권장
+  schema-example: warn
+
+  # contact 정보 (info.contact) 필수
+  info-contact: error

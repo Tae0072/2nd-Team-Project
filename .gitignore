@@ -1,0 +1,54 @@
+# Secrets — gitleaks pre-commit + GHA로 보호 (03번 § 11.2)
+*.env
+!.env.example
+*.key
+*.pem
+*-credentials.yaml
+secrets.yaml
+application-prod.yml
+application-secret.yml
+
+# Build
+build/
+out/
+.gradle/
+target/
+*.jar
+*.war
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test reports / coverage
+.nyc_output/
+coverage/
+test-results/
+**/jacoco.exec
+
+# Node / Frontend
+node_modules/
+dist/
+
+# Flutter
+flutter-app/.dart_tool/
+flutter-app/.flutter-plugins
+flutter-app/.flutter-plugins-dependencies
+flutter-app/build/
+
+# Logs
+logs/
+*.log
+
+# Temp
+tmp/
+temp/

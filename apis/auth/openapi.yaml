@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: QT-AI Auth Service
+  version: 0.1.0
+  description: |
+    회원·JWT·OAuth Service.
+    Owner: 강상민
+
+    ⚠️ **W0 placeholder** — info 블록만 있는 골격. W1 (5/18~22)에 강상민이 endpoint·schema·example 작성 예정.
+    정답은 04번 § 4 (API 명세서). 본 yaml은 그 박제를 OpenAPI로 변환한 것.
+  contact:
+    name: 강상민 (Auth Service Owner)
+    email: TBD@example.com
+servers:
+  - url: https://api.qtai.app
+    description: Production (via Gateway)
+  - url: http://localhost:4011
+    description: Local Prism mock (auth)
+tags:
+  - name: auth-public
+  - name: auth-private
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas: {}

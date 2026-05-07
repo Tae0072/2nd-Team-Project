@@ -1,0 +1,10 @@
+apiVersion: v2
+name: qtai-infra
+description: QT-AI infrastructure chart (MySQL, Redis, Kafka, Schema Registry, ChromaDB)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+
+# ⚠️ W0 placeholder — W1에 강태오가 작성.
+# 03번 § 9.1 토폴로지 박제대로 구현 예정.
+# 포함 예정: mysql StatefulSet, redis-cache, redis-ws, kafka (KRaft single-node), schema-registry, chromadb

@@ -1,0 +1,25 @@
+# QT-AI CI/CD — W0 placeholder
+#
+# ⚠️ W0 placeholder — W1 (5/18~22)에 강태오가 본격 작성.
+# 03번 § 10 + 04번 § 11.4 박제대로 구현 예정.
+#
+# 단계 (참고):
+#   1. lint   — gitleaks + Spotless + Spectral (apis/*/openapi.yaml)
+#   2. test   — JUnit 5 + Testcontainers (cp-kafka 7.6+)
+#   3. build  — Gradle multi-module
+#   4. image  — Docker buildx → ghcr.io/tae0072/{service}:{sha}
+#   5. helm   — helm lint + helm template
+
+name: CI/CD
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "W0 placeholder — W1에 강태오가 lint/test/build/image/helm 작성"

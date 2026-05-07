@@ -1,0 +1,7 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "journal.deleted-value",
+  "description": "W0 placeholder. W1에 owner가 본문 작성. 02번 § 6.1 + 03번 § 7.2 정답.",
+  "type": "object",
+  "_TODO": "Apicurio Schema Registry에 등록할 정식 JSON Schema는 W1에 작성"
+}

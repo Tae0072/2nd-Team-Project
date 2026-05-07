@@ -14,6 +14,7 @@
 | v1.0 | 2026-05-06 | 강태오 | 초기 작성 — 4개 서비스 DB 분리, ChromaDB 별도, Kafka 이벤트 연결 |
 | v1.1 | 2026-05-06 | 강태오 | **3차 검토 결과 25항목 일괄 패치** — PROMPT_TEMPLATES UK 정정 / AI_TURNS·AI_SESSIONS 추적 컬럼 추가 / JOURNAL_EVENTS sequence 메커니즘 / utf8mb4 표준 / MEDIUMTEXT / email 재가입 정책 / DRAFT 명칭 분리 / 토픽 표 보강 (Schema subject·DLQ) / Schema Registry 명시 / NOTIFICATION 정책 / Flyway / Outbox v1.0 한계 / event_data 예시 / 다이어그램 보강 |
 | v1.1.1 | 2026-05-06 | 강태오 | 03번 v1.1 동기화 — § 1.1 다이어그램에 Auth Redis-WS (refresh blacklist), Bible Redis-Cache 분리 표기 / § 2.3 REFRESH_TOKENS Redis blacklist 정책 노트 추가 |
+| v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 6.1 토픽 표 8번째 추가 (`journal.creation.failed` Saga 보상) + `user.activity.tracked` 멱등성 키 형식 04번과 통일 (`read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}`) + envelope에 `idempotencyKey` 필드 명시 / § 7.6 JOURNALS.status 다이어그램 정정 (PUBLISHED → DRAFT 화살표 제거 + "사용자 직접 작성" 제거 — 04번 § 7.4 INVALID_STATUS_TRANSITION 정책 정합) |
 
 ---
 
@@ -614,13 +615,14 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 | 토픽 | Producer | Consumer | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject | DLQ 토픽 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `user.activity.tracked` | BFF Aggregator | Journal Service | `user_id`, `activity_type`, `passage`, `occurred_at` | `{user_id}:{activity_type}:{occurred_at}` | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
+| `user.activity.tracked` | BFF Aggregator | Journal Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
 | `user.deactivated` | Auth Service | AI, Journal | `user_id`, `deactivated_at` | `user.deactivated:{user_id}` | `user.deactivated-value` | `user.deactivated.DLQ` |
 | `ai.session.completed` | AI Service | Journal Service | `session_id`, `user_id`, `passage`, `final_step`, `summary` | `ai.session.completed:{session_id}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
 | `journal.created` | Journal Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journal_id}` | `journal.created-value` | `journal.created.DLQ` |
 | `journal.updated` | Journal Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journal_id}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
 | `journal.deleted` | Journal Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journal_id}` | `journal.deleted-value` | `journal.deleted.DLQ` |
 | `notification.requested` | (다수 서비스) | Notification Aggregator (BFF의 일부) | `user_id`, `type`, `payload` | `{type}:{user_id}:{occurred_at}` | `notification.requested-value` | `notification.requested.DLQ` |
+| **`journal.creation.failed`** ⭐v1.2 | **Journal Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{session_id}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
 
 > **Schema Registry:** Confluent Schema Registry 또는 Apicurio Registry를 W1 Lock-in 3번에서 셋업. 모든 토픽은 위 `Schema Subject`로 등록. **검증 실패 메시지는 producer에서 reject** (DLQ 전송 X — DLQ는 컨슈머 처리 실패용).
 
@@ -628,16 +630,19 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 ```json
 {
-  "eventId": "evt_01HZX...",          // ULID, 멱등성 키 보강
+  "eventId": "evt_01HZX...",          // ULID, 메시지 식별자
   "eventType": "ai.session.completed",
   "eventVersion": 1,                   // 스키마 버전 (Schema Registry subject 버전과 일치)
   "schemaSubject": "ai.session.completed-value",  // Registry 검증
+  "idempotencyKey": "...",             // ⭐ v1.2 — 컨슈머 멱등성 키 (§ 6.1 표 형식)
   "occurredAt": "2026-05-26T14:30:00Z",
   "traceId": "trace_abc...",           // 분산 트레이싱 propagation
   "producerService": "ai-service",     // 디버깅·감사
   "data": { ... }                      // 토픽별 본문
 }
 ```
+
+> **`eventId` vs `idempotencyKey` (v1.2):** `eventId`는 메시지 단위 식별자(ULID, 매 발행마다 새로움). `idempotencyKey`는 비즈니스 의미 단위 (같은 사용자가 같은 분에 같은 구절을 읽으면 같은 키 → 컨슈머가 dedup). 둘 다 필수.
 
 **스키마 형식:** v1.0은 **JSON Schema** (Apicurio 기본). v1.1에 Avro 검토 (성능·압축 ↑).
 
@@ -742,23 +747,24 @@ stateDiagram-v2
 | ABANDONED | 무활동 폐기 | — | 배치 (24h 이상 무활동) |
 | COMPLETED_NO_JOURNAL | 완료했으나 Journal 생성 영구 실패 | — | Saga 보상 (§ 6.3) |
 
-### 7.6 JOURNALS.status
+### 7.6 JOURNALS.status (v1.2 정정 — 04번 § 7.4 정합)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT: AI 세션 완료로 자동 생성 또는 사용자 직접 작성
-    DRAFT --> PUBLISHED: 사용자 저장
-    PUBLISHED --> DRAFT: 사용자 편집 시작
-    PUBLISHED --> DELETED: 사용자 삭제 (Soft)
-    DRAFT --> DELETED: 사용자 삭제 (Soft)
+    [*] --> DRAFT: AI 세션 완료 컨슈머가 자동 생성 (POST /journals 없음 v1.0)
+    DRAFT --> PUBLISHED: 사용자 PATCH로 status='PUBLISHED' 전환
+    PUBLISHED --> DELETED: 사용자 DELETE (Soft)
+    DRAFT --> DELETED: 사용자 DELETE (Soft)
     DELETED --> [*]
 ```
 
 | 상태 | 설명 | 다음 상태 | 전이 트리거 |
 | --- | --- | --- | --- |
-| DRAFT | 임시 저장 | PUBLISHED, DELETED | — |
-| PUBLISHED | 정식 저장 | DRAFT (편집), DELETED | — |
-| DELETED | Soft 삭제 | (30일 후 hard delete 후보) | — |
+| DRAFT | 임시 저장 | PUBLISHED, DELETED | AI 세션 완료 컨슈머가 자동 생성 (`ai.session.completed:{session_id}` 멱등성 키) |
+| PUBLISHED | 정식 저장 | DELETED only | 사용자 PATCH. **PUBLISHED → DRAFT 금지 (04번 § 7.4 `INVALID_STATUS_TRANSITION` 422)** |
+| DELETED | Soft 삭제 | (30일 후 hard delete 후보) | 사용자 DELETE |
+
+> **v1.2 정정 사유:** v1.1까지는 다이어그램에 `PUBLISHED → DRAFT` 화살표 + "사용자 직접 작성"이 명시되어 있었으나 04번 § 7.1 (POST /journals 없음 v1.0) + § 7.4 (`INVALID_STATUS_TRANSITION` 422)와 모순. 04번을 정답으로 02번 정정. v1.1에 사용자가 발행 후 다시 편집하려면 새 PATCH로 `content`만 수정 가능 (status는 PUBLISHED 유지).
 
 ---
 
