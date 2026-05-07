@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 JPA Entity의 공통 필드(created_at, updated_at, version)는 모든 service가 공유. Maven artifact로 만들어서 의존성으로 가져오면 깔끔하지만 6주 시연에 별도 module + Maven Central publish 부담. 반면 6 service에 같은 코드를 6번 복사하면 변경 시 6 PR 필요.

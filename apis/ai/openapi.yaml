@@ -6,7 +6,7 @@ info:
     04번 § 6 본문 + 03번 § 3.3 신학 가드레일 정합.
   version: 1.0.0
   contact:
-    name: 이지윤 (AI Service Owner)
+    name: 강상민 (AI Service Owner)
     email: rkdxodh41@gmail.com
 servers:
   - url: http://qtai.local/api/v1

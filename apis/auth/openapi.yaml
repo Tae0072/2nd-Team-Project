@@ -6,7 +6,7 @@ info:
     04번 § 4 본문 + 05번 § 3·§ 4 보안 정합.
   version: 1.0.0
   contact:
-    name: 강상민 (Auth Service Owner)
+    name: 이지윤 (Auth Service Owner)
     email: rkdxodh41@gmail.com
 servers:
   - url: http://qtai.local/api/v1

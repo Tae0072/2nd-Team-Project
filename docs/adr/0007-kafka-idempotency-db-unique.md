@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 Kafka는 at-least-once delivery 모델. 같은 메시지가 2번 도착할 수 있음 (consumer 재시작 + offset 미확정 등). 1차 HMS는 application layer 중복 체크였는데 race condition 여지 있었음. MSA 풀스코프에서는 더 신뢰할 수 있는 방법 필요.

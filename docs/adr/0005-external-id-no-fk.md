@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 Database per Service에서 service 간 데이터 참조 (예: AI Service의 AI_SESSIONS.user_id가 Auth Service의 USERS.id를 가리킴)는 어떻게 표현해야 하는가? FK 제약을 걸면 schema 격리 위배 + 다른 service의 schema 변경에 따라 cascade 영향. 그러나 데이터 정합성은 필요.

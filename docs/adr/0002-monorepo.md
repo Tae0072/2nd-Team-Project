@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 MSA에서 service당 별도 git repo (polyrepo)로 가는 표준이 있지만 6명 6주 시연에는 cross-cutting 변경 (예: BaseEntity·event schema·ADR) 동기화 비용이 큼. 1차 HMS는 단일 repo였고 그게 협업에 도움됐음.

@@ -38,9 +38,9 @@
 | 담당자 | 역할 | 담당 |
 | --- | --- | --- |
 | **강태오** | Lead + DevOps 총괄 | BFF Aggregator + 공유 레이어 + Gateway + K8s/Helm/CI |
-| **강상민** | Auth Owner | Auth/User Service (JWT, OAuth) |
+| **이지윤** | Auth Owner | Auth/User Service (JWT, OAuth) |
 | **김태혁** | Bible Owner | Bible Service (다중 JOIN, Redis 캐시) |
-| **이지윤** | AI/RAG Owner | AI/RAG Service — **비즈니스 도메인 책임** (큐티 A~D 프롬프트, 신학 가드레일) |
+| **강상민** | AI/RAG Owner (팀 내 기술적 깊이 최고) | AI/RAG Service — RAG·SSE·프롬프트 인젝션 방어·신학 가드레일 (큐티 A~D 프롬프트) |
 | **이승욱** | Journal + Kafka Owner | Journal Service (이벤트 소싱, 컨슈머 멱등성) |
 | **김지민** | Flutter Owner | Flutter App (Sliver Sync Scroll, AI 대화, 알림) |
 

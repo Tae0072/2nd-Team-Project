@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 단일 DB는 운영 부담은 적지만 service 간 schema 변경 충돌이 잦음. 1차 HMS의 가장 큰 사고 중 하나가 \USERS\ 테이블 변경이 다른 도메인 모두를 깨뜨린 것. MSA 풀스코프에서는 schema 격리가 강제되어야 함.

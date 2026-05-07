@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 1차 프로젝트(HMS)는 단일 Spring Boot 모놀리스로 시작했지만 도메인이 커지면서 한 사람의 변경이 다른 도메인을 무너뜨리는 사고가 반복됨. 2차 프로젝트(QT-AI)는 6명이 6주 동안 동시에 6개 도메인을 작업해야 하므로 service 경계가 코드 분리·DB 분리 양쪽에 강제되어야 함.
@@ -22,9 +22,9 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 | --- | --- | --- |
 | Gateway | 강태오 | JWT 검증·라우팅·Rate Limit·X-User-Id strip |
 | BFF Aggregator | 강태오 | 4 service 병렬 호출·STOMP WS·대시보드 |
-| Auth Service | 강상민 | 회원·OAuth·JWT·Refresh Rotation |
+| Auth Service | 이지윤 | 회원·OAuth·JWT·Refresh Rotation |
 | Bible Service | 김태혁 | 성경 본문·BOOKS·KR_BIBLE |
-| AI Service | 이지윤 | 큐티 4단계·RAG·Anthropic |
+| AI Service | 강상민 | 큐티 4단계·RAG·Anthropic |
 | Journal Service | 이승욱 | 묵상 노트·이벤트 소싱·Saga 컨슈머 |
 
 각 service는 자체 DB schema 소유 (Database per Service — ADR-0003). FK 제약 없음 (ADR-0005). 외부 식별은 BIGINT user_id로만.

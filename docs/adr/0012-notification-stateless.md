@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 사용자 알림(예: AI 완료 → Journal 자동 생성됨)은 v1.0 시연에 어떻게 구현하는가? 별도 NOTIFICATION_LOG 테이블 + REST 조회 endpoint를 만들면 운영 부담 ↑. 그러나 알림은 사용자에게 보여줘야 함. WebSocket으로 실시간 전달이 가장 단순.

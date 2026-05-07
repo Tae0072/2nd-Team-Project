@@ -10,10 +10,10 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
-1차 HMS는 prompt를 코드에 하드코딩 → 변경 시 재배포 필요. AI 도메인은 prompt 튜닝이 곧 품질 — 자주 변경되는데 매번 배포는 부담. 또한 신학 가드레일이라는 도메인 특수성 때문에 검토 절차가 필요 (이지윤 owner — 09번 작성 예정).
+1차 HMS는 prompt를 코드에 하드코딩 → 변경 시 재배포 필요. AI 도메인은 prompt 튜닝이 곧 품질 — 자주 변경되는데 매번 배포는 부담. 또한 신학 가드레일이라는 도메인 특수성 때문에 검토 절차가 필요 (강상민 owner — 09번 작성 예정).
 
 ## Decision
 **PROMPT_TEMPLATES 테이블에 system prompt 저장** (02번 § 10):

@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 Soft Delete를 모든 테이블에 적용하면 데이터는 안전하지만 query 복잡도와 인덱스 크기가 늘어남. 1차 HMS는 모든 테이블에 deleted_at을 넣어서 일부 조회가 누락(deleted_at IS NULL 빠짐)되는 사고 발생. 어디에 적용할지 명확한 기준 필요.

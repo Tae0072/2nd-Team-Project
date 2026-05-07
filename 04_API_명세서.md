@@ -23,9 +23,9 @@
 1. [개요 · API 설계 정책](#1-개요--api-설계-정책)
 2. [공통 표준 (Cross-cutting Standards)](#2-공통-표준-cross-cutting-standards)
 3. [Gateway 라우팅 표](#3-gateway-라우팅-표)
-4. [Auth/User Service API](#4-authuser-service-api) — 강상민
+4. [Auth/User Service API](#4-authuser-service-api) — 이지윤
 5. [Bible Service API](#5-bible-service-api) — 김태혁
-6. [AI/RAG Service API](#6-airag-service-api) — 이지윤
+6. [AI/RAG Service API](#6-airag-service-api) — 강상민
 7. [Journal Service API](#7-journal-service-api) — 이승욱
 8. [BFF Aggregator API](#8-bff-aggregator-api) — 강태오
 9. [SSE (Server-Sent Events) 표준](#9-sse-server-sent-events-표준)
@@ -460,7 +460,7 @@ spring:
 
 ## 4. Auth/User Service API
 
-> **Owner:** 강상민 / **Base URL:** `http://auth-service.qtai.svc.cluster.local:8080` / **Public:** `https://api.qtai.app/api/v1/auth/...`
+> **Owner:** 이지윤 / **Base URL:** `http://auth-service.qtai.svc.cluster.local:8080` / **Public:** `https://api.qtai.app/api/v1/auth/...`
 >
 > **OpenAPI 파일:** `apis/auth/openapi.yaml`
 
@@ -811,7 +811,7 @@ Content-Type: application/json
 
 ## 6. AI/RAG Service API
 
-> **Owner:** 이지윤 / **Base URL:** `http://ai-service.qtai.svc.cluster.local:8080`
+> **Owner:** 강상민 / **Base URL:** `http://ai-service.qtai.svc.cluster.local:8080`
 >
 > **OpenAPI 파일:** `apis/ai/openapi.yaml`
 
@@ -1601,9 +1601,9 @@ info:
   version: 1.0.0
   description: |
     회원·JWT·OAuth Service.
-    Owner: 강상민
+    Owner: 이지윤
   contact:                          # ⭐ v1.1 — Spectral 룰 info-contact: error 통과용
-    name: 강상민 (Auth Service Owner)
+    name: 이지윤 (Auth Service Owner)
     email: kang.sangmin@example.com  # 임시; W0에 실제 contact로 교체
 servers:
   - url: https://api.qtai.app

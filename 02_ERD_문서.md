@@ -21,9 +21,9 @@
 ## 목차
 
 1. [데이터 아키텍처 개요](#1-데이터-아키텍처-개요)
-2. [Auth/User Service ERD](#2-authuser-service-erd) — 강상민
+2. [Auth/User Service ERD](#2-authuser-service-erd) — 이지윤
 3. [Bible Service ERD](#3-bible-service-erd) — 김태혁
-4. [AI/RAG Service ERD](#4-airag-service-erd) — 이지윤
+4. [AI/RAG Service ERD](#4-airag-service-erd) — 강상민
 5. [Journal Service ERD](#5-journal-service-erd) — 이승욱
 6. [서비스 간 연결 (Kafka 이벤트)](#6-서비스-간-연결-kafka-이벤트)
 7. [상태 코드 정의](#7-상태-코드-정의)
@@ -98,7 +98,7 @@
 
 ## 2. Auth/User Service ERD
 
-> **Owner:** 강상민 / **DB schema:** `auth_db` / **외부 노출 ID:** `users.id` (다른 서비스가 참조)
+> **Owner:** 이지윤 / **DB schema:** `auth_db` / **외부 노출 ID:** `users.id` (다른 서비스가 참조)
 
 ### 2.1 다이어그램
 
@@ -330,7 +330,7 @@ erDiagram
 
 ## 4. AI/RAG Service ERD
 
-> **Owner:** 이지윤 / **DB schema:** `ai_db` (메타·로그) + ChromaDB (벡터 스토어, § 10)
+> **Owner:** 강상민 / **DB schema:** `ai_db` (메타·로그) + ChromaDB (벡터 스토어, § 10)
 >
 > **비즈니스 책임:** 큐티 A~D형 프롬프트 설계 / 신학 가드레일 / RAG 출처 인용 강제
 
@@ -436,7 +436,7 @@ erDiagram
 - `idx_ai_turns_role` ON (role)
 - `idx_ai_turns_template_id` ON (used_prompt_template_id) — 프롬프트 버전별 회귀 분석
 
-> **신학 가드레일:** ASSISTANT 턴에 `rag_sources` 가 비어 있으면 PR 머지 금지 (이지윤 검수, [§ 10.3 환각 체크리스트](./01_프로젝트_계획서.md)).
+> **신학 가드레일:** ASSISTANT 턴에 `rag_sources` 가 비어 있으면 PR 머지 금지 (강상민 검수, [§ 10.3 환각 체크리스트](./01_프로젝트_계획서.md)).
 
 ---
 
@@ -961,7 +961,7 @@ CREATE TABLE users (
 
 ## 10. ChromaDB 벡터 스토어 (별도)
 
-> **Owner:** 이지윤 / **컨테이너:** AI Service와 같은 Pod 또는 별도 StatefulSet (W1 결정)
+> **Owner:** 강상민 / **컨테이너:** AI Service와 같은 Pod 또는 별도 StatefulSet (W1 결정)
 >
 > ChromaDB는 RDBMS가 아니므로 ERD가 아닌 **Collection 스키마**로 정의.
 
@@ -1003,7 +1003,7 @@ CREATE TABLE users (
 
 ### 10.3 RAG 출처 인용 표준 (신학 가드레일)
 
-> 이지윤 owner — 모든 ASSISTANT 턴은 인용한 ChromaDB 문서를 `AI_TURNS.rag_sources` JSON에 기록한다.
+> 강상민 owner — 모든 ASSISTANT 턴은 인용한 ChromaDB 문서를 `AI_TURNS.rag_sources` JSON에 기록한다.
 
 ```json
 {
@@ -1128,20 +1128,20 @@ bff-aggregator/src/main/java/com/qtai/bff/
 
 | # | 서비스 | 테이블 | Owner | 주요 외부 참조 (FK 제약 없음) | 주요 컬럼 변경 (v1.1) |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Auth | USERS | 강상민 | (외부 노출) | email 재가입 정책 |
-| 2 | Auth | REFRESH_TOKENS | 강상민 | users.id | — |
-| 3 | Auth | OAUTH_LINKS | 강상민 | users.id | — |
+| 1 | Auth | USERS | 이지윤 | (외부 노출) | email 재가입 정책 |
+| 2 | Auth | REFRESH_TOKENS | 이지윤 | users.id | — |
+| 3 | Auth | OAUTH_LINKS | 이지윤 | users.id | — |
 | 4 | Bible | BOOKS | 김태혁 | — | — |
 | 5 | Bible | KR_BIBLE | 김태혁 | books.id | — |
 | 6 | Bible | EN_BIBLE | 김태혁 | books.id | — |
 | 7 | Bible | COMMENTARIES | 김태혁 | books.id | — |
-| 8 | AI | PROMPT_TEMPLATES | 이지윤 | — | status DRAFT→EDITING |
-| 9 | AI | AI_SESSIONS | 이지윤 | (외부 참조) auth.users.id, bible.books.id | **summary 컬럼 추가** |
-| 10 | AI | AI_TURNS | 이지윤 | ai_sessions.id, prompt_templates.id | **used_prompt_template_id 추가, content MEDIUMTEXT, step nullable** |
+| 8 | AI | PROMPT_TEMPLATES | 강상민 | — | status DRAFT→EDITING |
+| 9 | AI | AI_SESSIONS | 강상민 | (외부 참조) auth.users.id, bible.books.id | **summary 컬럼 추가** |
+| 10 | AI | AI_TURNS | 강상민 | ai_sessions.id, prompt_templates.id | **used_prompt_template_id 추가, content MEDIUMTEXT, step nullable** |
 | 11 | Journal | JOURNALS | 이승욱 | (외부 참조) auth.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence 컬럼 추가** |
 | 12 | Journal | JOURNAL_EVENTS | 이승욱 | journals.id (유연 결합) | (journal_id, sequence) UNIQUE 추가 |
-| — | AI | (ChromaDB) commentary_embeddings | 이지윤 | bible.commentaries.id | — |
-| — | AI | (ChromaDB) dummy_paper_embeddings | 이지윤 | — | — |
+| — | AI | (ChromaDB) commentary_embeddings | 강상민 | bible.commentaries.id | — |
+| — | AI | (ChromaDB) dummy_paper_embeddings | 강상민 | — | — |
 
 **총 12개 RDBMS 테이블 + 2개 ChromaDB Collection**
 

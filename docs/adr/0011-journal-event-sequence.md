@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 ADR-0004 이벤트 소싱에서 동일 journal_id에 동시 PATCH가 들어오면 sequence 충돌 가능. 단순 \MAX(sequence)+1\은 race condition. UUID 기반 sequence는 정렬 X. 일관된 sequence 생성 + 동시성 안전이 필요.

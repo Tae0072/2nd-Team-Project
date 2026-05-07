@@ -10,7 +10,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-강상민, 김태혁, 이지윤, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
 
 ## Context
 USERS.email은 UNIQUE 제약. 탈퇴 시 row를 그대로 두면 같은 이메일로 재가입 X. row를 hard delete하면 이전 묵상 데이터 유실 (ADR-0006 위배). 사용자 가치(재가입 가능) + 데이터 보존 + UNIQUE 제약을 동시에 만족해야 함.
