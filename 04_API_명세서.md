@@ -1114,7 +1114,7 @@ data: [DONE]
 }
 ```
 
-> **변경 가능 필드:** `title`, `content`, `status` (DRAFT ↔ PUBLISHED). 다른 필드는 무시.
+> **변경 가능 필드:** `title`, `content`, `status` (DRAFT → PUBLISHED only — v1.2 정정). 다른 필드는 무시.
 
 **Response 200 OK:**
 ```json

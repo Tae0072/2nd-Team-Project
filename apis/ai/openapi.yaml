@@ -1,27 +1,330 @@
 openapi: 3.1.0
 info:
-  title: QT-AI AI Service
-  version: 0.1.0
+  title: QT-AI AI Service API
   description: |
-    Owner: 이지윤
-
-    ⚠️ **W0 placeholder** — info 블록만 있는 골격. W1 (5/18~22)에 이지윤이 endpoint·schema·example 작성 예정.
-    정답은 04번 § 6. 본 yaml은 그 박제를 OpenAPI로 변환한 것.
+    큐티 4단계 AI 대화·RAG·Anthropic 호출 service.
+    04번 § 6 본문 + 03번 § 3.3 신학 가드레일 정합.
+  version: 1.0.0
   contact:
     name: 이지윤 (AI Service Owner)
-    email: TBD@example.com
+    email: rkdxodh41@gmail.com
 servers:
-  - url: https://api.qtai.app
-    description: Production (via Gateway)
+  - url: http://qtai.local/api/v1
+    description: dev (Minikube)
   - url: http://localhost:4013
-    description: Local Prism mock (ai)
+    description: Prism mock (W1 Lock-in)
 tags:
   - name: ai
-paths: {}
+    description: AI 큐티 세션·턴
+paths:
+  /ai/sessions:
+    post:
+      tags: [ai]
+      operationId: createAiSession
+      summary: AI 세션 시작
+      description: |
+        구절 기반 큐티 4단계(A→B→C→D) 세션 생성.
+        본인 user_id로만 가능 (X-User-Id Gateway 검증).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCreateRequest'
+            examples:
+              standard:
+                value:
+                  passage: { bookCode: GEN, chapter: 1, verse: 1 }
+                  initialStep: A
+      responses:
+        '201':
+          description: 세션 생성
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+        '400':
+          description: 잘못된 passage 또는 step
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '401':
+          description: 인증 실패
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '429':
+          description: 60 req/min 또는 동시 SSE 3개 초과 (LLM 비용 보호)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /ai/sessions/{sessionId}:
+    get:
+      tags: [ai]
+      operationId: getAiSession
+      summary: AI 세션 조회
+      description: 본인 세션만 조회 가능 (자원 소유자 검증 — 05번 § 4.2)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: integer, format: int64, minimum: 1 }
+      responses:
+        '200':
+          description: 세션 + 모든 turn 목록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionDetailResponse'
+        '401':
+          description: 인증 실패
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 본인 세션 아님 (IDOR)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: 세션 없음
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /ai/sessions/{sessionId}/turns:
+    post:
+      tags: [ai]
+      operationId: createSessionTurn
+      summary: 사용자 턴 + AI 응답 (SSE)
+      description: |
+        사용자 메시지 보내고 AI 응답을 SSE 스트림으로 받음.
+        04번 § 6.3 SSE 표준 (event: token / turn_completed / error / end).
+        Gateway는 SSE buffering filter 안 적용 (04번 § 9.6).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TurnCreateRequest'
+      responses:
+        '200':
+          description: SSE 스트림 시작
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: |
+                  Server-Sent Events. 4 종류 이벤트:
+                  - event: token (data: { text: string })
+                  - event: turn_completed (data: { turnId: int, ragSources: [...] })
+                  - event: error (data: { code: string, message: string })
+                  - event: end (data: [DONE])
+              examples:
+                stream:
+                  value: |
+                    event: token
+                    data: {"text":"창조"}
+
+                    event: token
+                    data: {"text":"의 의미는 "}
+
+                    event: turn_completed
+                    data: {"turnId":33,"ragSources":[{"docId":"rag-001","relevance":0.92}]}
+
+                    event: end
+                    data: [DONE]
+        '400':
+          description: 빈 메시지·step 누락
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '401':
+          description: 인증 실패
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 본인 세션 아님
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '503':
+          description: Anthropic API 장애 (04번 § 6.3)
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '504':
+          description: Anthropic 응답 timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+  /ai/sessions/{sessionId}/abandon:
+    post:
+      tags: [ai]
+      operationId: abandonAiSession
+      summary: 세션 중단 (사용자가 그만하기)
+      description: status를 ABANDONED로 변경. 진행 중 SSE는 cancel.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '204':
+          description: 중단 완료
+        '401':
+          description: 인증 실패
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '403':
+          description: 본인 세션 아님
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '409':
+          description: 이미 종료된 세션
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  schemas: {}
+  schemas:
+    SessionCreateRequest:
+      type: object
+      required: [passage, initialStep]
+      properties:
+        passage:
+          $ref: '#/components/schemas/PassageRef'
+        initialStep:
+          type: string
+          enum: [A, B, C, D]
+          default: A
+
+    PassageRef:
+      type: object
+      required: [bookCode, chapter, verse]
+      properties:
+        bookCode: { type: string, pattern: '^[A-Z0-9]{3}$' }
+        chapter: { type: integer, minimum: 1 }
+        verse: { type: integer, minimum: 1 }
+
+    SessionResponse:
+      type: object
+      required: [id, userId, passage, currentStep, status, startedAt]
+      properties:
+        id: { type: integer, format: int64 }
+        userId: { type: integer, format: int64 }
+        passage: { $ref: '#/components/schemas/PassageRef' }
+        currentStep: { type: string, enum: [A, B, C, D] }
+        status:
+          type: string
+          enum: [IN_PROGRESS, COMPLETED, COMPLETED_NO_JOURNAL, ABANDONED]
+        startedAt: { type: string, format: date-time }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    SessionDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/SessionResponse'
+        - type: object
+          properties:
+            turns:
+              type: array
+              items:
+                $ref: '#/components/schemas/Turn'
+
+    TurnCreateRequest:
+      type: object
+      required: [step, content]
+      properties:
+        step: { type: string, enum: [A, B, C, D] }
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+
+    Turn:
+      type: object
+      required: [id, sessionId, role, step, content, createdAt]
+      properties:
+        id: { type: integer, format: int64 }
+        sessionId: { type: integer, format: int64 }
+        role:
+          type: string
+          enum: [USER, ASSISTANT]
+        step: { type: string, enum: [A, B, C, D] }
+        content: { type: string }
+        ragSources:
+          type: array
+          description: ASSISTANT 턴에 RAG 출처 (03번 § 3.3 강제)
+          items:
+            type: object
+            properties:
+              docId: { type: string }
+              relevance: { type: number, minimum: 0, maximum: 1 }
+        createdAt: { type: string, format: date-time }
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 (04번 § 2.4)
+      required: [type, title, status, code, instance]
+      properties:
+        type: { type: string, format: uri }
+        title: { type: string }
+        status: { type: integer }
+        code:
+          type: string
+          enum:
+            - UNAUTHORIZED
+            - TOKEN_EXPIRED
+            - VALIDATION_FAILED
+            - SESSION_NOT_FOUND
+            - SESSION_NOT_OWNED
+            - SESSION_ALREADY_TERMINATED
+            - INVALID_STEP_TRANSITION
+            - LLM_UNAVAILABLE
+            - LLM_TIMEOUT
+            - PROMPT_INJECTION_DETECTED
+            - RAG_SOURCES_REQUIRED
+            - RATE_LIMITED
+        detail: { type: string }
+        instance: { type: string }
+        traceId: { type: string, pattern: '^[0-9a-f]{32}$' }
+
+security:
+  - bearerAuth: []

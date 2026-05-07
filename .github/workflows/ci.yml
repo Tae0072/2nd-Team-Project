@@ -1,14 +1,11 @@
-# QT-AI CI/CD — W0 placeholder
+# QT-AI CI/CD — 본격 5 jobs (06번 § 3.3 박제 정합)
 #
-# ⚠️ W0 placeholder — W1 (5/18~22)에 강태오가 본격 작성.
-# 03번 § 10 + 04번 § 11.4 박제대로 구현 예정.
-#
-# 단계 (참고):
-#   1. lint   — gitleaks + Spotless + Spectral (apis/*/openapi.yaml)
-#   2. test   — JUnit 5 + Testcontainers (cp-kafka 7.6+)
-#   3. build  — Gradle multi-module
-#   4. image  — Docker buildx → ghcr.io/tae0072/{service}:{sha}
-#   5. helm   — helm lint + helm template
+# 단계:
+#   1. lint   — gitleaks + Spotless + Spectral + Helm lint
+#   2. test   — JUnit 5 + Testcontainers + OWASP Dependency-Check
+#   3. build  — Gradle multi-module bootJar
+#   4. image  — Docker buildx → ghcr.io (push 시만, matrix 6 service)
+#   5. deploy-dev — helm upgrade --install (develop 머지 시만)
 
 name: CI/CD
 
@@ -19,7 +16,146 @@ on:
     branches: [develop]
 
 jobs:
-  placeholder:
+
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "W0 placeholder — W1에 강태오가 lint/test/build/image/helm 작성"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # gitleaks가 history 검사
+
+      - name: Gitleaks (시크릿 탐지)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Spectral (OpenAPI lint)
+        run: |
+          npm install -g @stoplight/spectral-cli@^6
+          for spec in apis/*/openapi.yaml; do
+            echo "Linting $spec"
+            npx spectral lint "$spec" --ruleset .spectral.yaml || exit 1
+          done
+
+      # Spotless·Helm lint는 W1에 Gradle 설정 + helm Chart 본문 작성 후 활성화
+      # - name: Spotless (Java 코드 스타일)
+      #   uses: gradle/gradle-build-action@v3
+      #   with:
+      #     arguments: spotlessCheck
+      # - name: Helm lint
+      #   run: |
+      #     helm lint ./helm/qtai-umbrella --values ./helm/qtai-umbrella/values-dev.yaml
+      #     helm lint ./helm/qtai-infra
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/gradle-build-action@v3
+
+      # W1에 Gradle 모듈 본격 작성 후 활성화
+      # - name: 단위 + 통합 테스트
+      #   run: ./gradlew test integrationTest
+      # - name: OWASP Dependency-Check
+      #   run: ./gradlew dependencyCheckAggregate
+      # - name: Test Report Upload
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-reports
+      #     path: '**/build/reports/'
+
+      - name: Placeholder (W1 Gradle 본격 작성 전)
+        run: echo "test job - W1 (5/18~22)에 Gradle 모듈 6개 작성 후 활성화"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: gradle/gradle-build-action@v3
+
+      # W1에 Gradle 모듈 본격 작성 후 활성화
+      # - run: ./gradlew bootJar
+      # - name: Build artifact upload
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: jars
+      #     path: '**/build/libs/*.jar'
+
+      - name: Placeholder (W1 Gradle 본격 작성 전)
+        run: echo "build job - W1에 활성화"
+
+  image:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'    # PR에서는 이미지 빌드 X
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        service: [gateway, bff-aggregator, auth-service, bible-service, ai-service, journal-service]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # W1에 Dockerfile 6 service 본격 작성 후 활성화
+      # - name: Build + Push (${{ matrix.service }})
+      #   uses: docker/build-push-action@v5
+      #   with:
+      #     context: ${{ matrix.service }}
+      #     file: ${{ matrix.service }}/Dockerfile
+      #     push: true
+      #     tags: |
+      #       ghcr.io/tae0072/qtai-${{ matrix.service }}:${{ github.sha }}
+      #       ghcr.io/tae0072/qtai-${{ matrix.service }}:latest
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+
+      - name: Placeholder (W1 Dockerfile 본격 작성 전)
+        run: echo "image job (${{ matrix.service }}) - W1에 활성화"
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    needs: image
+    if: github.ref == 'refs/heads/develop'
+    environment: dev
+    steps:
+      - uses: actions/checkout@v4
+
+      # W1에 helm Chart 본문 + KUBECONFIG_DEV secret 적재 후 활성화
+      # - name: kubeconfig 설정
+      #   run: |
+      #     mkdir -p ~/.kube
+      #     echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > ~/.kube/config
+      #     chmod 600 ~/.kube/config
+      # - name: helm upgrade --install
+      #   run: |
+      #     helm upgrade --install qtai ./helm/qtai-umbrella \
+      #       --namespace qtai \
+      #       --values ./helm/qtai-umbrella/values.yaml \
+      #       --values ./helm/qtai-umbrella/values-dev.yaml \
+      #       --set image.tag=${{ github.sha }} \
+      #       --atomic --timeout 5m \
+      #       --wait
+      # - name: 배포 검증 (smoke test)
+      #   run: |
+      #     for svc in gateway auth bible ai journal bff-aggregator; do
+      #       kubectl wait --for=condition=Available --timeout=120s \
+      #         deployment/$svc -n qtai
+      #     done
+
+      - name: Placeholder (W1 Helm Chart + KUBECONFIG_DEV secret 적재 전)
+        run: echo "deploy-dev job - W1 (5/18~22)에 활성화"

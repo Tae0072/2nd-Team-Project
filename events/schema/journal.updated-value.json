@@ -1,7 +1,73 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "journal.updated-value",
-  "description": "W0 placeholder. W1에 owner가 본문 작성. 02번 § 6.1 + 03번 § 7.2 정답.",
+  "description": "묵상 노트 변경 이벤트 (이벤트 소싱 — 02번 § 5 + ADR-0011).",
   "type": "object",
-  "_TODO": "Apicurio Schema Registry에 등록할 정식 JSON Schema는 W1에 작성"
+  "required": [
+    "eventId", "eventType", "eventVersion", "schemaSubject",
+    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "이벤트 고유 ID (UUID v4 또는 ULID)"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "journal.updated",
+      "description": "이벤트 타입 (Kafka topic 명과 동일)"
+    },
+    "eventVersion": {
+      "type": "string",
+      "pattern": "^v\\d+$",
+      "description": "이벤트 schema 버전 (예: v1)"
+    },
+    "schemaSubject": {
+      "type": "string",
+      "const": "journal.updated-value",
+      "description": "Schema Registry subject 명"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "pattern": "^journal\\.update:[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "이벤트 발생 시각 (ISO 8601)"
+    },
+    "traceId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "W3C Trace Context trace_id (분산 추적용)"
+    },
+    "producerService": {
+      "type": "string",
+      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
+      "description": "이벤트 발행 서비스명"
+    },
+    "data": {
+      "type": "object",
+      "required": ["journalId", "userId", "sequence", "eventType", "occurredAt"],
+      "additionalProperties": false,
+      "properties": {
+        "journalId": { "type": "integer", "minimum": 1 },
+        "userId": { "type": "integer", "minimum": 1 },
+        "sequence": { "type": "integer", "minimum": 1, "description": "이벤트 sequence — 02번 § 5.4 last_event_sequence + SELECT FOR UPDATE" },
+        "eventType": {
+          "type": "string",
+          "enum": ["TITLE_CHANGED", "CONTENT_CHANGED", "STATUS_CHANGED"]
+        },
+        "payload": {
+          "type": "object",
+          "description": "eventType에 따른 변경 내용",
+          "additionalProperties": true
+        },
+        "occurredAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
 }

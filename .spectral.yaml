@@ -1,14 +1,22 @@
 extends:
   - "spectral:oas"
 rules:
-  # 모든 endpoint operationId 필수
+  # 모든 endpoint operationId 필수 (Spectral OAS 내장)
   operation-operationId: error
 
-  # 모든 endpoint summary 필수
+  # 모든 endpoint description 필수 (Spectral OAS 내장)
   operation-description: warn
-  operation-summary: error
 
-  # 모든 4xx/5xx 응답에 application/problem+json 사용 (v1.1 truthy 함수)
+  # 모든 endpoint summary 필수 — Spectral OAS 내장 룰에 없으므로 사용자 정의로 작성
+  operation-summary-required:
+    description: 모든 operation에 summary 필수 (04번 § 1.5)
+    severity: error
+    given: $.paths[*][get,post,put,patch,delete]
+    then:
+      field: summary
+      function: truthy
+
+  # 모든 4xx/5xx 응답에 application/problem+json 사용 (04번 § 2.4 RFC 9457)
   problem-json-on-errors:
     description: 4xx/5xx 응답은 application/problem+json + ProblemDetail 사용
     severity: error
@@ -17,7 +25,7 @@ rules:
       field: "application/problem+json"
       function: truthy
 
-  # 인증 필요 endpoint는 security 명시
+  # 인증 필요 endpoint는 security 명시 (Spectral OAS 내장)
   operation-security-defined: error
 
   # snake_case 금지 (응답 본문 필드는 camelCase)
@@ -30,8 +38,5 @@ rules:
       functionOptions:
         match: '^[a-z][a-zA-Z0-9]*$'
 
-  # 모든 schema에 example 권장
-  schema-example: warn
-
-  # contact 정보 (info.contact) 필수
+  # contact 정보 (info.contact) 필수 (Spectral OAS 내장)
   info-contact: error

@@ -1,7 +1,77 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "notification.requested-value",
-  "description": "W0 placeholder. W1에 owner가 본문 작성. 02번 § 6.1 + 03번 § 7.2 정답.",
+  "description": "사용자 알림 요청 이벤트 — BFF Aggregator가 STOMP로 전달 (03번 § 1.1 + 04번 § 10.2 + ADR-0012).",
   "type": "object",
-  "_TODO": "Apicurio Schema Registry에 등록할 정식 JSON Schema는 W1에 작성"
+  "required": [
+    "eventId", "eventType", "eventVersion", "schemaSubject",
+    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "이벤트 고유 ID (UUID v4 또는 ULID)"
+    },
+    "eventType": {
+      "type": "string",
+      "const": "notification.requested",
+      "description": "이벤트 타입 (Kafka topic 명과 동일)"
+    },
+    "eventVersion": {
+      "type": "string",
+      "pattern": "^v\\d+$",
+      "description": "이벤트 schema 버전 (예: v1)"
+    },
+    "schemaSubject": {
+      "type": "string",
+      "const": "notification.requested-value",
+      "description": "Schema Registry subject 명"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "pattern": "^[A-Z_]+:[0-9]+:[0-9TZ:.\\-]+$",
+      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "이벤트 발생 시각 (ISO 8601)"
+    },
+    "traceId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$",
+      "description": "W3C Trace Context trace_id (분산 추적용)"
+    },
+    "producerService": {
+      "type": "string",
+      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
+      "description": "이벤트 발행 서비스명"
+    },
+    "data": {
+      "type": "object",
+      "required": ["notificationId", "userId", "type", "requestedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "notificationId": { "type": "string", "description": "알림 ID (ULID)" },
+        "userId": { "type": "integer", "minimum": 1, "description": "수신 대상 — BFF Aggregator가 user_id 격리 (ADR-0012)" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "JOURNAL_AUTO_CREATED",
+            "JOURNAL_CREATION_FAILED",
+            "AI_SESSION_TIMEOUT",
+            "SYSTEM_NOTICE"
+          ]
+        },
+        "payload": {
+          "type": "object",
+          "description": "type에 따른 알림 내용",
+          "additionalProperties": true
+        },
+        "requestedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
 }
