@@ -67,6 +67,20 @@
 - STOMP CONNECT 인증 검증 (BFF 측) → 04번 § 10.2
 - AI 프롬프트 운영 → 09번 (이지윤 강상민 페어 — 별도 작성 예정)
 
+**v1.0 시연 범위 매트릭스 (Android 우선):**
+
+| 항목 | v1.0 (6/17 발표) | v1.1 (Q3 검토) |
+| --- | --- | --- |
+| 대상 OS | **Android 우선** (Android 7.0 / API 24+) | iOS 14+ 추가 |
+| 화면 | 5개 핵심 (대시보드·AI 대화·입체 묵상·노트 작성·알림) | + 설정·통계·history |
+| 인증 | JWT + Google OAuth | + Apple Sign-In (iOS 출시 시) |
+| 오프라인 | ❌ (네트워크 필수) | 부분 캐시 (Bible 본문) |
+| 다크 모드 | ❌ (라이트 only) | 라이트/다크 토글 |
+| 다국어 | ❌ (한국어 only) | 영어 ARB 추가 |
+| 푸시 알림 | ❌ (앱 켜진 동안만 STOMP) | FCM (Firebase Cloud Messaging) |
+
+**근거 — Android 우선:** 6주 시연 일정에 iOS 인증·App Store Review·Apple Developer Program(USD 99/yr) 부담 ↑. 대학생 데모 환경은 Android emulator 100% 관외. iOS는 v1.1에 검토 (§ 14.4).
+
 ### 1.2 1차(HMS) 프론트엔드 패턴 분석 — 무엇을 차단하는가
 
 | 1차 사고 패턴 | 본질적 원인 | 2차 가드레일 |
@@ -421,6 +435,17 @@ Future<List<Journal>> journalList(JournalListRef ref) async {
 }
 ```
 
+### 4.6 자주 빠지는 함정 메트릭스
+
+| 함정 | 증상 | 원인 | 해결 |
+| --- | --- | --- | --- |
+| `setState` 호출 | 화면 일부 안 그려짐 | Riverpod 프로젝트에서 StatefulWidget setState 사용 | `ConsumerStatefulWidget` + `ref.read().notifier.method()` 으로 전환 |
+| `ref.watch` vs `ref.read` 혼동 | 불필요한 rebuild | build 밖에서 watch 호출 | build안에서만 watch, 콜백(onPressed 등)에서는 read |
+| Provider 의존 cycle | runtime crash | `aProvider → bProvider → aProvider` | DI 구조 재설계 — core/di/providers.dart에서 단방향 그래프 계수 |
+| `AsyncValue.error` 무시 | 에러 상황 표시 안 됨 | `state.when(error: ..., data: ...)` 에서 생략 | 모든 when에 error/loading/data 3상태 모두 처리 (§ 12 참조) |
+| `keepAlive: true` 남발 | 메모리 누수 | 잠시 쓰고 잊은 Provider에 keepAlive | `dioProvider`·`stompClientProvider`·`notificationsStreamProvider`만 keepAlive |
+| Provider family 인자 변경 | 매번 새 instance | family 인자가 record 아닌 Map | record `({String book, int ch})` 또는 freezed equatable 객체로 전달 |
+
 ---
 
 ## 5. 라우팅 — go_router
@@ -564,6 +589,27 @@ Dio dio(DioRef ref) {
   return dio;
 }
 ```
+
+**인터셉터 체이닝 흐름 (⚠️ 순서 주의):**
+
+```
+Request 흐름:
+  TraceInterceptor.onRequest    → W3C traceparent 헤더 생성 (§ 6.4.1)
+  AuthInterceptor.onRequest     → Authorization 헤더 첨부
+  LogInterceptor.onRequest      → 로그 (Authorization 마스킹)
+
+Response 흐름 (역순):
+  LogInterceptor.onResponse
+  AuthInterceptor.onResponse    (no-op)
+  TraceInterceptor.onResponse   (no-op)
+
+Error 흐름 (역순):
+  LogInterceptor.onError
+  AuthInterceptor.onError       → 401 시 Refresh + retry (§ 6.4)
+  TraceInterceptor.onError
+```
+
+> **⚠️ 입력 순서 주의:** TraceInterceptor가 AuthInterceptor보다 먼저 `add` 되어야 요청 시 traceparent가 먼저 생성되고, 에러 시 역순으로 AuthInterceptor의 401 retry가 TraceInterceptor보다 먼저 실행됨. 수동 재시도 완료 후에도 traceparent는 동일하게 유지되어야 분산 추적이 일관됨.
 
 ### 6.2 Retrofit 인터페이스 — API 계약 자동 생성
 
@@ -730,6 +776,50 @@ class AuthInterceptor extends QueuedInterceptor {
 - `QueuedInterceptor` 사용 — 동시 401 응답이 와도 onError는 큐로 직렬 처리
 - `synchronized`로 refresh를 1회만 실행 — race condition 차단 (1차 사고 패턴 방어)
 - `_retried` extra flag로 무한 재시도 차단
+
+#### 6.4.1 TraceInterceptor — W3C Trace Context 자동 생성
+
+분산 추적은 Flutter 요청이 Gateway → BFF → 4 service → Kafka envelope까지 **같은 traceId로 연결**되어야 Tempo에서 전 구간 span tree로 조회 가능. Flutter가 요청 마다 W3C traceparent 헤더를 생성해서 보내야 함.
+
+```dart
+// lib/core/network/trace_interceptor.dart
+import 'dart:math';
+import 'package:dio/dio.dart';
+
+class TraceInterceptor extends Interceptor {
+  static final _random = Random.secure();
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    // W3C traceparent: version-trace_id-span_id-flags
+    final traceId = _hex(16);  // 32 hex chars
+    final spanId = _hex(8);    // 16 hex chars
+    options.headers['traceparent'] = '00-$traceId-$spanId-01';
+    options.extra['traceId'] = traceId;
+    handler.next(options);
+  }
+
+  String _hex(int bytes) {
+    final buf = StringBuffer();
+    for (var i = 0; i < bytes; i++) {
+      buf.write(_random.nextInt(256).toRadixString(16).padLeft(2, '0'));
+    }
+    return buf.toString();
+  }
+}
+```
+
+Dio Provider에 등록:
+
+```dart
+dio.interceptors.add(TraceInterceptor());           // 1. traceparent 먼저
+dio.interceptors.add(AuthInterceptor(ref));         // 2. Authorization
+dio.interceptors.add(LogInterceptor(...));          // 3. 로그
+```
+
+**사용 시나리오:**
+- 사용자가 "AI 답변이 이상해요" 신고 → Sentry에 필수로 traceId 포함 (§ 15.3) → 운영자가 Tempo에서 해당 traceId 검색 → Flutter→Gateway→BFF→AI Service→Anthropic 전 구간 로그 1회 조회.
+- 06번 § 12와 정합 (W3C Trace Context 표준).
 
 ### 6.5 ProblemDetail 매핑
 
@@ -1794,6 +1884,20 @@ PATCH 시 status 전이 검증: DRAFT → PUBLISHED만 허용 (04번 § 7.4 v1.2
 ---
 
 ## 11. UI 디자인 시스템·테마·국제화
+
+### 11.0 디자인 원칙 5개 (위반 시 결과 명시)
+
+디자인 토큰·폰트·간격을 결정하기 전에 5개 원칙에 동의. 이 원칙을 위반하는 구현은 PR 거절.
+
+| 원칙 | 의미 | 위반 시 결과 |
+| --- | --- | --- |
+| **읽기 가독성 우선** | 본 앱은 묵상 도구 — 폰트·줄간격·여백이 시각적 피로 직접 영향 | 사용자 이탈 |
+| **상태 변화 즉시 반영** | API 응답 → UI 업데이트는 200ms 이내 (Riverpod `AsyncValue`) | "버튼 눌렀는데 반응 없는 앱" |
+| **에러는 친절하게** | RFC 9457 `code` → 한국어 사용자 메시지 매핑 (`detail` 직접 노출 X) | 기술 용어 노출 |
+| **재시도는 명시적** | 네트워크 에러 시 자동 retry는 idempotent endpoint(GET·PUT·DELETE)만. POST는 사용자 버튼 | 중복 결제·중복 노트 생성 |
+| **로딩 상태 명시** | API 호출 시 skeleton 또는 progress indicator 필수. 빈 화면 X | "앱이 멈춘 줄 앜" |
+
+본 원칙은 § 4.4 (`AsyncValue.when(loading/error/data)` 표준) + § 11.4 (`ErrorView`·`LoadingIndicator`·`EmptyState` 공통 위젯) + § 12 (자동 vs 수동 재시도)에서 설계 수준으로 구현됨.
 
 ### 11.1 디자인 토큰 — Material 3 기반
 
