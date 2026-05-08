@@ -5,7 +5,7 @@
 > **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.2](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.2](./03_아키텍처_정의서.md) / [04_API_명세서 v1.2](./04_API_명세서.md) / [05_보안_명세서 v1.0](./05_보안_명세서.md) / [06_DevOps_운영_매뉴얼 v1.0](./06_DevOps_운영_매뉴얼.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md)
 > **owner:** 김지민 (Frontend Flutter Owner)
 > **Frontend 키워드:** Flutter 3.x · Dart 3.x · Riverpod 2.x · go_router · Dio + Retrofit · freezed · flutter_secure_storage · stomp_dart_client · dio_sse 또는 직접 SSE · Material 3 · go_router_builder · GetIt(선택) · flutter_localizations
-> **W1 Lock-in 산출물:** 본 문서 + lutter-app/ 프로젝트 골격 + Riverpod 표준 Provider 1개 + Dio Interceptor (JWT·Refresh·ProblemDetail) + 5 화면 라우팅 골격 + secure_storage 키 표준 + lutter test 통과
+> **W1 Lock-in 산출물:** 본 문서 + flutter-app/ 프로젝트 골격 + Riverpod 표준 Provider 1개 + Dio Interceptor (JWT·Refresh·ProblemDetail) + 5 화면 라우팅 골격 + secure_storage 키 표준 + flutter test 통과
 > **목적:** 1차(HMS)의 핵심 실패 패턴 — **Mustache SSR + jQuery 혼재로 화면 상태 추적 불가, 토큰 보관·갱신 표준 없음, 백엔드 변경 시 클라이언트 깨짐** — 을 본질적으로 차단. 6명이 4 service 백엔드를 작업하는 동안 김지민 1명이 Flutter 모바일을 단독으로 풀스코프 구현. 표준 패턴 위에서 비슷 실력으로도 5 화면 + SSE + STOMP + JWT + 입체 묵상까지 완성 가능하도록 박제.
 
 ---
@@ -120,7 +120,7 @@
 | Target Android SDK | **API 34 (Android 14)** | Google Play 정책 (2025년 8월부터 API 34 강제) |
 | Min iOS | **iOS 14** | flutter_secure_storage·stomp_dart_client 모두 호환 |
 
-> **W0 Lock-in:** 본 버전 외 다른 SDK 사용 X. lutter --version 결과를 lutter-app/.fvmrc 또는 README에 박제. 김지민이 fvm(Flutter Version Manager)로 버전 고정.
+> **W0 Lock-in:** 본 버전 외 다른 SDK 사용 X. flutter --version 결과를 flutter-app/.fvmrc 또는 README에 박제. 김지민이 fvm(Flutter Version Manager)로 버전 고정.
 
 ### 2.2 핵심 패키지 결정 표
 
@@ -151,7 +151,7 @@
 
 W1 시작 시 김지민이 다음을 1회 실행:
 
-`ash
+`bash
 flutter pub deps --json > deps.json
 flutter pub outdated  # 오래된 패키지 확인
 `
@@ -164,7 +164,7 @@ flutter pub outdated  # 오래된 패키지 확인
 
 ### 3.1 폴더 구조 — feature 단위 분리
 
-lutter-app/ 프로젝트는 **feature 단위로 분리** (auth, dashboard, passage, ai_session, journal). 각 feature 안에 layer (data·domain·presentation) 분리. 1차 HMS의 "controller·service·dao 묶음" 패턴 반복 X — feature 간 격리가 service 격리와 자연스럽게 매칭.
+flutter-app/ 프로젝트는 **feature 단위로 분리** (auth, dashboard, passage, ai_session, journal). 각 feature 안에 layer (data·domain·presentation) 분리. 1차 HMS의 "controller·service·dao 묶음" 패턴 반복 X — feature 간 격리가 service 격리와 자연스럽게 매칭.
 
 `
 flutter-app/
@@ -263,11 +263,11 @@ flutter-app/
 | **domain** | freezed 모델·Repository interface(선택) | (의존 X — 순수 Dart) |
 | **data** | API 클라이언트·DTO·Repository 구현 | domain만 의존 |
 
-> **ArchUnit 같은 검증은 Flutter에 없지만**, dart analyze + nalysis_options.yaml의 import 규칙으로 강제 가능. 또는 PR 리뷰 체크리스트에 명시 (§ 16).
+> **ArchUnit 같은 검증은 Flutter에 없지만**, dart analyze + analysis_options.yaml의 import 규칙으로 강제 가능. 또는 PR 리뷰 체크리스트에 명시 (§ 16).
 
 ### 3.3 import 규칙 (ArchUnit 대용)
 
-nalysis_options.yaml에 다음을 추가 — dart analyze 시 import 위반 즉시 발견:
+analysis_options.yaml에 다음을 추가 — dart analyze 시 import 위반 즉시 발견:
 
 `yaml
 analyzer:
