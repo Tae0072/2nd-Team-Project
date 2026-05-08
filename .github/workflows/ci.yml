@@ -1,4 +1,4 @@
-﻿name: QT-AI CI
+name: QT-AI CI
 
 on:
   push:
@@ -180,6 +180,12 @@ jobs:
         if: steps.ai-check.outputs.exists == 'true'
         working-directory: ai-service
         run: ruff check .
+
+      - name: mypy type check
+        if: steps.ai-check.outputs.exists == 'true'
+        working-directory: ai-service
+        run: mypy . --ignore-missing-imports --python-version 3.11
+
 
   # ────────────────────────────────────────────────────
   # CI Summary Gate — 모든 Job 통과해야 PR 머지 가능
