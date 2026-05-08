@@ -1,14 +1,28 @@
-// QT-AI 모노레포 Gradle multi-module 골격 (W0 placeholder)
-//
-// ⚠️ W0 placeholder — W1 (5/18~22)에 강태오가 본격 작성.
-// 03번 § 12 (기술 스택) + § 13 (패키지 구조) 박제대로 구현 예정.
+﻿rootProject.name = "qt-ai"
 
-rootProject.name = "qt-ai"
+// ─── Spring Boot 서비스 모듈 (5개) ───────────────────────────────
+include("gateway-service")
+include("auth-service")
+include("bible-service")
+include("bff-service")
+include("journal-service")
 
-// 6 service modules (W1에 각 service 디렉토리 + build.gradle.kts 작성)
-// include("gateway")
-// include("bff-aggregator")
-// include("auth-service")
-// include("bible-service")
-// include("ai-service")
-// include("journal-service")
+// ─── 공유 라이브러리 ─────────────────────────────────────────────
+include("shared-kernel")
+
+// ─── AI Service (Python FastAPI) : 별도 ai-service/ 디렉토리 ─────
+// Python 서비스는 Gradle 외부 관리. ai-service/ 폴더 구조 참조.
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+    }
+}

@@ -1,161 +1,208 @@
-# QT-AI CI/CD — 본격 5 jobs (06번 § 3.3 박제 정합)
-#
-# 단계:
-#   1. lint   — gitleaks + Spotless + Spectral + Helm lint
-#   2. test   — JUnit 5 + Testcontainers + OWASP Dependency-Check
-#   3. build  — Gradle multi-module bootJar
-#   4. image  — Docker buildx → ghcr.io (push 시만, matrix 6 service)
-#   5. deploy-dev — helm upgrade --install (develop 머지 시만)
-
-name: CI/CD
+﻿name: QT-AI CI
 
 on:
   push:
-    branches: [develop, main]
+    branches: [ main, develop, "feature/**", "hotfix/**" ]
   pull_request:
-    branches: [develop]
+    branches: [ main, develop ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "21"
+  FLUTTER_VERSION: "3.24.5"
+  NODE_VERSION: "20"
 
 jobs:
-
-  lint:
+  # ────────────────────────────────────────────────────
+  # Job 1: Gradle 멀티모듈 빌드 + 단위 테스트
+  # ────────────────────────────────────────────────────
+  gradle-build:
+    name: Gradle Build & Unit Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0    # gitleaks가 history 검사
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Gitleaks (시크릿 탐지)
+      - name: Setup Java 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build (skip test)
+        run: ./gradlew build -x test --parallel --daemon
+
+      - name: Unit Test
+        run: ./gradlew test --parallel --daemon
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/build/reports/tests/"
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────
+  # Job 2: OpenAPI Spectral Lint (W1 Lock-in 핵심)
+  # ────────────────────────────────────────────────────
+  spectral-lint:
+    name: OpenAPI Spectral Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Spectral
+        run: npm install -g @stoplight/spectral-cli@6
+
+      - name: Lint auth openapi.yaml
+        run: spectral lint apis/auth/openapi.yaml --ruleset .spectral.yaml
+
+      - name: Lint bible openapi.yaml
+        run: spectral lint apis/bible/openapi.yaml --ruleset .spectral.yaml
+
+      - name: Lint ai openapi.yaml
+        run: spectral lint apis/ai/openapi.yaml --ruleset .spectral.yaml
+
+      - name: Lint journal openapi.yaml
+        run: spectral lint apis/journal/openapi.yaml --ruleset .spectral.yaml
+
+      - name: Lint bff openapi.yaml
+        run: spectral lint apis/bff/openapi.yaml --ruleset .spectral.yaml
+
+  # ────────────────────────────────────────────────────
+  # Job 3: Flutter Analyze (김지민 Flutter App)
+  # ────────────────────────────────────────────────────
+  flutter-analyze:
+    name: Flutter Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check flutter-app directory
+        id: flutter-check
+        run: |
+          if [ -d "flutter-app" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "flutter-app 디렉토리 없음 — W1 이후 생성 예정, skip"
+          fi
+
+      - name: Setup Flutter
+        if: steps.flutter-check.outputs.exists == 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        if: steps.flutter-check.outputs.exists == 'true'
+        working-directory: flutter-app
+        run: flutter pub get
+
+      - name: Flutter analyze
+        if: steps.flutter-check.outputs.exists == 'true'
+        working-directory: flutter-app
+        run: flutter analyze --fatal-infos
+
+      - name: Flutter test
+        if: steps.flutter-check.outputs.exists == 'true'
+        working-directory: flutter-app
+        run: flutter test
+
+  # ────────────────────────────────────────────────────
+  # Job 4: gitleaks — 시크릿 스캔 (1차 HMS 실패 패턴 차단)
+  # ────────────────────────────────────────────────────
+  gitleaks:
+    name: Secret Scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Spectral (OpenAPI lint)
+  # ────────────────────────────────────────────────────
+  # Job 5: Python AI Service Lint (강상민)
+  # ────────────────────────────────────────────────────
+  python-lint:
+    name: Python AI Service Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check ai-service directory
+        id: ai-check
         run: |
-          npm install -g @stoplight/spectral-cli@^6
-          for spec in apis/*/openapi.yaml; do
-            echo "Linting $spec"
-            npx spectral lint "$spec" --ruleset .spectral.yaml || exit 1
+          if [ -d "ai-service" ] && [ -f "ai-service/requirements.txt" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "ai-service 디렉토리 없음 — W1 이후 생성 예정, skip"
+          fi
+
+      - name: Setup Python 3.11
+        if: steps.ai-check.outputs.exists == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        if: steps.ai-check.outputs.exists == 'true'
+        working-directory: ai-service
+        run: |
+          pip install ruff mypy
+
+      - name: ruff lint
+        if: steps.ai-check.outputs.exists == 'true'
+        working-directory: ai-service
+        run: ruff check .
+
+  # ────────────────────────────────────────────────────
+  # CI Summary Gate — 모든 Job 통과해야 PR 머지 가능
+  # ────────────────────────────────────────────────────
+  ci-gate:
+    name: CI Gate (All Jobs Must Pass)
+    needs: [gradle-build, spectral-lint, flutter-analyze, gitleaks, python-lint]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          results=(
+            "${{ needs.gradle-build.result }}"
+            "${{ needs.spectral-lint.result }}"
+            "${{ needs.flutter-analyze.result }}"
+            "${{ needs.gitleaks.result }}"
+            "${{ needs.python-lint.result }}"
+          )
+          for result in "${results[@]}"; do
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "CI FAILED: $result"
+              exit 1
+            fi
           done
-
-      # Spotless·Helm lint는 W1에 Gradle 설정 + helm Chart 본문 작성 후 활성화
-      # - name: Spotless (Java 코드 스타일)
-      #   uses: gradle/gradle-build-action@v3
-      #   with:
-      #     arguments: spotlessCheck
-      # - name: Helm lint
-      #   run: |
-      #     helm lint ./helm/qtai-umbrella --values ./helm/qtai-umbrella/values-dev.yaml
-      #     helm lint ./helm/qtai-infra
-
-  test:
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-      - uses: gradle/gradle-build-action@v3
-
-      # W1에 Gradle 모듈 본격 작성 후 활성화
-      # - name: 단위 + 통합 테스트
-      #   run: ./gradlew test integrationTest
-      # - name: OWASP Dependency-Check
-      #   run: ./gradlew dependencyCheckAggregate
-      # - name: Test Report Upload
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: test-reports
-      #     path: '**/build/reports/'
-
-      - name: Placeholder (W1 Gradle 본격 작성 전)
-        run: echo "test job - W1 (5/18~22)에 Gradle 모듈 6개 작성 후 활성화"
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: 21 }
-      - uses: gradle/gradle-build-action@v3
-
-      # W1에 Gradle 모듈 본격 작성 후 활성화
-      # - run: ./gradlew bootJar
-      # - name: Build artifact upload
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: jars
-      #     path: '**/build/libs/*.jar'
-
-      - name: Placeholder (W1 Gradle 본격 작성 전)
-        run: echo "build job - W1에 활성화"
-
-  image:
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push'    # PR에서는 이미지 빌드 X
-    permissions:
-      packages: write
-    strategy:
-      matrix:
-        service: [gateway, bff-aggregator, auth-service, bible-service, ai-service, journal-service]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # W1에 Dockerfile 6 service 본격 작성 후 활성화
-      # - name: Build + Push (${{ matrix.service }})
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     context: ${{ matrix.service }}
-      #     file: ${{ matrix.service }}/Dockerfile
-      #     push: true
-      #     tags: |
-      #       ghcr.io/tae0072/qtai-${{ matrix.service }}:${{ github.sha }}
-      #       ghcr.io/tae0072/qtai-${{ matrix.service }}:latest
-      #     cache-from: type=gha
-      #     cache-to: type=gha,mode=max
-
-      - name: Placeholder (W1 Dockerfile 본격 작성 전)
-        run: echo "image job (${{ matrix.service }}) - W1에 활성화"
-
-  deploy-dev:
-    runs-on: ubuntu-latest
-    needs: image
-    if: github.ref == 'refs/heads/develop'
-    environment: dev
-    steps:
-      - uses: actions/checkout@v4
-
-      # W1에 helm Chart 본문 + KUBECONFIG_DEV secret 적재 후 활성화
-      # - name: kubeconfig 설정
-      #   run: |
-      #     mkdir -p ~/.kube
-      #     echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > ~/.kube/config
-      #     chmod 600 ~/.kube/config
-      # - name: helm upgrade --install
-      #   run: |
-      #     helm upgrade --install qtai ./helm/qtai-umbrella \
-      #       --namespace qtai \
-      #       --values ./helm/qtai-umbrella/values.yaml \
-      #       --values ./helm/qtai-umbrella/values-dev.yaml \
-      #       --set image.tag=${{ github.sha }} \
-      #       --atomic --timeout 5m \
-      #       --wait
-      # - name: 배포 검증 (smoke test)
-      #   run: |
-      #     for svc in gateway auth bible ai journal bff-aggregator; do
-      #       kubectl wait --for=condition=Available --timeout=120s \
-      #         deployment/$svc -n qtai
-      #     done
-
-      - name: Placeholder (W1 Helm Chart + KUBECONFIG_DEV secret 적재 전)
-        run: echo "deploy-dev job - W1 (5/18~22)에 활성화"
+          echo "CI PASSED"

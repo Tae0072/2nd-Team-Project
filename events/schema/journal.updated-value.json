@@ -1,72 +1,23 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "journal.updated-value",
-  "description": "묵상 노트 변경 이벤트 (이벤트 소싱 — 02번 § 5 + ADR-0011).",
+  "$id": "journal.updated-value",
+  "title": "JournalUpdatedEvent",
+  "description": "묵상 노트 수정 이벤트 — Kafka topic: journal.updated",
   "type": "object",
-  "required": [
-    "eventId", "eventType", "eventVersion", "schemaSubject",
-    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
-  ],
-  "additionalProperties": false,
+  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
   "properties": {
-    "eventId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-      "description": "이벤트 고유 ID (UUID v4, RFC 4122)"
-    },
-    "eventType": {
-      "type": "string",
-      "const": "journal.updated",
-      "description": "이벤트 타입 (Kafka topic 명과 동일)"
-    },
-    "eventVersion": {
-      "type": "string",
-      "pattern": "^v\\d+$",
-      "description": "이벤트 schema 버전 (예: v1)"
-    },
-    "schemaSubject": {
-      "type": "string",
-      "const": "journal.updated-value",
-      "description": "Schema Registry subject 명"
-    },
-    "idempotencyKey": {
-      "type": "string",
-      "pattern": "^journal\\.update:[0-9A-HJKMNP-TV-Z]{26}$",
-      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
-    },
-    "occurredAt": {
-      "type": "string",
-      "format": "date-time",
-      "description": "이벤트 발생 시각 (ISO 8601)"
-    },
-    "traceId": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{32}$",
-      "description": "W3C Trace Context trace_id (분산 추적용)"
-    },
-    "producerService": {
-      "type": "string",
-      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
-      "description": "이벤트 발행 서비스명"
-    },
-    "data": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "const": "JOURNAL_UPDATED" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "idempotencyKey": { "type": "string" },
+    "payload": {
       "type": "object",
-      "required": ["journalId", "userId", "sequence", "eventType", "occurredAt"],
-      "additionalProperties": false,
+      "required": ["journalId", "userId"],
       "properties": {
-        "journalId": { "type": "integer", "minimum": 1 },
-        "userId": { "type": "integer", "minimum": 1 },
-        "sequence": { "type": "integer", "minimum": 1, "description": "이벤트 sequence — 02번 § 5.4 last_event_sequence + SELECT FOR UPDATE" },
-        "eventType": {
-          "type": "string",
-          "enum": ["TITLE_CHANGED", "CONTENT_CHANGED", "STATUS_CHANGED"]
-        },
-        "payload": {
-          "type": "object",
-          "description": "eventType에 따른 변경 내용",
-          "additionalProperties": true
-        },
-        "occurredAt": { "type": "string", "format": "date-time" }
+        "journalId": { "type": "integer" },
+        "userId": { "type": "integer" },
+        "title": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       }
     }
   }

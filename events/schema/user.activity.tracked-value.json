@@ -1,71 +1,33 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "user.activity.tracked-value",
-  "description": "사용자 구절 읽기 추적 이벤트 (02번 § 6.1 + 04번 § 4.10).",
+  "$id": "user.activity.tracked-value",
+  "title": "UserActivityTrackedEvent",
+  "description": "사용자 활동 추적 이벤트 — topic: user.activity.tracked",
   "type": "object",
-  "required": [
-    "eventId", "eventType", "eventVersion", "schemaSubject",
-    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
-  ],
-  "additionalProperties": false,
+  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
   "properties": {
-    "eventId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-      "description": "이벤트 고유 ID (UUID v4, RFC 4122)"
-    },
-    "eventType": {
-      "type": "string",
-      "const": "user.activity.tracked",
-      "description": "이벤트 타입 (Kafka topic 명과 동일)"
-    },
-    "eventVersion": {
-      "type": "string",
-      "pattern": "^v\\d+$",
-      "description": "이벤트 schema 버전 (예: v1)"
-    },
-    "schemaSubject": {
-      "type": "string",
-      "const": "user.activity.tracked-value",
-      "description": "Schema Registry subject 명"
-    },
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "const": "USER_ACTIVITY_TRACKED" },
+    "occurredAt": { "type": "string", "format": "date-time" },
     "idempotencyKey": {
       "type": "string",
-      "pattern": "^read\\.passage:[0-9]+:[A-Z0-9]{3}:[0-9]+:[0-9]+:[0-9]+$",
-      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
+      "description": "read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute} 형식",
+      "example": "read.passage:1001:JHN:3:16:28562400"
     },
-    "occurredAt": {
-      "type": "string",
-      "format": "date-time",
-      "description": "이벤트 발생 시각 (ISO 8601)"
-    },
-    "traceId": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{32}$",
-      "description": "W3C Trace Context trace_id (분산 추적용)"
-    },
-    "producerService": {
-      "type": "string",
-      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
-      "description": "이벤트 발행 서비스명"
-    },
-    "data": {
+    "payload": {
       "type": "object",
-      "required": ["type", "userId", "passage", "readAt"],
-      "additionalProperties": false,
+      "required": ["userId", "activityType"],
       "properties": {
-        "type": { "type": "string", "const": "read.passage" },
-        "userId": { "type": "integer", "minimum": 1 },
-        "passage": {
-          "type": "object",
-          "required": ["bookCode", "chapter", "verse"],
-          "properties": {
-            "bookCode": { "type": "string", "pattern": "^[A-Z0-9]{3}$" },
-            "chapter": { "type": "integer", "minimum": 1 },
-            "verse": { "type": "integer", "minimum": 1 }
-          }
+        "userId": { "type": "integer" },
+        "activityType": {
+          "type": "string",
+          "enum": ["READ_PASSAGE", "START_SESSION", "COMPLETE_SESSION", "PUBLISH_JOURNAL"]
         },
-        "readAt": { "type": "string", "format": "date-time" }
+        "book": { "type": "string", "nullable": true },
+        "chapter": { "type": "integer", "nullable": true },
+        "verse": { "type": "integer", "nullable": true },
+        "sessionId": { "type": "integer", "nullable": true },
+        "journalId": { "type": "integer", "nullable": true }
       }
     }
   }

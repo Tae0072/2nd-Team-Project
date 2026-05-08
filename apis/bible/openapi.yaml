@@ -1,231 +1,307 @@
-openapi: 3.1.0
+﻿openapi: 3.1.0
 info:
   title: QT-AI Bible Service API
+  version: "1.2"
   description: |
-    성경 본문·BOOKS·KR_BIBLE 조회 service.
-    04번 § 5 본문. Read-only — write endpoint 없음 (관리자 시드만).
-  version: 1.0.0
+    성경 본문 서비스. 한국어(개역개정) + 영어(KJV) 성경 본문,
+    주석(Commentary), Redis 24h 캐시를 담당한다.
   contact:
-    name: 김태혁 (Bible Service Owner)
-    email: rkdxodh41@gmail.com
+    name: 김태혁 (Bible Owner)
 servers:
-  - url: http://qtai.local/api/v1
-    description: dev (Minikube)
-  - url: http://localhost:4012
-    description: Prism mock (W1 Lock-in)
+  - url: http://localhost:8082
+    description: Local (직접)
+  - url: http://localhost:8080/bible
+    description: Gateway 경유
+
 tags:
-  - name: bible
-    description: 성경 본문·메타
+  - name: books
+    description: 성경 목록
+  - name: passages
+    description: 성경 구절 조회
+  - name: commentaries
+    description: 주석 조회
+
 paths:
   /bible/books:
     get:
-      tags: [bible]
+      tags: [books]
+      summary: 성경 전체 목록 (66권)
       operationId: listBooks
-      summary: 성경 66권 목록
-      description: 구약 39권 + 신약 27권 = 66권 메타 정보 (정렬 + 약어 + 한글명 + 영문명)
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       responses:
         '200':
-          description: 66권 목록
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Book'
-              examples:
-                first3:
-                  value:
-                    - { code: GEN, krName: 창세기, enName: Genesis, chapterCount: 50, testament: OLD, sortOrder: 1 }
-                    - { code: EXO, krName: 출애굽기, enName: Exodus, chapterCount: 40, testament: OLD, sortOrder: 2 }
-                    - { code: LEV, krName: 레위기, enName: Leviticus, chapterCount: 27, testament: OLD, sortOrder: 3 }
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /bible/books/{bookCode}:
-    get:
-      tags: [bible]
-      operationId: getBook
-      summary: 단일 책 상세
-      description: 책 코드로 메타 + 장 수 조회
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: bookCode
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: '^[A-Z0-9]{3}$'
-            example: GEN
-      responses:
-        '200':
-          description: 책 상세
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Book'
-        '404':
-          description: 존재하지 않는 책 코드
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /bible/books/{bookCode}/chapters/{chapter}:
-    get:
-      tags: [bible]
-      operationId: getChapter
-      summary: 한 장 본문 (모든 절)
-      description: 책 코드 + 장 번호로 모든 verse 조회. 큐티 시작 시 BFF가 호출.
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: bookCode
-          in: path
-          required: true
-          schema: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        - name: chapter
-          in: path
-          required: true
-          schema: { type: integer, minimum: 1 }
-      responses:
-        '200':
-          description: 장 본문 (verse 배열)
+          description: 성경 목록
           content:
             application/json:
               schema:
                 type: object
-                required: [bookCode, chapter, verses]
                 properties:
-                  bookCode: { type: string }
-                  chapter: { type: integer }
-                  verses:
+                  data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Verse'
-        '404':
-          description: 존재하지 않는 장
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                      $ref: '#/components/schemas/BookResponse'
 
-  /passages/{bookCode}/{chapter}/{verse}:
+  /bible/passages/{book}/{chapter}:
     get:
-      tags: [bible]
-      operationId: getPassage
-      summary: 단일 절 본문
-      description: 04번 § 5.4 — BFF Aggregator 입체적 묵상 화면이 호출
+      tags: [passages]
+      summary: 장(Chapter) 전체 구절 조회 — 한/영 병기
+      operationId: getChapter
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: bookCode
-          in: path
-          required: true
-          schema: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        - name: chapter
-          in: path
-          required: true
-          schema: { type: integer, minimum: 1 }
-        - name: verse
-          in: path
-          required: true
-          schema: { type: integer, minimum: 1 }
+        - $ref: '#/components/parameters/BookParam'
+        - $ref: '#/components/parameters/ChapterParam'
+        - name: lang
+          in: query
+          schema:
+            type: string
+            enum: [ko, en, both]
+            default: both
       responses:
         '200':
-          description: 단일 절
+          description: 구절 목록
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Verse'
+                $ref: '#/components/schemas/ChapterResponse'
         '404':
-          description: 존재하지 않는 절
+          $ref: '#/components/responses/NotFound'
+
+  /bible/passages/{book}/{chapter}/{verse}:
+    get:
+      tags: [passages]
+      summary: 단일 구절 조회 — 한/영 병기
+      operationId: getVerse
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookParam'
+        - $ref: '#/components/parameters/ChapterParam'
+        - $ref: '#/components/parameters/VerseParam'
+        - name: lang
+          in: query
+          schema:
+            type: string
+            enum: [ko, en, both]
+            default: both
+      responses:
+        '200':
+          description: 단일 구절
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '401':
-          description: 인증 실패
+                $ref: '#/components/schemas/VerseDetailResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /bible/commentaries/{book}/{chapter}/{verse}:
+    get:
+      tags: [commentaries]
+      summary: 구절 주석 목록 조회
+      operationId: getCommentaries
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/BookParam'
+        - $ref: '#/components/parameters/ChapterParam'
+        - $ref: '#/components/parameters/VerseParam'
+      responses:
+        '200':
+          description: 주석 목록
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CommentaryResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /bible/search:
+    get:
+      tags: [passages]
+      summary: 성경 구절 전문 검색
+      operationId: searchPassages
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 2
+        - name: lang
+          in: query
+          schema:
+            type: string
+            enum: [ko, en]
+            default: ko
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 50
+      responses:
+        '200':
+          description: 검색 결과 (페이징)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageResponse'
 
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  parameters:
+    BookParam:
+      name: book
+      in: path
+      required: true
+      description: 성경 책 약어 (예- GEN, EXO, PSA, MAT, JHN)
+      schema:
+        type: string
+        example: JHN
+    ChapterParam:
+      name: chapter
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        example: 3
+    VerseParam:
+      name: verse
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        example: 16
+
   schemas:
-    Book:
+    BookResponse:
       type: object
-      required: [code, krName, enName, chapterCount, testament, sortOrder]
       properties:
-        code: { type: string, pattern: '^[A-Z0-9]{3}$', example: GEN }
-        krName: { type: string, example: 창세기 }
-        enName: { type: string, example: Genesis }
-        chapterCount: { type: integer, example: 50 }
+        bookCode:
+          type: string
+          example: JHN
+        bookNameKo:
+          type: string
+          example: 요한복음
+        bookNameEn:
+          type: string
+          example: John
         testament:
           type: string
           enum: [OLD, NEW]
-        sortOrder: { type: integer, minimum: 1, maximum: 66 }
+        totalChapters:
+          type: integer
 
-    Verse:
+    VerseResponse:
       type: object
-      required: [bookCode, chapter, verse, text]
       properties:
-        bookCode: { type: string, example: GEN }
-        chapter: { type: integer, example: 1 }
-        verse: { type: integer, example: 1 }
-        text:
+        book:
           type: string
-          example: 태초에 하나님이 천지를 창조하시니라
-        translation:
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        textKo:
           type: string
-          enum: [KRV]
-          default: KRV
-          description: 한글 개역개정만 v1.0
+          nullable: true
+        textEn:
+          type: string
+          nullable: true
 
-    ProblemDetail:
+    VerseDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/VerseResponse'
+        - type: object
+          properties:
+            commentaryCount:
+              type: integer
+
+    ChapterResponse:
       type: object
-      description: RFC 9457 (04번 § 2.4)
-      required: [type, title, status, code, instance]
       properties:
-        type: { type: string, format: uri }
-        title: { type: string }
-        status: { type: integer }
+        book:
+          type: string
+        bookNameKo:
+          type: string
+        chapter:
+          type: integer
+        totalVerses:
+          type: integer
+        verses:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerseResponse'
+
+    CommentaryResponse:
+      type: object
+      properties:
+        commentaryId:
+          type: integer
+          format: int64
+        source:
+          type: string
+          example: Matthew Henry Commentary
+        content:
+          type: string
+        lang:
+          type: string
+          enum: [ko, en]
+
+    PageResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerseResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [code, message, traceId]
+      properties:
         code:
           type: string
-          enum:
-            - UNAUTHORIZED
-            - TOKEN_EXPIRED
-            - BOOK_NOT_FOUND
-            - CHAPTER_NOT_FOUND
-            - PASSAGE_NOT_FOUND
-            - VALIDATION_FAILED
-            - RATE_LIMITED
-        detail: { type: string }
-        instance: { type: string }
-        traceId: { type: string, pattern: '^[0-9a-f]{32}$' }
+        message:
+          type: string
+        traceId:
+          type: string
 
-security:
-  - bearerAuth: []
+  responses:
+    NotFound:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: BIBLE_PASSAGE_NOT_FOUND
+            message: 해당 구절을 찾을 수 없습니다.
+            traceId: "00-abc123-01"

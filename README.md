@@ -1,4 +1,4 @@
-# 📖 QT-AI — 큐티 AI 앱 (2차 팀 프로젝트)
+﻿# 📖 QT-AI — 큐티 AI 앱 (2차 팀 프로젝트)
 
 > Flutter 모바일 + Spring Boot MSA + AI 코칭형 묵상 도우미
 
@@ -12,9 +12,9 @@
 | --- | --- |
 | 모바일 | Flutter (Sliver 기반 Sync Scroll, RiverPod, DIO) |
 | API Gateway | Spring Cloud Gateway (JWT 검증, SSE 패스스루) |
-| 백엔드 (MSA) | Spring Boot · BFF Aggregator · Auth · Bible · AI · Journal |
+| 백엔드 (MSA) | Spring Boot 3.4 (Gateway·Auth·Bible·BFF·Journal) + **Python FastAPI** (AI/RAG) |
 | 메시징 | Kafka (이벤트 소싱 + Saga 보상 트랜잭션) |
-| AI/RAG | Anthropic Claude API (SSE 스트리밍) + ChromaDB |
+| AI/RAG | **Python FastAPI** (port 8085) + Anthropic Claude API (SSE 스트리밍) + ChromaDB + sentence-transformers |
 | 데이터 | MySQL · Redis |
 | 인프라 | Kubernetes (Minikube) + Helm |
 | 관측성 | Loki · Prometheus · Jaeger |

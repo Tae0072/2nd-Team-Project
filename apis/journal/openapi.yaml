@@ -1,385 +1,330 @@
-openapi: 3.1.0
+﻿openapi: 3.1.0
 info:
   title: QT-AI Journal Service API
+  version: "1.2"
   description: |
-    묵상 노트(Journal) CRUD + 이벤트 소싱 + Saga 컨슈머 service.
-    04번 § 7 본문 + 02번 § 5 (이벤트 소싱) + ADR-0004 정합.
-  version: 1.0.0
+    묵상 노트 서비스. 큐티 기록 CRUD, 이벤트 소싱(JOURNAL_EVENTS),
+    Kafka Outbox 발행, Saga 보상 트랜잭션 컨슈머를 담당한다.
   contact:
-    name: 이승욱 (Journal Service Owner)
-    email: rkdxodh41@gmail.com
+    name: 이승욱 (Journal Owner)
 servers:
-  - url: http://qtai.local/api/v1
-    description: dev (Minikube)
-  - url: http://localhost:4014
-    description: Prism mock (W1 Lock-in)
+  - url: http://localhost:8084
+    description: Local (직접)
+  - url: http://localhost:8080/journal
+    description: Gateway 경유
+
 tags:
-  - name: journal
-    description: 묵상 노트
+  - name: journals
+    description: 묵상 노트 CRUD
+
 paths:
-  /journals:
-    get:
-      tags: [journal]
-      operationId: listJournals
-      summary: 본인 묵상 노트 목록 (페이지네이션)
-      description: |
-        본인 user_id로 필터. 04번 § 7.1 — Custom PageResponse DTO.
+  /journal/journals:
+    post:
+      tags: [journals]
+      summary: 묵상 노트 생성 (DRAFT 상태)
+      operationId: createJournal
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalRequest'
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [journals]
+      summary: 내 묵상 노트 목록 조회
+      operationId: listJournals
+      security:
+        - BearerAuth: []
       parameters:
-        - name: page
-          in: query
-          schema: { type: integer, minimum: 0, default: 0 }
-        - name: size
-          in: query
-          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
         - name: status
           in: query
           schema:
             type: string
             enum: [DRAFT, PUBLISHED]
-        - name: sort
+        - name: page
           in: query
           schema:
-            type: string
-            enum: ["createdAt,desc", "createdAt,asc", "updatedAt,desc", "updatedAt,asc"]
-            default: "createdAt,desc"
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
       responses:
         '200':
-          description: 페이지네이션 결과
+          description: 노트 목록 (페이징)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalPageResponse'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '400':
-          description: 잘못된 페이지 또는 정렬 파라미터
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
 
-    post:
-      tags: [journal]
-      operationId: createJournal
-      summary: 묵상 노트 직접 작성
-      description: 사용자가 직접 작성. AI 자동 생성은 ai.session.completed 컨슈머가 처리.
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/JournalCreateRequest'
-      responses:
-        '201':
-          description: 생성 완료
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JournalResponse'
-        '400':
-          description: 본문 누락 또는 길이 초과
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /journals/{journalId}:
+  /journal/journals/{journalId}:
     get:
-      tags: [journal]
+      tags: [journals]
+      summary: 묵상 노트 상세 조회
       operationId: getJournal
-      summary: 단일 묵상 노트 조회
-      description: 본인 노트만 조회 가능 (자원 소유자 검증 — 05번 § 4.2 IDOR 방어)
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: journalId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/JournalIdParam'
       responses:
         '200':
-          description: 노트 본문
+          description: 노트 상세
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalResponse'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
         '403':
-          description: 본인 노트 아님 (IDOR)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: 노트 없음
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/NotFound'
 
-    patch:
-      tags: [journal]
+    put:
+      tags: [journals]
+      summary: 묵상 노트 수정 (DRAFT 상태만)
       operationId: updateJournal
-      summary: 묵상 노트 수정
-      description: |
-        변경 가능 필드: title, content, status (DRAFT → PUBLISHED only — v1.2 정정).
-        02번 § 5 이벤트 소싱: JOURNAL_EVENTS 추가 + JOURNALS 갱신 (같은 트랜잭션).
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: journalId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/JournalIdParam'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/JournalUpdateRequest'
+              $ref: '#/components/schemas/UpdateJournalRequest'
       responses:
         '200':
-          description: 수정 완료
+          description: 수정 성공
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/JournalResponse'
-        '400':
-          description: 잘못된 status 전이 (PUBLISHED → DRAFT 등)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
         '403':
-          description: 본인 노트 아님 (IDOR)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: 노트 없음
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: PUBLISHED 상태는 수정 불가
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: JOURNAL_INVALID_STATUS_TRANSITION
+                message: PUBLISHED 상태의 노트는 수정할 수 없습니다.
+                traceId: "00-abc123-01"
 
     delete:
-      tags: [journal]
+      tags: [journals]
+      summary: 묵상 노트 삭제 (Soft Delete)
       operationId: deleteJournal
-      summary: 묵상 노트 Soft Delete
-      description: |
-        deleted_at 컬럼 갱신 (02번 § 7.5 + ADR-0006). journal.deleted 토픽 발행.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: journalId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/JournalIdParam'
       responses:
         '204':
-          description: 삭제 완료
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          description: 삭제 성공
         '403':
-          description: 본인 노트 아님 (IDOR)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/Forbidden'
         '404':
-          description: 이미 삭제된 또는 존재하지 않는 노트
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/NotFound'
 
-  /journals/{journalId}/events:
-    get:
-      tags: [journal]
-      operationId: getJournalEvents
-      summary: 묵상 노트 변경 이력 (v1.0 운영자만)
+  /journal/journals/{journalId}/publish:
+    patch:
+      tags: [journals]
+      summary: 묵상 노트 발행 (DRAFT → PUBLISHED)
+      operationId: publishJournal
       description: |
-        02번 § 5 + ADR-0011 — JOURNAL_EVENTS 시간 순.
-        v1.0은 ROLE_ADMIN만 (디버깅용). v1.1에 사용자 본인 노트 history 공개 검토.
+        발행 성공 시 Kafka journal.created 이벤트 발행 (Outbox 패턴).
+        AI Session이 COMPLETED 상태일 때만 발행 가능.
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: journalId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/JournalIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishJournalRequest'
       responses:
         '200':
-          description: 변경 이력 시간 순
+          description: 발행 성공
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/JournalEvent'
-        '401':
-          description: 인증 실패
+                $ref: '#/components/schemas/JournalResponse'
+        '409':
+          description: 이미 발행됨 또는 상태 전환 불가
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '403':
-          description: ROLE_ADMIN 필요 (v1.0)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  parameters:
+    JournalIdParam:
+      name: journalId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 100
+
   schemas:
-    JournalCreateRequest:
+    CreateJournalRequest:
       type: object
-      required: [title, content]
+      required: [title, content, book, chapter, verse]
       properties:
-        title: { type: string, minLength: 1, maxLength: 200 }
-        content: { type: string, minLength: 1 }
-        status:
+        title:
           type: string
-          enum: [DRAFT, PUBLISHED]
-          default: DRAFT
-        passage:
-          $ref: '#/components/schemas/PassageRef'
-
-    JournalUpdateRequest:
-      type: object
-      properties:
-        title: { type: string, minLength: 1, maxLength: 200 }
-        content: { type: string, minLength: 1 }
-        status:
+          maxLength: 200
+          example: "요한복음 3:16 큐티"
+        content:
           type: string
-          enum: [DRAFT, PUBLISHED]
-          description: DRAFT → PUBLISHED only (v1.2 정정 — 04번 § 7.4)
-
-    JournalResponse:
-      type: object
-      required: [id, userId, title, content, status, createdAt, updatedAt]
-      properties:
-        id: { type: integer, format: int64 }
-        userId: { type: integer, format: int64 }
-        aiSessionId:
+          maxLength: 10000
+        book:
+          type: string
+          example: JHN
+        chapter:
+          type: integer
+          example: 3
+        verse:
+          type: integer
+          example: 16
+        sessionId:
           type: integer
           format: int64
           nullable: true
-          description: AI 자동 생성 시 sessionId, 사용자 직접 작성 시 null
-        title: { type: string }
-        content: { type: string }
-        status:
+          description: 연결된 AI 세션 ID
+
+    UpdateJournalRequest:
+      type: object
+      properties:
+        title:
           type: string
-          enum: [DRAFT, PUBLISHED]
-        passage:
-          $ref: '#/components/schemas/PassageRef'
-        lastEventSequence:
+          maxLength: 200
+        content:
+          type: string
+          maxLength: 10000
+
+    PublishJournalRequest:
+      type: object
+      required: [idempotencyKey]
+      properties:
+        idempotencyKey:
+          type: string
+          description: Kafka 멱등성 키 (클라이언트 생성 UUID)
+          example: "pub-uuid-v4-abc123"
+
+    JournalResponse:
+      type: object
+      properties:
+        journalId:
           type: integer
           format: int64
-          description: 02번 § 5.4 — 동시성 보장
-        createdAt: { type: string, format: date-time }
-        updatedAt: { type: string, format: date-time }
+        userId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+        book:
+          type: string
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, DELETED]
+        sessionId:
+          type: integer
+          format: int64
+          nullable: true
+        version:
+          type: integer
+          description: 낙관적 락 버전
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     JournalPageResponse:
       type: object
-      required: [items, page, size, totalElements, totalPages]
       properties:
-        items:
+        content:
           type: array
           items:
             $ref: '#/components/schemas/JournalResponse'
-        page: { type: integer, minimum: 0 }
-        size: { type: integer, minimum: 1 }
-        totalElements: { type: integer, format: int64 }
-        totalPages: { type: integer }
-        first: { type: boolean }
-        last: { type: boolean }
-
-    JournalEvent:
-      type: object
-      required: [id, journalId, sequence, eventType, occurredAt]
-      properties:
-        id: { type: integer, format: int64 }
-        journalId: { type: integer, format: int64 }
-        sequence:
+        page:
           type: integer
-          format: int64
-          minimum: 1
-          description: 02번 § 5.4 — last_event_sequence + SELECT FOR UPDATE
-        eventType:
-          type: string
-          enum: [CREATED, TITLE_CHANGED, CONTENT_CHANGED, STATUS_CHANGED, DELETED]
-        payload:
-          type: object
-          description: eventType별 변경 내용
-        occurredAt: { type: string, format: date-time }
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
 
-    PassageRef:
+    ErrorResponse:
       type: object
-      required: [bookCode, chapter, verse]
+      required: [code, message, traceId]
       properties:
-        bookCode: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        chapter: { type: integer, minimum: 1 }
-        verse: { type: integer, minimum: 1 }
-
-    ProblemDetail:
-      type: object
-      description: RFC 9457 (04번 § 2.4)
-      required: [type, title, status, code, instance]
-      properties:
-        type: { type: string, format: uri }
-        title: { type: string }
-        status: { type: integer }
         code:
           type: string
-          enum:
-            - UNAUTHORIZED
-            - TOKEN_EXPIRED
-            - VALIDATION_FAILED
-            - JOURNAL_NOT_FOUND
-            - JOURNAL_NOT_OWNED
-            - INVALID_STATUS_TRANSITION
-            - JOURNAL_ALREADY_DELETED
-            - PAYLOAD_TOO_LARGE
-            - RATE_LIMITED
-        detail: { type: string }
-        instance: { type: string }
-        traceId: { type: string, pattern: '^[0-9a-f]{32}$' }
+        message:
+          type: string
+        traceId:
+          type: string
 
-security:
-  - bearerAuth: []
+  responses:
+    Unauthorized:
+      description: 인증 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 권한 없음 (타인의 노트)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: JOURNAL_ACCESS_DENIED
+            message: 해당 노트에 접근 권한이 없습니다.
+            traceId: "00-abc123-01"
+    NotFound:
+      description: 노트 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: JOURNAL_NOT_FOUND
+            message: 묵상 노트를 찾을 수 없습니다.
+            traceId: "00-abc123-01"

@@ -1,66 +1,27 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "journal.creation.failed-value",
-  "description": "Journal 자동 생성 영구 실패 시 Saga 보상 이벤트 (02번 § 6.1 v1.2 + 03번 § 6.1 + 07번 § 4.6).",
+  "$id": "journal.creation.failed-value",
+  "title": "JournalCreationFailedEvent",
+  "description": "묵상 노트 발행 실패 Saga 보상 이벤트 — topic: journal.creation.failed",
   "type": "object",
-  "required": [
-    "eventId", "eventType", "eventVersion", "schemaSubject",
-    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
-  ],
-  "additionalProperties": false,
+  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
   "properties": {
-    "eventId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-      "description": "이벤트 고유 ID (UUID v4, RFC 4122)"
-    },
-    "eventType": {
-      "type": "string",
-      "const": "journal.creation.failed",
-      "description": "이벤트 타입 (Kafka topic 명과 동일)"
-    },
-    "eventVersion": {
-      "type": "string",
-      "pattern": "^v\\d+$",
-      "description": "이벤트 schema 버전 (예: v1)"
-    },
-    "schemaSubject": {
-      "type": "string",
-      "const": "journal.creation.failed-value",
-      "description": "Schema Registry subject 명"
-    },
-    "idempotencyKey": {
-      "type": "string",
-      "pattern": "^journal\\.creation\\.failed:[0-9]+$",
-      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
-    },
-    "occurredAt": {
-      "type": "string",
-      "format": "date-time",
-      "description": "이벤트 발생 시각 (ISO 8601)"
-    },
-    "traceId": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{32}$",
-      "description": "W3C Trace Context trace_id (분산 추적용)"
-    },
-    "producerService": {
-      "type": "string",
-      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
-      "description": "이벤트 발행 서비스명"
-    },
-    "data": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "const": "JOURNAL_CREATION_FAILED" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "idempotencyKey": { "type": "string" },
+    "payload": {
       "type": "object",
-      "required": ["sessionId", "userId", "errorCode", "retryCount", "failedAt"],
-      "additionalProperties": false,
+      "required": ["journalId", "userId", "reason"],
       "properties": {
-        "sessionId": { "type": "integer", "minimum": 1, "description": "AI 세션 ID — AI Service가 status를 COMPLETED_NO_JOURNAL로 변경" },
-        "userId": { "type": "integer", "minimum": 1 },
-        "journalId": { "type": ["integer", "null"], "description": "부분 생성된 Journal ID (있으면)" },
-        "errorCode": { "type": "string", "description": "실패 원인 코드 (예: PAYLOAD_TOO_LARGE, DB_CONSTRAINT_VIOLATION)" },
-        "errorMessage": { "type": "string", "description": "실패 메시지 (운영자용)" },
-        "retryCount": { "type": "integer", "minimum": 1, "description": "최종 retry 횟수 (3회 후 DLQ → @DltHandler가 본 토픽 발행)" },
-        "failedAt": { "type": "string", "format": "date-time" }
+        "journalId": { "type": "integer" },
+        "userId": { "type": "integer" },
+        "reason": { "type": "string", "description": "실패 원인 코드" },
+        "compensationTarget": {
+          "type": "string",
+          "enum": ["AI_SERVICE", "JOURNAL_SERVICE"],
+          "description": "보상 대상 서비스"
+        }
       }
     }
   }

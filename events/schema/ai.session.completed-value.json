@@ -1,79 +1,27 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ai.session.completed-value",
-  "description": "AI 큐티 세션 4단계 완료 이벤트 (03번 § 6.1 + 02번 § 6.1).",
+  "$id": "ai.session.completed-value",
+  "title": "AiSessionCompletedEvent",
+  "description": "AI 큐티 세션 완료 이벤트 — topic: ai.session.completed",
   "type": "object",
-  "required": [
-    "eventId", "eventType", "eventVersion", "schemaSubject",
-    "idempotencyKey", "occurredAt", "traceId", "producerService", "data"
-  ],
-  "additionalProperties": false,
+  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
   "properties": {
-    "eventId": {
-      "type": "string",
-      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
-      "description": "이벤트 고유 ID (UUID v4, RFC 4122)"
-    },
-    "eventType": {
-      "type": "string",
-      "const": "ai.session.completed",
-      "description": "이벤트 타입 (Kafka topic 명과 동일)"
-    },
-    "eventVersion": {
-      "type": "string",
-      "pattern": "^v\\d+$",
-      "description": "이벤트 schema 버전 (예: v1)"
-    },
-    "schemaSubject": {
-      "type": "string",
-      "const": "ai.session.completed-value",
-      "description": "Schema Registry subject 명"
-    },
-    "idempotencyKey": {
-      "type": "string",
-      "pattern": "^ai\\.session\\.completed:[0-9]+$",
-      "description": "멱등성 키 — DB UNIQUE 제약과 함께 중복 처리 차단 (02번 § 8.3 + ADR-0007)"
-    },
-    "occurredAt": {
-      "type": "string",
-      "format": "date-time",
-      "description": "이벤트 발생 시각 (ISO 8601)"
-    },
-    "traceId": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{32}$",
-      "description": "W3C Trace Context trace_id (분산 추적용)"
-    },
-    "producerService": {
-      "type": "string",
-      "enum": ["auth-service", "bible-service", "ai-service", "journal-service", "bff-aggregator", "gateway"],
-      "description": "이벤트 발행 서비스명"
-    },
-    "data": {
+    "eventId": { "type": "string", "format": "uuid" },
+    "eventType": { "type": "string", "const": "AI_SESSION_COMPLETED" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "idempotencyKey": { "type": "string" },
+    "payload": {
       "type": "object",
-      "required": ["sessionId", "userId", "passage", "completedAt", "journalDraft"],
-      "additionalProperties": false,
+      "required": ["sessionId", "userId", "finalStage"],
       "properties": {
-        "sessionId": { "type": "integer", "minimum": 1 },
-        "userId": { "type": "integer", "minimum": 1 },
-        "passage": {
-          "type": "object",
-          "required": ["bookCode", "chapter", "verse"],
-          "properties": {
-            "bookCode": { "type": "string", "pattern": "^[A-Z0-9]{3}$" },
-            "chapter": { "type": "integer", "minimum": 1 },
-            "verse": { "type": "integer", "minimum": 1 }
-          }
-        },
-        "completedAt": { "type": "string", "format": "date-time" },
-        "journalDraft": {
-          "type": "object",
-          "required": ["title", "content"],
-          "properties": {
-            "title": { "type": "string", "minLength": 1, "maxLength": 200 },
-            "content": { "type": "string", "minLength": 1 }
-          }
-        }
+        "sessionId": { "type": "integer" },
+        "userId": { "type": "integer" },
+        "book": { "type": "string" },
+        "chapter": { "type": "integer" },
+        "verse": { "type": "integer" },
+        "finalStage": { "type": "string", "enum": ["D"] },
+        "totalTurns": { "type": "integer" },
+        "totalTokens": { "type": "integer" }
       }
     }
   }

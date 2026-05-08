@@ -1,290 +1,275 @@
-openapi: 3.1.0
+﻿openapi: 3.1.0
 info:
   title: QT-AI BFF Aggregator API
+  version: "1.2"
   description: |
-    Backend for Frontend — 4 service 어그리게이션 + STOMP WebSocket.
-    04번 § 8 본문 + 03번 § 1.1 정합. Gateway는 BFF로 라우팅만 (검증은 BFF).
-  version: 1.0.0
+    BFF(Backend for Frontend) 집계 서비스.
+    4 서비스 병렬 호출, 대시보드 집계, STOMP WebSocket 알림,
+    알림 목록 조회를 담당한다.
+
+    ## WebSocket (STOMP)
+    - 연결: `ws://localhost:8083/ws`
+    - STOMP CONNECT 시 `Authorization: Bearer {accessToken}` 헤더 필수
+    - BFF가 JWT 검증 담당 (Gateway는 /ws/** 인증 패스스루)
+    - 구독: `/user/queue/notifications`
   contact:
-    name: 강태오 (BFF + Gateway + DevOps Owner)
-    email: rkdxodh41@gmail.com
+    name: 강태오 (Lead + BFF Owner)
 servers:
-  - url: http://qtai.local/api/v1
-    description: dev (Minikube)
-  - url: http://localhost:4015
-    description: Prism mock (W1 Lock-in)
+  - url: http://localhost:8083
+    description: Local (직접)
+  - url: http://localhost:8080/bff
+    description: Gateway 경유
+
 tags:
   - name: dashboard
-    description: 대시보드 어그리게이션
-  - name: passage
-    description: 입체적 묵상 화면
-  - name: websocket
-    description: STOMP WebSocket (REST 외)
+    description: 대시보드 집계
+  - name: notifications
+    description: 알림 관리
+
 paths:
-  /me/dashboard:
+  /bff/me/dashboard:
     get:
       tags: [dashboard]
-      operationId: getMyDashboard
-      summary: 본인 대시보드 (4 service 병렬 호출 결과)
-      description: |
-        04번 § 8.1 + § 9.4 — Auth + Bible + AI + Journal 4 service에 CompletableFuture로 병렬 호출.
-        한 service 실패 시 partial result + 어떤 service가 실패했는지 명시 (status 200 또는 207).
-        Anthropic API/MySQL 장애 등 모든 downstream 503은 BFF가 200 + partial 또는 503으로 매핑 (04번 § 9.5).
+      summary: 내 대시보드 집계 (Auth + Bible + AI + Journal 병렬 호출)
+      operationId: getDashboard
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       responses:
         '200':
-          description: 모든 service 정상 응답
+          description: 대시보드 집계 결과
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/DashboardResponse'
-        '207':
-          description: 일부 service 실패 (partial result)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DashboardResponse'
-              examples:
-                partial:
-                  value:
-                    user:
-                      id: 1
-                      nickname: alice
-                    todayPassage:
-                      bookCode: GEN
-                      chapter: 1
-                      verse: 1
-                      text: 태초에 하나님이 천지를 창조하시니라
-                    aiSession: null
-                    journalSummary: null
-                    failures:
-                      - service: ai-service
-                        code: LLM_UNAVAILABLE
-                      - service: journal-service
-                        code: SERVICE_UNAVAILABLE
         '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/Unauthorized'
         '503':
-          description: Auth Service 장애 (본인 정보 조회 불가) — 04번 § 9.5 critical 매핑
+          description: 하위 서비스 부분 장애 (degraded 모드 — 가능한 데이터만 반환)
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/DashboardResponse'
 
-  /passages/{bookCode}/{chapter}/{verse}:
+  /bff/me/notifications:
     get:
-      tags: [passage]
-      operationId: getPassageView
-      summary: 입체적 묵상 화면 (Bible × 3 호출)
-      description: |
-        04번 § 8.2 — BFF가 Bible Service에 3번 호출해서 합침:
-        1. 해당 절 본문
-        2. 같은 장의 모든 절 (context)
-        3. 책 메타 (chapter_count 등)
-        모두 CompletableFuture로 병렬 호출. 1 service 실패 시 503.
+      tags: [notifications]
+      summary: 알림 목록 조회
+      operationId: listNotifications
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: bookCode
-          in: path
-          required: true
-          schema: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        - name: chapter
-          in: path
-          required: true
-          schema: { type: integer, minimum: 1 }
-        - name: verse
-          in: path
-          required: true
-          schema: { type: integer, minimum: 1 }
+        - name: unreadOnly
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
       responses:
         '200':
-          description: 입체적 묵상 화면 데이터
+          description: 알림 목록
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PassageViewResponse'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '404':
-          description: 존재하지 않는 절
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '503':
-          description: Bible Service 장애
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/NotificationPageResponse'
 
-  /ws/notifications:
-    get:
-      tags: [websocket]
-      operationId: connectNotificationsWebSocket
-      summary: STOMP WebSocket — 알림 수신
-      description: |
-        04번 § 10.2 + 05번 § 3.7 — STOMP WebSocket.
-        - Gateway는 패스스루 (Upgrade 헤더 그대로 BFF로)
-        - BFF가 STOMP CONNECT 프레임의 Authorization 헤더에서 JWT 직접 검증
-        - 검증 후 \`/user/{userId}/queue/notifications\` 구독
-        - notification.requested 토픽 consume 시 user_id 일치 세션에만 푸시 (ADR-0012)
-
-        본 endpoint는 OpenAPI 3.1로는 WebSocket 직접 표현 불가.
-        실제 구현은 STOMP 프로토콜 (참고: 04번 § 10.2 본문 + ADR-0012).
+  /bff/me/notifications/{notificationId}/read:
+    patch:
+      tags: [notifications]
+      summary: 알림 읽음 처리
+      operationId: markNotificationRead
       security:
-        - bearerAuth: []
+        - BearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
-        '101':
-          description: WebSocket Upgrade 성공
-        '401':
-          description: STOMP CONNECT JWT 검증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '426':
-          description: Upgrade 필요 (HTTP request로 호출 시)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+        '204':
+          description: 읽음 처리 성공
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /bff/me/notifications/read-all:
+    patch:
+      tags: [notifications]
+      summary: 전체 알림 읽음 처리
+      operationId: markAllNotificationsRead
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: 전체 읽음 처리 성공
 
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
   schemas:
     DashboardResponse:
       type: object
-      required: [user, todayPassage]
-      description: |
-        4 service 병렬 호출 결과 어그리게이션.
-        partial result 시 일부 필드 null + failures 배열 채움.
       properties:
         user:
           $ref: '#/components/schemas/UserSummary'
-        todayPassage:
-          $ref: '#/components/schemas/Verse'
-          description: 오늘의 묵상 구절 (Bible Service)
-        aiSession:
-          $ref: '#/components/schemas/AiSessionSummary'
-          nullable: true
-        journalSummary:
-          $ref: '#/components/schemas/JournalSummary'
-          nullable: true
-        failures:
+        todayVerse:
+          $ref: '#/components/schemas/TodayVerse'
+        recentSessions:
           type: array
-          description: 실패한 service 목록 (모두 정상이면 빈 배열)
           items:
-            type: object
-            required: [service, code]
-            properties:
-              service:
-                type: string
-                enum: [auth-service, bible-service, ai-service, journal-service]
-              code:
-                type: string
-                description: ProblemDetail.code 또는 SERVICE_UNAVAILABLE
+            $ref: '#/components/schemas/SessionSummary'
+          description: 최근 AI 세션 5개
+        recentJournals:
+          type: array
+          items:
+            $ref: '#/components/schemas/JournalSummary'
+          description: 최근 묵상 노트 5개
+        unreadNotificationCount:
+          type: integer
+        degraded:
+          type: boolean
+          description: 하위 서비스 일부 장애로 부분 데이터만 반환 시 true
+        degradedServices:
+          type: array
+          items:
+            type: string
+          description: 장애 서비스 이름 목록
 
     UserSummary:
       type: object
-      required: [id, nickname]
       properties:
-        id: { type: integer, format: int64 }
-        nickname: { type: string }
-        emailVerified: { type: boolean }
+        userId:
+          type: integer
+          format: int64
+        nickname:
+          type: string
+        totalJournals:
+          type: integer
 
-    AiSessionSummary:
+    TodayVerse:
+      type: object
+      description: BFF 정적 매핑 기반 오늘의 구절
+      properties:
+        book:
+          type: string
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        textKo:
+          type: string
+        textEn:
+          type: string
+
+    SessionSummary:
       type: object
       properties:
-        id: { type: integer, format: int64 }
-        currentStep: { type: string, enum: [A, B, C, D] }
+        sessionId:
+          type: integer
+          format: int64
+        book:
+          type: string
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        currentStage:
+          type: string
+          enum: [A, B, C, D]
         status:
           type: string
-          enum: [IN_PROGRESS, COMPLETED, COMPLETED_NO_JOURNAL, ABANDONED]
-        startedAt: { type: string, format: date-time }
+        updatedAt:
+          type: string
+          format: date-time
 
     JournalSummary:
       type: object
       properties:
-        recentJournalCount:
+        journalId:
           type: integer
-          description: 최근 7일 작성 노트 수
-        latestJournal:
-          type: object
-          nullable: true
-          properties:
-            id: { type: integer, format: int64 }
-            title: { type: string }
-            updatedAt: { type: string, format: date-time }
+          format: int64
+        title:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED]
+        updatedAt:
+          type: string
+          format: date-time
 
-    PassageViewResponse:
+    NotificationResponse:
       type: object
-      required: [book, currentVerse, chapterVerses]
       properties:
-        book:
-          type: object
-          required: [code, krName, chapterCount]
-          properties:
-            code: { type: string }
-            krName: { type: string }
-            chapterCount: { type: integer }
-        currentVerse:
-          $ref: '#/components/schemas/Verse'
-        chapterVerses:
+        notificationId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum: [JOURNAL_PUBLISHED, AI_SESSION_COMPLETED, SYSTEM]
+          description: 알림 유형 (확장 가능)
+        title:
+          type: string
+        body:
+          type: string
+        isRead:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    NotificationPageResponse:
+      type: object
+      properties:
+        content:
           type: array
           items:
-            $ref: '#/components/schemas/Verse'
+            $ref: '#/components/schemas/NotificationResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
 
-    Verse:
+    ErrorResponse:
       type: object
-      required: [bookCode, chapter, verse, text]
+      required: [code, message, traceId]
       properties:
-        bookCode: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        chapter: { type: integer, minimum: 1 }
-        verse: { type: integer, minimum: 1 }
-        text: { type: string }
-        translation:
-          type: string
-          enum: [KRV]
-          default: KRV
-
-    ProblemDetail:
-      type: object
-      description: RFC 9457 (04번 § 2.4)
-      required: [type, title, status, code, instance]
-      properties:
-        type: { type: string, format: uri }
-        title: { type: string }
-        status: { type: integer }
         code:
           type: string
-          enum:
-            - UNAUTHORIZED
-            - TOKEN_EXPIRED
-            - VALIDATION_FAILED
-            - PASSAGE_NOT_FOUND
-            - SERVICE_UNAVAILABLE
-            - PARTIAL_RESULT
-            - WEBSOCKET_AUTH_FAILED
-            - WEBSOCKET_UPGRADE_REQUIRED
-            - RATE_LIMITED
-        detail: { type: string }
-        instance: { type: string }
-        traceId: { type: string, pattern: '^[0-9a-f]{32}$' }
+        message:
+          type: string
+        traceId:
+          type: string
 
-security:
-  - bearerAuth: []
+  responses:
+    Unauthorized:
+      description: 인증 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

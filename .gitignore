@@ -52,3 +52,8 @@ logs/
 # Temp
 tmp/
 temp/
+
+# AI Service 로컬 환경변수 (시크릿 포함)
+.env.local
+ai-service/.env.local
+**/*.env.local

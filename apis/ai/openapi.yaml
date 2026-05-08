@@ -1,262 +1,275 @@
-openapi: 3.1.0
+﻿openapi: 3.1.0
 info:
   title: QT-AI AI Service API
+  version: "1.2"
   description: |
-    큐티 4단계 AI 대화·RAG·Anthropic 호출 service.
-    04번 § 6 본문 + 03번 § 3.3 신학 가드레일 정합.
-  version: 1.0.0
+    AI/RAG 서비스. 큐티 A(관찰)·B(해석)·C(적용)·D(결단) 4단계 코칭,
+    Anthropic Claude SSE 스트리밍, ChromaDB RAG, 프롬프트 템플릿 관리를 담당한다.
+
+    ## SSE 스트리밍
+    POST /ai/sessions/{id}/messages 는 `text/event-stream` 응답으로
+    토큰 단위 스트리밍을 반환한다. Gateway NoBufferingFilter 적용.
+
+    ## 큐티 4단계
+    - A (관찰): 본문에서 무엇을 보는가?
+    - B (해석): 이 말씀이 의미하는 것은?
+    - C (적용): 내 삶에 어떻게 적용하는가?
+    - D (결단): 오늘 무엇을 결단하는가?
   contact:
-    name: 강상민 (AI Service Owner)
-    email: rkdxodh41@gmail.com
+    name: 강상민 (AI/RAG Owner)
 servers:
-  - url: http://qtai.local/api/v1
-    description: dev (Minikube)
-  - url: http://localhost:4013
-    description: Prism mock (W1 Lock-in)
+  - url: http://localhost:8085
+    description: Local Python FastAPI (직접)
+  - url: http://localhost:8080/ai
+    description: Gateway 경유
+
 tags:
-  - name: ai
-    description: AI 큐티 세션·턴
+  - name: sessions
+    description: 큐티 AI 세션 관리
+  - name: messages
+    description: AI 대화 (SSE 스트리밍)
+  - name: templates
+    description: 프롬프트 템플릿
+
 paths:
   /ai/sessions:
     post:
-      tags: [ai]
-      operationId: createAiSession
-      summary: AI 세션 시작
-      description: |
-        구절 기반 큐티 4단계(A→B→C→D) 세션 생성.
-        본인 user_id로만 가능 (X-User-Id Gateway 검증).
+      tags: [sessions]
+      summary: 큐티 세션 생성
+      operationId: createSession
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SessionCreateRequest'
-            examples:
-              standard:
-                value:
-                  passage: { bookCode: GEN, chapter: 1, verse: 1 }
-                  initialStep: A
+              $ref: '#/components/schemas/CreateSessionRequest'
       responses:
         '201':
-          description: 세션 생성
+          description: 세션 생성 성공
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionResponse'
-        '400':
-          description: 잘못된 passage 또는 step
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
         '401':
-          description: 인증 실패
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      tags: [sessions]
+      summary: 내 세션 목록 조회
+      operationId: listSessions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: 세션 목록
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '429':
-          description: 60 req/min 또는 동시 SSE 3개 초과 (LLM 비용 보호)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/SessionPageResponse'
 
   /ai/sessions/{sessionId}:
     get:
-      tags: [ai]
-      operationId: getAiSession
-      summary: AI 세션 조회
-      description: 본인 세션만 조회 가능 (자원 소유자 검증 — 05번 § 4.2)
+      tags: [sessions]
+      summary: 세션 상세 조회 (대화 이력 포함)
+      operationId: getSession
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema: { type: integer, format: int64, minimum: 1 }
+        - $ref: '#/components/parameters/SessionIdParam'
       responses:
         '200':
-          description: 세션 + 모든 turn 목록
+          description: 세션 상세
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionDetailResponse'
-        '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '403':
-          description: 본인 세션 아님 (IDOR)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
         '404':
-          description: 세션 없음
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/NotFound'
 
-  /ai/sessions/{sessionId}/turns:
+  /ai/sessions/{sessionId}/messages:
     post:
-      tags: [ai]
-      operationId: createSessionTurn
-      summary: 사용자 턴 + AI 응답 (SSE)
-      description: |
-        사용자 메시지 보내고 AI 응답을 SSE 스트림으로 받음.
-        04번 § 6.3 SSE 표준 (event: token / turn_completed / error / end).
-        Gateway는 SSE buffering filter 안 적용 (04번 § 9.6).
+      tags: [messages]
+      summary: AI에게 메시지 전송 (SSE 스트리밍 응답)
+      operationId: sendMessage
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/SessionIdParam'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TurnCreateRequest'
+              $ref: '#/components/schemas/SendMessageRequest'
       responses:
         '200':
-          description: SSE 스트림 시작
+          description: SSE 스트림 — 토큰 단위 청크
           content:
             text/event-stream:
               schema:
-                type: string
-                description: |
-                  Server-Sent Events. 4 종류 이벤트:
-                  - event: token (data: { text: string })
-                  - event: turn_completed (data: { turnId: int, ragSources: [...] })
-                  - event: error (data: { code: string, message: string })
-                  - event: end (data: [DONE])
-              examples:
-                stream:
-                  value: |
-                    event: token
-                    data: {"text":"창조"}
-
-                    event: token
-                    data: {"text":"의 의미는 "}
-
-                    event: turn_completed
-                    data: {"turnId":33,"ragSources":[{"docId":"rag-001","relevance":0.92}]}
-
-                    event: end
-                    data: [DONE]
-        '400':
-          description: 빈 메시지·step 누락
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/SseChunk'
         '401':
-          description: 인증 실패
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '403':
-          description: 본인 세션 아님
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '503':
-          description: Anthropic API 장애 (04번 § 6.3)
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '504':
-          description: Anthropic 응답 timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
 
-  /ai/sessions/{sessionId}/abandon:
-    post:
-      tags: [ai]
-      operationId: abandonAiSession
-      summary: 세션 중단 (사용자가 그만하기)
-      description: status를 ABANDONED로 변경. 진행 중 SSE는 cancel.
+  /ai/sessions/{sessionId}/advance:
+    patch:
+      tags: [sessions]
+      summary: 큐티 단계 진행 (A→B→C→D)
+      operationId: advanceStage
       security:
-        - bearerAuth: []
+        - BearerAuth: []
       parameters:
-        - name: sessionId
-          in: path
-          required: true
-          schema: { type: integer, format: int64 }
+        - $ref: '#/components/parameters/SessionIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvanceStageRequest'
       responses:
-        '204':
-          description: 중단 완료
-        '401':
-          description: 인증 실패
+        '200':
+          description: 단계 진행 성공
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
-        '403':
-          description: 본인 세션 아님
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/SessionResponse'
         '409':
-          description: 이미 종료된 세션
+          description: 이미 마지막 단계 (D)
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ProblemDetail'
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ai/prompt-templates:
+    get:
+      tags: [templates]
+      summary: 프롬프트 템플릿 목록 (큐티 A~D)
+      operationId: listPromptTemplates
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: stage
+          in: query
+          schema:
+            type: string
+            enum: [A, B, C, D]
+          description: 단계 필터 (없으면 전체)
+      responses:
+        '200':
+          description: 템플릿 목록
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PromptTemplateResponse'
 
 components:
   securitySchemes:
-    bearerAuth:
+    BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  parameters:
+    SessionIdParam:
+      name: sessionId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+        example: 42
+
   schemas:
-    SessionCreateRequest:
+    CreateSessionRequest:
       type: object
-      required: [passage, initialStep]
+      required: [book, chapter, verse]
       properties:
-        passage:
-          $ref: '#/components/schemas/PassageRef'
-        initialStep:
+        book:
+          type: string
+          example: JHN
+          description: 성경 책 코드
+        chapter:
+          type: integer
+          example: 3
+        verse:
+          type: integer
+          example: 16
+        templateType:
           type: string
           enum: [A, B, C, D]
           default: A
+          description: 시작 단계
 
-    PassageRef:
+    SendMessageRequest:
       type: object
-      required: [bookCode, chapter, verse]
+      required: [userMessage]
       properties:
-        bookCode: { type: string, pattern: '^[A-Z0-9]{3}$' }
-        chapter: { type: integer, minimum: 1 }
-        verse: { type: integer, minimum: 1 }
+        userMessage:
+          type: string
+          maxLength: 2000
+          example: "이 구절에서 하나님의 사랑이 어떻게 표현되나요?"
+        idempotencyKey:
+          type: string
+          description: 클라이언트 멱등성 키 (선택)
+          example: "msg-uuid-v4"
+
+    AdvanceStageRequest:
+      type: object
+      required: [currentStage]
+      properties:
+        currentStage:
+          type: string
+          enum: [A, B, C]
+          description: 현재 단계 (D는 마지막이므로 진행 불가)
 
     SessionResponse:
       type: object
-      required: [id, userId, passage, currentStep, status, startedAt]
       properties:
-        id: { type: integer, format: int64 }
-        userId: { type: integer, format: int64 }
-        passage: { $ref: '#/components/schemas/PassageRef' }
-        currentStep: { type: string, enum: [A, B, C, D] }
+        sessionId:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        book:
+          type: string
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        currentStage:
+          type: string
+          enum: [A, B, C, D]
         status:
           type: string
-          enum: [IN_PROGRESS, COMPLETED, COMPLETED_NO_JOURNAL, ABANDONED]
-        startedAt: { type: string, format: date-time }
-        completedAt: { type: string, format: date-time, nullable: true }
+          enum: [ACTIVE, COMPLETED, ABANDONED]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
 
     SessionDetailResponse:
       allOf:
@@ -266,65 +279,118 @@ components:
             turns:
               type: array
               items:
-                $ref: '#/components/schemas/Turn'
+                $ref: '#/components/schemas/TurnResponse'
 
-    TurnCreateRequest:
+    TurnResponse:
       type: object
-      required: [step, content]
       properties:
-        step: { type: string, enum: [A, B, C, D] }
-        content:
-          type: string
-          minLength: 1
-          maxLength: 4000
-
-    Turn:
-      type: object
-      required: [id, sessionId, role, step, content, createdAt]
-      properties:
-        id: { type: integer, format: int64 }
-        sessionId: { type: integer, format: int64 }
+        turnId:
+          type: integer
+          format: int64
         role:
           type: string
           enum: [USER, ASSISTANT]
-        step: { type: string, enum: [A, B, C, D] }
-        content: { type: string }
-        ragSources:
-          type: array
-          description: ASSISTANT 턴에 RAG 출처 (03번 § 3.3 강제)
-          items:
-            type: object
-            properties:
-              docId: { type: string }
-              relevance: { type: number, minimum: 0, maximum: 1 }
-        createdAt: { type: string, format: date-time }
+        content:
+          type: string
+        stage:
+          type: string
+          enum: [A, B, C, D]
+        inputTokens:
+          type: integer
+          nullable: true
+        outputTokens:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
 
-    ProblemDetail:
+    SessionPageResponse:
       type: object
-      description: RFC 9457 (04번 § 2.4)
-      required: [type, title, status, code, instance]
       properties:
-        type: { type: string, format: uri }
-        title: { type: string }
-        status: { type: integer }
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    SseChunk:
+      type: object
+      description: SSE 이벤트 페이로드
+      properties:
+        type:
+          type: string
+          enum: [token, done, error]
+        data:
+          type: string
+          description: "type=token: 토큰 문자열 / type=done: 최종 요약 JSON / type=error: 에러 메시지"
+        sessionId:
+          type: integer
+          format: int64
+        stage:
+          type: string
+          enum: [A, B, C, D]
+
+    PromptTemplateResponse:
+      type: object
+      properties:
+        templateId:
+          type: integer
+          format: int64
+        stage:
+          type: string
+          enum: [A, B, C, D]
+        name:
+          type: string
+        systemPrompt:
+          type: string
+        isActive:
+          type: boolean
+        version:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      required: [code, message, traceId]
+      properties:
         code:
           type: string
-          enum:
-            - UNAUTHORIZED
-            - TOKEN_EXPIRED
-            - VALIDATION_FAILED
-            - SESSION_NOT_FOUND
-            - SESSION_NOT_OWNED
-            - SESSION_ALREADY_TERMINATED
-            - INVALID_STEP_TRANSITION
-            - LLM_UNAVAILABLE
-            - LLM_TIMEOUT
-            - PROMPT_INJECTION_DETECTED
-            - RAG_SOURCES_REQUIRED
-            - RATE_LIMITED
-        detail: { type: string }
-        instance: { type: string }
-        traceId: { type: string, pattern: '^[0-9a-f]{32}$' }
+        message:
+          type: string
+        traceId:
+          type: string
 
-security:
-  - bearerAuth: []
+  responses:
+    Unauthorized:
+      description: 인증 실패
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: AI_SESSION_NOT_FOUND
+            message: 세션을 찾을 수 없습니다.
+            traceId: "00-abc123-01"
+    UnprocessableEntity:
+      description: 입력값 검증 실패 또는 신학 가드레일 차단
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: AI_THEOLOGICAL_GUARDRAIL_BLOCKED
+            message: 해당 요청은 신학 가드레일에 의해 차단되었습니다.
+            traceId: "00-abc123-01"

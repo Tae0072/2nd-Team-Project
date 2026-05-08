@@ -1,0 +1,17 @@
+﻿spring:
+  application:
+    name: gateway-service
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  tracing:
+    sampling:
+      probability: 1.0
