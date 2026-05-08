@@ -19,7 +19,7 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 **v1.0: BFF Aggregator의 stateless WebSocket (STOMP)** (03번 § 1.1):
 
 흐름:
-1. AI Service가 \i.session.completed\ 발행
+1. AI Service가 \ai.session.completed\ 발행
 2. Journal Service가 자동으로 새 Journal 생성 + \
 otification.requested\ 발행
 3. BFF Aggregator가 \

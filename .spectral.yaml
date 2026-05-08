@@ -25,8 +25,14 @@ rules:
       field: "application/problem+json"
       function: truthy
 
-  # 인증 필요 endpoint는 security 명시 (Spectral OAS 내장)
-  operation-security-defined: error
+  # 인증 필요 endpoint는 security 명시 — Spectral 6 내장 룰 없으므로 커스텀 정의
+  operation-security-defined:
+    description: 인증이 필요한 모든 endpoint는 security 필드 명시 (05번 § 2)
+    severity: error
+    given: $.paths[*][get,post,put,patch,delete]
+    then:
+      field: security
+      function: truthy
 
   # snake_case 금지 (응답 본문 필드는 camelCase)
   schema-property-camelcase:

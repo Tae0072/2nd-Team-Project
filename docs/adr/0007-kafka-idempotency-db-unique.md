@@ -35,7 +35,7 @@ consumer 처리 흐름:
 4. 정상 INSERT → 비즈니스 로직 처리 → ack
 
 idempotencyKey pattern은 토픽별 (events/schema/*.json):
-- ai.session.completed: \i.session.completed:{sessionId}\
+- ai.session.completed: \ai.session.completed:{sessionId}\
 - journal.created: \journal.created:{journalId}\
 - 등등 (8개 토픽 모두)
 

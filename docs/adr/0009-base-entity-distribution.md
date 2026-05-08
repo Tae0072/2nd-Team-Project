@@ -26,7 +26,7 @@ bible-service/src/main/java/com/qtai/common/BaseEntity.java
 \\\
 
 변경 시 6 service 모두 PR (스크립트로 자동 동기화 가능):
-\\\ash
+\\\bash
 # 강태오 W0 작성: scripts/sync-base-entity.sh
 for svc in gateway bff-aggregator auth-service bible-service ai-service journal-service; do
   cp common/BaseEntity.java \/src/main/java/com/qtai/common/BaseEntity.java

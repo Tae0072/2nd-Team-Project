@@ -11,8 +11,8 @@
   "properties": {
     "eventId": {
       "type": "string",
-      "format": "uuid",
-      "description": "이벤트 고유 ID (UUID v4 또는 ULID)"
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
+      "description": "이벤트 고유 ID (UUID v4, RFC 4122)"
     },
     "eventType": {
       "type": "string",

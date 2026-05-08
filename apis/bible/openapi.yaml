@@ -37,9 +37,9 @@ paths:
               examples:
                 first3:
                   value:
-                    - { code: GEN, kr_name: 창세기, en_name: Genesis, chapter_count: 50, testament: OLD, order: 1 }
-                    - { code: EXO, kr_name: 출애굽기, en_name: Exodus, chapter_count: 40, testament: OLD, order: 2 }
-                    - { code: LEV, kr_name: 레위기, en_name: Leviticus, chapter_count: 27, testament: OLD, order: 3 }
+                    - { code: GEN, krName: 창세기, enName: Genesis, chapterCount: 50, testament: OLD, sortOrder: 1 }
+                    - { code: EXO, krName: 출애굽기, enName: Exodus, chapterCount: 40, testament: OLD, sortOrder: 2 }
+                    - { code: LEV, krName: 레위기, enName: Leviticus, chapterCount: 27, testament: OLD, sortOrder: 3 }
         '401':
           description: 인증 실패
           content:

@@ -42,8 +42,8 @@ paths:
           in: query
           schema:
             type: string
-            enum: [createdAt,desc, createdAt,asc, updatedAt,desc, updatedAt,asc]
-            default: createdAt,desc
+            enum: ["createdAt,desc", "createdAt,asc", "updatedAt,desc", "updatedAt,asc"]
+            default: "createdAt,desc"
       responses:
         '200':
           description: 페이지네이션 결과
