@@ -1,4 +1,4 @@
-﻿openapi: 3.1.0
+openapi: 3.1.0
 info:
   title: QT-AI AI Service API
   version: "1.2"
@@ -320,11 +320,14 @@ components:
 
     SseChunk:
       type: object
-      description: SSE 이벤트 페이로드
+      description: >-
+        SSE 이벤트 페이로드. 04_API_명세서.md canonical 포맷:
+        turn_started/token/rag_sources/turn_completed/[DONE]
       properties:
-        type:
+        eventType:
           type: string
-          enum: [token, done, error]
+          enum: [turn_started, token, rag_sources, turn_completed]
+          description: SSE event 필드값
         data:
           type: string
           description: "type=token: 토큰 문자열 / type=done: 최종 요약 JSON / type=error: 에러 메시지"

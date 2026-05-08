@@ -1,4 +1,4 @@
-﻿spring:
+spring:
   application:
     name: gateway-service
   profiles:
@@ -15,46 +15,59 @@
             allowedHeaders: "*"
             allowCredentials: true
       routes:
+        # ── 인증 필요 없는 경로 (AuthFilter 미적용) ───────────────────────────
         - id: auth-service
           uri: http://auth-service:8081
           predicates:
-            - Path=/auth/**
+            - Path=/api/v1/auth/**
           filters:
-            - StripPrefix=0
+            - RewritePath=/api/v1/(?<seg>.*), /${seg}
+            # AuthFilter 없음 — 로그인/회원가입은 토큰 불필요
 
+        # ── WebSocket 핸드셰이크 (인증 제외 — STOMP CONNECT 프레임에서 검증) ──
+        # P1-4 fix: /ws/** 는 HTTP Authorization 없이 Upgrade 요청이 들어오므로
+        # Gateway에서 401 차단하면 STOMP 연결이 불가능. BFF가 STOMP CONNECT 시점에 직접 검증.
+        - id: bff-ws
+          uri: ws://bff-service:8083
+          predicates:
+            - Path=/ws/**
+          filters:
+            - RewritePath=/ws/(?<seg>.*), /ws/${seg}
+            # AuthFilter 없음
+
+        # ── 인증 필요 경로 (AuthFilter 적용) ─────────────────────────────────
         - id: bible-service
           uri: http://bible-service:8082
           predicates:
-            - Path=/bible/**
+            - Path=/api/v1/bible/**
           filters:
             - AuthFilter
-            - StripPrefix=0
+            - RewritePath=/api/v1/(?<seg>.*), /${seg}
 
+        # BFF Aggregator: /api/v1/me/**, /api/v1/passages/**
         - id: bff-service
           uri: http://bff-service:8083
           predicates:
-            - Path=/bff/**,/ws/**
+            - Path=/api/v1/me/**,/api/v1/passages/**
           filters:
             - AuthFilter
-            - StripPrefix=0
+            - RewritePath=/api/v1/(?<seg>.*), /${seg}
 
         - id: journal-service
           uri: http://journal-service:8084
           predicates:
-            - Path=/journal/**
+            - Path=/api/v1/journals/**
           filters:
             - AuthFilter
-            - StripPrefix=0
+            - RewritePath=/api/v1/(?<seg>.*), /${seg}
 
         - id: ai-service
           uri: http://ai-service:8085
           predicates:
-            - Path=/ai/**
+            - Path=/api/v1/ai/**
           filters:
             - AuthFilter
-            - name: RequestHeaderSize
-              args:
-                maxSize: 16KB
+            - RewritePath=/api/v1/(?<seg>.*), /${seg}
 
   data:
     redis:
