@@ -1,26 +1,35 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.created-value",
   "title": "JournalCreatedEvent",
-  "description": "묵상 노트 발행 이벤트 — Kafka topic: journal.created",
+  "description": "묵상 노트 자동 생성(DRAFT) 이벤트 — topic: journal.created",
   "type": "object",
-  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
+  "required": ["eventId", "eventType", "eventVersion", "schemaSubject", "occurredAt", "traceId", "producerService", "idempotencyKey", "data"],
   "properties": {
-    "eventId": { "type": "string", "format": "uuid", "description": "이벤트 고유 ID" },
-    "eventType": { "type": "string", "const": "JOURNAL_CREATED" },
-    "occurredAt": { "type": "string", "format": "date-time" },
-    "idempotencyKey": { "type": "string", "description": "Kafka 컨슈머 멱등성 키" },
-    "payload": {
+    "eventId":        { "type": "string" },
+    "eventType":      { "type": "string", "const": "journal.created" },
+    "eventVersion":   { "type": "integer", "minimum": 1 },
+    "schemaSubject":  { "type": "string", "const": "journal.created-value" },
+    "occurredAt":     { "type": "string", "format": "date-time" },
+    "traceId":        { "type": "string" },
+    "producerService":{ "type": "string", "const": "journal-service" },
+    "idempotencyKey": { "type": "string", "description": "journal.created:{journalId}" },
+    "data": {
       "type": "object",
-      "required": ["journalId", "userId", "title", "book", "chapter", "verse"],
+      "required": ["journalId", "userId", "passage", "createdAt"],
       "properties": {
-        "journalId": { "type": "integer" },
-        "userId": { "type": "integer" },
-        "title": { "type": "string" },
-        "book": { "type": "string" },
-        "chapter": { "type": "integer" },
-        "verse": { "type": "integer" },
-        "sessionId": { "type": "integer" }
+        "journalId":  { "type": "integer" },
+        "userId":     { "type": "integer" },
+        "passage": {
+          "type": "object",
+          "required": ["bookCode", "chapter", "verse"],
+          "properties": {
+            "bookCode": { "type": "string" },
+            "chapter":  { "type": "integer" },
+            "verse":    { "type": "integer" }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
       }
     }
   }

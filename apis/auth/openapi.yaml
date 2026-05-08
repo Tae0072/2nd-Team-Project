@@ -3,23 +3,21 @@ info:
   title: QT-AI Auth Service API
   version: "1.2"
   description: |
-    인증/인가 서비스. JWT RS256 발급·검증·갱신, Google OAuth 2.0,
-    회원가입·탈퇴·정보 조회를 담당한다.
+    인증/인가 서비스. JWT RS256 발급/검증/갱신, Google OAuth 2.0 (idToken POST).
+    토큰 정책(03번 11.1): Access=30분(1800s), Refresh=14일. blacklist=Redis-WS(Refresh jti만). Access blacklist 없음.
   contact:
     name: 이지윤 (Auth Owner)
 servers:
+  - url: http://localhost:4011
+    description: Prism mock (04번 12.2 기준 포트)
   - url: http://localhost:8081
-    description: Local (직접 접근)
+    description: Local 직접 접근
   - url: http://localhost:8080
-    description: Gateway 경유 (prefix /auth 는 Gateway 라우팅 규칙에서 처리)
+    description: Gateway 경유
 tags:
-  - name: auth
-    description: 로그인·로그아웃·토큰 갱신
-  - name: user
-    description: 회원가입·탈퇴·내 정보
-  - name: oauth
-    description: Google OAuth 2.0
-
+  - {name: auth, description: 로그인/로그아웃/토큰갱신}
+  - {name: user, description: 회원가입/탈퇴/내정보}
+  - {name: oauth, description: Google OAuth 2.0}
 paths:
   /auth/register:
     post:
@@ -33,18 +31,30 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
+            example:
+              email: user@example.com
+              password: P@ssw0rd123
+              nickname: 큐티러버
       responses:
         '201':
           description: 회원가입 성공
+          headers:
+            Location: {schema: {type: string}, description: /auth/me}
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+              example:
+                id: 5678
+                email: user@example.com
+                nickname: 큐티러버
+                createdAt: '2026-05-12T03:21:11.456Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '409':
           $ref: '#/components/responses/Conflict'
-        '422':
-          $ref: '#/components/responses/UnprocessableEntity'
-
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
   /auth/login:
     post:
       tags: [auth]
@@ -57,25 +67,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: user@example.com
+              password: P@ssw0rd123
       responses:
         '200':
-          description: 로그인 성공 — Access + Refresh 토큰 반환
+          description: 로그인 성공 - Access+Refresh 토큰 반환
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenPairResponse'
+              example:
+                accessToken: 'eyJhbGc...'
+                refreshToken: 'eyJhbGc...'
+                tokenType: Bearer
+                expiresIn: 1800
+                user: {id: 5678, email: 'user@example.com', nickname: 큐티러버}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/TooManyRequests'
-
   /auth/logout:
     post:
       tags: [auth]
-      summary: 로그아웃 (Refresh Token 블랙리스트 등록)
+      summary: 로그아웃 (Refresh blacklist 등록)
+      description: "인증 불필요(security: []). refresh token만 검증. Access 만료 후에도 가능. (04번 4.5)"
       operationId: logout
-      security:
-        - BearerAuth: []
+      security: []
       requestBody:
         required: true
         content:
@@ -83,15 +101,13 @@ paths:
             schema:
               $ref: '#/components/schemas/LogoutRequest'
       responses:
-        '204':
-          description: 로그아웃 성공
+        '204': {description: 로그아웃 성공}
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   /auth/refresh:
     post:
       tags: [auth]
-      summary: Access Token 갱신 (Refresh Token Rotation)
+      summary: Access Token 갱신 (Token Rotation + Redis Distributed Lock)
       operationId: refreshToken
       security: []
       requestBody:
@@ -102,21 +118,26 @@ paths:
               $ref: '#/components/schemas/RefreshRequest'
       responses:
         '200':
-          description: 새 토큰 쌍 반환
+          description: 신규 토큰 쌍
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenPairResponse'
+              example:
+                accessToken: 'eyJhbGc...(new)'
+                refreshToken: 'eyJhbGc...(new)'
+                tokenType: Bearer
+                expiresIn: 1800
         '401':
           $ref: '#/components/responses/Unauthorized'
-
+        '409':
+          $ref: '#/components/responses/Conflict'
   /auth/me:
     get:
       tags: [user]
       summary: 내 정보 조회
       operationId: getMe
-      security:
-        - BearerAuth: []
+      security: [{BearerAuth: []}]
       responses:
         '200':
           description: 사용자 정보
@@ -124,16 +145,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+              example:
+                id: 5678
+                email: user@example.com
+                nickname: 큐티러버
+                role: ROLE_USER
+                status: ACTIVE
+                createdAt: '2026-05-12T03:21:11.456Z'
+                updatedAt: '2026-05-26T08:14:33.001Z'
+                oauthLinks: [{provider: GOOGLE, linkedAt: '2026-05-15T10:00:00Z'}]
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   /auth/me/deactivate:
     post:
       tags: [user]
-      summary: 회원 탈퇴 (Soft Delete + 이메일 마스킹)
+      summary: 회원 탈퇴 (Soft Delete + email 마스킹 + user.deactivated 이벤트)
+      description: "TX: status=DEACTIVATED, deleted_at=NOW(), email 마스킹, refresh revoke. AFTER_COMMIT: Kafka user.deactivated 발행."
       operationId: deactivateMe
-      security:
-        - BearerAuth: []
+      security: [{BearerAuth: []}]
       requestBody:
         required: true
         content:
@@ -141,189 +170,208 @@ paths:
             schema:
               $ref: '#/components/schemas/DeactivateRequest'
       responses:
-        '204':
-          description: 탈퇴 성공
+        '204': {description: 탈퇴 성공}
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
-
   /auth/oauth/google:
-    get:
+    post:
       tags: [oauth]
-      summary: Google OAuth 리다이렉트
-      operationId: googleOAuthRedirect
+      summary: Google OAuth - idToken POST (JWK 직접 검증)
+      description: |
+        Flutter Google Sign-In SDK 발급 idToken POST. 서버가 JWKS endpoint(1h cache)로
+        서명/iss/aud/exp 직접 검증. redirect 방식 미사용(모바일 앱 표준, 04번 4.8).
+      operationId: googleOAuthLogin
       security: []
-      responses:
-        '302':
-          description: Google 인가 화면으로 리다이렉트
-
-  /auth/oauth/google/callback:
-    get:
-      tags: [oauth]
-      summary: Google OAuth 콜백 — JWT 발급
-      operationId: googleOAuthCallback
-      security: []
-      parameters:
-        - name: code
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: state
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleOAuthRequest'
+            example:
+              idToken: 'eyJ...'
       responses:
         '200':
-          description: OAuth 로그인 성공
+          description: OAuth 로그인/가입 성공
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenPairResponse'
+                $ref: '#/components/schemas/OAuthLoginResponse'
+              example:
+                accessToken: 'eyJhbGc...'
+                refreshToken: 'eyJhbGc...'
+                tokenType: Bearer
+                expiresIn: 1800
+                user: {id: 5678, email: 'user@example.com', nickname: 큐티러버}
+                isNewUser: false
         '401':
           $ref: '#/components/responses/Unauthorized'
-
+        '502':
+          $ref: '#/components/responses/BadGateway'
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
   schemas:
     RegisterRequest:
       type: object
       required: [email, password, nickname]
       properties:
-        email:
-          type: string
-          format: email
-          example: user@example.com
-        password:
-          type: string
-          minLength: 8
-          example: P@ssw0rd123
-        nickname:
-          type: string
-          minLength: 2
-          maxLength: 20
-          example: 큐티러버
-
+        email: {type: string, format: email, maxLength: 254, description: 'RFC 5321 max 254'}
+        password: {type: string, minLength: 8, maxLength: 72, description: '영문+숫자+특수문자 1개이상 (bcrypt max 72)'}
+        nickname: {type: string, minLength: 2, maxLength: 50}
     LoginRequest:
       type: object
       required: [email, password]
       properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-
+        email: {type: string, format: email}
+        password: {type: string}
     LogoutRequest:
       type: object
       required: [refreshToken]
       properties:
-        refreshToken:
-          type: string
-
+        refreshToken: {type: string}
     RefreshRequest:
       type: object
       required: [refreshToken]
       properties:
-        refreshToken:
-          type: string
-
+        refreshToken: {type: string}
     DeactivateRequest:
       type: object
-      required: [password]
       properties:
-        password:
-          type: string
-          description: 본인 확인용 현재 패스워드
-
+        password: {type: string, description: 이메일 가입자 본인확인}
+        confirmText: {type: string, enum: ['탈퇴'], description: 소셜 전용 가입자}
+    GoogleOAuthRequest:
+      type: object
+      required: [idToken]
+      properties:
+        idToken: {type: string, description: 'Google Sign-In SDK 발급 ID Token (JWK 검증)'}
     TokenPairResponse:
       type: object
+      required: [accessToken, refreshToken, tokenType, expiresIn, user]
       properties:
-        accessToken:
-          type: string
-          description: JWT RS256, 15분 유효
-        refreshToken:
-          type: string
-          description: 불투명 토큰, 7일 유효
-        tokenType:
-          type: string
-          example: Bearer
-        expiresIn:
-          type: integer
-          example: 900
-          description: Access Token 유효기간(초)
-
+        accessToken: {type: string, description: 'JWT RS256, 30분 유효'}
+        refreshToken: {type: string, description: '불투명 토큰, 14일 유효'}
+        tokenType: {type: string, const: Bearer}
+        expiresIn: {type: integer, example: 1800, description: 'Access Token 유효기간(초), 1800=30분'}
+        user:
+          $ref: '#/components/schemas/UserSummary'
+    OAuthLoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/TokenPairResponse'
+        - type: object
+          properties:
+            isNewUser: {type: boolean, description: 'true=신규가입, false=기존로그인'}
     UserResponse:
       type: object
+      required: [id, email, nickname]
       properties:
-        userId:
-          type: integer
-          format: int64
-          example: 1001
-        email:
-          type: string
-          format: email
-        nickname:
-          type: string
-        provider:
-          type: string
-          enum: [LOCAL, GOOGLE]
-        createdAt:
-          type: string
-          format: date-time
-
-    ErrorResponse:
+        id: {type: integer, format: int64, description: '외부 노출 식별자 (다른 서비스의 user_id 참조값)'}
+        email: {type: string, format: email}
+        nickname: {type: string}
+        role: {type: string, enum: [ROLE_USER, ROLE_ADMIN]}
+        status: {type: string, enum: [ACTIVE, SUSPENDED, DEACTIVATED]}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+        oauthLinks:
+          type: array
+          items:
+            type: object
+            properties:
+              provider: {type: string, enum: [GOOGLE]}
+              linkedAt: {type: string, format: date-time}
+    UserSummary:
       type: object
-      required: [code, message, traceId]
+      required: [id, email, nickname]
       properties:
-        code:
-          type: string
-          example: AUTH_INVALID_CREDENTIALS
-        message:
-          type: string
-        traceId:
-          type: string
-          description: W3C Trace Context traceId
-
+        id: {type: integer, format: int64}
+        email: {type: string, format: email}
+        nickname: {type: string}
+    ProblemDetail:
+      type: object
+      required: [type, title, status, code, traceId, timestamp]
+      properties:
+        type: {type: string, format: uri}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        instance: {type: string}
+        code: {type: string, description: '도메인 에러 코드 (예: EMAIL_ALREADY_EXISTS)'}
+        traceId: {type: string, description: 'W3C Trace Context traceId'}
+        timestamp: {type: string, format: date-time}
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: {type: string}
+              code: {type: string}
+              message: {type: string}
   responses:
+    BadRequest:
+      description: 검증 실패 (400)
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/validation-failed'
+            title: Validation failed
+            status: 400
+            code: VALIDATION_FAILED
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-26T14:30:00.123Z'
+            errors: [{field: password, code: PASSWORD_TOO_WEAK, message: '영문+숫자+특수문자 1개이상'}]
     Unauthorized:
-      description: 인증 실패
+      description: 인증 실패 (401)
       content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
           example:
-            code: AUTH_INVALID_CREDENTIALS
-            message: 이메일 또는 패스워드가 올바르지 않습니다.
-            traceId: "00-abc123-01"
+            type: 'https://api.qtai.app/errors/unauthorized'
+            title: Unauthorized
+            status: 401
+            code: INVALID_CREDENTIALS
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-26T14:30:00.123Z'
     Conflict:
-      description: 이미 존재하는 리소스
+      description: 충돌 (409)
       content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
           example:
-            code: AUTH_EMAIL_ALREADY_EXISTS
-            message: 이미 사용 중인 이메일입니다.
-            traceId: "00-abc123-01"
-    UnprocessableEntity:
-      description: 입력값 검증 실패
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            type: 'https://api.qtai.app/errors/conflict'
+            title: Conflict
+            status: 409
+            code: EMAIL_ALREADY_EXISTS
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-26T14:30:00.123Z'
     TooManyRequests:
-      description: Rate Limit 초과
+      description: Rate limit 초과 (429)
+      headers:
+        Retry-After: {schema: {type: integer}}
       content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
           example:
-            code: RATE_LIMIT_EXCEEDED
-            message: 요청 한도를 초과했습니다. 잠시 후 다시 시도하세요.
-            traceId: "00-abc123-01"
+            type: 'https://api.qtai.app/errors/rate-limited'
+            title: Too Many Requests
+            status: 429
+            code: RATE_LIMITED
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-26T14:30:00.123Z'
+    BadGateway:
+      description: 업스트림 오류 (502)
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/bad-gateway'
+            title: Bad Gateway
+            status: 502
+            code: OAUTH_PROVIDER_ERROR
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-26T14:30:00.123Z'

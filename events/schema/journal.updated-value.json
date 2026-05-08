@@ -1,22 +1,32 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.updated-value",
   "title": "JournalUpdatedEvent",
-  "description": "묵상 노트 수정 이벤트 — Kafka topic: journal.updated",
+  "description": "묵상 노트 수정 이벤트 — topic: journal.updated",
   "type": "object",
-  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
+  "required": ["eventId", "eventType", "eventVersion", "schemaSubject", "occurredAt", "traceId", "producerService", "idempotencyKey", "data"],
   "properties": {
-    "eventId": { "type": "string", "format": "uuid" },
-    "eventType": { "type": "string", "const": "JOURNAL_UPDATED" },
-    "occurredAt": { "type": "string", "format": "date-time" },
-    "idempotencyKey": { "type": "string" },
-    "payload": {
+    "eventId":        { "type": "string" },
+    "eventType":      { "type": "string", "const": "journal.updated" },
+    "eventVersion":   { "type": "integer", "minimum": 1 },
+    "schemaSubject":  { "type": "string", "const": "journal.updated-value" },
+    "occurredAt":     { "type": "string", "format": "date-time" },
+    "traceId":        { "type": "string" },
+    "producerService":{ "type": "string", "const": "journal-service" },
+    "idempotencyKey": { "type": "string", "description": "journal.update:{ULID}" },
+    "data": {
       "type": "object",
-      "required": ["journalId", "userId"],
+      "required": ["journalId", "delta", "updatedAt"],
       "properties": {
-        "journalId": { "type": "integer" },
-        "userId": { "type": "integer" },
-        "title": { "type": "string" },
+        "journalId":  { "type": "integer" },
+        "delta": {
+          "type": "object",
+          "description": "변경된 필드만 포함",
+          "properties": {
+            "title":   { "type": "object", "properties": { "old": {"type": "string"}, "new": {"type": "string"} } },
+            "content": { "type": "object", "properties": { "old": {"type": "string"}, "new": {"type": "string"} } }
+          }
+        },
         "updatedAt": { "type": "string", "format": "date-time" }
       }
     }

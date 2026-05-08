@@ -1,4 +1,4 @@
-﻿# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
+# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
 
 > **문서 버전:** v1.2
 > **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1) / 2026-05-07 (v1.2 — 외부 검토 9항목 일괄 패치)
@@ -820,7 +820,7 @@ Content-Type: application/json
 | # | Method | Path | 인증 | 설명 |
 | --- | --- | --- | --- | --- |
 | 6.2 | POST | `/ai/sessions` | ✅ | 세션 시작 |
-| 6.3 | POST | `/ai/sessions/{id}/messages` | ✅ | 대화 턴 추가 (**SSE 스트리밍**) |
+| 6.3 | POST | `/ai/sessions/{id}/turns` | ✅ | 대화 턴 추가 (**SSE 스트리밍**) |
 | 6.4 | GET | `/ai/sessions/{id}` | ✅ | 세션 + 턴 조회 |
 | 6.5 | GET | `/ai/sessions` | ✅ | 본인 세션 목록 (페이지네이션) |
 
@@ -867,7 +867,7 @@ Content-Type: application/json
 }
 ```
 
-### 6.3 POST /ai/sessions/{id}/messages — SSE 스트리밍
+### 6.3 POST /ai/sessions/{id}/turns — SSE 스트리밍
 
 **Request:**
 ```http
@@ -1342,7 +1342,7 @@ data: [DONE]
 
 | Endpoint | 용도 |
 | --- | --- |
-| `POST /ai/sessions/{id}/messages` | AI 응답 토큰 스트리밍 (§ 6.3) |
+| `POST /ai/sessions/{id}/turns` | AI 응답 토큰 스트리밍 (§ 6.3) |
 
 ### 9.2 Event 종류 (§ 6.3 상세)
 

@@ -1,27 +1,27 @@
-{
+﻿{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.creation.failed-value",
   "title": "JournalCreationFailedEvent",
-  "description": "묵상 노트 발행 실패 Saga 보상 이벤트 — topic: journal.creation.failed",
+  "description": "묵상 노트 자동 생성 영구 실패 이벤트 (Saga 보상) — topic: journal.creation.failed",
   "type": "object",
-  "required": ["eventId", "eventType", "occurredAt", "idempotencyKey", "payload"],
+  "required": ["eventId", "eventType", "eventVersion", "schemaSubject", "occurredAt", "traceId", "producerService", "idempotencyKey", "data"],
   "properties": {
-    "eventId": { "type": "string", "format": "uuid" },
-    "eventType": { "type": "string", "const": "JOURNAL_CREATION_FAILED" },
-    "occurredAt": { "type": "string", "format": "date-time" },
-    "idempotencyKey": { "type": "string" },
-    "payload": {
+    "eventId":        { "type": "string" },
+    "eventType":      { "type": "string", "const": "journal.creation.failed" },
+    "eventVersion":   { "type": "integer", "minimum": 1 },
+    "schemaSubject":  { "type": "string", "const": "journal.creation.failed-value" },
+    "occurredAt":     { "type": "string", "format": "date-time" },
+    "traceId":        { "type": "string" },
+    "producerService":{ "type": "string", "const": "journal-service" },
+    "idempotencyKey": { "type": "string", "description": "journal.creation.failed:{sessionId}" },
+    "data": {
       "type": "object",
-      "required": ["journalId", "userId", "reason"],
+      "required": ["sessionId", "originalIdempotencyKey", "error", "failedAt"],
       "properties": {
-        "journalId": { "type": "integer" },
-        "userId": { "type": "integer" },
-        "reason": { "type": "string", "description": "실패 원인 코드" },
-        "compensationTarget": {
-          "type": "string",
-          "enum": ["AI_SERVICE", "JOURNAL_SERVICE"],
-          "description": "보상 대상 서비스"
-        }
+        "sessionId":              { "type": "integer" },
+        "originalIdempotencyKey": { "type": "string" },
+        "error":                  { "type": "string" },
+        "failedAt":               { "type": "string", "format": "date-time" }
       }
     }
   }
