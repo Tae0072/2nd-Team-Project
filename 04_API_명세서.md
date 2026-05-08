@@ -1,4 +1,4 @@
-# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
+﻿# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
 
 > **문서 버전:** v1.2
 > **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1) / 2026-05-07 (v1.2 — 외부 검토 9항목 일괄 패치)
@@ -72,9 +72,9 @@ http://{service}.qtai.svc.cluster.local:8080/api/v1/{도메인}/...
 **도메인 별 prefix:**
 | Service | Prefix | 호출 경로 |
 | --- | --- | --- |
-| Auth | `/api/v1/auth/...` | Gateway → Auth Service |
-| Bible | `/api/v1/bible/...` | Gateway → Bible Service (직접) 또는 BFF → Bible |
-| AI | `/api/v1/ai/...` | Gateway → AI Service |
+| Auth | `/auth/...` | Gateway → Auth Service |
+| Bible | `/bible/...` | Gateway → Bible Service (직접) 또는 BFF → Bible |
+| AI | `/ai/...` | Gateway → AI Service |
 | Journal | `/api/v1/journals/...` | Gateway → Journal Service |
 | BFF (Aggregate) | `/api/v1/me/...`, `/api/v1/passages/...` | Gateway → BFF Aggregator |
 | WebSocket | `/ws/...` | Gateway → BFF Aggregator (STOMP) |
@@ -121,11 +121,11 @@ http://{service}.qtai.svc.cluster.local:8080/api/v1/{도메인}/...
 | `X-User-Id` | `{user_id}` | **내부 전용**. Gateway가 JWT 검증 후 주입. 외부 클라이언트가 보내면 Gateway가 strip. NetworkPolicy로 외부 spoofing 차단 (03번 § 9.4) |
 
 **인증이 필요 없는 엔드포인트** (`security: []`):
-- `POST /api/v1/auth/register`
-- `POST /api/v1/auth/login`
-- `POST /api/v1/auth/refresh`
-- `POST /api/v1/auth/logout` ⭐ **v1.1 변경** — refresh token만 검증, access 만료 후에도 logout 가능
-- `POST /api/v1/auth/oauth/google`
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `POST /auth/logout` ⭐ **v1.1 변경** — refresh token만 검증, access 만료 후에도 logout 가능
+- `POST /auth/oauth/google`
 - `GET /actuator/health/*` (관측성)
 
 ### 2.2 분산 트레이싱 헤더
@@ -377,7 +377,7 @@ spring:
     gateway:
       routes:
         - id: auth-login
-          predicates: [Path=/api/v1/auth/login, Method=POST]
+          predicates: [Path=/auth/login, Method=POST]
           filters:
             - name: RequestRateLimiter
               args:
@@ -419,20 +419,20 @@ spring:
 
 | Route ID | Path | Method | Target Service | 인증 | 비고 |
 | --- | --- | --- | --- | --- | --- |
-| auth-public | `/api/v1/auth/register` | POST | auth-service | ❌ | Rate 3/min |
-| auth-public | `/api/v1/auth/login` | POST | auth-service | ❌ | Rate 5/min |
-| auth-public | `/api/v1/auth/refresh` | POST | auth-service | ❌ | |
-| auth-public | `/api/v1/auth/logout` | POST | auth-service | ❌ ⭐ | refresh token만 검증 (v1.1 변경) |
-| auth-public | `/api/v1/auth/oauth/google` | POST | auth-service | ❌ | |
-| auth-private | `/api/v1/auth/me` | GET | auth-service | ✅ | |
-| auth-private | `/api/v1/auth/me/deactivate` ⭐ | POST | auth-service | ✅ | v1.1 변경 — DELETE body 대신 POST |
-| bible | `/api/v1/bible/**` | GET | bible-service | ✅ | 직접 호출 (단일 자원) |
+| auth-public | `/auth/register` | POST | auth-service | ❌ | Rate 3/min |
+| auth-public | `/auth/login` | POST | auth-service | ❌ | Rate 5/min |
+| auth-public | `/auth/refresh` | POST | auth-service | ❌ | |
+| auth-public | `/auth/logout` | POST | auth-service | ❌ ⭐ | refresh token만 검증 (v1.1 변경) |
+| auth-public | `/auth/oauth/google` | POST | auth-service | ❌ | |
+| auth-private | `/auth/me` | GET | auth-service | ✅ | |
+| auth-private | `/auth/me/deactivate` ⭐ | POST | auth-service | ✅ | v1.1 변경 — DELETE body 대신 POST |
+| bible | `/bible/**` | GET | bible-service | ✅ | 직접 호출 (단일 자원) |
 | bible-aggregate | `/api/v1/passages/{book}/{ch}/{v}` ⭐ | GET | **bff-aggregator** | ✅ | v1.1 — wildcard 제거, 정확 패턴 |
 | commentary | `/api/v1/commentary/**` | GET | bible-service | ✅ | 직접 호출 |
-| ai | `/api/v1/ai/sessions` | POST | ai-service | ✅ | |
-| ai-sse | `/api/v1/ai/sessions/*/turns` | POST | ai-service | ✅ | **SSE 패스스루** |
-| ai | `/api/v1/ai/sessions/*` | GET | ai-service | ✅ | |
-| ai-list | `/api/v1/ai/sessions` | GET | ai-service | ✅ | |
+| ai | `/ai/sessions` | POST | ai-service | ✅ | |
+| ai-sse | `/ai/sessions/*/turns` | POST | ai-service | ✅ | **SSE 패스스루** |
+| ai | `/ai/sessions/*` | GET | ai-service | ✅ | |
+| ai-list | `/ai/sessions` | GET | ai-service | ✅ | |
 | journal | `/api/v1/journals/**` | GET, PATCH, DELETE | journal-service | ✅ | |
 | me | `/api/v1/me/**` | GET | bff-aggregator | ✅ | 대시보드 |
 | ws | `/ws/**` | WebSocket | bff-aggregator | ❌ ⭐ | v1.2 — Gateway 단순 패스스루 (HTTP handshake에는 JWT 헤더 없음). BFF가 STOMP CONNECT 프레임 헤더 검증 (§ 10.2) |
@@ -460,7 +460,7 @@ spring:
 
 ## 4. Auth/User Service API
 
-> **Owner:** 이지윤 / **Base URL:** `http://auth-service.qtai.svc.cluster.local:8080` / **Public:** `https://api.qtai.app/api/v1/auth/...`
+> **Owner:** 이지윤 / **Base URL:** `http://auth-service.qtai.svc.cluster.local:8080` / **Public:** `https://api.qtai.app/auth/...`
 >
 > **OpenAPI 파일:** `apis/auth/openapi.yaml`
 
@@ -468,19 +468,19 @@ spring:
 
 | # | Method | Path | 인증 | 설명 |
 | --- | --- | --- | --- | --- |
-| 4.2 | POST | `/api/v1/auth/register` | ❌ | 회원가입 |
-| 4.3 | POST | `/api/v1/auth/login` | ❌ | 로그인 |
-| 4.4 | POST | `/api/v1/auth/refresh` | ❌ | 토큰 갱신 (Token Rotation, Distributed Lock) |
-| 4.5 | POST | `/api/v1/auth/logout` | ❌ ⭐ | 로그아웃 (refresh token만 검증) |
-| 4.6 | GET | `/api/v1/auth/me` | ✅ | 내 정보 조회 |
-| 4.7 | POST | `/api/v1/auth/me/deactivate` ⭐ | ✅ | 회원 탈퇴 (v1.1 — DELETE body 대신) |
-| 4.8 | POST | `/api/v1/auth/oauth/google` | ❌ | Google OAuth 로그인 (JWK 직접 검증) |
+| 4.2 | POST | `/auth/register` | ❌ | 회원가입 |
+| 4.3 | POST | `/auth/login` | ❌ | 로그인 |
+| 4.4 | POST | `/auth/refresh` | ❌ | 토큰 갱신 (Token Rotation, Distributed Lock) |
+| 4.5 | POST | `/auth/logout` | ❌ ⭐ | 로그아웃 (refresh token만 검증) |
+| 4.6 | GET | `/auth/me` | ✅ | 내 정보 조회 |
+| 4.7 | POST | `/auth/me/deactivate` ⭐ | ✅ | 회원 탈퇴 (v1.1 — DELETE body 대신) |
+| 4.8 | POST | `/auth/oauth/google` | ❌ | Google OAuth 로그인 (JWK 직접 검증) |
 
-### 4.2 POST /api/v1/auth/register
+### 4.2 POST /auth/register
 
 **Request:**
 ```http
-POST /api/v1/auth/register
+POST /auth/register
 Content-Type: application/json
 
 {
@@ -498,7 +498,7 @@ Content-Type: application/json
 **Response 201 Created:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/auth/me
+Location: /auth/me
 Content-Type: application/json
 
 {
@@ -515,11 +515,11 @@ Content-Type: application/json
 - 409 `EMAIL_ALREADY_EXISTS` — 활성(`status='ACTIVE'`) 사용자 중 동일 이메일 존재 (탈퇴된 사용자는 마스킹되어 충돌 안 남 — 02번 § 2.2.1)
 - 429 `RATE_LIMITED` — 3회/분 초과
 
-### 4.3 POST /api/v1/auth/login
+### 4.3 POST /auth/login
 
 **Request:**
 ```http
-POST /api/v1/auth/login
+POST /auth/login
 Content-Type: application/json
 
 {
@@ -548,7 +548,7 @@ Content-Type: application/json
 - 401 `ACCOUNT_DEACTIVATED` — `status='DEACTIVATED'`
 - 429 `RATE_LIMITED` — 5회/분 초과
 
-### 4.4 POST /api/v1/auth/refresh — Token Rotation + race condition 방지
+### 4.4 POST /auth/refresh — Token Rotation + race condition 방지
 
 **Request:**
 ```json
@@ -584,11 +584,11 @@ Content-Type: application/json
 - 401 `REFRESH_TOKEN_INVALID` — 서명·구조 오류 또는 DB 미존재
 - 409 `RACE_CONDITION_DETECTED` — Lock 획득 실패 (재시도 권장)
 
-### 4.5 POST /api/v1/auth/logout — v1.1 인증 ❌
+### 4.5 POST /auth/logout — v1.1 인증 ❌
 
 **Request:**
 ```http
-POST /api/v1/auth/logout
+POST /auth/logout
 Content-Type: application/json
 
 {
@@ -610,7 +610,7 @@ Content-Type: application/json
 - 401 `REFRESH_TOKEN_INVALID` — 서명 오류 또는 DB 미존재 (스푸핑 차단)
 - 만료된 토큰은 **에러 아님** (이미 만료되어 무효화된 상태로 간주)
 
-### 4.6 GET /api/v1/auth/me
+### 4.6 GET /auth/me
 
 **Response 200 OK:**
 ```json
@@ -628,13 +628,13 @@ Content-Type: application/json
 }
 ```
 
-### 4.7 POST /api/v1/auth/me/deactivate — 회원 탈퇴 (v1.1 변경)
+### 4.7 POST /auth/me/deactivate — 회원 탈퇴 (v1.1 변경)
 
 > **v1.1 변경:** `DELETE /me { password }`는 RFC 7231 비표준 (DELETE body 일부 환경에서 strip). **`POST /me/deactivate { password }`로 변경**.
 
 **Request:**
 ```http
-POST /api/v1/auth/me/deactivate
+POST /auth/me/deactivate
 Authorization: Bearer {accessToken}
 Content-Type: application/json
 
@@ -655,7 +655,7 @@ Content-Type: application/json
 7. AI Service 컨슈머 → 활성 세션 정리
 8. Journal Service 컨슈머 → 데이터 처리 정책에 따라 (v1.0은 보존, v1.1 GDPR 검토)
 
-### 4.8 POST /api/v1/auth/oauth/google — JWK 직접 검증 (v1.1)
+### 4.8 POST /auth/oauth/google — JWK 직접 검증 (v1.1)
 
 **Request:**
 ```json
@@ -707,14 +707,14 @@ Content-Type: application/json
 
 | # | Method | Path | 인증 | 설명 |
 | --- | --- | --- | --- | --- |
-| 5.2 | GET | `/api/v1/bible/kr/{bookCode}/{chapter}/{verse}` | ✅ | 한국어 (개역한글) |
-| 5.3 | GET | `/api/v1/bible/en/{bookCode}/{chapter}/{verse}` | ✅ | 영어 (KJV PD) |
+| 5.2 | GET | `/bible/kr/{bookCode}/{chapter}/{verse}` | ✅ | 한국어 (개역한글) |
+| 5.3 | GET | `/bible/en/{bookCode}/{chapter}/{verse}` | ✅ | 영어 (KJV PD) |
 | 5.4 | GET | `/api/v1/commentary/{bookCode}/{chapter}/{verse}` | ✅ | 주석 (Matthew Henry PD + 더미한글) |
-| 5.5 | GET | `/api/v1/bible/books` | ✅ | 책 목록 조회 (66권) |
+| 5.5 | GET | `/bible/books` | ✅ | 책 목록 조회 (66권) |
 
 > **v1.1 단순화:** v1.0의 사설 통합 endpoint(`/api/v1/passages/...`)를 Bible Service에서 **제거**. 통합은 BFF가 책임 (Bible의 3개 endpoint를 병렬 호출). 03번 § 5.2 BFF UseCase 코드와 정합. 단일 책임 원칙 + endpoint 단위 캐시 일관성 ↑.
 
-### 5.2 GET /api/v1/bible/kr/{bookCode}/{chapter}/{verse}
+### 5.2 GET /bible/kr/{bookCode}/{chapter}/{verse}
 
 **Path 파라미터:**
 | 이름 | 타입 | 예 |
@@ -745,7 +745,7 @@ Content-Type: application/json
 - TTL: **24h**
 - **Hot 100 정의**: 사용자 활동 통계 기반 상위 100구절 (예: 시편 23편, 요한복음 3:16 등) — TTL 7일·preload 시작 시 ETL로 자동 적재. v1.0은 수동 목록 (`config/hot-passages.yml`).
 
-### 5.3 GET /api/v1/bible/en/{bookCode}/{chapter}/{verse}
+### 5.3 GET /bible/en/{bookCode}/{chapter}/{verse}
 
 **Response 200 OK:**
 ```json
@@ -789,7 +789,7 @@ Content-Type: application/json
 
 > **주의:** 한 구절에 0~N개 주석. 빈 배열 (`"items": []`) 가능 — 404 아님.
 
-### 5.5 GET /api/v1/bible/books
+### 5.5 GET /bible/books
 
 **Response 200 OK:**
 ```json
@@ -819,12 +819,12 @@ Content-Type: application/json
 
 | # | Method | Path | 인증 | 설명 |
 | --- | --- | --- | --- | --- |
-| 6.2 | POST | `/api/v1/ai/sessions` | ✅ | 세션 시작 |
-| 6.3 | POST | `/api/v1/ai/sessions/{id}/turns` | ✅ | 대화 턴 추가 (**SSE 스트리밍**) |
-| 6.4 | GET | `/api/v1/ai/sessions/{id}` | ✅ | 세션 + 턴 조회 |
-| 6.5 | GET | `/api/v1/ai/sessions` | ✅ | 본인 세션 목록 (페이지네이션) |
+| 6.2 | POST | `/ai/sessions` | ✅ | 세션 시작 |
+| 6.3 | POST | `/ai/sessions/{id}/messages` | ✅ | 대화 턴 추가 (**SSE 스트리밍**) |
+| 6.4 | GET | `/ai/sessions/{id}` | ✅ | 세션 + 턴 조회 |
+| 6.5 | GET | `/ai/sessions` | ✅ | 본인 세션 목록 (페이지네이션) |
 
-### 6.2 POST /api/v1/ai/sessions
+### 6.2 POST /ai/sessions
 
 **Request:**
 ```json
@@ -854,7 +854,7 @@ StartSessionRequest:
 **Response 201 Created:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/ai/sessions/9012
+Location: /ai/sessions/9012
 Content-Type: application/json
 
 {
@@ -867,11 +867,11 @@ Content-Type: application/json
 }
 ```
 
-### 6.3 POST /api/v1/ai/sessions/{id}/turns — SSE 스트리밍
+### 6.3 POST /ai/sessions/{id}/messages — SSE 스트리밍
 
 **Request:**
 ```http
-POST /api/v1/ai/sessions/9012/turns
+POST /ai/sessions/9012/turns
 Authorization: Bearer ...
 Content-Type: application/json
 Accept: text/event-stream
@@ -950,7 +950,7 @@ event: end
 data: [DONE]
 ```
 
-### 6.4 GET /api/v1/ai/sessions/{id}
+### 6.4 GET /ai/sessions/{id}
 
 **Response 200 OK:**
 ```json
@@ -999,7 +999,7 @@ data: [DONE]
 > - `contentRedacted`: boolean — true면 클라이언트가 해당 턴을 화면에서 숨김 또는 placeholder 표시
 > - **금지:** SYSTEM 턴 본문 노출. yaml schema에서 `contentRedacted: true`인 경우 클라이언트가 무시하도록 명시.
 
-### 6.5 GET /api/v1/ai/sessions
+### 6.5 GET /ai/sessions
 
 **Query:** `?status=COMPLETED&page=0&size=20&sort=createdAt,desc`
 
@@ -1250,7 +1250,7 @@ data: [DONE]
 3. **AI Service** `/ai/sessions?status=IN_PROGRESS&size=1&sort=updatedAt,desc` → `activeSession` (가장 최근 1개) + `stats.completedSessions` (별도 count query)
 4. **BFF 자체 정적 매핑** → `todayPassage` (v1.2 정정 — § 5에 Bible Service `/bible/today` endpoint 없음. v1.0은 BFF가 수정 정적 테이블 조회 (요일별 추천 또는 Hot 100 random 1개). v1.1 Bible Service에 endpoint 추가 검토)
 
-> **`activeSession` 정책 (v1.1):** 사용자가 다중 passage로 세션 동시 진행 가능하지만 대시보드는 **가장 최근 updatedAt IN_PROGRESS 세션 1개**만 노출. 전체 목록은 `/api/v1/ai/sessions` 따로 호출.
+> **`activeSession` 정책 (v1.1):** 사용자가 다중 passage로 세션 동시 진행 가능하지만 대시보드는 **가장 최근 updatedAt IN_PROGRESS 세션 1개**만 노출. 전체 목록은 `/ai/sessions` 따로 호출.
 
 > **stats.currentStreak / longestStreak:** v1.0은 Journal Service가 본인 journal 일자별 집계로 계산 (간단 SQL). v1.1에 별도 `user.activity.tracked` Kafka 컨슈머로 통계 테이블 분리.
 
@@ -1291,8 +1291,8 @@ data: [DONE]
 ### 8.3 GET /api/v1/passages/{bookCode}/{chapter}/{verse}
 
 **처리 (v1.1 명시):** 03번 § 1.3.1 시나리오 1. **BFF가 Bible Service의 3개 endpoint를 병렬 직접 호출** (단일 책임 + 캐시 단위 명확):
-1. `GET /api/v1/bible/kr/{...}` → `kr`
-2. `GET /api/v1/bible/en/{...}` → `en`
+1. `GET /bible/kr/{...}` → `kr`
+2. `GET /bible/en/{...}` → `en`
 3. `GET /api/v1/commentary/{...}` → `commentaries`
 
 **Response 200 OK:**
@@ -1342,7 +1342,7 @@ data: [DONE]
 
 | Endpoint | 용도 |
 | --- | --- |
-| `POST /api/v1/ai/sessions/{id}/turns` | AI 응답 토큰 스트리밍 (§ 6.3) |
+| `POST /ai/sessions/{id}/messages` | AI 응답 토큰 스트리밍 (§ 6.3) |
 
 ### 9.2 Event 종류 (§ 6.3 상세)
 
@@ -1407,7 +1407,7 @@ dependencies:
 // 사용 예 (flutter_client_sse 기준)
 SSEClient.subscribeToSSE(
   method: SSERequestType.POST,
-  url: 'https://api.qtai.app/api/v1/ai/sessions/$id/turns',
+  url: 'https://api.qtai.app/ai/sessions/$id/turns',
   header: {
     'Authorization': 'Bearer $accessToken',
     'Accept':        'text/event-stream',
@@ -1437,7 +1437,7 @@ spring:
         - id: ai-sse
           uri: http://ai-service:8080
           predicates:
-            - Path=/api/v1/ai/sessions/*/turns
+            - Path=/ai/sessions/*/turns
             - Method=POST
           filters:
             - PreserveHostHeader
@@ -1667,7 +1667,7 @@ components:
         nickname: { type: string }
 
 paths:
-  /api/v1/auth/login:
+  /auth/login:
     post:
       tags: [auth-public]
       operationId: login

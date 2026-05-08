@@ -4,6 +4,17 @@
   profiles:
     active: local
 
+spring:
+  data:
+    redis:
+      url: ${REDIS_WS_URL:redis://localhost:6379/0}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: bff-notification
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
 server:
   port: 8083
 
@@ -15,3 +26,7 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} traceId=%X{traceId} - %msg%n"

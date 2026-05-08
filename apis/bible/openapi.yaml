@@ -221,11 +221,9 @@ components:
         verse:
           type: integer
         textKo:
-          type: string
-          nullable: true
+          type: ["string", "null"]
         textEn:
-          type: string
-          nullable: true
+          type: ["string", "null"]
 
     VerseDetailResponse:
       allOf:

@@ -215,7 +215,6 @@ components:
         sessionId:
           type: integer
           format: int64
-          nullable: true
           description: 연결된 AI 세션 ID
 
     UpdateJournalRequest:
@@ -262,7 +261,6 @@ components:
         sessionId:
           type: integer
           format: int64
-          nullable: true
         version:
           type: integer
           description: 낙관적 락 버전

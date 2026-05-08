@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "notification.requested-value",
   "title": "NotificationRequestedEvent",
@@ -21,7 +21,7 @@
         },
         "title": { "type": "string" },
         "body": { "type": "string" },
-        "referenceId": { "type": "integer", "nullable": true }
+        "referenceId": { "type": "integer" }
       }
     }
   }

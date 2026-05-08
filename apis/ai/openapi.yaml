@@ -295,11 +295,9 @@ components:
           type: string
           enum: [A, B, C, D]
         inputTokens:
-          type: integer
-          nullable: true
+          type: ["integer", "null"]
         outputTokens:
-          type: integer
-          nullable: true
+          type: ["integer", "null"]
         createdAt:
           type: string
           format: date-time

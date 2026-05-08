@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "user.activity.tracked-value",
   "title": "UserActivityTrackedEvent",
@@ -23,11 +23,11 @@
           "type": "string",
           "enum": ["READ_PASSAGE", "START_SESSION", "COMPLETE_SESSION", "PUBLISH_JOURNAL"]
         },
-        "book": { "type": "string", "nullable": true },
-        "chapter": { "type": "integer", "nullable": true },
-        "verse": { "type": "integer", "nullable": true },
-        "sessionId": { "type": "integer", "nullable": true },
-        "journalId": { "type": "integer", "nullable": true }
+        "book": { "type": "string" },
+        "chapter": { "type": "integer" },
+        "verse": { "type": "integer" },
+        "sessionId": { "type": "integer" },
+        "journalId": { "type": "integer" }
       }
     }
   }

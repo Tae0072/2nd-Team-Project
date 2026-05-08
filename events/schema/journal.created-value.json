@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.created-value",
   "title": "JournalCreatedEvent",
@@ -20,7 +20,7 @@
         "book": { "type": "string" },
         "chapter": { "type": "integer" },
         "verse": { "type": "integer" },
-        "sessionId": { "type": "integer", "nullable": true }
+        "sessionId": { "type": "integer" }
       }
     }
   }

@@ -3,7 +3,7 @@ P2 fix: 동기 client → AsyncAnthropic (이벤트 루프 블로킹 방지)
 """
 import json
 import os
-from typing import AsyncIterator, Optional
+from typing import AsyncIterator
 import anthropic
 from app.domain.schemas import SendMessageRequest
 from app.infrastructure.chroma import get_chroma_collection

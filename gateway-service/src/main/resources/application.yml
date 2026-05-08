@@ -3,15 +3,78 @@
     name: gateway-service
   profiles:
     active: local
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"]
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=0
+
+        - id: bible-service
+          uri: http://bible-service:8082
+          predicates:
+            - Path=/bible/**
+          filters:
+            - AuthFilter
+            - StripPrefix=0
+
+        - id: bff-service
+          uri: http://bff-service:8083
+          predicates:
+            - Path=/bff/**,/ws/**
+          filters:
+            - AuthFilter
+            - StripPrefix=0
+
+        - id: journal-service
+          uri: http://journal-service:8084
+          predicates:
+            - Path=/journal/**
+          filters:
+            - AuthFilter
+            - StripPrefix=0
+
+        - id: ai-service
+          uri: http://ai-service:8085
+          predicates:
+            - Path=/ai/**
+          filters:
+            - AuthFilter
+            - name: RequestHeaderSize
+              args:
+                maxSize: 16KB
+
+  data:
+    redis:
+      url: ${REDIS_WS_URL:redis://localhost:6379/0}
 
 server:
   port: 8080
+
+jwt:
+  public-key-path: ${JWT_PUBLIC_KEY_PATH:/run/secrets/jwt_public.pem}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,info,prometheus,gateway
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} traceId=%X{traceId} - %msg%n"

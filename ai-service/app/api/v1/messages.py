@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Depends, HTTPException, status
+﻿from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.domain.schemas import SendMessageRequest
 from app.usecase.chat_usecase import ChatUseCase
@@ -22,13 +22,8 @@ async def send_message(
     chat_uc: ChatUseCase = Depends(get_chat_usecase),
     session_uc: SessionUseCase = Depends(get_session_usecase),
 ):
-    """
-    AI에게 메시지 전송 — SSE 스트리밍 응답 (text/event-stream)
-    P1 fix: 세션 존재·소유권 검증 후 실제 컨텍스트를 ChatUseCase에 전달.
-    """
-    # 세션 존재·소유권 검증 (X-User-Id 헤더는 Gateway가 주입)
+    """AI SSE 스트리밍 — 세션 검증 후 ChatUseCase에 실제 컨텍스트 전달."""
     session = await session_uc.get_session_or_404(session_id)
-
     return StreamingResponse(
         chat_uc.stream_response(
             session_id=session_id,
@@ -39,8 +34,5 @@ async def send_message(
             verse=session["verse"],
         ),
         media_type="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-        },
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

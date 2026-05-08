@@ -4,6 +4,23 @@
   profiles:
     active: local
 
+spring:
+  datasource:
+    url: ${AUTH_DB_URL:jdbc:mysql://localhost:3306/auth_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    username: ${AUTH_DB_USER:qtai}
+    password: ${AUTH_DB_PASSWORD:qtai_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      url: ${REDIS_WS_URL:redis://localhost:6379/0}
 server:
   port: 8081
 
@@ -15,3 +32,7 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} traceId=%X{traceId} - %msg%n"

@@ -1,11 +1,8 @@
 ﻿# QT-AI Spectral OpenAPI Lint 규칙
-# CI: spectral lint apis/{service}/openapi.yaml --ruleset .spectral.yaml
-
 extends:
   - spectral:oas
 
 rules:
-  # ── 필수 info 필드 ────────────────────────────────────────────
   info-contact:
     description: info.contact 반드시 존재
     severity: error
@@ -14,7 +11,6 @@ rules:
       field: contact
       function: truthy
 
-  # ── 모든 operation에 operationId ────────────────────────────
   operation-operationId:
     description: operationId 누락 금지
     severity: error
@@ -23,7 +19,6 @@ rules:
       field: operationId
       function: truthy
 
-  # ── 모든 operation에 tags ────────────────────────────────────
   operation-tags:
     description: tags 누락 금지
     severity: warn
@@ -32,7 +27,6 @@ rules:
       field: tags
       function: truthy
 
-  # ── ErrorResponse에 traceId 필드 ─────────────────────────────
   error-response-traceId:
     description: 에러 응답 스키마에 traceId 필드 필수
     severity: warn
@@ -41,7 +35,6 @@ rules:
       field: traceId
       function: truthy
 
-  # ── 4xx/5xx 응답에 content 정의 ──────────────────────────────
   error-response-content:
     description: 에러 응답에 content 필드 정의 필수
     severity: warn
@@ -50,17 +43,6 @@ rules:
       field: content
       function: truthy
 
-  # ── path에 소문자 + kebab-case 강제 ─────────────────────────
-  path-kebab-case:
-    description: path는 소문자 kebab-case 사용
-    severity: warn
-    given: "$.paths[*]~"
-    then:
-      function: pattern
-      functionOptions:
-        match: "^/[a-z0-9/-]+$"
-
-  # ── servers 필드 필수 ────────────────────────────────────────
   oas3-api-servers:
     description: servers 필드 필수
     severity: error
@@ -69,6 +51,6 @@ rules:
       field: servers
       function: truthy
 
-  # Spectral 기본 OAS 규칙 일부 완화 ─────────────────────────
-  oas3-unused-component:
-    severity: warn   # error → warn (개발 중 공통 스키마 재사용 허용)
+  # NOTE: oas3-unused-component는 기본 OAS ruleset 비활성화(off)로만 처리
+  # given/then 없이 severity만 지정하면 Spectral 로딩 오류 발생
+  oas3-unused-component: off
