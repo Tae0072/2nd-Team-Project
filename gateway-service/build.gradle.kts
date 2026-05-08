@@ -8,16 +8,13 @@
 dependencies {
     implementation(project(":shared-kernel"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("io.micrometer:micrometer-tracing-bridge-otel")
     implementation("io.opentelemetry:opentelemetry-exporter-otlp")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:mysql")
 }
 
 dependencyManagement {
@@ -27,5 +24,5 @@ dependencyManagement {
 }
 
 springBoot {
-    mainClass.set("com.qtai.gatewayservice.ApplicationKt")
+    mainClass.set("com.qtai.gatewayservice.GatewayServiceApplicationKt")
 }

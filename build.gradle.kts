@@ -11,10 +11,6 @@ plugins {
 allprojects {
     group = "com.qtai"
     version = "0.0.1-SNAPSHOT"
-
-    repositories {
-        mavenCentral()
-    }
 }
 
 subprojects {

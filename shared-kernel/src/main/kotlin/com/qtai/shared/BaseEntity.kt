@@ -1,24 +1,12 @@
 ﻿package com.qtai.shared.domain
 
-import jakarta.persistence.Column
-import jakarta.persistence.EntityListeners
-import jakarta.persistence.MappedSuperclass
-import org.springframework.data.annotation.CreatedDate
-import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener::class)
+/**
+ * 공통 감사 필드 — JPA 어노테이션은 각 서비스 모듈에서 상속 시 적용.
+ * shared-kernel은 JPA 의존성 없이 유지.
+ */
 abstract class BaseEntity {
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
     var createdAt: LocalDateTime = LocalDateTime.now()
-        protected set
-
-    @LastModifiedDate
-    @Column(nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
-        protected set
 }
