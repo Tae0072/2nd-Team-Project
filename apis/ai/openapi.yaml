@@ -19,10 +19,9 @@ info:
     name: 강상민 (AI/RAG Owner)
 servers:
   - url: http://localhost:8085
-    description: Local Python FastAPI (직접)
-  - url: http://localhost:8080/ai
-    description: Gateway 경유
-
+    description: Local (직접 접근)
+  - url: http://localhost:8080
+    description: Gateway 경유 (prefix /ai 는 Gateway 라우팅 규칙에서 처리)
 tags:
   - name: sessions
     description: 큐티 AI 세션 관리

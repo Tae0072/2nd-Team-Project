@@ -9,10 +9,9 @@ info:
     name: 이지윤 (Auth Owner)
 servers:
   - url: http://localhost:8081
-    description: Local (직접)
-  - url: http://localhost:8080/auth
-    description: Gateway 경유
-
+    description: Local (직접 접근)
+  - url: http://localhost:8080
+    description: Gateway 경유 (prefix /auth 는 Gateway 라우팅 규칙에서 처리)
 tags:
   - name: auth
     description: 로그인·로그아웃·토큰 갱신

@@ -28,5 +28,5 @@ dependencyManagement {
 }
 
 springBoot {
-    mainClass.set("com.qtai.bffservice.ApplicationKt")
+    mainClass.set("com.qtai.bffservice.BffServiceApplicationKt")
 }

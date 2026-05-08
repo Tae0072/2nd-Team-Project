@@ -29,5 +29,5 @@ dependencyManagement {
 }
 
 springBoot {
-    mainClass.set("com.qtai.authservice.ApplicationKt")
+    mainClass.set("com.qtai.authservice.AuthServiceApplicationKt")
 }

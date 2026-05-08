@@ -30,5 +30,5 @@ dependencyManagement {
 }
 
 springBoot {
-    mainClass.set("com.qtai.journalservice.ApplicationKt")
+    mainClass.set("com.qtai.journalservice.JournalServiceApplicationKt")
 }

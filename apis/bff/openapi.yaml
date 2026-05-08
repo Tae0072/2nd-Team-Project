@@ -16,10 +16,9 @@ info:
     name: 강태오 (Lead + BFF Owner)
 servers:
   - url: http://localhost:8083
-    description: Local (직접)
-  - url: http://localhost:8080/bff
-    description: Gateway 경유
-
+    description: Local (직접 접근)
+  - url: http://localhost:8080
+    description: Gateway 경유 (prefix /bff 는 Gateway 라우팅 규칙에서 처리)
 tags:
   - name: dashboard
     description: 대시보드 집계

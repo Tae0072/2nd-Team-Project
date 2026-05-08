@@ -29,5 +29,5 @@ dependencyManagement {
 }
 
 springBoot {
-    mainClass.set("com.qtai.bibleservice.ApplicationKt")
+    mainClass.set("com.qtai.bibleservice.BibleServiceApplicationKt")
 }

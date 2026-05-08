@@ -9,10 +9,9 @@ info:
     name: 김태혁 (Bible Owner)
 servers:
   - url: http://localhost:8082
-    description: Local (직접)
-  - url: http://localhost:8080/bible
-    description: Gateway 경유
-
+    description: Local (직접 접근)
+  - url: http://localhost:8080
+    description: Gateway 경유 (prefix /bible 는 Gateway 라우팅 규칙에서 처리)
 tags:
   - name: books
     description: 성경 목록
