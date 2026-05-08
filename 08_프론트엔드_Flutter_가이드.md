@@ -144,7 +144,7 @@
 
 - **모든 dependency는 caret(^) 범위로 명시** — minor 업데이트는 자동, breaking change 차단
 - **pubspec.lock은 commit한다** — CI·로컬·다른 팀원 모두 동일 의존성 트리
-- **breaking change 발견 시 ADR 작성** — 09번 ADR 디렉토리에 (예:  013-flutter-riverpod-3-migration.md)
+- **breaking change 발견 시 ADR 작성** — 09번 ADR 디렉토리에 (예: 0013-flutter-riverpod-3-migration.md)
 - **dev_dependency는 pubspec.yaml에 명시** — build_runner, riverpod_generator, retrofit_generator, json_serializable, freezed, mockito, flutter_test (SDK), integration_test (SDK)
 
 ### 2.4 패키지 보안 검증
