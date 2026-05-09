@@ -1,0 +1,6 @@
+﻿apiVersion: v2
+name: qtai-infra
+description: QT-AI 인프라 컴포넌트 (MySQL, Redis, Kafka, Schema Registry, Observability)
+type: application
+version: 0.1.0
+# W0 골격 — 실제 chart 내용은 W1 강태오 작성

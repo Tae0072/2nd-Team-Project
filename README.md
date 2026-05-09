@@ -81,6 +81,8 @@
 | 19 | [성능_테스트_가이드](./19_성능_테스트_가이드.md) | ✅ v1.0 |
 | 20 | [W1_Foundation_실행_가이드](./20_W1_Foundation_실행_가이드.md) | ✅ v1.0 |
 | 21 | [프로젝트_회고_템플릿](./21_프로젝트_회고_템플릿.md) | ✅ v1.0 |
+| — | [DECISIONS.md](./DECISIONS.md) — 단일 기준표 (포트·TTL·Route·Envelope·인프라) | ✅ |
+| — | [AGENTS.md](./AGENTS.md) — AI 에이전트 협업 가이드 | ✅ |
 
 > **0~3번 두껍게 정책**: MSA 풀스코프 특성상 W1 Foundation Lock-in을 강제하기 위해 브리프·아키텍처·서비스 경계·API 계약 문서를 우선·중점 작성.
 

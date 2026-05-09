@@ -153,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/ProblemDetail'
 
   /ai/prompt-templates:
     get:
@@ -356,9 +356,26 @@ components:
         version:
           type: integer
 
-    ErrorResponse:
+
+    ProblemDetail:
       type: object
-      required: [code, message, traceId]
+      required: [type, title, status, code, traceId, timestamp]
+      properties:
+        type: {type: string, format: uri}
+        title: {type: string}
+        status: {type: integer}
+        detail: {type: string}
+        code: {type: string, description: "도메인 에러 코드"}
+        traceId: {type: string}
+        timestamp: {type: string, format: date-time}
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: {type: string}
+              code: {type: string}
+              message: {type: string}
       properties:
         code:
           type: string
@@ -371,15 +388,15 @@ components:
     Unauthorized:
       description: 인증 실패
       content:
-        application/json:
+        application/problem+json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/ProblemDetail'
     NotFound:
       description: 리소스 없음
       content:
-        application/json:
+        application/problem+json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/ProblemDetail'
           example:
             code: AI_SESSION_NOT_FOUND
             message: 세션을 찾을 수 없습니다.
@@ -387,9 +404,9 @@ components:
     UnprocessableEntity:
       description: 입력값 검증 실패 또는 신학 가드레일 차단
       content:
-        application/json:
+        application/problem+json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/ProblemDetail'
           example:
             code: AI_THEOLOGICAL_GUARDRAIL_BLOCKED
             message: 해당 요청은 신학 가드레일에 의해 차단되었습니다.
