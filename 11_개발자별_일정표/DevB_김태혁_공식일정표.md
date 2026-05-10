@@ -6,7 +6,7 @@
 역할: Bible Service Owner
 담당 서비스: Bible Service — 성경 본문(KR/EN) · 주석 · Redis 24h 캐시 · 전문 검색
 개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.2 / 04_API_명세서 v1.2
+연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5
 
 ---
 
@@ -25,20 +25,20 @@
 bible-service/
   └── src/main/kotlin/com/qtai/bibleservice/
       ├── domain/
-      │   ├── entity/Book.kt
-      │   ├── entity/KrBible.kt        (개역개정)
-      │   ├── entity/EnBible.kt        (KJV)
-      │   ├── entity/Commentary.kt
+      │   ├── entity/Book.java
+      │   ├── entity/KrBible.java        (개역한글)
+      │   ├── entity/EnBible.java        (KJV)
+      │   ├── entity/Commentary.java
       │   └── repository/
       ├── usecase/
-      │   ├── GetChapterUseCase.kt     ← 전담 소유
-      │   ├── GetVerseUseCase.kt
-      │   ├── GetCommentaryUseCase.kt
-      │   └── SearchPassageUseCase.kt
+      │   ├── GetChapterUseCase.java     ← 전담 소유
+      │   ├── GetVerseUseCase.java
+      │   ├── GetCommentaryUseCase.java
+      │   └── SearchPassageUseCase.java
       ├── infrastructure/
-      │   └── cache/BibleCacheRepository.kt  (Redis 24h TTL)
+      │   └── cache/BibleCacheRepository.java  (Redis 24h TTL)
       └── api/
-          └── BibleController.kt
+          └── BibleController.java
   └── src/main/resources/
       └── db/migration/
           ├── V1__create_bible_tables.sql
@@ -46,8 +46,8 @@ bible-service/
 ```
 
 **BFF에 제공하는 공개 인터페이스**
-- `GET /bible/passages/{book}/{chapter}/{verse}` — BFF의 `/me/dashboard` 오늘의 구절에서 호출
-- `GET /bible/passages/{book}/{chapter}` — AI Service RAG 컨텍스트 조회에서 호출
+- `GET /bible/kr/{book}/{chapter}/{verse}` — BFF의 `/me/dashboard` 오늘의 구절에서 호출
+- `GET /bible/kr/{book}/{chapter}/1 (장 첫절)` — AI Service RAG 컨텍스트 조회에서 호출
 - 캐시 키 형식: `cache:passage:{book}:{chapter}:{verse}` (TTL 24h)
 
 ---
@@ -70,18 +70,18 @@ bible-service/
 
 | 일자 | 오전 | 오후 코어 | 저녁 |
 |------|------|-----------|------|
-| 5/12 월 | 킥오프 참석. git pull | Flyway V1 — BOOKS·KR_BIBLE·EN_BIBLE·COMMENTARIES 테이블 | Book 엔티티 + BOOKS 66권 V2 시드 |
+| 5/12 화 | 킥오프 참석. git pull | Flyway V1 — BOOKS·KR_BIBLE·EN_BIBLE·COMMENTARIES 테이블 | Book 엔티티 + BOOKS 66권 V2 시드 |
 | 5/13 화 | Stand-up | KrBible·EnBible 엔티티 + 연관관계 (book-chapter-verse 복합 조회) | @DataJpaTest — 기본 조회 1개 |
 | 5/14 수 | Stand-up | `GetChapterUseCase` — 한/영 병기 병렬 쿼리 구현 | Repository 쿼리 메서드 3개 이상 |
 | 5/15 목 | Stand-up | `GetVerseUseCase` + `BibleController` 기본 엔드포인트 | X-User-Id 헤더 수신 확인 (Gateway 연동) |
-| 5/16 금 | Stand-up | 단위 테스트 — UseCase Mockito | `/bible/passages/JHN/3` curl 성공 확인 |
+| 5/16 금 | Stand-up | 단위 테스트 — UseCase Mockito | `/bible/kr/JHN/3/16` curl 성공 확인 |
 | 5/19 월 | Stand-up | `BibleCacheRepository` Redis 24h TTL 설정 | 캐시 히트 로그 확인 |
 | 5/20 화 | Stand-up | `GetCommentaryUseCase` + Commentary 샘플 시드 | W1 체크리스트 점검 |
 | 5/21 수 | Stand-up | 통합 테스트 (@SpringBootTest + Testcontainers MySQL) | PR 정리 |
 | 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | W1 회고 |
 
 **W1 완료 기준**
-- [ ] `/bible/passages/JHN/3` → 한/영 병기 구절 반환
+- [ ] `/bible/kr/JHN/3/16` → 한/영 병기 구절 반환
 - [ ] `/bible/books` → 66권 목록 반환 (Flyway V2 시드)
 - [ ] Flyway V1+V2 마이그레이션 성공
 - [ ] Repository @DataJpaTest 통과

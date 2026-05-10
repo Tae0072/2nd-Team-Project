@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — DevOps 운영 매뉴얼 v1.0
+﻿��� QT-AI (큐티 AI 앱) — DevOps 운영 매뉴얼 v1.0
 
 > **문서 버전:** v1.0
 > **작성일:** 2026-05-07
-> **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.2](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.2](./03_아키텍처_정의서.md) / [04_API_명세서 v1.2](./04_API_명세서.md) / [05_보안_명세서 v1.0](./05_보안_명세서.md)
+> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.3](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.3](./03_아키텍처_정의서.md) / [04_API_명세서 v1.5](./04_API_명세서.md) / [05_보안_명세서 v1.0](./05_보안_명세서.md)
 > **DevOps 키워드:** GitHub Actions · Docker buildx · ghcr.io · Helm · Minikube · Flyway · Loki/Prometheus/Jaeger · Rollback · Incident Runbook · 온콜
 > **W1 Lock-in 산출물:** 본 문서 + `.github/workflows/ci.yml` + `.github/workflows/cd.yml` + `helm/qtai-umbrella/` + `helm/qtai-infra/` + Grafana 대시보드 JSON
 > **목적:** 03번 아키텍처 청사진을 **실행 가능한 운영 절차**로 변환. 6명이 W2~W5 매주 동일한 절차로 배포·롤백·모니터링·사고 대응을 수행할 수 있도록 박제. 1차(HMS)에서 "시연 직전 부랴부랴 배포" 사고를 본질적으로 차단.

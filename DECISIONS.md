@@ -14,7 +14,7 @@
 | BFF Aggregator | 8083 | 4015 | 8080 | bff-aggregator.qtai.svc.cluster.local:8080 |
 | Auth Service | 8081 | 4011 | 8080 | auth-service.qtai.svc.cluster.local:8080 |
 | Bible Service | 8082 | 4012 | 8080 | bible-service.qtai.svc.cluster.local:8080 |
-| AI Service | 8085 | 4013 | 8085 | ai-service.qtai.svc.cluster.local:8085 |
+| AI Service | 8085 | 4013 | **8080** | ai-service.qtai.svc.cluster.local:8080 |
 | Journal Service | 8084 | 4014 | 8080 | journal-service.qtai.svc.cluster.local:8080 |
 | MySQL | 3306 | — | 3306 | mysql.qtai.svc.cluster.local:3306 |
 | Redis-Cache (Bible) | 6379 | — | 6379 | redis-cache.qtai.svc.cluster.local:6379 |
@@ -50,15 +50,22 @@
 | 한글 성경 | `GET /bible/kr/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
 | 영어 성경 | `GET /bible/en/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
 | 주석 | `GET /api/v1/commentary/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
+| 성경 목록 | `GET /bible/books` | Bible Service | ✅ |
 | AI 세션 시작 | `POST /ai/sessions` | AI Service | ✅ |
 | AI 대화 (SSE) | `POST /ai/sessions/{id}/turns` | AI Service | ✅ |
+| AI 세션 조회 | `GET /ai/sessions/{id}` | AI Service | ✅ |
+| AI 세션 목록 | `GET /ai/sessions` | AI Service | ✅ |
 | 묵상 노트 목록 | `GET /api/v1/journals` | Journal Service | ✅ |
+| 묵상 노트 단건 | `GET /api/v1/journals/{id}` | Journal Service | ✅ |
 | 묵상 노트 수정 | `PATCH /api/v1/journals/{id}` | Journal Service | ✅ |
-| 로그아웃 | `POST /auth/logout` | Auth Service | ❌ (refresh만) |
+| 묵상 노트 삭제 | `DELETE /api/v1/journals/{id}` | Journal Service | ✅ |
+| 이벤트 로그 | `GET /api/v1/journals/{id}/events` | Journal Service | ✅ |
+| 로그아웃 | `POST /auth/logout` | Auth Service | ❌ (갱신만) |
 | Google OAuth | `POST /auth/oauth/google` | Auth Service | ❌ |
 | WebSocket 알림 | `WS /ws/notifications` | BFF Aggregator | ❌ (STOMP CONNECT 헤더) |
 
-> **AI SSE endpoint:** `/ai/sessions/{id}/turns` (messages 아님 — 04번 § 6.3 기준)
+> **AI SSE endpoint:** `/ai/sessions/{id}/turns` (turns가 정식명, messages 아님 — 04번 §6.3 기준)
+> **Journal 수동 생성 없음:** `POST /api/v1/journals` 없음. Journal은 `ai.session.completed` Kafka 컨슈머로 자동 DRAFT 생성. 사용자는 수정·발행만.
 
 ---
 

@@ -6,7 +6,7 @@
 역할: Auth Service Owner
 담당 서비스: Auth/User Service — JWT RS256·OAuth·회원·Refresh Rotation
 개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.2 / 04_API_명세서 v1.2 / 05_보안_명세서 v1.0
+연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5 / 05_보안_명세서 v1.0
 
 ---
 
@@ -25,20 +25,20 @@
 auth-service/
   └── src/main/kotlin/com/qtai/authservice/
       ├── domain/
-      │   ├── user/entity/User.kt           ← 전담 소유
-      │   ├── user/entity/RefreshToken.kt
-      │   ├── user/entity/OAuthLink.kt
+      │   ├── user/entity/User.java           ← 전담 소유
+      │   ├── user/entity/RefreshToken.java
+      │   ├── user/entity/OAuthLink.java
       │   └── user/repository/
       ├── usecase/
-      │   ├── LoginUseCase.kt               ← 전담 소유
-      │   ├── RegisterUseCase.kt
-      │   ├── RefreshTokenUseCase.kt
-      │   └── OAuthUseCase.kt
+      │   ├── LoginUseCase.java               ← 전담 소유
+      │   ├── RegisterUseCase.java
+      │   ├── RefreshTokenUseCase.java
+      │   └── OAuthUseCase.java
       ├── infrastructure/
-      │   ├── jwt/JwtProvider.kt            ← 강태오와 공동 설계, 이지윤 구현
-      │   └── redis/RefreshTokenRepository.kt
+      │   ├── jwt/JwtProvider.java            ← 강태오와 공동 설계, 이지윤 구현
+      │   └── redis/RefreshTokenRepository.java
       └── api/
-          └── AuthController.kt
+          └── AuthController.java
   └── src/main/resources/
       ├── db/migration/V1__create_auth_tables.sql
       └── application.yml
@@ -70,8 +70,8 @@ Gateway AuthFilter에 제공하는 공개 인터페이스:
 
 | 일자 | 오전 | 오후 코어 | 저녁 |
 |------|------|-----------|------|
-| 5/12 월 | 킥오프 참석. git pull. 환경 확인 | `auth-service/` 패키지 구조 생성. Flyway V1 SQL (USERS·REFRESH_TOKENS·OAUTH_LINKS) | User 엔티티 기본 필드 |
-| 5/13 화 | Stand-up | `LoginUseCase` 골격 + bcrypt 비밀번호 인코딩 구현 | JWT RS256 키쌍 생성 (`JwtProvider.kt`) |
+| 5/12 화 | 킥오프 참석. git pull. 환경 확인 | `auth-service/` 패키지 구조 생성. Flyway V1 SQL (USERS·REFRESH_TOKENS·OAUTH_LINKS) | User 엔티티 기본 필드 |
+| 5/13 화 | Stand-up | `LoginUseCase` 골격 + bcrypt 비밀번호 인코딩 구현 | JWT RS256 키쌍 생성 (`JwtProvider.java`) |
 | 5/14 수 | Stand-up | `RegisterUseCase` + 이메일 중복 검증 | `RefreshTokenUseCase` — Rotation 정책 구현 |
 | 5/15 목 | Stand-up | `AuthController` — `/auth/login`, `/auth/register`, `/auth/refresh` | Redis blacklist 연동 (`RefreshTokenRepository`) |
 | 5/16 금 | Stand-up | 단위 테스트 — `LoginUseCase`, `RegisterUseCase` (Mockito) | 1차 `/auth/login` → JWT 발급 curl 테스트 |

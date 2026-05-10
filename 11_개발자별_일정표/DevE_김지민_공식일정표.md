@@ -6,7 +6,7 @@
 역할: Flutter App Owner
 담당 영역: Flutter 모바일 앱 — Sliver 기반 Sync Scroll · RiverPod · DIO · SSE 스트리밍 UI
 개발 기간: W1(5/15 이후) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 04_API_명세서 v1.2 / 08_프론트엔드_Flutter_가이드 v1.0
+연관 문서: 00_개발_일정_총괄표 / 04_API_명세서 v1.5 / 08_프론트엔드_Flutter_가이드 v1.0
 
 ---
 
@@ -92,7 +92,7 @@ dev_dependencies:
 
 | 일자 | 오전 | 오후 코어 | 저녁 |
 |------|------|-----------|------|
-| 5/12 월 | 킥오프 참석 | Flutter SDK + FVM 3.24.5 환경 확인. `flutter create flutter-app` | pubspec.yaml 의존성 추가 + `flutter pub get` |
+| 5/12 화 | 킥오프 참석 | Flutter SDK + FVM 3.24.5 환경 확인. `flutter create flutter-app` | pubspec.yaml 의존성 추가 + `flutter pub get` |
 | 5/13 화 | Stand-up | `go_router` 라우팅 설정 (5개 화면). `app_theme.dart` 기본 테마 | Mock 데이터로 홈 화면 기본 레이아웃 |
 | 5/14 수 | Stand-up | `DioClient` 설정 (baseUrl, timeout, JWT interceptor 골격) | RiverPod Provider 기본 구조 설계 |
 | 5/15 목 | Stand-up | 로그인·회원가입 화면 UI (Auth API 연동 전 Mock) | `auth` feature 디렉토리 구조 완성 |
@@ -114,7 +114,7 @@ dev_dependencies:
 
 | 일자 | 주요 작업 |
 |------|-----------|
-| 5/26 화 | 페이스 점검 (11:30). Bible API 연동 — `GET /bible/passages/JHN/3` 실데이터 표시 |
+| 5/26 화 | 페이스 점검 (11:30). Bible API 연동 — `GET /api/v1/passages/JHN/3` 실데이터 표시 |
 | 5/27 수 | **Sliver Sync Scroll** — `CustomScrollView` + `SliverList` 한/영 병기 동기화 구현 |
 | 5/28 목 | **AI SSE 스트리밍 UI** — `dio_sse` + `StreamBuilder` 타이핑 애니메이션 |
 | 5/29 금 | Journal CRUD 화면 + API 연동. 전체 화면 Flow 연결 확인 |

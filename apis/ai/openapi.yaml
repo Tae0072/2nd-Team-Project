@@ -1,23 +1,17 @@
 openapi: 3.1.0
 info:
   title: QT-AI AI Service API
-  version: "1.2"
+  version: "1.3"
   description: |
-    AI/RAG 서비스. 큐티 A(관찰)·B(해석)·C(적용)·D(결단) 4단계 코칭,
+    AI/RAG 서비스 (Python FastAPI). 큐티 A(관찰)·B(해석)·C(적용)·D(결단) 4단계 코칭,
     Anthropic Claude SSE 스트리밍, ChromaDB RAG, 프롬프트 템플릿 관리를 담당한다.
-
-    ## SSE 스트리밍
-    POST /ai/sessions/{id}/messages 는 `text/event-stream` 응답으로
-    토큰 단위 스트리밍을 반환한다. Gateway NoBufferingFilter 적용.
-
-    ## 큐티 4단계
-    - A (관찰): 본문에서 무엇을 보는가?
-    - B (해석): 이 말씀이 의미하는 것은?
-    - C (적용): 내 삶에 어떻게 적용하는가?
-    - D (결단): 오늘 무엇을 결단하는가?
+    구현 언어: Python FastAPI 단독 (Java/Spring Boot 금지 — DECISIONS.md §6).
+    SSE endpoint: POST /ai/sessions/{id}/turns (turns 정식명, messages 아님 — 04번 §6.3).
   contact:
     name: 강상민 (AI/RAG Owner)
 servers:
+  - url: http://localhost:4013
+    description: Prism mock (04번 12.2 기준 포트)
   - url: http://localhost:8085
     description: Local (직접 접근)
   - url: http://localhost:8080
@@ -25,16 +19,14 @@ servers:
 tags:
   - name: sessions
     description: 큐티 AI 세션 관리
-  - name: messages
-    description: AI 대화 (SSE 스트리밍)
-  - name: templates
-    description: 프롬프트 템플릿
+  - name: turns
+    description: AI 대화 턴 (SSE 스트리밍)
 
 paths:
   /ai/sessions:
     post:
       tags: [sessions]
-      summary: 큐티 세션 생성
+      summary: 큐티 세션 시작 (04번 §6.2)
       operationId: createSession
       security:
         - BearerAuth: []
@@ -43,45 +35,62 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSessionRequest'
+              $ref: '#/components/schemas/StartSessionRequest'
+            example:
+              passage: {bookCode: GEN, chapter: 1, verse: 1}
+              initialStep: A
       responses:
         '201':
           description: 세션 생성 성공
+          headers:
+            Location: {schema: {type: string}, description: /ai/sessions/{id}}
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionResponse'
+              example:
+                id: 9012
+                userId: 5678
+                passage: {bookId: 1, bookCode: GEN, chapter: 1, verse: 1}
+                currentStep: A
+                status: IN_PROGRESS
+                summary: null
+                createdAt: '2026-05-26T14:30:00.123Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
     get:
       tags: [sessions]
-      summary: 내 세션 목록 조회
+      summary: 본인 세션 목록 조회 (04번 §6.5)
       operationId: listSessions
       security:
         - BearerAuth: []
       parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [IN_PROGRESS, COMPLETED, ABANDONED, COMPLETED_NO_JOURNAL]
+          description: 상태 필터. BFF dashboard는 status=IN_PROGRESS 사용.
         - name: page
           in: query
-          schema:
-            type: integer
-            default: 0
+          schema: {type: integer, default: 0}
         - name: size
           in: query
-          schema:
-            type: integer
-            default: 20
+          schema: {type: integer, default: 20, maximum: 50}
       responses:
         '200':
-          description: 세션 목록
+          description: 세션 목록 (PageResponse 표준)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionPageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
   /ai/sessions/{sessionId}:
     get:
       tags: [sessions]
-      summary: 세션 상세 조회 (대화 이력 포함)
+      summary: 세션 + 턴 상세 조회 (04번 §6.4)
       operationId: getSession
       security:
         - BearerAuth: []
@@ -89,19 +98,46 @@ paths:
         - $ref: '#/components/parameters/SessionIdParam'
       responses:
         '200':
-          description: 세션 상세
+          description: 세션 상세 (턴 목록 포함)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SessionDetailResponse'
+              example:
+                id: 9012
+                userId: 5678
+                passage: {bookId: 1, bookCode: GEN, chapter: 1, verse: 1}
+                currentStep: C
+                status: IN_PROGRESS
+                summary: null
+                createdAt: '2026-05-26T14:30:00.123Z'
+                updatedAt: '2026-05-26T14:42:11.789Z'
+                turns:
+                  - {id: 31, role: SYSTEM, step: null, content: '', contentRedacted: true, createdAt: '2026-05-26T14:30:00.150Z'}
+                  - {id: 32, role: USER, step: A, content: '하나님이 천지를 창조하셨다는 게 어떤 의미인가요?', contentRedacted: false, createdAt: '2026-05-26T14:30:01.000Z'}
+                  - id: 33
+                    role: ASSISTANT
+                    step: A
+                    content: '이 구절은 창조의 첫 행위를 선언합니다...'
+                    contentRedacted: false
+                    promptTemplateId: 7
+                    ragSources: [{type: commentary, id: 11, weight: 0.82}]
+                    createdAt: '2026-05-26T14:30:05.123Z'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /ai/sessions/{sessionId}/messages:
+  /ai/sessions/{sessionId}/turns:
     post:
-      tags: [messages]
-      summary: AI에게 메시지 전송 (SSE 스트리밍 응답)
-      operationId: sendMessage
+      tags: [turns]
+      summary: AI 대화 턴 추가 — SSE 스트리밍 (04번 §6.3)
+      description: |
+        SSE 스트리밍 응답. Accept: text/event-stream 필수.
+        첫 토큰 timeout 5s / idle 30s / max 5분.
+        클라이언트 끊김 시 Flux.doFinally(CANCEL)로 Anthropic 호출 즉시 중단.
+        error 발생 시 event:error 후 반드시 event:end [DONE] 발행.
+      operationId: createTurn
       security:
         - BearerAuth: []
       parameters:
@@ -111,76 +147,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SendMessageRequest'
+              $ref: '#/components/schemas/CreateTurnRequest'
+            example:
+              userMessage: '이 구절에서 하나님의 사랑이 어떻게 표현되나요?'
       responses:
         '200':
-          description: SSE 스트림 — 토큰 단위 청크
+          description: SSE 스트림 (Content-Type text/event-stream)
           content:
             text/event-stream:
               schema:
                 $ref: '#/components/schemas/SseChunk'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/UnprocessableEntity'
-
-  /ai/sessions/{sessionId}/advance:
-    patch:
-      tags: [sessions]
-      summary: 큐티 단계 진행 (A→B→C→D)
-      operationId: advanceStage
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/SessionIdParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AdvanceStageRequest'
-      responses:
-        '200':
-          description: 단계 진행 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SessionResponse'
-        '409':
-          description: 이미 마지막 단계 (D)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetail'
-
-  /ai/prompt-templates:
-    get:
-      tags: [templates]
-      summary: 프롬프트 템플릿 목록 (큐티 A~D)
-      operationId: listPromptTemplates
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: stage
-          in: query
-          schema:
-            type: string
-            enum: [A, B, C, D]
-          description: 단계 필터 (없으면 전체)
-      responses:
-        '200':
-          description: 템플릿 목록
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/PromptTemplateResponse'
+        '502':
+          $ref: '#/components/responses/BadGateway'
+        '504':
+          $ref: '#/components/responses/GatewayTimeout'
 
 components:
   securitySchemes:
@@ -197,78 +185,100 @@ components:
       schema:
         type: integer
         format: int64
-        example: 42
+        example: 9012
 
   schemas:
-    CreateSessionRequest:
+    PassageRef:
       type: object
-      required: [book, chapter, verse]
+      required: [bookCode, chapter, verse]
       properties:
-        book:
-          type: string
-          example: JHN
-          description: 성경 책 코드
-        chapter:
-          type: integer
-          example: 3
-        verse:
-          type: integer
-          example: 16
-        templateType:
+        bookId:
+          type: ["integer", "null"]
+          format: int64
+          description: DB 내부 ID (응답에만 포함)
+        bookCode: {type: string, example: GEN}
+        chapter: {type: integer, minimum: 1}
+        verse: {type: integer, minimum: 1}
+
+    StartSessionRequest:
+      type: object
+      required: [passage]
+      properties:
+        passage:
+          $ref: '#/components/schemas/PassageRef'
+        initialStep:
           type: string
           enum: [A, B, C, D]
           default: A
-          description: 시작 단계
+          description: 시작 단계 (기본값 A)
 
-    SendMessageRequest:
+    CreateTurnRequest:
       type: object
       required: [userMessage]
       properties:
         userMessage:
           type: string
           maxLength: 2000
-          example: "이 구절에서 하나님의 사랑이 어떻게 표현되나요?"
-        idempotencyKey:
-          type: string
-          description: 클라이언트 멱등성 키 (선택)
-          example: "msg-uuid-v4"
-
-    AdvanceStageRequest:
-      type: object
-      required: [currentStage]
-      properties:
-        currentStage:
-          type: string
-          enum: [A, B, C]
-          description: 현재 단계 (D는 마지막이므로 진행 불가)
+          example: '하나님이 천지를 창조하셨다는 게 어떤 의미인가요?'
 
     SessionResponse:
       type: object
+      required: [id, userId, passage, currentStep, status, createdAt]
       properties:
-        sessionId:
-          type: integer
-          format: int64
-        userId:
-          type: integer
-          format: int64
-        book:
-          type: string
-        chapter:
-          type: integer
-        verse:
-          type: integer
-        currentStage:
+        id: {type: integer, format: int64}
+        userId: {type: integer, format: int64}
+        passage:
+          $ref: '#/components/schemas/PassageRef'
+        currentStep:
           type: string
           enum: [A, B, C, D]
+          description: 현재 큐티 단계
         status:
           type: string
-          enum: [ACTIVE, COMPLETED, ABANDONED]
-        createdAt:
-          type: string
-          format: date-time
+          enum: [IN_PROGRESS, COMPLETED, ABANDONED, COMPLETED_NO_JOURNAL]
+          description: |
+            IN_PROGRESS: 진행 중 / COMPLETED: D단계 완료 + Journal 생성됨
+            ABANDONED: 탈퇴로 중단 / COMPLETED_NO_JOURNAL: Saga 보상 (Journal 생성 실패)
+        summary:
+          type: ["string", "null"]
+          description: D 단계 완료 시 AI 생성 요약
+        createdAt: {type: string, format: date-time}
         updatedAt:
-          type: string
+          type: ["string", "null"]
           format: date-time
+
+    TurnResponse:
+      type: object
+      properties:
+        id: {type: integer, format: int64}
+        role:
+          type: string
+          enum: [USER, ASSISTANT, SYSTEM]
+        step:
+          type: ["string", "null"]
+          enum: [A, B, C, D]
+          description: SYSTEM 턴은 null
+        content:
+          type: string
+          description: SYSTEM 턴은 빈 문자열. contentRedacted=true면 클라이언트가 숨김 처리.
+        contentRedacted:
+          type: boolean
+          default: false
+          description: true=화면 숨김 (SYSTEM 프롬프트 보호).
+        promptTemplateId:
+          type: ["integer", "null"]
+          format: int64
+          description: ASSISTANT 턴에만 포함
+        ragSources:
+          type: ["array", "null"]
+          description: ASSISTANT 턴에만 포함. 신학 가드레일상 ASSISTANT 턴은 항상 포함 필수.
+          items:
+            type: object
+            properties:
+              type: {type: string}
+              id: {type: integer, format: int64}
+              weight: {type: number, format: float}
+        createdAt: {type: string, format: date-time}
 
     SessionDetailResponse:
       allOf:
@@ -280,82 +290,41 @@ components:
               items:
                 $ref: '#/components/schemas/TurnResponse'
 
-    TurnResponse:
-      type: object
-      properties:
-        turnId:
-          type: integer
-          format: int64
-        role:
-          type: string
-          enum: [USER, ASSISTANT]
-        content:
-          type: string
-        stage:
-          type: string
-          enum: [A, B, C, D]
-        inputTokens:
-          type: ["integer", "null"]
-        outputTokens:
-          type: ["integer", "null"]
-        createdAt:
-          type: string
-          format: date-time
-
     SessionPageResponse:
       type: object
       properties:
-        content:
+        items:
           type: array
           items:
             $ref: '#/components/schemas/SessionResponse'
         page:
-          type: integer
-        size:
-          type: integer
-        totalElements:
-          type: integer
-        totalPages:
-          type: integer
+          type: object
+          properties:
+            number: {type: integer}
+            size: {type: integer}
+            totalElements: {type: integer}
+            totalPages: {type: integer}
 
     SseChunk:
       type: object
-      description: >-
-        SSE 이벤트 페이로드. 04_API_명세서.md canonical 포맷:
-        turn_started/token/rag_sources/turn_completed/[DONE]
+      description: |
+        SSE 이벤트 페이로드 (04번 §6.3 canonical).
+        eventType별 data 구조:
+          turn_started: {turnId:null, step:"A", timestamp:"..."}
+          token: {text:"토큰 문자열"}
+          rag_sources: {sources:[{type,id,weight}]}
+          step_changed: {from:"A", to:"B"}
+          turn_completed: {turnId:33, step:"A", promptTemplateId:7, totalTokens:245, elapsedMs:4123}
+          end: "[DONE]"
+          error: {code:"LLM_PROVIDER_ERROR", detail:"...", traceId:"..."}
       properties:
         eventType:
           type: string
-          enum: [turn_started, token, rag_sources, turn_completed]
-          description: SSE event 필드값
+          enum: [turn_started, token, rag_sources, step_changed, turn_completed, end, error]
+          description: SSE event 필드값 (7종)
         data:
           type: string
-          description: "type=token: 토큰 문자열 / type=done: 최종 요약 JSON / type=error: 에러 메시지"
-        sessionId:
-          type: integer
-          format: int64
-        stage:
-          type: string
-          enum: [A, B, C, D]
-
-    PromptTemplateResponse:
-      type: object
-      properties:
-        templateId:
-          type: integer
-          format: int64
-        stage:
-          type: string
-          enum: [A, B, C, D]
-        name:
-          type: string
-        systemPrompt:
-          type: string
-        isActive:
-          type: boolean
-        version:
-          type: integer
-
+          description: JSON 직렬화된 페이로드 (eventType별 구조 상이)
 
     ProblemDetail:
       type: object
@@ -365,8 +334,9 @@ components:
         title: {type: string}
         status: {type: integer}
         detail: {type: string}
-        code: {type: string, description: "도메인 에러 코드"}
-        traceId: {type: string}
+        instance: {type: string}
+        code: {type: string, description: '도메인 에러 코드'}
+        traceId: {type: string, description: 'W3C Trace Context traceId'}
         timestamp: {type: string, format: date-time}
         errors:
           type: array
@@ -376,38 +346,82 @@ components:
               field: {type: string}
               code: {type: string}
               message: {type: string}
-      properties:
-        code:
-          type: string
-        message:
-          type: string
-        traceId:
-          type: string
 
   responses:
     Unauthorized:
-      description: 인증 실패
+      description: 인증 실패 (401)
       content:
         application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/unauthorized'
+            title: Unauthorized
+            status: 401
+            code: UNAUTHORIZED
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'
+    Forbidden:
+      description: 타인 세션 접근 금지 (403)
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/forbidden'
+            title: Forbidden
+            status: 403
+            code: SESSION_NOT_OWNED
+            detail: 해당 세션에 접근 권한이 없습니다.
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'
     NotFound:
-      description: 리소스 없음
+      description: 세션 없음 (404)
       content:
         application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
           example:
+            type: 'https://api.qtai.app/errors/not-found'
+            title: Not Found
+            status: 404
             code: AI_SESSION_NOT_FOUND
-            message: 세션을 찾을 수 없습니다.
-            traceId: "00-abc123-01"
+            detail: 세션을 찾을 수 없습니다.
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'
     UnprocessableEntity:
-      description: 입력값 검증 실패 또는 신학 가드레일 차단
+      description: 비즈니스 규칙 위반 (422)
       content:
         application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetail'
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
           example:
-            code: AI_THEOLOGICAL_GUARDRAIL_BLOCKED
-            message: 해당 요청은 신학 가드레일에 의해 차단되었습니다.
-            traceId: "00-abc123-01"
+            type: 'https://api.qtai.app/errors/unprocessable-entity'
+            title: Unprocessable Entity
+            status: 422
+            code: SESSION_ALREADY_COMPLETED
+            detail: 이미 완료된 세션입니다.
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'
+    BadGateway:
+      description: Anthropic API 오류 (502)
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/bad-gateway'
+            title: Bad Gateway
+            status: 502
+            code: LLM_PROVIDER_ERROR
+            detail: Anthropic API 503 after 3 retries
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'
+    GatewayTimeout:
+      description: LLM 첫 토큰 5s 초과 (504)
+      content:
+        application/problem+json:
+          schema: {$ref: '#/components/schemas/ProblemDetail'}
+          example:
+            type: 'https://api.qtai.app/errors/gateway-timeout'
+            title: Gateway Timeout
+            status: 504
+            code: LLM_TIMEOUT
+            detail: LLM 응답 첫 토큰 5s 초과
+            traceId: '0af7651916cd43dd8448eb211c80319c'
+            timestamp: '2026-05-12T00:00:00.000Z'

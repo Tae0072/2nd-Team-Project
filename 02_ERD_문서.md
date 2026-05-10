@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — ERD 문서 v1.1
+﻿��� QT-AI (큐티 AI 앱) — ERD 문서 v1.1
 
 > **문서 버전:** v1.1
 > **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치)
-> **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서
+> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서
 > **MSA 데이터 원칙:** **Database per Service** — 각 서비스가 자기 DB 소유, 서비스 간 직접 JOIN 금지, 비동기 동기화는 Kafka 이벤트로
 
 ---
@@ -14,7 +14,8 @@
 | v1.0 | 2026-05-06 | 강태오 | 초기 작성 — 4개 서비스 DB 분리, ChromaDB 별도, Kafka 이벤트 연결 |
 | v1.1 | 2026-05-06 | 강태오 | **3차 검토 결과 25항목 일괄 패치** — PROMPT_TEMPLATES UK 정정 / AI_TURNS·AI_SESSIONS 추적 컬럼 추가 / JOURNAL_EVENTS sequence 메커니즘 / utf8mb4 표준 / MEDIUMTEXT / email 재가입 정책 / DRAFT 명칭 분리 / 토픽 표 보강 (Schema subject·DLQ) / Schema Registry 명시 / NOTIFICATION 정책 / Flyway / Outbox v1.0 한계 / event_data 예시 / 다이어그램 보강 |
 | v1.1.1 | 2026-05-06 | 강태오 | 03번 v1.1 동기화 — § 1.1 다이어그램에 Auth Redis-WS (refresh blacklist), Bible Redis-Cache 분리 표기 / § 2.3 REFRESH_TOKENS Redis blacklist 정책 노트 추가 |
-| v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 6.1 토픽 표 8번째 추가 (`journal.creation.failed` Saga 보상) + `user.activity.tracked` 멱등성 키 형식 04번과 통일 (`read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}`) + envelope에 `idempotencyKey` 필드 명시 / § 7.6 JOURNALS.status 다이어그램 정정 (PUBLISHED → DRAFT 화살표 제거 + "사용자 직접 작성" 제거 — 04번 § 7.4 INVALID_STATUS_TRANSITION 정책 정합) |
+| v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 6.1 토픽 표 8번째 추가 (`journal.creation.failed` Saga 보상) + `user.activity.tracked` 멱등성 키 형식 04번과 통일 (`read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}`) + envelope에 `idempotencyKey` 필드 명시 / § 7.6 JOURNALS.status 다이어그램 정정 (PUBLISHED → DRAFT 화살표 제거 + "사용자 직접 작성" 제거 — 04번 § 7.4 INVALID_STATUS_TRANSITION 정책 정합) |
+| v1.3 | 2026-05-09 | 강태오 | DECISIONS.md 정합 패치 — § 1.1 Kafka 토픽 다이어그램에 `journal.creation.failed` 추가 / § 3 헤더 + § 9.3 Redis 캐시 키 형식 수정(`passage:` → `cache:passage:kr:`) + EN 캐시 키 추가 / § 6.1 멱등성 키 snake_case→camelCase 통일({userId},{sessionId},{journalId},{epochMinute}) / 헤더 연관문서 v1.3→v1.4 |
 
 ---
 
@@ -69,6 +70,7 @@
    │  topics: user.deactivated / user.activity.tracked│
    │          ai.session.completed / journal.created  │
    │          journal.updated / journal.deleted       │
+   │          journal.creation.failed                │
    │          notification.requested                  │
    │  + 각 토픽의 DLQ: {topic}.DLQ                    │
    └─────────────────────────────────────────────────┘
@@ -206,7 +208,7 @@ ADR 후보 0010.
 
 ## 3. Bible Service ERD
 
-> **Owner:** 김태혁 / **DB schema:** `bible_db` + Redis 캐시 (`passage:{book}:{ch}:{v}`, TTL 24h)
+> **Owner:** 김태혁 / **DB schema:** `bible_db` + Redis 캐시 (`cache:passage:kr:{book}:{ch}:{v}`, TTL 24h) — DECISIONS.md §7
 >
 > **데이터 출처:** § [01번 § 3.1 데이터 저작권 표](./01_프로젝트_계획서.md) — KJV (PD) + Matthew Henry (PD) + 개역한글(출처 표기) + 한글 주석 더미데이터
 
@@ -615,14 +617,14 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 | 토픽 | Producer | Consumer | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject | DLQ 토픽 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `user.activity.tracked` | BFF Aggregator | Journal Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
-| `user.deactivated` | Auth Service | AI, Journal | `user_id`, `deactivated_at` | `user.deactivated:{user_id}` | `user.deactivated-value` | `user.deactivated.DLQ` |
-| `ai.session.completed` | AI Service | Journal Service | `session_id`, `user_id`, `passage`, `final_step`, `summary` | `ai.session.completed:{session_id}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
-| `journal.created` | Journal Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journal_id}` | `journal.created-value` | `journal.created.DLQ` |
-| `journal.updated` | Journal Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journal_id}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
-| `journal.deleted` | Journal Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journal_id}` | `journal.deleted-value` | `journal.deleted.DLQ` |
-| `notification.requested` | (다수 서비스) | Notification Aggregator (BFF의 일부) | `user_id`, `type`, `payload` | `{type}:{user_id}:{occurred_at}` | `notification.requested-value` | `notification.requested.DLQ` |
-| **`journal.creation.failed`** ⭐v1.2 | **Journal Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{session_id}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
+| `user.activity.tracked` | BFF Aggregator | Journal Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
+| `user.deactivated` | Auth Service | AI, Journal | `user_id`, `deactivated_at` | `user.deactivated:{userId}` | `user.deactivated-value` | `user.deactivated.DLQ` |
+| `ai.session.completed` | AI Service | Journal Service | `session_id`, `user_id`, `passage`, `final_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
+| `journal.created` | Journal Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
+| `journal.updated` | Journal Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
+| `journal.deleted` | Journal Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
+| `notification.requested` | (다수 서비스) | Notification Aggregator (BFF의 일부) | `user_id`, `type`, `payload` | `{type}:{userId}:{occurredAt}` | `notification.requested-value` | `notification.requested.DLQ` |
+| **`journal.creation.failed`** ⭐v1.2 | **Journal Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{sessionId}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
 
 > **Schema Registry:** Confluent Schema Registry 또는 Apicurio Registry를 W1 Lock-in 3번에서 셋업. 모든 토픽은 위 `Schema Subject`로 등록. **검증 실패 메시지는 producer에서 reject** (DLQ 전송 X — DLQ는 컨슈머 처리 실패용).
 
@@ -760,7 +762,7 @@ stateDiagram-v2
 
 | 상태 | 설명 | 다음 상태 | 전이 트리거 |
 | --- | --- | --- | --- |
-| DRAFT | 임시 저장 | PUBLISHED, DELETED | AI 세션 완료 컨슈머가 자동 생성 (`ai.session.completed:{session_id}` 멱등성 키) |
+| DRAFT | 임시 저장 | PUBLISHED, DELETED | AI 세션 완료 컨슈머가 자동 생성 (`ai.session.completed:{sessionId}` 멱등성 키) |
 | PUBLISHED | 정식 저장 | DELETED only | 사용자 PATCH. **PUBLISHED → DRAFT 금지 (04번 § 7.4 `INVALID_STATUS_TRANSITION` 422)** |
 | DELETED | Soft 삭제 | (30일 후 hard delete 후보) | 사용자 DELETE |
 
@@ -952,8 +954,9 @@ CREATE TABLE users (
 
 | 키 패턴 | TTL | 무효화 트리거 | 설명 |
 | --- | --- | --- | --- |
-| `passage:{book}:{ch}:{v}` | 24h | (없음 — 정적 데이터) | 입체 화면용 통합 응답 캐시 |
-| `passage:hot100` | 1h | 통계 배치 | Top 100 핫셋 ID 리스트 |
+| `cache:passage:kr:{book}:{ch}:{v}` | 24h | (없음 — 정적 데이터) | KR 구절 캐시 (DECISIONS.md §7) |
+| `cache:passage:en:{book}:{ch}:{v}` | 24h | (없음 — 정적 데이터) | EN 구절 캐시 |
+| `cache:passage:hot100` | 1h | 통계 배치 | Top 100 핫셋 ID 리스트 |
 
 **캐시 히트율 목표:** ≥ 60% (Hot 100구절 기준, [01번 § 11.2](./01_프로젝트_계획서.md) 참조)
 

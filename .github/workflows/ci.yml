@@ -29,13 +29,13 @@ jobs:
             apis/journal/openapi.yaml \
             apis/bff/openapi.yaml
 
-  test:
-    name: Unit Test (${{ matrix.service }})
+  test-java:
+    name: Java Unit Test (${{ matrix.service }})
     runs-on: ubuntu-latest
     needs: lint
     strategy:
       matrix:
-        service: [auth-service, bible-service, ai-service, journal-service, bff-aggregator]
+        service: [auth-service, bible-service, journal-service, bff-aggregator]
     steps:
       - uses: actions/checkout@v4
 
@@ -57,10 +57,29 @@ jobs:
           name: test-results-${{ matrix.service }}
           path: ${{ matrix.service }}/build/reports/tests/
 
+  test-python:
+    name: Python Unit Test (ai-service)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r ai-service/requirements.txt
+
+      - name: Run pytest
+        run: pytest ai-service/tests/ -v
+        env:
+          ENVIRONMENT: test
+
   build-and-push:
     name: Docker build & push (${{ matrix.service }})
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test-java, test-python]
     if: github.ref == 'refs/heads/main'
     strategy:
       matrix:

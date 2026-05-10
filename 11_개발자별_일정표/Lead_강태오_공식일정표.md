@@ -5,7 +5,7 @@
 담당자: 강태오
 역할: 책임개발자 (Tech Lead) — Gateway + BFF Aggregator + DevOps 총괄
 개발 기간: W0(5/8~5/11) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 01_프로젝트_계획서 v1.3 / 03_아키텍처_정의서 v1.2 / 06_DevOps_운영_매뉴얼 v1.0
+연관 문서: 00_개발_일정_총괄표 / 01_프로젝트_계획서 v1.4 / 03_아키텍처_정의서 v1.3 / 06_DevOps_운영_매뉴얼 v1.0
 
 ---
 
@@ -32,18 +32,18 @@
 ```
 gateway-service/          ← 전담 소유 (타인 수정 시 Lead 사전 협의 필수)
   └── filter/
-      ├── AuthFilter.kt        (JWT 검증 → X-User-Id 주입)
-      └── NoBufferingFilter.kt (SSE buffering 우회)
+      ├── AuthFilter.java        (JWT 검증 → X-User-Id 주입)
+      └── NoBufferingFilter.java (SSE buffering 우회)
   └── config/
-      ├── RouteConfig.kt       (6 서비스 라우팅)
-      └── RateLimitConfig.kt
+      ├── RouteConfig.java       (6 서비스 라우팅)
+      └── RateLimitConfig.java
 
 bff-service/              ← 전담 소유
   └── usecase/
-      ├── DashboardUseCase.kt  (4 서비스 병렬 호출)
-      └── NotificationUseCase.kt
+      ├── DashboardUseCase.java  (4 서비스 병렬 호출)
+      └── NotificationUseCase.java
   └── websocket/
-      └── StompConfig.kt       (WebSocket 세션 레지스트리)
+      └── StompConfig.java       (WebSocket 세션 레지스트리)
 
 helm/                     ← 전담 소유
   ├── qtai-umbrella/
@@ -84,7 +84,7 @@ shared-kernel/            ← 전담 소유
 
 | 일자 | 오전 (9~12) | 오후 코어 (13~18) | 저녁 |
 |------|------------|-------------------|------|
-| 5/12 월 | 킥오프 (10:00, 30분). Gradle 6 module 최종 확인 | K8s namespace `qtai` + Helm infra chart (MySQL·Redis·Kafka·ChromaDB) 기동 | Gateway 라우팅 6개 서비스 초기 설정 |
+| 5/12 화 | 킥오프 (10:00, 30분). Gradle 6 module 최종 확인 | K8s namespace `qtai` + Helm infra chart (MySQL·Redis·Kafka·ChromaDB) 기동 | Gateway 라우팅 6개 서비스 초기 설정 |
 | 5/13 화 | Stand-up. AuthFilter (JWT 검증 → X-User-Id) 구현 | Kafka 토픽 8종 자동 생성 스크립트 | K8s Secret 4종 (anthropic, mysql, jwt-keys, google-oauth) |
 | 5/14 수 | Stand-up. NoBufferingFilter (SSE buffering 우회) | BFF Aggregator `/me/dashboard` 병렬 호출 골격 | shared-kernel BaseEntity, ErrorResponse 최종화 |
 | 5/15 목 | Stand-up. K8s 스켈레톤 6 pod `/actuator/health` 200 확인 | STOMP WebSocket 기본 설정 (BFF StompConfig) | 팀원 환경 막힘 지원 |
@@ -98,12 +98,12 @@ shared-kernel/            ← 전담 소유
 
 | 산출물 | 파일 | 완료 기준 |
 |--------|------|-----------|
-| AuthFilter | `gateway-service/.../AuthFilter.kt` | JWT 검증 → X-User-Id 헤더 주입 동작 |
-| NoBufferingFilter | `gateway-service/.../NoBufferingFilter.kt` | SSE curl 테스트 첫 토큰 즉시 수신 |
+| AuthFilter | `gateway-service/.../AuthFilter.java` | JWT 검증 → X-User-Id 헤더 주입 동작 |
+| NoBufferingFilter | `gateway-service/.../NoBufferingFilter.java` | SSE curl 테스트 첫 토큰 즉시 수신 |
 | K8s 스켈레톤 | `helm/qtai-umbrella/` | 6 pod Running + health 200 |
 | Kafka 토픽 8종 | `scripts/kafka-topics.sh` | `kafka-topics.sh --list` 8개 확인 |
 | Loki·Prometheus·Jaeger | `helm/qtai-infra/` | 3종 대시보드 접속 가능 |
-| BFF dashboard 골격 | `bff-service/.../DashboardUseCase.kt` | `/me/dashboard` 200 반환 (partial 허용) |
+| BFF dashboard 골격 | `bff-service/.../DashboardUseCase.java` | `/me/dashboard` 200 반환 (partial 허용) |
 
 **W1 Lock-in 게이트 (5/22 18:00)**
 - [ ] 서비스 경계 확정 (ADR-0001 팀 합의)
@@ -122,7 +122,7 @@ shared-kernel/            ← 전담 소유
 |------|-----------|
 | 5/26 화 | 페이스 점검 (11:30). Gateway 통합 라우팅 검증 — curl 6 서비스 health |
 | 5/27 수 | NetworkPolicy 6×6 매트릭스 완성. BFF `/me/dashboard` 5 서비스 실데이터 |
-| 5/28 목 | PATCH `/ai/sessions/{id}/advance` 라우팅 검증. Prometheus Alert 설정 |
+| 5/28 목 | GET/POST `/api/v1/passages/{book}/{ch}/{v}` 라우팅 검증
 | 5/29 금 | W2 페이스 점검 + PR 리뷰 집중 머지 |
 
 ---

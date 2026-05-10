@@ -1,7 +1,7 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI Auth Service API
-  version: "1.2"
+  version: "1.3"
   description: |
     인증/인가 서비스. JWT RS256 발급/검증/갱신, Google OAuth 2.0 (idToken POST).
     토큰 정책(03번 11.1): Access=30분(1800s), Refresh=14일. blacklist=Redis-WS(Refresh jti만). Access blacklist 없음.

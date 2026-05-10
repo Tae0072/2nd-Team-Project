@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — Frontend Flutter 가이드 v1.0
+﻿��� QT-AI (큐티 AI 앱) — Frontend Flutter 가이드 v1.0
 
 > **문서 버전:** v1.0
 > **작성일:** 2026-05-07
-> **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.2](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.2](./03_아키텍처_정의서.md) / [04_API_명세서 v1.2](./04_API_명세서.md) / [05_보안_명세서 v1.0](./05_보안_명세서.md) / [06_DevOps_운영_매뉴얼 v1.0](./06_DevOps_운영_매뉴얼.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md)
+> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.3](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.3](./03_아키텍처_정의서.md) / [04_API_명세서 v1.5](./04_API_명세서.md) / [05_보안_명세서 v1.0](./05_보안_명세서.md) / [06_DevOps_운영_매뉴얼 v1.0](./06_DevOps_운영_매뉴얼.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md)
 > **owner:** 김지민 (Frontend Flutter Owner)
 > **Frontend 키워드:** Flutter 3.x · Dart 3.x · Riverpod 2.x · go_router · Dio + Retrofit · freezed · flutter_secure_storage · stomp_dart_client · dio_sse 또는 직접 SSE · Material 3 · go_router_builder · GetIt(선택) · flutter_localizations
 > **W1 Lock-in 산출물:** 본 문서 + flutter-app/ 프로젝트 골격 + Riverpod 표준 Provider 1개 + Dio Interceptor (JWT·Refresh·ProblemDetail) + 5 화면 라우팅 골격 + secure_storage 키 표준 + flutter test 통과

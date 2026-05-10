@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.2
+﻿# 📖 QT-AI (큐티 AI 앱) — API 명세서 v1.5
 
-> **문서 버전:** v1.2
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1) / 2026-05-07 (v1.2 — 외부 검토 9항목 일괄 패치)
-> **연관 문서:** [01_프로젝트_계획서 v1.3](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.1.1](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.1](./03_아키텍처_정의서.md)
+> **문서 버전:** v1.5
+> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1) / 2026-05-07 (v1.2) / 2026-05-09 (v1.3 — yaml 이슈 6종 패치) / 2026-05-09 (v1.4 — yaml↔명세서 정합) / 2026-05-09 (v1.5 — DECISIONS.md 정합 + journal yaml 재작성)
+> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [02_ERD_문서 v1.3](./02_ERD_문서.md) / [03_아키텍처_정의서 v1.3](./03_아키텍처_정의서.md)
 > **W1 Lock-in 산출물:** 본 문서 + `apis/{service}/openapi.yaml` × 5 (Spectral lint 통과 + Prism mock 가동) — 03번 § 2.2
 > **목적:** 6명이 W1 종료 시점에 동일한 API 계약 위에서 병렬로 코드를 작성할 수 있도록 모든 endpoint·DTO·에러·페이로드를 박제. 한 번 동결되면 W2 이후 수정은 ADR 발행 + 영향 범위 PR 일괄 동시 머지로만.
 
@@ -15,6 +15,9 @@
 | v1.0 | 2026-05-06 | 강태오 | 초기 작성 — 5 service OpenAPI 골격 + 공통 표준 (헤더·에러·페이징·CORS·Rate Limit) + Gateway 라우팅 표 + SSE/WebSocket 페이로드 + Spectral 룰 + Prism mock 가동 절차 + 1차 실패 패턴 ↔ API 가드레일 매핑 |
 | v1.1 | 2026-05-06 | 강태오 | **3차 검토 36항목 일괄 패치** — 필수 12 (도메인 에러 코드 5개 추가 / `PageResponse<T>` Custom DTO / Rate Limiter Spring Cloud Gateway 내장 / logout 인증 ❌ / DELETE 본문 → POST /me/deactivate / OAuth JWK 직접 검증 / `/passages` 흐름 통일 BFF→Bible 3개 직접 / WS STOMP CONNECT 헤더 / yaml info.contact / Spectral 룰 함수 정정 / servers↔포트 일관 / 503 Custom Mapper) + 일관성 12 (dashboard 5 service 정확화 / activeSession 정책 / Refresh Rotation race / PATCH idempotency_key 자동 / SSE schema / wildcard 의도 / Pod 다중 다이어그램 / SYSTEM 마스킹 schema / SSE 라이브러리 fix / 금지 filter / Spring SSE 표준 / consumer group / events 02번 정합) + 선택 12 (Slack #qtai-api / PASSWORD_TOO_WEAK / SSE close 정책 / epoch_minute 분 경계 / 알림 type 확장 / wss/ws 환경별 / SpringDoc 자동생성 안 씀 / .spectral.yaml 위치 / Mock 검증 도구 / OAS 3.1 의존성 매트릭스 / Hot 100 정의 / Idempotency-Key UX) |
 | v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 2.10 Rate Limiter yaml 정정 (login `replenishRate=1, burstCapacity=5` — 분 단위 정확 5/min은 Spring Cloud Gateway 초 단위 한계로 불가, Bucket4j v1.1 검토) / § 3 Gateway 라우팅 표 `/ws/**` 인증 ❌ (BFF가 STOMP CONNECT 검증) / § 5 + § 8.2 `/bible/today` 모순 제거 (BFF 자체 정적 매핑 단일화) / § 6.7 AI 컨슈머 + § 7.8 Journal 발행에 `journal.creation.failed` 추가 (Saga 보상) / § 10.2 STOMP 인증 흐름 강화 (Gateway 패스스루 + BFF 검증 책임 명시) |
+| v1.3 | 2026-05-09 | 강태오 | **yaml 이슈 6종 패치** — bible/ai/journal Prism mock 포트 누락(4012/4013/4014) / ProblemDetail `properties:` 중복 제거 / 에러 응답 example 필수필드 보완(`type`·`title`·`status`·`timestamp`) / bible description 개역개정→개역한글 저작권 오류 수정 / AI Session `status` 불일치(ACTIVE vs IN_PROGRESS) 해소 / `currentStage`↔`currentStep` 필드명 통일 |
+| v1.4 | 2026-05-09 | 강태오 | **yaml-명세서 정합 패치** — bible yaml 전면 재작성 (kr/en/commentary 경로 일치, lang param 방식 제거) / ai yaml 전면 재작성 (turns endpoint, IN_PROGRESS status, currentStep, Python FastAPI 명시, advanceStage 제거, 에러코드 보완) / bff yaml 1번 오수정 롤백 (currentStep/IN_PROGRESS 복원) / 03번 §1.3.1 commentary 경로 누락(/api/v1/) 수정 |
+| v1.5 | 2026-05-09 | 강태오 | **DECISIONS.md 정합 패치** — journal yaml 전면 재작성(`/api/v1/journals`, POST create 제거, PUT→PATCH, events endpoint 추가) / bff yaml `todayVerse`→`todayPassage` / DECISIONS.md §1 AI K8s 포트 8085→8080 / DECISIONS.md §3 누락 routes 추가(성경목록·AI 세션조회/목록·journal 단건·삭제·이벤트) + journal 수동 생성 없음 명시 |
 
 ---
 
@@ -401,7 +404,7 @@ spring:
 
 > **v1.0 멱등성 적용 범위:** Kafka 컨슈머만 (DB UNIQUE — ADR-0007). HTTP는 자연 멱등 메서드만 신뢰.
 >
-> **UX 영향 (v1.1 명시):** 사용자가 PATCH 버튼을 동시에 N번 누르면 N번의 `journal.update:{ulid}` 이벤트가 적재됨 (각각 다른 idempotency_key). `@Lock(PESSIMISTIC_WRITE)`로 직렬화는 되지만 N개 events 생성. UX 측면에서는 클라이언트(Flutter)가 button debounce(300ms) + loading state로 1차 방어. v1.1에 `Idempotency-Key` 헤더 도입 검토.
+> **UX 영향 (v1.1 명시):** 사용자가 PATCH 버튼을 동시에 N번 누르면 N번의 `journal.update:{ULID}` 이벤트가 적재됨 (각각 다른 idempotency_key). `@Lock(PESSIMISTIC_WRITE)`로 직렬화는 되지만 N개 events 생성. UX 측면에서는 클라이언트(Flutter)가 button debounce(300ms) + loading state로 1차 방어. v1.1에 `Idempotency-Key` 헤더 도입 검토.
 
 ### 2.12 시간·로케일
 
@@ -651,7 +654,7 @@ Content-Type: application/json
 3. `USERS.deleted_at = NOW()`
 4. `USERS.email = 'u_{id}_deactivated_{epoch_ms}@deleted.local'` (마스킹 — 02번 § 2.2.1)
 5. `REFRESH_TOKENS` 모두 `revoked_at` UPDATE
-6. **AFTER_COMMIT** → Kafka publish `user.deactivated` (멱등성 키: `user.deactivated:{user_id}`)
+6. **AFTER_COMMIT** → Kafka publish `user.deactivated` (멱등성 키: `user.deactivated:{userId}`)
 7. AI Service 컨슈머 → 활성 세션 정리
 8. Journal Service 컨슈머 → 데이터 처리 정책에 따라 (v1.0은 보존, v1.1 GDPR 검토)
 
@@ -1025,7 +1028,7 @@ data: [DONE]
 
 | 이벤트 | 토픽 | 시점 | 멱등성 키 |
 | --- | --- | --- | --- |
-| `ai.session.completed` | `ai.session.completed` | D 단계 도달 시 (AFTER_COMMIT) | `ai.session.completed:{session_id}` |
+| `ai.session.completed` | `ai.session.completed` | D 단계 도달 시 (AFTER_COMMIT) | `ai.session.completed:{sessionId}` |
 
 ### 6.7 컨슈머 토픽
 
@@ -1155,7 +1158,7 @@ data: [DONE]
 1. TX 시작
 2. JOURNALS row 잠금
 3. `JOURNALS.deleted_at = NOW()`, `last_event_sequence + 1`
-4. JOURNAL_EVENTS INSERT (eventType=`DELETED`, idempotency_key=`journal.delete:{journal_id}:{epoch_ms}`)
+4. JOURNAL_EVENTS INSERT (eventType=`DELETED`, idempotency_key=`journal.delete:{journalId}:{epochMs}`)
 5. TX 커밋
 6. **AFTER_COMMIT** → Kafka `journal.deleted`
 
@@ -1213,10 +1216,10 @@ data: [DONE]
 
 | 이벤트 | 토픽 | 시점 | 멱등성 키 |
 | --- | --- | --- | --- |
-| `journal.created` | `journal.created` | AI 세션 컨슈머가 DRAFT 생성 시 (AFTER_COMMIT) | `ai.session.completed:{session_id}` |
+| `journal.created` | `journal.created` | AI 세션 컨슈머가 DRAFT 생성 시 (AFTER_COMMIT) | `journal.created:{journalId}` |
 | `journal.updated` | `journal.updated` | PATCH (AFTER_COMMIT) | `journal.update:{ULID}` |
-| `journal.deleted` | `journal.deleted` | DELETE (AFTER_COMMIT) | `journal.delete:{journal_id}:{epoch_ms}` |
-| `journal.creation.failed` ⭐v1.2 | `journal.creation.failed` | `ai.session.completed` 컨슈머 영구 실패 시 @DltHandler에서 발행 (Saga 보상) | `journal.creation.failed:{session_id}` |
+| `journal.deleted` | `journal.deleted` | DELETE (AFTER_COMMIT) | `journal.delete:{journalId}:{epochMs}` |
+| `journal.creation.failed` ⭐v1.2 | `journal.creation.failed` | `ai.session.completed` 컨슈머 영구 실패 시 @DltHandler에서 발행 (Saga 보상) | `journal.creation.failed:{sessionId}` |
 
 ### 7.9 컨슈머 토픽
 
@@ -1311,7 +1314,7 @@ data: [DONE]
 **사이드 이펙트 (사용자 활동 이벤트 발행):**
 - `KafkaTemplate` → `user.activity.tracked` 발행 (Best-effort, 응답 본문에 영향 X)
 - 페이로드: `{ userId, type: "READ_PASSAGE", book, chapter, verse, occurredAt }`
-- 멱등성 키: `read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}`
+- 멱등성 키: `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}`
 
 > **epoch_minute 분 경계 noted (v1.1):** 분 경계(59초→1초)에서 같은 user가 1초 차이로 두 번 접근 시 epoch_minute 다름 → 2회 적재 가능. v1.0 의도된 단순화 — 통계 정확성보다 단순성 우선. v1.1에 sliding window 검토.
 
@@ -1323,7 +1326,7 @@ data: [DONE]
 
 | 이벤트 | 토픽 | 시점 | 멱등성 키 |
 | --- | --- | --- | --- |
-| `user.activity.tracked` | `user.activity.tracked` | GET /passages/... 호출 시 (Best-effort) | `read.passage:{user_id}:{book}:{ch}:{v}:{epoch_minute}` |
+| `user.activity.tracked` | `user.activity.tracked` | GET /passages/... 호출 시 (Best-effort) | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` |
 
 ### 8.6 컨슈머 토픽
 

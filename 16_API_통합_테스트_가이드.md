@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — API 통합 테스트 가이드 v1.0
+﻿��� QT-AI (큐티 AI 앱) — API 통합 테스트 가이드 v1.0
 
 > **문서 버전:** v1.0
 > **작성일:** 2026-05-08
-> **연관 문서:** [04_API_명세서 v1.2](./04_API_명세서.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md) / [10_트러블슈팅_FAQ v1.0](./10_트러블슈팅_FAQ.md)
+> **연관 문서:** [04_API_명세서 v1.5](./04_API_명세서.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md) / [10_트러블슈팅_FAQ v1.0](./10_트러블슈팅_FAQ.md)
 > **owner:** 강태오 (Lead) · 각 서비스 owner (서비스별 계약 테스트)
 > **목적:** 서비스 간 API 계약이 실제로 동작하는지 검증. OpenAPI 스펙 → Prism mock → Spring RestAssured / Flutter DIO 계약 테스트 흐름 박제.
 
@@ -117,7 +117,7 @@ static const Env _dev = Env._(
 ### 3.1 RestAssured 계약 테스트
 
 ```kotlin
-// auth-service/src/test/kotlin/com/qtai/auth/contract/AuthContractTest.kt
+// auth-service/src/test/java/com/qtai/auth/contract/AuthContractTest.java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = ["spring.profiles.active=test"])
 class AuthContractTest {
@@ -184,7 +184,7 @@ class AuthContractTest {
 ### 3.2 Testcontainers 설정
 
 ```kotlin
-// auth-service/src/test/kotlin/com/qtai/auth/TestContainersConfig.kt
+// auth-service/src/test/java/com/qtai/auth/TestContainersConfig.java
 @TestConfiguration
 class TestContainersConfig {
 
@@ -224,7 +224,7 @@ class TestContainersConfig {
 ### 4.1 Anthropic mock 서버 (WireMock)
 
 ```kotlin
-// ai-service/src/test/kotlin/com/qtai/ai/contract/AiServiceSseContractTest.kt
+// ai-service/src/test/java/com/qtai/ai/contract/AiServiceSseContractTest.java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AiServiceSseContractTest {
 
@@ -319,7 +319,7 @@ fun parseSseEvents(rawStream: String): List<SseEvent> {
 ### 5.1 EmbeddedKafka 통합 테스트
 
 ```kotlin
-// journal-service/src/test/kotlin/com/qtai/journal/kafka/JournalKafkaIntegrationTest.kt
+// journal-service/src/test/java/com/qtai/journal/kafka/JournalKafkaIntegrationTest.java
 @SpringBootTest
 @EmbeddedKafka(
     partitions = 3,
@@ -488,7 +488,7 @@ fvm flutter drive \
 ### 7.1 W3 통합 시나리오 테스트 목록
 
 ```kotlin
-// e2e/src/test/kotlin/com/qtai/e2e/QTaiE2eTest.kt
+// e2e/src/test/java/com/qtai/e2e/QTaiE2eTest.java
 // 전체 K8s 환경에서 실행 — W3 통합 시 1회
 
 class QTaiE2eTest {

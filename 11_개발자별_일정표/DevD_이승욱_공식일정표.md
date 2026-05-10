@@ -6,7 +6,7 @@
 역할: Journal Service Owner + Kafka Owner
 담당 서비스: Journal Service — 묵상 노트 이벤트 소싱 · Outbox · Saga 보상 트랜잭션
 개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.2 / 04_API_명세서 v1.2 / 03_아키텍처_정의서 v1.2 §6
+연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5 / 03_아키텍처_정의서 v1.3 §6
 
 ---
 
@@ -25,21 +25,21 @@
 journal-service/
   └── src/main/kotlin/com/qtai/journalservice/
       ├── domain/
-      │   ├── entity/Journal.kt
-      │   ├── entity/JournalEvent.kt      (이벤트 소싱 로그)
-      │   ├── entity/OutboxEvent.kt       (Kafka Outbox 패턴)
+      │   ├── entity/Journal.java
+      │   ├── entity/JournalEvent.java      (이벤트 소싱 로그)
+      │   ├── entity/OutboxEvent.java       (Kafka Outbox 패턴)
       │   └── repository/
       ├── usecase/
-      │   ├── CreateJournalUseCase.kt
-      │   ├── PublishJournalUseCase.kt    (Outbox + 멱등성 키)
-      │   └── SagaCompensationUseCase.kt  (journal.creation.failed 컨슈머)
+      │   ├── CreateJournalUseCase.java
+      │   ├── PublishJournalUseCase.java    (Outbox + 멱등성 키)
+      │   └── SagaCompensationUseCase.java  (journal.creation.failed 컨슈머)
       ├── infrastructure/
       │   ├── kafka/
-      │   │   ├── JournalEventProducer.kt  (Outbox 발행)
-      │   │   └── SagaCompensationConsumer.kt
-      │   └── scheduler/OutboxScheduler.kt (Outbox polling)
+      │   │   ├── JournalEventProducer.java  (Outbox 발행)
+      │   │   └── SagaCompensationConsumer.java
+      │   └── scheduler/OutboxScheduler.java (Outbox polling)
       └── api/
-          └── JournalController.kt
+          └── JournalController.java
   └── src/main/resources/
       └── db/migration/
           ├── V1__create_journal_tables.sql
@@ -61,7 +61,7 @@ journal-service/
 | Outbox 패턴 | `OUTBOX_EVENTS` 테이블 → 스케줄러 → Kafka 발행 | W2 화 | 트랜잭션 원자성 보장 |
 | 멱등성 키 | `PublishJournalRequest.idempotencyKey` → DB UNIQUE | W2 수 | 중복 발행 방지 |
 | Saga 보상 컨슈머 | `journal.creation.failed` 수신 → Journal DRAFT 롤백 | W3 월 | 분산 트랜잭션 |
-| 낙관적 락 | `@Version` 필드 — 동시 수정 충돌 방지 | W2 화 | 동시 편집 안전 |
+| 낙관적 락 | `@Lock(LockModeType.PESSIMISTIC_WRITE)` 필드 — 동시 수정 충돌 방지 | W2 화 | 동시 편집 안전 |
 | Flyway | V1 (Journal+Events) + V2 (Outbox) | W1 월 | DB 스키마 관리 |
 
 ---
@@ -72,20 +72,20 @@ journal-service/
 
 | 일자 | 오전 | 오후 코어 | 저녁 |
 |------|------|-----------|------|
-| 5/12 월 | 킥오프 참석. git pull | Flyway V1 — JOURNALS·JOURNAL_EVENTS 테이블 DDL | Journal Entity + JournalEvent Entity |
+| 5/12 화 | 킥오프 참석. git pull | Flyway V1 — JOURNALS·JOURNAL_EVENTS 테이블 DDL | Journal Entity + JournalEvent Entity |
 | 5/13 화 | Stand-up | Journal Repository (findByUserId + findById + soft delete) | @DataJpaTest — 기본 CRUD 확인 |
 | 5/14 수 | Stand-up | `CreateJournalUseCase` — DRAFT 생성 + JournalEvent 기록 | 이벤트 소싱 sequence 로직 (ADR-0011) |
 | 5/15 목 | Stand-up | `JournalController` — POST/GET/PUT/DELETE 엔드포인트 | X-User-Id 헤더 → userId 추출 |
-| 5/16 금 | Stand-up | 단위 테스트 — CreateJournalUseCase Mockito | `/journal/journals` POST curl 테스트 |
+| 5/16 금 | Stand-up | 단위 테스트 — CreateJournalUseCase Mockito | `/api/v1/journals` POST curl 테스트 |
 | 5/19 월 | Stand-up | Flyway V2 — OUTBOX_EVENTS 테이블 + OutboxEvent 엔티티 | Kafka consumer group 명명 규칙 확인 |
 | 5/20 화 | Stand-up | `PublishJournalUseCase` 골격 (DRAFT→PUBLISHED + Outbox insert) | 멱등성 키 DB UNIQUE 제약 확인 |
 | 5/21 수 | Stand-up | Kafka producer 골격 (`JournalEventProducer`) — local Kafka 연결 테스트 | W1 체크리스트 점검 |
 | 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | W1 회고 |
 
 **W1 완료 기준**
-- [ ] `POST /journal/journals` → 201 DRAFT 생성
-- [ ] `GET /journal/journals/{id}` → 상세 조회
-- [ ] `PUT /journal/journals/{id}` → DRAFT 수정
+- [ ] `POST /api/v1/journals` → 201 DRAFT 생성
+- [ ] `GET /api/v1/journals/{id}` → 상세 조회
+- [ ] `PATCH /api/v1/journals/{id}` → DRAFT 수정
 - [ ] JOURNAL_EVENTS 이벤트 소싱 기록 확인
 - [ ] Flyway V1+V2 마이그레이션 성공
 
@@ -95,9 +95,9 @@ journal-service/
 
 | 일자 | 주요 작업 |
 |------|-----------|
-| 5/26 화 | 페이스 점검. `PATCH /journal/journals/{id}/publish` → Outbox insert + PUBLISHED 상태 전이 |
+| 5/26 화 | 페이스 점검. `PATCH /api/v1/journals/{id}/publish` → Outbox insert + PUBLISHED 상태 전이 |
 | 5/27 수 | `OutboxScheduler` — 5초 주기 polling → KafkaTemplate 발행 |
-| 5/28 목 | `@Version` 낙관적 락 적용. 멱등성 키 중복 발행 테스트 |
+| 5/28 목 | `@Lock(LockModeType.PESSIMISTIC_WRITE)` 낙관적 락 적용. 멱등성 키 중복 발행 테스트 |
 | 5/29 금 | Kafka consumer 로그 확인 (`kafka-console-consumer.sh`). Service 커버리지 60%+ |
 
 ---
