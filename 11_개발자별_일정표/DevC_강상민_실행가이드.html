@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -6,17 +6,142 @@
 <title>QT-AI — Dev C 강상민 실행가이드</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;--text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;--pink:#db61a2;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre-wrap}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer}.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}.wrap{max-width:1180px;margin:0 auto;padding:0 24px}header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.proj{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}.wnav:hover{border-color:var(--t2);color:var(--text)}.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}.sec-title{font-size:15px;font-weight:700}.callout{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-left:3px solid var(--accent);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}.callout strong{color:var(--text)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.ok{background:rgba(87,171,90,.08);border-color:rgba(87,171,90,.25);border-left-color:var(--green)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600;white-space:nowrap}.tbl tr:last-child td{border-bottom:none}.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:330px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(87,171,90,.12);color:var(--green);border:1px solid rgba(87,171,90,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.btype{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px}.btype-name{font-family:var(--mono);color:var(--teal);font-weight:700;font-size:11px;margin-bottom:4px}.btype-ex{color:var(--t2);font-size:11px}.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.wblock{padding:18px 0 8px}.whdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.wdot{width:13px;height:13px;border-radius:50%;flex-shrink:0}.wlabel{font-size:14px;font-weight:700}.wperiod{font-size:12px;color:var(--t2)}.wgoal{font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:4px}.col-hdr{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden}.col-hdr div{padding:8px 13px;font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}.day-card{border:1px solid var(--border);border-top:none;overflow:hidden}.day-card:last-child{border-radius:0 0 8px 8px}.dtrig{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;cursor:pointer;transition:background .1s}.dtrig:hover,.dtrig.open{background:var(--bg2)}.dtc{padding:11px 13px;font-size:12px;color:var(--t2);line-height:1.5}.dt-date{font-weight:700;color:var(--text);font-size:13px;line-height:1.4}.dt-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-top:3px}.bd{background:rgba(224,130,61,.12);color:var(--orange)}.bo{background:rgba(87,171,90,.12);color:var(--green)}.bc{background:rgba(83,155,245,.12);color:var(--blue)}.bi{background:rgba(57,197,207,.12);color:var(--teal)}.bk{background:rgba(227,179,65,.12);color:var(--yellow)}.bt{background:rgba(248,81,73,.12);color:var(--lead)}.br{background:rgba(176,131,240,.12);color:var(--purple)}.bp{background:rgba(219,97,162,.12);color:var(--pink)}.bg{background:rgba(227,179,65,.12);color:var(--yellow)}.be{background:rgba(57,197,207,.12);color:var(--teal)}.dt-chev{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;transition:transform .2s}.dt-chev.open{transform:rotate(180deg)}.day-detail{display:none;border-top:1px solid var(--border)}.day-detail.show{display:block}.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi:nth-last-child(-n+2){border-bottom:none}.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}.path-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}.criteria{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:13px;margin-top:12px}.crit-title{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.crit-item{display:flex;gap:8px;padding:5px 0;font-size:12px;color:var(--t2);align-items:flex-start}.pbar{height:5px;background:var(--bg3);border-radius:3px;margin:10px 0 5px;overflow:hidden}.pfill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}.ptxt{font-size:11px;color:var(--t2)}.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:260px;overflow-y:auto}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.sd{color:var(--t3)}.sy{color:var(--yellow)}.ai-stage{margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}.ai-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);cursor:pointer}.ai-hdr:hover{background:var(--bg4)}.ai-w{font-size:10px;font-weight:700;background:var(--bg4);color:var(--t2);padding:2px 8px;border-radius:4px;flex-shrink:0}.ai-spacer{margin-left:auto}.ai-body{padding:16px;border-top:1px solid var(--border);display:none}.ai-body.show{display:block}.ai-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}.ai-lbl:not(:first-child){margin-top:14px}.ctx-list,.verify-list{list-style:none}.ctx-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:3px 0;line-height:1.5}.ctx-list li::before{content:'📄 ';font-size:10px}.verify-list li{font-size:12px;color:var(--t2);padding:4px 0;display:flex;gap:6px;line-height:1.55}.verify-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}.prompt-box{background:#010409;border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:#adbac7;line-height:1.75;white-space:pre-wrap;font-family:var(--sans)}@media(max-width:820px){.two,.four-grid{grid-template-columns:1fr}.branch-grid{grid-template-columns:1fr}.col-hdr,.dtrig{grid-template-columns:72px 1fr}.col-hdr div:nth-child(3),.col-hdr div:nth-child(4),.dtrig .dtc:nth-child(3),.dtrig .dtc:nth-child(4){display:none}.own-item{display:block}.own-path{min-width:auto;margin-bottom:8px}.wrap{padding:0 14px}}
+
+/* ===== Spec Panel (자기완결성 명세 S5) ===== */
+.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
+.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
+.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
+.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
+.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
+.spec-panel summary.spec-sum:hover{background:var(--bg3)}
+.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
+.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
+.spec-panel[open]{background:var(--bg)}
+.spec-panel > *:not(summary){padding:0 18px 14px}
+.spec-panel pre{margin-top:6px}
+
+/* ===== Workflow/Report Section (S6) ===== */
+.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
+.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
+.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
+.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
+.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
+.wr-flow .arrow{color:var(--t2);font-weight:700}
+.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
+.folder-rule strong{color:var(--lead)}
+@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
+
+
+/* ===== 사용 규칙 박스 (S0) ===== */
+.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
+.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
+.rules-box ol li{color:var(--text);font-size:13.5px}
+.rules-box ol li strong{color:var(--blue)}
+
+/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
+.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
+.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
+.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
+.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
+@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
+
+/* ===== 원문 문서 매트릭스 (S7) ===== */
+.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
+.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
+.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
+.ref-matrix tr:hover td{background:var(--bg3)}
+
+
+/* ===== DoD 박스 (day 카드 하단) ===== */
+.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
+.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
+.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
+.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
+.dod-item label{cursor:pointer;flex:1;line-height:1.5}
+.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
+
 </style>
 </head>
 <body style="--accent:#b083f0">
 <header><div class="wrap"><div class="hdr">
   <span class="proj">QT-AI</span>
   <div><div class="dev-name">강상민 <span class="role-chip">Dev C · AI/RAG Service Owner</span></div><div class="dev-sub">AI/RAG Service · Python FastAPI · Anthropic Claude SSE · ChromaDB · Kafka</div></div>
-  <div class="wnav-wrap"><button class="wnav" onclick="g('W0')">W0</button><button class="wnav" onclick="g('W1')">W1</button><button class="wnav" onclick="g('W2')">W2</button><button class="wnav" onclick="g('W3')">W3</button><button class="wnav" onclick="g('W4')">W4</button><button class="wnav" onclick="g('W5')">W5</button></div>
+  <div class="wnav-wrap"><button class="wnav" onclick="g('W0')">W0</button><button class="wnav" onclick="g('W1')">W1</button><button class="wnav" onclick="g('W2')">W2</button><button class="wnav" onclick="g('W3')">W3</button><button class="wnav" onclick="g('W4')">W4</button><button class="wnav" onclick="g('W5')">W5</button><button class="wnav" onclick="g('s5')" style="background:rgba(83,155,245,.15);border-color:var(--blue);color:var(--blue);font-weight:700">📋 명세</button><button class="wnav" onclick="g('s6')" style="background:rgba(87,171,90,.15);border-color:var(--green);color:var(--green);font-weight:700">📊 워크플로우</button><button class="wnav" onclick="g('s7')" style="background:rgba(224,130,61,.15);border-color:var(--orange);color:var(--orange);font-weight:700">📚 참조</button></div>
 </div></div></header>
 <div class="wrap">
+
+<!-- S0a: USAGE RULES (헤더 직후, 항상 펼쳐짐) -->
+<div class="rules-box">
+  <h2>📜 이 문서만 보고 작업하는 규칙</h2>
+  <ol>
+    <li>매일 <strong>본인 W1~W5 카드</strong>만 먼저 펼쳐서 오늘 할 일을 파악합니다.</li>
+    <li>작업 브랜치는 <code>feature/ai-{task-slug}</code> 형식 (예: <code>feature/ai-sse-stream</code>).</li>
+    <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
+    <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
+    <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
+    <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
+    <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
+  </ol>
+</div>
+
+<!-- S0b: SETUP COMMANDS (토글) -->
+<details class="spec-panel">
+  <summary class="spec-sum">
+    <span class="spec-num" style="background:var(--green)">🔧</span>
+    <span class="spec-title">환경 셋업 빠른 명령어 — 처음 시작 시 1회 실행</span>
+  </summary>
+  <div class="setup-box">
+    <div class="setup-grid">
+      <div class="setup-card">
+        <h4>1. 저장소 클론 + 브랜치</h4>
+        <pre>git clone git@github.com:Tae0072/2nd-Team-Project.git
+cd 2nd-Team-Project
+
+git checkout develop
+git pull origin develop
+
+# 작업 브랜치 생성
+git checkout -b feature/ai-sse-stream</pre>
+      </div>
+      <div class="setup-card">
+        <h4>2. 환경 검증</h4>
+        <pre>java -version    # Java 21 (Temurin)
+docker --version # Docker 4.x
+minikube status  # Running
+kubectl config set-context --current --namespace=qtai
+
+# 본인 서비스 빌드 검증
+cd ai-service && pytest</pre>
+      </div>
+      <div class="setup-card">
+        <h4>3. 데이터베이스 기동</h4>
+        <pre># Helm으로 DB 인프라 일괄 기동
+cd helm
+helm install qtai-infra ./qtai-infra -n qtai
+
+# 헬스체크
+kubectl get pods -n qtai
+kubectl logs -f deployment/{service-name} -n qtai</pre>
+      </div>
+      <div class="setup-card">
+        <h4>4. 본인 역할 추가 도구</h4>
+        <pre># AI 추가 필수: Python 3.11 + venv + sentence-transformers + ChromaDB
+
+# 본인 서비스 테스트 명령
+cd ai-service && pytest -v --cov</pre>
+      </div>
+    </div>
+    <div class="callout warn mt12">⚠️ 자세한 셋업은 <code>11_개발_환경_셋업_가이드.md</code> 참조. 실패 시 <code>10_트러블슈팅_FAQ.md</code> §1~§3 우선 확인.</div>
+  </div>
+</details>
+
   <div class="sec" id="s0"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">Dev C 역할 핵심 선언</div></div><div class="callout"><strong>"AI 없이는 이 앱이 존재하지 않는다."</strong><br>AI/RAG Service는 QT-AI의 핵심 가치인 소크라테스식 큐티 코칭을 담당한다. SSE 스트리밍 응답 품질, 신학 가드레일, 큐티 A~D 단계 프롬프트 설계가 시연에서 가장 강렬한 인상을 남기는 부분이다.</div><div class="two mt12"><table class="tbl"><thead><tr><th>담당</th><th>핵심 책임</th></tr></thead><tbody><tr><td>RAG</td><td>ChromaDB 시드·검색·컨텍스트 품질</td></tr><tr><td>SSE</td><td>AsyncAnthropic 스트림과 첫 토큰 지연 관리</td></tr><tr><td>Prompt</td><td>큐티 A~D 프롬프트와 신학 가드레일</td></tr><tr><td>Kafka</td><td>ai.session.completed 발행과 schema envelope 준수</td></tr></tbody></table><div><div class="callout red">🚫 <strong>AI Service 혼용 금지</strong><br>ai-service는 FastAPI 단독이다. Spring Boot WebClient/Java 서비스 코드를 만들지 않는다.</div><div class="callout ok mt8">✅ <strong>완료 증거</strong><br>pytest, curl -N SSE, Chroma collection count, prompt 샘플 응답, Kafka event 로그를 남긴다.</div></div></div></div>
-  <div class="sec" id="s1"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">아래 경로는 Dev C 강상민의 전담 영역이다. 변경 시 FastAPI 구조, SSE 스트림, RAG 컨텍스트, API Key 노출 여부를 함께 확인한다.</div><div class="own-tree mt12"><div class="own-item"><div class="own-path">ai-service/main.py<br><span style="color:var(--t2);padding-left:12px">└── FastAPI app 엔트리포인트</span></div><div class="own-desc">FastAPI 앱 설정, 라우터 등록, health endpoint</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/api/v1/<br><span style="color:var(--t2);padding-left:12px">sessions.py · messages.py · templates.py</span></div><div class="own-desc">세션 CRUD, SSE 메시지, 프롬프트 템플릿 API</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/usecase/<br><span style="color:var(--t2);padding-left:12px">chat_usecase.py · session_usecase.py</span></div><div class="own-desc">AsyncAnthropic 스트리밍, 세션 상태 전이</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/infrastructure/<br><span style="color:var(--t2);padding-left:12px">chroma.py · database.py</span></div><div class="own-desc">ChromaDB RAG, SQLAlchemy MySQL 연결</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/scripts/rag_index.py<br>alembic/</div><div class="own-desc">RAG 시드와 AI_SESSIONS/AI_TURNS 마이그레이션</div><span class="lock-tag">P0</span></div></div></div>
+  <div class="sec" id="s1"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">아래 경로는 Dev C 강상민의 전담 영역이다. 변경 시 FastAPI 구조, SSE 스트림, RAG 컨텍스트, API Key 노출 여부를 함께 확인한다.</div><div class="own-tree mt12"><div class="own-item"><div class="own-path">ai-service/main.py<br><span style="color:var(--t2);padding-left:12px">└── FastAPI app 엔트리포인트</span></div><div class="own-desc">FastAPI 앱 설정, 라우터 등록, health endpoint</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/api/v1/<br><span style="color:var(--t2);padding-left:12px">sessions.py · turns.py · templates.py</span></div><div class="own-desc">세션 CRUD, SSE 메시지, 프롬프트 템플릿 API</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/usecase/<br><span style="color:var(--t2);padding-left:12px">chat_usecase.py · session_usecase.py</span></div><div class="own-desc">AsyncAnthropic 스트리밍, 세션 상태 전이</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/app/infrastructure/<br><span style="color:var(--t2);padding-left:12px">chroma.py · database.py</span></div><div class="own-desc">ChromaDB RAG, SQLAlchemy MySQL 연결</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">ai-service/scripts/rag_index.py<br>alembic/</div><div class="own-desc">RAG 시드와 AI_SESSIONS/AI_TURNS 마이그레이션</div><span class="lock-tag">P0</span></div></div></div>
   <div class="sec" id="s2"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 다른 사람한테 물어볼 필요 없음</div></div><div class="pr-panel-list"><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devc-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/짧은-설명 (케밥케이스)</strong><span>브랜치 타입과 예시를 먼저 맞춘다.</span></div><div class="pr-panel-chev open" id="chev-devc-pr-1">⌄</div></div><div class="pr-panel-body show" id="devc-pr-1"><div class="branch-grid"><div class="btype"><div class="btype-name">feature/</div><div class="btype-ex">신규 기능<br>예) feature/ai-sse-stream</div></div><div class="btype"><div class="btype-name">fix/</div><div class="btype-ex">버그 수정<br>예) fix/ai-guardrail-injection</div></div><div class="btype"><div class="btype-name">refactor/</div><div class="btype-ex">코드 개선<br>예) refactor/chroma-client</div></div><div class="btype"><div class="btype-name">test/</div><div class="btype-ex">테스트 추가<br>예) test/ai-session-e2e</div></div><div class="btype"><div class="btype-name">docs/</div><div class="btype-ex">문서 수정<br>예) docs/ai-prompt-guide</div></div><div class="btype"><div class="btype-name">chore/</div><div class="btype-ex">설정 변경<br>예) chore/ai-requirements</div></div></div></div></div><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devc-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 7단계 (반드시 이 순서로)</strong><span>PR 생성 전 로컬 검증까지 이 순서로 진행한다.</span></div><div class="pr-panel-chev open" id="chev-devc-pr-2">⌄</div></div><div class="pr-panel-body show" id="devc-pr-2"><div class="pr-step-list"><div class="pr-step"><div class="pr-step-num">1</div><div style="width:100%"><div class="pr-step-title">develop 최신 pull</div><pre>git checkout develop &amp;&amp; git pull origin develop<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div style="width:100%"><div class="pr-step-title">feature 브랜치 생성 (develop 기준)</div><pre>git checkout -b feature/ai-sse-stream<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div style="width:100%"><div class="pr-step-title">작업 후 커밋 메시지 작성</div><pre>git add .
 git commit -m &quot;feat(ai): stream qt coaching response with rag context&quot;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div style="width:100%"><div class="pr-step-title">로컬 검증 실행</div><pre>python -m pytest ai-service/tests -q
 python -m ruff check ai-service
@@ -45,26 +170,26 @@ python ai-service/scripts/rag_index.py --dry-run<button class="copy-btn" onclick
 git checkout -b hotfix/ai-sse-timeout
 git commit -m &quot;fix(ai): reduce first token latency for sse&quot;
 git push origin hotfix/ai-sse-timeout<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div></div></div>
-  <div class="sec" id="s3"><div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">일별 상세 일정 + 완료 결과 미리보기</div></div><div class="criteria"><div class="crit-title">W1 완료 기준</div><label class="crit-item"><input type="checkbox" id="c1" onchange="updateProg()"> <span>POST /ai/sessions → 201 세션 생성</span></label><label class="crit-item"><input type="checkbox" id="c2" onchange="updateProg()"> <span>POST /ai/sessions/{id}/messages → SSE 첫 토큰 수신</span></label><label class="crit-item"><input type="checkbox" id="c3" onchange="updateProg()"> <span>ChromaDB RAG 검색 결과 1건 이상</span></label><label class="crit-item"><input type="checkbox" id="c4" onchange="updateProg()"> <span>큐티 A단계 프롬프트 응답 품질 확인</span></label><label class="crit-item"><input type="checkbox" id="c5" onchange="updateProg()"> <span>Alembic 마이그레이션 성공</span></label><div class="pbar"><div class="pfill" id="prog" style="width:0%"></div></div><div class="ptxt" id="prog-txt">0 / 5 완료</div></div><div id="weeks-root"><div class="wblock mt20" id="W0"><div class="whdr"><div class="wdot" style="background:var(--purple)"></div><span class="wlabel">W0</span><span class="wperiod">5/10~5/11</span><span class="wgoal">RAG 시드 준비 최우선</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W0-0')"><div class="dtc"><div class="dt-date">5/10~5/11</div><span class="dt-badge br">RAG</span></div><div class="dtc">공개 도메인 주석 원문 수집</div><div class="dtc"><code>scripts/rag_index.py</code> 작성</div><div class="dtc">ChromaDB collection size ≥ 5 확인</div><div class="dt-chev" id="chev-devc-W0-0">⌄</div></div><div class="day-detail" id="devc-W0-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/scripts/rag_index.py</li><li>ai-service/app/infrastructure/chroma.py</li><li>ai-service/data/rag_seed/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Matthew Henry 등 공개 도메인 자료를 JHN 3장 중심으로 적재한다. 개역개정/ESV/NIV는 넣지 않는다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python ai-service/scripts/rag_index.py
-python ai-service/scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> ChromaDB collection size ≥ 5 확인</div><button class="sim-btn" onclick="runSim('devc-W0-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W0-0"></div></div></div></div></div></div><div class="wblock mt20" id="W1"><div class="whdr"><div class="wdot" style="background:var(--blue)"></div><span class="wlabel">W1</span><span class="wperiod">5/12~5/22</span><span class="wgoal">FastAPI + SSE + 세션 CRUD 골격 완성</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-0')"><div class="dtc"><div class="dt-date">5/12 월</div><span class="dt-badge bd">환경</span></div><div class="dtc">킥오프 참석 · Python venv 구성</div><div class="dtc"><code>pip install -r requirements.txt</code> · ChromaDB K8s 확인</div><div class="dtc">rag_index.py 실행 결과 기록</div><div class="dt-chev" id="chev-devc-W1-0">⌄</div></div><div class="day-detail" id="devc-W1-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/requirements.txt</li><li>ai-service/main.py</li><li>ai-service/scripts/rag_index.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">FastAPI 개발 환경과 RAG 시드 실행 경로를 고정한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>cd ai-service
+  <div class="sec" id="s3"><div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">일별 상세 일정 + 완료 결과 미리보기</div></div><div class="criteria"><div class="crit-title">W1 완료 기준</div><label class="crit-item"><input type="checkbox" id="c1" onchange="updateProg()"> <span>POST /ai/sessions → 201 세션 생성</span></label><label class="crit-item"><input type="checkbox" id="c2" onchange="updateProg()"> <span>POST /ai/sessions/{id}/turns → SSE 첫 토큰 수신</span></label><label class="crit-item"><input type="checkbox" id="c3" onchange="updateProg()"> <span>ChromaDB RAG 검색 결과 1건 이상</span></label><label class="crit-item"><input type="checkbox" id="c4" onchange="updateProg()"> <span>큐티 A단계 프롬프트 응답 품질 확인</span></label><label class="crit-item"><input type="checkbox" id="c5" onchange="updateProg()"> <span>Alembic 마이그레이션 성공</span></label><div class="pbar"><div class="pfill" id="prog" style="width:0%"></div></div><div class="ptxt" id="prog-txt">0 / 5 완료</div></div><div id="weeks-root"><div class="wblock mt20" id="W0"><div class="whdr"><div class="wdot" style="background:var(--purple)"></div><span class="wlabel">W0</span><span class="wperiod">5/10~5/11</span><span class="wgoal">RAG 시드 준비 최우선</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W0-0')"><div class="dtc"><div class="dt-date">5/10~5/11</div><span class="dt-badge br">RAG</span></div><div class="dtc">공개 도메인 주석 원문 수집</div><div class="dtc"><code>scripts/rag_index.py</code> 작성</div><div class="dtc">ChromaDB collection size ≥ 5 확인</div><div class="dt-chev" id="chev-devc-W0-0">⌄</div></div><div class="day-detail" id="devc-W0-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/scripts/rag_index.py</li><li>ai-service/app/infrastructure/chroma.py</li><li>ai-service/data/rag_seed/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Matthew Henry 등 공개 도메인 자료를 JHN 3장 중심으로 적재한다. 개역한글/ESV/NIV는 넣지 않는다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python ai-service/scripts/rag_index.py
+python ai-service/scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> ChromaDB collection size ≥ 5 확인</div><button class="sim-btn" onclick="runSim('devc-W0-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W0-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W0-0-0"><label for="dod-sdevc-W0-0-0">단위 테스트 추가/통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W0-0-1"><label for="dod-sdevc-W0-0-1">본인 서비스 빌드 성공</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W0-0-2"><label for="dod-sdevc-W0-0-2">PR draft 등록 (커밋 메시지 규칙 준수)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W0-0-3"><label for="dod-sdevc-W0-0-3">workspaces/{본인}/reports/ 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W1"><div class="whdr"><div class="wdot" style="background:var(--blue)"></div><span class="wlabel">W1</span><span class="wperiod">5/12~5/22</span><span class="wgoal">FastAPI + SSE + 세션 CRUD 골격 완성</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-0')"><div class="dtc"><div class="dt-date">5/12 화</div><span class="dt-badge bd">환경</span></div><div class="dtc">킥오프 참석 · Python venv 구성</div><div class="dtc"><code>pip install -r requirements.txt</code> · ChromaDB K8s 확인</div><div class="dtc">rag_index.py 실행 결과 기록</div><div class="dt-chev" id="chev-devc-W1-0">⌄</div></div><div class="day-detail" id="devc-W1-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/requirements.txt</li><li>ai-service/main.py</li><li>ai-service/scripts/rag_index.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">FastAPI 개발 환경과 RAG 시드 실행 경로를 고정한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>cd ai-service
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
-python scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> rag_index.py 실행 결과 기록</div><button class="sim-btn" onclick="runSim('devc-W1-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-0"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-1')"><div class="dtc"><div class="dt-date">5/13 화</div><span class="dt-badge bd">DB</span></div><div class="dtc">Stand-up</div><div class="dtc">Alembic 초기화 · AI_SESSIONS 마이그레이션 작성</div><div class="dtc">AI_TURNS 마이그레이션 작성</div><div class="dt-chev" id="chev-devc-W1-1">⌄</div></div><div class="day-detail" id="devc-W1-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/alembic/</li><li>ai-service/app/infrastructure/database.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">AI 세션/턴 저장 테이블을 MySQL 기준으로 만든다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>cd ai-service
+python scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> rag_index.py 실행 결과 기록</div><button class="sim-btn" onclick="runSim('devc-W1-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-0-0"><label for="dod-sdevc-W1-0-0">Python 3.11 설치 + ai-service/ venv 생성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-0-1"><label for="dod-sdevc-W1-0-1">requirements.txt (anthropic·fastapi·uvicorn·sqlalchemy·alembic·sentence-transformers·chromadb·confluent-kafka) 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-0-2"><label for="dod-sdevc-W1-0-2">pip install -r requirements.txt 성공</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-0-3"><label for="dod-sdevc-W1-0-3">uvicorn app.main:app --reload 기동 → /docs 200 OK</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-0-4"><label for="dod-sdevc-W1-0-4">reports/ 리포트 작성</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-1')"><div class="dtc"><div class="dt-date">5/13 화</div><span class="dt-badge bd">DB</span></div><div class="dtc">Stand-up</div><div class="dtc">Alembic 초기화 · AI_SESSIONS 마이그레이션 작성</div><div class="dtc">AI_TURNS 마이그레이션 작성</div><div class="dt-chev" id="chev-devc-W1-1">⌄</div></div><div class="day-detail" id="devc-W1-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/alembic/</li><li>ai-service/app/infrastructure/database.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">AI 세션/턴 저장 테이블을 MySQL 기준으로 만든다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>cd ai-service
 alembic init alembic
 alembic revision -m &quot;create ai sessions and turns&quot;
-alembic upgrade head<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> AI_TURNS 마이그레이션 작성</div><button class="sim-btn" onclick="runSim('devc-W1-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-1"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-2')"><div class="dtc"><div class="dt-date">5/14 수</div><span class="dt-badge bi">SSE</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>ChatUseCase.stream_response()</code> 하드코딩 SSE 동작 확인</div><div class="dtc">curl -N 첫 토큰 수신</div><div class="dt-chev" id="chev-devc-W1-2">⌄</div></div><div class="day-detail" id="devc-W1-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/chat_usecase.py</li><li>ai-service/app/api/v1/messages.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">DB 연결 전이라도 SSE 스트림 골격이 실제로 흐르는지 검증한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8085/ai/sessions/1/messages
-pytest ai-service/tests/test_sse.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> curl -N 첫 토큰 수신</div><button class="sim-btn" onclick="runSim('devc-W1-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-2"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-3')"><div class="dtc"><div class="dt-date">5/15 목</div><span class="dt-badge bp">프롬프트</span></div><div class="dtc">Stand-up</div><div class="dtc">큐티 A~D 시스템 프롬프트 4종 작성</div><div class="dtc">단계별 응답 품질 셀프 테스트</div><div class="dt-chev" id="chev-devc-W1-3">⌄</div></div><div class="day-detail" id="devc-W1-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/templates.py</li><li>ai-service/app/prompts/templates.py</li><li>09_AI_프롬프트_운영_가이드.md</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">A 관찰, B 해석, C 적용, D 결단 단계별 시스템 프롬프트를 분리한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>pytest ai-service/tests/test_prompt_templates.py -q
-rg -n &quot;STAGE_SYSTEM_PROMPTS|guardrail&quot; ai-service/app<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 단계별 응답 품질 셀프 테스트</div><button class="sim-btn" onclick="runSim('devc-W1-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-3"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-4')"><div class="dtc"><div class="dt-date">5/16 금</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>SessionUseCase.create_session</code> DB 실구현</div><div class="dtc">/ai/sessions POST → 201 확인</div><div class="dt-chev" id="chev-devc-W1-4">⌄</div></div><div class="day-detail" id="devc-W1-4"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/app/api/v1/sessions.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">501 stub을 실제 세션 생성 API로 교체한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i -X POST http://localhost:8085/ai/sessions \
+alembic upgrade head<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> AI_TURNS 마이그레이션 작성</div><button class="sim-btn" onclick="runSim('devc-W1-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-1"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-1-0"><label for="dod-sdevc-W1-1-0">alembic init + 환경 설정 (env.py + alembic.ini)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-1-1"><label for="dod-sdevc-W1-1-1">V1 마이그레이션 (AI_SESSIONS·AI_TURNS·PROMPT_TEMPLATES) 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-1-2"><label for="dod-sdevc-W1-1-2">alembic upgrade head 성공</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-1-3"><label for="dod-sdevc-W1-1-3">mysql -e 'SHOW TABLES' → 3개 테이블 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-1-4"><label for="dod-sdevc-W1-1-4">reports/ 리포트 작성</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-2')"><div class="dtc"><div class="dt-date">5/14 수</div><span class="dt-badge bi">SSE</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>ChatUseCase.stream_response()</code> 하드코딩 SSE 동작 확인</div><div class="dtc">curl -N 첫 토큰 수신</div><div class="dt-chev" id="chev-devc-W1-2">⌄</div></div><div class="day-detail" id="devc-W1-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/chat_usecase.py</li><li>ai-service/app/api/v1/turns.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">DB 연결 전이라도 SSE 스트림 골격이 실제로 흐르는지 검증한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8085/ai/sessions/1/turns
+pytest ai-service/tests/test_sse.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> curl -N 첫 토큰 수신</div><button class="sim-btn" onclick="runSim('devc-W1-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-2"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-2-0"><label for="dod-sdevc-W1-2-0">sse-starlette 설치 + EventSourceResponse 패턴 구현</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-2-1"><label for="dod-sdevc-W1-2-1">POST /ai/sessions/{id}/turns endpoint 골격 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-2-2"><label for="dod-sdevc-W1-2-2">turn_started·token·turn_completed·end 4 이벤트 발행 구조</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-2-3"><label for="dod-sdevc-W1-2-3">curl로 SSE event 1건 이상 수신 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-2-4"><label for="dod-sdevc-W1-2-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-3')"><div class="dtc"><div class="dt-date">5/15 목</div><span class="dt-badge bp">프롬프트</span></div><div class="dtc">Stand-up</div><div class="dtc">큐티 A~D 시스템 프롬프트 4종 작성</div><div class="dtc">단계별 응답 품질 셀프 테스트</div><div class="dt-chev" id="chev-devc-W1-3">⌄</div></div><div class="day-detail" id="devc-W1-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/templates.py</li><li>ai-service/app/prompts/templates.py</li><li>09_AI_프롬프트_운영_가이드.md</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">A 관찰, B 해석, C 적용, D 결단 단계별 시스템 프롬프트를 분리한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>pytest ai-service/tests/test_prompt_templates.py -q
+rg -n &quot;STAGE_SYSTEM_PROMPTS|guardrail&quot; ai-service/app<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 단계별 응답 품질 셀프 테스트</div><button class="sim-btn" onclick="runSim('devc-W1-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-3"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-3-0"><label for="dod-sdevc-W1-3-0">prompts/ 디렉토리 + A·B·C·D 4단계 시스템 프롬프트 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-3-1"><label for="dod-sdevc-W1-3-1">DB seed 스크립트로 PROMPT_TEMPLATES 4행 삽입</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-3-2"><label for="dod-sdevc-W1-3-2">단계별 응답 품질 셀프 테스트 (수동 호출 → 로그 확인)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-3-3"><label for="dod-sdevc-W1-3-3">프롬프트 인젝션 방어 1줄 이상 포함</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-3-4"><label for="dod-sdevc-W1-3-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-4')"><div class="dtc"><div class="dt-date">5/16 금</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>SessionUseCase.create_session</code> DB 실구현</div><div class="dtc">/ai/sessions POST → 201 확인</div><div class="dt-chev" id="chev-devc-W1-4">⌄</div></div><div class="day-detail" id="devc-W1-4"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/app/api/v1/sessions.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">501 stub을 실제 세션 생성 API로 교체한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i -X POST http://localhost:8085/ai/sessions \
   -H &quot;Content-Type: application/json&quot; \
-  -d &quot;{\&quot;passageRef\&quot;:\&quot;JHN 3:16\&quot;}&quot;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> /ai/sessions POST → 201 확인</div><button class="sim-btn" onclick="runSim('devc-W1-4')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-4"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-5')"><div class="dtc"><div class="dt-date">5/19 월</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc">SessionUseCase 전체 CRUD 구현</div><div class="dtc">세션 단계 A→B 진행 테스트</div><div class="dt-chev" id="chev-devc-W1-5">⌄</div></div><div class="day-detail" id="devc-W1-5"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/app/domain/schemas.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">get, list, advance 흐름을 Pydantic camelCase 응답과 맞춘다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i -X PATCH http://localhost:8085/ai/sessions/{id}/advance<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 세션 단계 A→B 진행 테스트</div><button class="sim-btn" onclick="runSim('devc-W1-5')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-5"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-6')"><div class="dtc"><div class="dt-date">5/20 화</div><span class="dt-badge bo">테스트</span></div><div class="dtc">Stand-up</div><div class="dtc">messages.py 세션 존재·소유권 검증 완성</div><div class="dtc">pytest 기본 테스트 작성</div><div class="dt-chev" id="chev-devc-W1-6">⌄</div></div><div class="day-detail" id="devc-W1-6"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/messages.py</li><li>ai-service/tests/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">없는 세션, 다른 사용자 세션, 정상 SSE 케이스를 테스트한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> pytest 기본 테스트 작성</div><button class="sim-btn" onclick="runSim('devc-W1-6')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-6"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-7')"><div class="dtc"><div class="dt-date">5/21 수</div><span class="dt-badge bi">SSE</span></div><div class="dtc">Stand-up</div><div class="dtc">Gateway 경유 SSE 테스트 (강태오 협력)</div><div class="dtc">NoBufferingFilter 동작 확인</div><div class="dt-chev" id="chev-devc-W1-7">⌄</div></div><div class="day-detail" id="devc-W1-7"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>gateway/</li><li>ai-service/app/api/v1/messages.py</li><li>curl 로그</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Gateway를 지나도 SSE가 버퍼링 없이 전달되는지 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8080/ai/sessions/1/messages<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> NoBufferingFilter 동작 확인</div><button class="sim-btn" onclick="runSim('devc-W1-7')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-7"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-8')"><div class="dtc"><div class="dt-date">5/22 목</div><span class="dt-badge bt">게이트</span></div><div class="dtc">Stand-up</div><div class="dtc">W1 Lock-in 게이트 참석 (18:00)</div><div class="dtc">W1 회고</div><div class="dt-chev" id="chev-devc-W1-8">⌄</div></div><div class="day-detail" id="devc-W1-8"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>GitHub PR</li><li>pytest 로그</li><li>curl SSE 로그</li><li>ChromaDB count</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">W1 완료 기준 5개를 직접 체크하고 증거를 PR에 첨부한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests -q
-curl -N http://localhost:8085/ai/sessions/1/messages
-python ai-service/scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> W1 회고</div><button class="sim-btn" onclick="runSim('devc-W1-8')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-8"></div></div></div></div></div></div><div class="wblock mt20" id="W2"><div class="whdr"><div class="wdot" style="background:var(--purple)"></div><span class="wlabel">W2</span><span class="wperiod">5/26~5/29</span><span class="wgoal">신학 가드레일 + 실연동 완성</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-0')"><div class="dtc"><div class="dt-date">5/26 화</div><span class="dt-badge bp">프롬프트</span></div><div class="dtc">페이스 점검 (11:30)</div><div class="dtc">신학 가드레일 시스템 프롬프트 추가</div><div class="dtc">이단 탐지 문구 삽입 확인</div><div class="dt-chev" id="chev-devc-W2-0">⌄</div></div><div class="day-detail" id="devc-W2-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/prompts/templates.py</li><li>09_AI_프롬프트_운영_가이드.md</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">모든 단계 프롬프트에 공통 가드레일을 삽입한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_guardrail.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 이단 탐지 문구 삽입 확인</div><button class="sim-btn" onclick="runSim('devc-W2-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-0"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-1')"><div class="dtc"><div class="dt-date">5/27 수</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>PATCH /ai/sessions/{id}/advance</code> A→B→C→D E2E</div><div class="dtc">전체 흐름 E2E 테스트</div><div class="dt-chev" id="chev-devc-W2-1">⌄</div></div><div class="day-detail" id="devc-W2-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/tests/test_session_flow.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">세션 단계 전이가 순서대로만 허용되는지 검증한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_session_flow.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 전체 흐름 E2E 테스트</div><button class="sim-btn" onclick="runSim('devc-W2-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-1"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-2')"><div class="dtc"><div class="dt-date">5/28 목</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>GET /ai/prompt-templates</code> DB 연결 · Bible Service 연동</div><div class="dtc">강태오·김태혁 협력 로그 기록</div><div class="dt-chev" id="chev-devc-W2-2">⌄</div></div><div class="day-detail" id="devc-W2-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/templates.py</li><li>bff-aggregator/</li><li>bible-service/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">AI가 Bible DB를 직접 조회하지 않고 BFF/Bible API 경계를 지킨다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i http://localhost:8085/ai/prompt-templates
-curl -i http://localhost:8080/bible/passages/JHN/3/16<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 강태오·김태혁 협력 로그 기록</div><button class="sim-btn" onclick="runSim('devc-W2-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-2"></div></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-3')"><div class="dtc"><div class="dt-date">5/29 금</div><span class="dt-badge bo">테스트</span></div><div class="dtc">Stand-up</div><div class="dtc">pytest 커버리지 60%+ · 목록/상세 API 완성</div><div class="dtc">coverage 로그 PR 첨부</div><div class="dt-chev" id="chev-devc-W2-3">⌄</div></div><div class="day-detail" id="devc-W2-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/tests/</li><li>coverage.xml</li><li>GitHub PR</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">세션 생성/조회/전이/SSE 기본 케이스를 테스트로 잠근다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests --cov=app --cov-report=term-missing<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> coverage 로그 PR 첨부</div><button class="sim-btn" onclick="runSim('devc-W2-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-3"></div></div></div></div></div></div><div class="wblock mt20" id="W3"><div class="whdr"><div class="wdot" style="background:var(--orange)"></div><span class="wlabel">W3</span><span class="wperiod">6/1~6/5</span><span class="wgoal">Kafka 이벤트 + 성능 측정</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W3-0')"><div class="dtc"><div class="dt-date">6/1~6/5</div><span class="dt-badge bk">Kafka</span></div><div class="dtc">Kafka producer 구현</div><div class="dtc"><code>ai.session.completed</code> 이벤트 발행</div><div class="dtc">SSE P95 ≤ 2000ms 측정</div><div class="dt-chev" id="chev-devc-W3-0">⌄</div></div><div class="day-detail" id="devc-W3-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/kafka/event_publisher.py</li><li>events/schema/ai.session.completed-value.json</li><li>k6/ai-sse.js</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">큐티 D단계 완료 시 Journal Saga가 받을 표준 envelope를 발행한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_ai_completed_event.py -q
-k6 run k6/ai-sse.js<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> SSE P95 ≤ 2000ms 측정</div><button class="sim-btn" onclick="runSim('devc-W3-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W3-0"></div></div></div></div></div></div><div class="wblock mt20" id="W4"><div class="whdr"><div class="wdot" style="background:var(--lead)"></div><span class="wlabel">W4</span><span class="wperiod">6/8~6/12</span><span class="wgoal">프롬프트 인젝션 방어 + dry-run</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W4-0')"><div class="dtc"><div class="dt-date">6/8~6/12</div><span class="dt-badge br">리뷰</span></div><div class="dtc">회귀 테스트</div><div class="dtc">큐티 D단계 완결 시나리오 dry-run</div><div class="dtc">pytest 커버리지 70%+</div><div class="dt-chev" id="chev-devc-W4-0">⌄</div></div><div class="day-detail" id="devc-W4-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/tests/</li><li>demo/qt-d-flow.md</li><li>coverage.xml</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">시연 질문 흐름에서 프롬프트 가드레일이 무너지지 않는지 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests --cov=app
-rg -n &quot;ANTHROPIC_API_KEY|sk-ant|payload&quot; ai-service events/schema<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> pytest 커버리지 70%+</div><button class="sim-btn" onclick="runSim('devc-W4-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W4-0"></div></div></div></div></div></div><div class="wblock mt20" id="W5"><div class="whdr"><div class="wdot" style="background:var(--green)"></div><span class="wlabel">W5</span><span class="wperiod">6/15~6/17</span><span class="wgoal">시연 리허설 + 백업 플랜</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W5-0')"><div class="dtc"><div class="dt-date">6/15~6/17</div><span class="dt-badge bo">시연</span></div><div class="dtc">시연 리허설 지원</div><div class="dtc">AI 응답 지연/장애 fallback 준비</div><div class="dtc">백업 응답 샘플과 로그 준비</div><div class="dt-chev" id="chev-devc-W5-0">⌄</div></div><div class="day-detail" id="devc-W5-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/logs/</li><li>demo/ai-response-samples.md</li><li>GitHub release notes</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">시연 직전 SSE, RAG, API key, prompt 응답 샘플을 한 번 더 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8080/ai/sessions/1/messages
-kubectl logs -n qtai deploy/ai-service --tail=100<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 백업 응답 샘플과 로그 준비</div><button class="sim-btn" onclick="runSim('devc-W5-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W5-0"></div></div></div></div></div></div></div></div>
-  <div class="sec" id="s4"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드 — 컨텍스트 없이 요청 금지</div></div><div class="ai-stage"><div class="ai-hdr" onclick="togglePanel('ai-0')"><span class="ai-w">W1</span><strong>FastAPI 라우터·Alembic·SSE 골격 생성</strong><span class="ai-spacer"></span><span class="pr-panel-chev open" id="chev-ai-0">⌄</span></div><div class="ai-body show" id="ai-0"><div class="ai-lbl">필수 컨텍스트</div><ul class="ctx-list"><li>apis/ai/openapi.yaml</li><li>events/schema/ai.session.completed-value.json</li><li>03_아키텍처_정의서.md AI Service 단독 FastAPI</li><li>AGENTS.md AI Service 스택 확정</li></ul><div class="ai-lbl">복붙 요청 프롬프트</div><div class="prompt-box">[역할] QT-AI Dev C, FastAPI AI/RAG Service Owner.
+  -d &quot;{\&quot;passageRef\&quot;:\&quot;JHN 3:16\&quot;}&quot;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> /ai/sessions POST → 201 확인</div><button class="sim-btn" onclick="runSim('devc-W1-4')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-4"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-4-0"><label for="dod-sdevc-W1-4-0">StartSessionUseCase + AdvanceStepUseCase 골격 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-4-1"><label for="dod-sdevc-W1-4-1">POST /ai/sessions + GET /ai/sessions/{id} endpoint 구현</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-4-2"><label for="dod-sdevc-W1-4-2">Pydantic 모델 5개+ (CamelModel 상속) 정의</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-4-3"><label for="dod-sdevc-W1-4-3">단위 테스트 1개 이상 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-4-4"><label for="dod-sdevc-W1-4-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-5')"><div class="dtc"><div class="dt-date">5/19 월</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc">SessionUseCase 전체 CRUD 구현</div><div class="dtc">세션 단계 A→B 진행 테스트</div><div class="dt-chev" id="chev-devc-W1-5">⌄</div></div><div class="day-detail" id="devc-W1-5"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/app/domain/schemas.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">get, list, advance 흐름을 Pydantic camelCase 응답과 맞춘다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i -X PATCH http://localhost:8085/api/v1/passages/{book}/{ch}/{v}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 세션 단계 A→B 진행 테스트</div><button class="sim-btn" onclick="runSim('devc-W1-5')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-5"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-5-0"><label for="dod-sdevc-W1-5-0">Anthropic AsyncAnthropic.messages.stream 호출 정상</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-5-1"><label for="dod-sdevc-W1-5-1">A 단계 1턴 → B 단계 자동 전이 로직 동작</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-5-2"><label for="dod-sdevc-W1-5-2">세션 status·current_step DB 업데이트 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-5-3"><label for="dod-sdevc-W1-5-3">E2E 테스트: A 입력 → SSE 토큰 수신 → DB 저장 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-5-4"><label for="dod-sdevc-W1-5-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-6')"><div class="dtc"><div class="dt-date">5/20 화</div><span class="dt-badge bo">테스트</span></div><div class="dtc">Stand-up</div><div class="dtc">turns.py 세션 존재·소유권 검증 완성</div><div class="dtc">pytest 기본 테스트 작성</div><div class="dt-chev" id="chev-devc-W1-6">⌄</div></div><div class="day-detail" id="devc-W1-6"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/turns.py</li><li>ai-service/tests/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">없는 세션, 다른 사용자 세션, 정상 SSE 케이스를 테스트한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> pytest 기본 테스트 작성</div><button class="sim-btn" onclick="runSim('devc-W1-6')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-6"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-6-0"><label for="dod-sdevc-W1-6-0">pytest + pytest-asyncio 설정</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-6-1"><label for="dod-sdevc-W1-6-1">StartSessionUseCase 단위 테스트 3 케이스 (성공·실패 포함)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-6-2"><label for="dod-sdevc-W1-6-2">AdvanceStepUseCase 단위 테스트 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-6-3"><label for="dod-sdevc-W1-6-3">pytest --cov 커버리지 60%+ 도달</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-6-4"><label for="dod-sdevc-W1-6-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-7')"><div class="dtc"><div class="dt-date">5/21 수</div><span class="dt-badge bi">SSE</span></div><div class="dtc">Stand-up</div><div class="dtc">Gateway 경유 SSE 테스트 (강태오 협력)</div><div class="dtc">NoBufferingFilter 동작 확인</div><div class="dt-chev" id="chev-devc-W1-7">⌄</div></div><div class="day-detail" id="devc-W1-7"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>gateway/</li><li>ai-service/app/api/v1/turns.py</li><li>curl 로그</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Gateway를 지나도 SSE가 버퍼링 없이 전달되는지 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8080/ai/sessions/1/turns<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> NoBufferingFilter 동작 확인</div><button class="sim-btn" onclick="runSim('devc-W1-7')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-7"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-7-0"><label for="dod-sdevc-W1-7-0">Gateway NoBufferingFilter 동작 확인 (Lead 협력)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-7-1"><label for="dod-sdevc-W1-7-1">curl로 Gateway → AI Service SSE 첫 토큰 즉시 수신 (<500ms)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-7-2"><label for="dod-sdevc-W1-7-2">클라이언트 EventSource로 토큰 수신 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-7-3"><label for="dod-sdevc-W1-7-3">error 이벤트 → end 이벤트 흐름 검증 (04번 §6.3)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-7-4"><label for="dod-sdevc-W1-7-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W1-8')"><div class="dtc"><div class="dt-date">5/22 목</div><span class="dt-badge bt">게이트</span></div><div class="dtc">Stand-up</div><div class="dtc">W1 Lock-in 게이트 참석 (18:00)</div><div class="dtc">W1 회고</div><div class="dt-chev" id="chev-devc-W1-8">⌄</div></div><div class="day-detail" id="devc-W1-8"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>GitHub PR</li><li>pytest 로그</li><li>curl SSE 로그</li><li>ChromaDB count</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">W1 완료 기준 5개를 직접 체크하고 증거를 PR에 첨부한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests -q
+curl -N http://localhost:8085/ai/sessions/1/turns
+python ai-service/scripts/rag_index.py --dry-run<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> W1 회고</div><button class="sim-btn" onclick="runSim('devc-W1-8')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W1-8"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-8-0"><label for="dod-sdevc-W1-8-0">5/22 18:00 Foundation 게이트 참석</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-8-1"><label for="dod-sdevc-W1-8-1">AI Service W1 종료 기준 모두 ✅ (DB·프롬프트·API·SSE·테스트)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-8-2"><label for="dod-sdevc-W1-8-2">W1 회고 — 환각·인젝션 사례 공유</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-8-3"><label for="dod-sdevc-W1-8-3">15_체크리스트 W1 항목 마킹</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W1-8-4"><label for="dod-sdevc-W1-8-4">reports/ W1 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W2"><div class="whdr"><div class="wdot" style="background:var(--purple)"></div><span class="wlabel">W2</span><span class="wperiod">5/26~5/29</span><span class="wgoal">신학 가드레일 + 실연동 완성</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-0')"><div class="dtc"><div class="dt-date">5/26 화</div><span class="dt-badge bp">프롬프트</span></div><div class="dtc">페이스 점검 (11:30)</div><div class="dtc">신학 가드레일 시스템 프롬프트 추가</div><div class="dtc">이단 탐지 문구 삽입 확인</div><div class="dt-chev" id="chev-devc-W2-0">⌄</div></div><div class="day-detail" id="devc-W2-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/prompts/templates.py</li><li>09_AI_프롬프트_운영_가이드.md</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">모든 단계 프롬프트에 공통 가드레일을 삽입한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_guardrail.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 이단 탐지 문구 삽입 확인</div><button class="sim-btn" onclick="runSim('devc-W2-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-0-0"><label for="dod-sdevc-W2-0-0">이단 탐지 시스템 프롬프트 추가 (theology guard)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-0-1"><label for="dod-sdevc-W2-0-1">theology-set 20건 시드 + 검증 (95%+ 정확도)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-0-2"><label for="dod-sdevc-W2-0-2">검증 5종 통합 (인젝션·환각·RAG 인용·docId·LLM-as-judge)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-0-3"><label for="dod-sdevc-W2-0-3">11:30 페이스 점검 회의 참석</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-0-4"><label for="dod-sdevc-W2-0-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-1')"><div class="dtc"><div class="dt-date">5/27 수</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>PATCH /api/v1/passages/{book}/{ch}/{v}</code> A→B→C→D E2E</div><div class="dtc">전체 흐름 E2E 테스트</div><div class="dt-chev" id="chev-devc-W2-1">⌄</div></div><div class="day-detail" id="devc-W2-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/usecase/session_usecase.py</li><li>ai-service/tests/test_session_flow.py</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">세션 단계 전이가 순서대로만 허용되는지 검증한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_session_flow.py -q<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 전체 흐름 E2E 테스트</div><button class="sim-btn" onclick="runSim('devc-W2-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-1"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-1-0"><label for="dod-sdevc-W2-1-0">AdvanceStepUseCase — SELECT FOR UPDATE + 단계 전이 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-1-1"><label for="dod-sdevc-W2-1-1">A 단계 1턴 E2E 완주 (입력 → Anthropic → SSE 수신)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-1-2"><label for="dod-sdevc-W2-1-2">LLM-as-judge Haiku 호출 통합</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-1-3"><label for="dod-sdevc-W2-1-3">curl로 단계 전이 검증 (current_step A→B)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-1-4"><label for="dod-sdevc-W2-1-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-2')"><div class="dtc"><div class="dt-date">5/28 목</div><span class="dt-badge bi">API</span></div><div class="dtc">Stand-up</div><div class="dtc"><code>GET /ai/prompt-templates</code> DB 연결 · Bible Service 연동</div><div class="dtc">강태오·김태혁 협력 로그 기록</div><div class="dt-chev" id="chev-devc-W2-2">⌄</div></div><div class="day-detail" id="devc-W2-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/api/v1/templates.py</li><li>bff-aggregator/</li><li>bible-service/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">AI가 Bible DB를 직접 조회하지 않고 BFF/Bible API 경계를 지킨다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -i http://localhost:8085/ai/prompt-templates
+curl -i http://localhost:8080/api/v1/passages/JHN/3/16<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 강태오·김태혁 협력 로그 기록</div><button class="sim-btn" onclick="runSim('devc-W2-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-2"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-2-0"><label for="dod-sdevc-W2-2-0">B 단계 RAG 검색 (top-K 5 + rerank) 구현</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-2-1"><label for="dod-sdevc-W2-2-1">RAG 시드 20개 (qtai_corpus collection)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-2-2"><label for="dod-sdevc-W2-2-2">rag_sources SSE 이벤트 발행 — docId·snippet 포함</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-2-3"><label for="dod-sdevc-W2-2-3">환각 구절 검증 (Bible /verse_exists API 호출)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-2-4"><label for="dod-sdevc-W2-2-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W2-3')"><div class="dtc"><div class="dt-date">5/29 금</div><span class="dt-badge bo">테스트</span></div><div class="dtc">Stand-up</div><div class="dtc">pytest 커버리지 60%+ · 목록/상세 API 완성</div><div class="dtc">coverage 로그 PR 첨부</div><div class="dt-chev" id="chev-devc-W2-3">⌄</div></div><div class="day-detail" id="devc-W2-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/tests/</li><li>coverage.xml</li><li>GitHub PR</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">세션 생성/조회/전이/SSE 기본 케이스를 테스트로 잠근다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests --cov=app --cov-report=term-missing<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> coverage 로그 PR 첨부</div><button class="sim-btn" onclick="runSim('devc-W2-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W2-3"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-3-0"><label for="dod-sdevc-W2-3-0">pytest --cov 커버리지 60%+ 달성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-3-1"><label for="dod-sdevc-W2-3-1">coverage 로그 PR 첨부</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-3-2"><label for="dod-sdevc-W2-3-2">feature/ai-w2 브랜치 정리 + develop rebase</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-3-3"><label for="dod-sdevc-W2-3-3">15_체크리스트 W2 6항목 마킹</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W2-3-4"><label for="dod-sdevc-W2-3-4">reports/ W2 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W3"><div class="whdr"><div class="wdot" style="background:var(--orange)"></div><span class="wlabel">W3</span><span class="wperiod">6/1~6/5</span><span class="wgoal">Kafka 이벤트 + 성능 측정</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W3-0')"><div class="dtc"><div class="dt-date">6/1~6/5</div><span class="dt-badge bk">Kafka</span></div><div class="dtc">Kafka producer 구현</div><div class="dtc"><code>ai.session.completed</code> 이벤트 발행</div><div class="dtc">SSE P95 ≤ 2000ms 측정</div><div class="dt-chev" id="chev-devc-W3-0">⌄</div></div><div class="day-detail" id="devc-W3-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/app/kafka/event_publisher.py</li><li>events/schema/ai.session.completed-value.json</li><li>k6/ai-sse.js</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">큐티 D단계 완료 시 Journal Saga가 받을 표준 envelope를 발행한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests/test_ai_completed_event.py -q
+k6 run k6/ai-sse.js<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> SSE P95 ≤ 2000ms 측정</div><button class="sim-btn" onclick="runSim('devc-W3-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W3-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-0"><label for="dod-sdevc-W3-0-0">A→B→C→D 4단계 E2E 완주 테스트 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-1"><label for="dod-sdevc-W3-0-1">Kafka ai.session.completed 발행 (세션 완료 시)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-2"><label for="dod-sdevc-W3-0-2">injection-set 30건 100% 차단 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-3"><label for="dod-sdevc-W3-0-3">SELF_HARM_DETECTED 즉시 대응 흐름 (§6.4)</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-4"><label for="dod-sdevc-W3-0-4">RAG 시드 50개 추가</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W3-0-5"><label for="dod-sdevc-W3-0-5">PR draft 등록</label></div></div></div></div></div><div class="wblock mt20" id="W4"><div class="whdr"><div class="wdot" style="background:var(--lead)"></div><span class="wlabel">W4</span><span class="wperiod">6/8~6/12</span><span class="wgoal">프롬프트 인젝션 방어 + dry-run</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W4-0')"><div class="dtc"><div class="dt-date">6/8~6/12</div><span class="dt-badge br">리뷰</span></div><div class="dtc">회귀 테스트</div><div class="dtc">큐티 D단계 완결 시나리오 dry-run</div><div class="dtc">pytest 커버리지 70%+</div><div class="dt-chev" id="chev-devc-W4-0">⌄</div></div><div class="day-detail" id="devc-W4-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/tests/</li><li>demo/qt-d-flow.md</li><li>coverage.xml</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">시연 질문 흐름에서 프롬프트 가드레일이 무너지지 않는지 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>python -m pytest ai-service/tests --cov=app
+rg -n &quot;ANTHROPIC_API_KEY|sk-ant|payload&quot; ai-service events/schema<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> pytest 커버리지 70%+</div><button class="sim-btn" onclick="runSim('devc-W4-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W4-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-0"><label for="dod-sdevc-W4-0-0">theology-set 50건 95%+ 정확도 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-1"><label for="dod-sdevc-W4-0-1">golden-set 100건 95%+ 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-2"><label for="dod-sdevc-W4-0-2">nightly 회귀 CI job 동작 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-3"><label for="dod-sdevc-W4-0-3">비용 모니터링 Prometheus metric 9종 발행 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-4"><label for="dod-sdevc-W4-0-4">pytest 커버리지 70%+ 최종 달성</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W4-0-5"><label for="dod-sdevc-W4-0-5">reports/ W4 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W5"><div class="whdr"><div class="wdot" style="background:var(--green)"></div><span class="wlabel">W5</span><span class="wperiod">6/15~6/17</span><span class="wgoal">시연 리허설 + 백업 플랜</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('devc-W5-0')"><div class="dtc"><div class="dt-date">6/15~6/17</div><span class="dt-badge bo">시연</span></div><div class="dtc">시연 리허설 지원</div><div class="dtc">AI 응답 지연/장애 fallback 준비</div><div class="dtc">백업 응답 샘플과 로그 준비</div><div class="dt-chev" id="chev-devc-W5-0">⌄</div></div><div class="day-detail" id="devc-W5-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>ai-service/logs/</li><li>demo/ai-response-samples.md</li><li>GitHub release notes</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">시연 직전 SSE, RAG, API key, prompt 응답 샘플을 한 번 더 확인한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>curl -N http://localhost:8080/ai/sessions/1/turns
+kubectl logs -n qtai deploy/ai-service --tail=100<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 백업 응답 샘플과 로그 준비</div><button class="sim-btn" onclick="runSim('devc-W5-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sdevc-W5-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W5-0-0"><label for="dod-sdevc-W5-0-0">AI 응답 지연 시 fallback (정적 응답) 준비</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W5-0-1"><label for="dod-sdevc-W5-0-1">백업 응답 샘플 5건 + 로그 캡처</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W5-0-2"><label for="dod-sdevc-W5-0-2">시연 환경 헬스체크 — Anthropic API 연결 확인</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W5-0-3"><label for="dod-sdevc-W5-0-3">시연 중 OOMKilled 발생 시 memory limit 1Gi 증설</label></div><div class="dod-item"><input type="checkbox" id="dod-sdevc-W5-0-4"><label for="dod-sdevc-W5-0-4">reports/ W5 발표 종합 리포트 작성</label></div></div></div></div></div></div></div>
+<div class="sec" id="s4"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드 — 컨텍스트 없이 요청 금지</div></div><div class="ai-stage"><div class="ai-hdr" onclick="togglePanel('ai-0')"><span class="ai-w">W1</span><strong>FastAPI 라우터·Alembic·SSE 골격 생성</strong><span class="ai-spacer"></span><span class="pr-panel-chev open" id="chev-ai-0">⌄</span></div><div class="ai-body show" id="ai-0"><div class="ai-lbl">필수 컨텍스트</div><ul class="ctx-list"><li>apis/ai/openapi.yaml</li><li>events/schema/ai.session.completed-value.json</li><li>03_아키텍처_정의서.md AI Service 단독 FastAPI</li><li>AGENTS.md AI Service 스택 확정</li></ul><div class="ai-lbl">복붙 요청 프롬프트</div><div class="prompt-box">[역할] QT-AI Dev C, FastAPI AI/RAG Service Owner.
 
 [요청] FastAPI 라우터, SessionUseCase, ChatUseCase SSE 골격을 작성해줘.
 조건:
@@ -83,10 +208,714 @@ kubectl logs -n qtai deploy/ai-service --tail=100<button class="copy-btn" onclic
 - payload 키 금지, data 사용
 - idempotencyKey = ai.session.completed:{sessionId}
 - SSE P95 측정 로그를 남길 것</div><div class="ai-lbl">검증 체크</div><ul class="verify-list"><li>schemaSubject와 eventType 일치</li><li>payload 문자열 grep 결과 0</li><li>P95 수치가 PR에 첨부됐는지</li></ul></div></div></div>
+
+<!-- S5: SELF-CONTAINED SPEC -->
+<div class="sec" id="s5">
+  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 다른 문서 참조 없이 작업 가능</div></div>
+  <div class="callout blue">ℹ️ AI Service는 <strong>Python FastAPI</strong> 단독 프로젝트. Spring 코드 금지. 04_API_명세서 §6·DECISIONS.md·events/schema에서 이식.</div>
+
+  <!-- 5.1 PYDANTIC 모델 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.1</span><span class="spec-title">Pydantic 모델 — Request/Response 명세</span></summary>
+  <div class="callout warn mt8">⚠️ Python은 snake_case가 관습이지만 API 응답은 <strong>camelCase</strong>. <code>alias_generator=to_camel</code>로 둘 다 지원.</div>
+  <pre># ai-service/app/domain/schemas.py
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
+from datetime import datetime
+from typing import Optional, List, Literal
+
+
+class CamelModel(BaseModel):
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True,
+        from_attributes=True
+    )
+
+# ── Path/Body 입력 ──
+class PassageRef(CamelModel):
+    book_code: str = Field(..., min_length=3, max_length=3)  # GEN, EXO, ..., REV
+    chapter:   int = Field(..., ge=1)
+    verse:     int = Field(..., ge=1)
+
+
+class StartSessionRequest(CamelModel):
+    passage:      PassageRef
+    initial_step: Literal["A", "B", "C", "D"] = "A"  # default "A" (04번 §6.2)
+
+
+class TurnRequest(CamelModel):
+    user_message: str = Field(..., min_length=1, max_length=4000)
+
+
+# ── 응답 ──
+class PassageDetail(CamelModel):
+    book_id:   int
+    book_code: str
+    chapter:   int
+    verse:     int
+
+
+class SessionResponse(CamelModel):
+    id:           int
+    user_id:      int
+    passage:      PassageDetail
+    current_step: Literal["A", "B", "C", "D"]
+    status:       Literal["IN_PROGRESS", "COMPLETED", "ABANDONED", "COMPLETED_NO_JOURNAL"]
+    summary:      Optional[str] = None
+    created_at:   datetime
+    updated_at:   Optional[datetime] = None
+
+
+class TurnDetail(CamelModel):
+    id:                 int
+    role:               Literal["SYSTEM", "USER", "ASSISTANT"]
+    step:               Optional[Literal["A", "B", "C", "D"]] = None
+    content:            str          # SYSTEM은 언제나 ""
+    content_redacted:   bool         # SYSTEM은 true → 클라이언트에서 숨김
+    prompt_template_id: Optional[int] = None
+    rag_sources:        Optional[List[dict]] = None
+    created_at:         datetime
+
+
+class SessionDetailResponse(SessionResponse):
+    turns: List[TurnDetail]
+
+
+# ── 페이지네이션 ──
+class PageInfo(CamelModel):
+    number:         int
+    size:           int
+    total_elements: int
+    total_pages:    int
+
+
+class SessionListResponse(CamelModel):
+    items: List[SessionResponse]
+    page:  PageInfo<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.2 SSE 이벤트 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.2</span><span class="spec-title">SSE 이벤트 스키마 (04번 §6.3 / §9.2)</span></summary>
+  <div class="callout warn mt8">⚠️ 의존성: <code>sse-starlette</code> + <code>anthropic</code> SDK. <strong>error 이벤트 발생 시도 마지막에 반드시 <code>event: end [DONE]</code></strong> (정상 종료 신호).</div>
+  <pre># ai-service/app/api/v1/sse_events.py
+from typing import Literal, TypedDict, Optional, List
+
+
+class TurnStartedEvent(TypedDict):
+    turnId:    Optional[int]
+    step:      Literal["A", "B", "C", "D"]
+    timestamp: str
+
+
+class TokenEvent(TypedDict):
+    text: str
+
+
+class RagSource(TypedDict):
+    type:   Literal["commentary", "dummy_paper"]
+    id:     int
+    source: Optional[str]
+    weight: float
+
+
+class RagSourcesEvent(TypedDict):
+    sources: List[RagSource]
+
+
+class TurnCompletedEvent(TypedDict):
+    turnId:           int
+    step:             Literal["A", "B", "C", "D"]
+    promptTemplateId: int
+    totalTokens:      int
+    elapsedMs:        int
+
+
+class StepChangedEvent(TypedDict):
+    fromStep: Literal["A", "B", "C", "D"]
+    toStep:   Literal["A", "B", "C", "D"]
+
+
+class ErrorEvent(TypedDict):
+    code:    str   # LLM_PROVIDER_ERROR / LLM_TIMEOUT 등
+    detail:  str
+    traceId: str
+
+
+# SSE 이벤트 종류 — 04번 §6.3
+#   turn_started, token, rag_sources, step_changed, turn_completed, end, error</pre>
+
+  <pre># ai-service/app/api/v1/turns.py
+from fastapi import APIRouter, Depends, HTTPException, Header
+from sse_starlette.sse import EventSourceResponse
+import asyncio, json
+
+router = APIRouter()
+
+
+@router.post("/ai/sessions/{session_id}/turns")
+async def add_turn(
+    session_id:  int,
+    body:        TurnRequest,
+    x_user_id:   int = Header(..., alias="X-User-Id"),
+    chat_uc:     ChatUseCase = Depends(),
+):
+    # ── 스트림 시작 전 HTTP 에러 (404/403/422/502/504) ──
+    session = chat_uc.validate_and_load(session_id, x_user_id)
+
+    async def event_generator():
+        try:
+            yield {"event": "turn_started", "data": json.dumps({
+                "turnId": None, "step": session.current_step,
+                "timestamp": datetime.utcnow().isoformat() + "Z"
+            })}
+
+            # Anthropic 스트림
+            async for token in chat_uc.stream(session, body.user_message):
+                yield {"event": "token", "data": json.dumps({"text": token})}
+
+            # RAG 출처 — 매 ASSISTANT 턴마다 필수 (03번 §3.3)
+            yield {"event": "rag_sources", "data": json.dumps({"sources": chat_uc.rag_sources})}
+
+            # 턴 완료 — DB 적재 후
+            saved = chat_uc.save_assistant_turn(...)
+            yield {"event": "turn_completed", "data": json.dumps({
+                "turnId":           saved.id,
+                "step":             saved.step,
+                "promptTemplateId": saved.prompt_template_id,
+                "totalTokens":      saved.total_tokens,
+                "elapsedMs":        saved.elapsed_ms
+            })}
+        except Exception as e:
+            # error 도중 발생 — 04번 §6.3 error→end 정책
+            yield {"event": "error", "data": json.dumps({
+                "code": classify_error(e),
+                "detail": str(e),
+                "traceId": get_trace_id()
+            })}
+        finally:
+            # 반드시 end 발행 (클라이언트 정상 종료 신호)
+            yield {"event": "end", "data": "[DONE]"}
+
+    return EventSourceResponse(event_generator())<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.3 에러 코드 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.3</span><span class="spec-title">AIError 코드 + ProblemDetail (04번 §2.4 / §2.6)</span></summary>
+  <pre># ai-service/app/common/errors.py
+from enum import Enum
+from http import HTTPStatus
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class ErrorCode:
+    http_status: int
+    code:        str
+    message:     str
+
+
+class AIError:
+    SESSION_NOT_FOUND          = ErrorCode(404, "SESSION_NOT_FOUND",          "AI 세션 없음")
+    SESSION_NOT_OWNED          = ErrorCode(403, "SESSION_NOT_OWNED",          "본인 세션 아님")
+    SESSION_ALREADY_COMPLETED  = ErrorCode(422, "SESSION_ALREADY_COMPLETED",  "이미 D 단계 완료")
+    LLM_PROVIDER_ERROR         = ErrorCode(502, "LLM_PROVIDER_ERROR",         "Anthropic API 5xx")
+    LLM_TIMEOUT                = ErrorCode(504, "LLM_TIMEOUT",                "첫 토큰 timeout (5s)")
+    PROMPT_TEMPLATE_NOT_ACTIVE = ErrorCode(422, "PROMPT_TEMPLATE_NOT_ACTIVE", "검수 안 된 프롬프트")
+
+
+class CommonError:
+    VALIDATION_FAILED    = ErrorCode(400, "VALIDATION_FAILED",    "검증 실패")
+    UNAUTHORIZED         = ErrorCode(401, "UNAUTHORIZED",         "JWT 누락·만료")
+    FORBIDDEN            = ErrorCode(403, "FORBIDDEN",            "권한 부족")
+    RATE_LIMITED         = ErrorCode(429, "RATE_LIMITED",         "Rate limit 초과")
+    INTERNAL_ERROR       = ErrorCode(500, "INTERNAL_ERROR",       "알 수 없는 오류")
+    UPSTREAM_UNAVAILABLE = ErrorCode(503, "UPSTREAM_UNAVAILABLE", "Circuit Breaker OPEN")
+
+
+class BusinessException(Exception):
+    def __init__(self, error: ErrorCode):
+        self.error = error
+        super().__init__(error.message)
+
+
+# 글로벌 익셉션 핸들러
+from fastapi import Request
+from fastapi.responses import JSONResponse
+from datetime import datetime, timezone
+
+
+async def business_exception_handler(request: Request, exc: BusinessException):
+    return JSONResponse(
+        status_code = exc.error.http_status,
+        content = {
+            "type":      f"https://api.qtai.app/errors/{exc.error.code.lower().replace('_', '-')}",
+            "title":     exc.error.message,
+            "status":    exc.error.http_status,
+            "instance":  str(request.url.path),
+            "code":      exc.error.code,
+            "traceId":   request.headers.get("traceparent", "").split("-")[1] if request.headers.get("traceparent") else None,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        },
+        media_type = "application/problem+json"
+    )
+
+
+# main.py·등록
+app.add_exception_handler(BusinessException, business_exception_handler)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.4 KAFKA 발행 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.4</span><span class="spec-title">Kafka 페이로드 — ai.session.completed (발행)</span></summary>
+  <div class="callout warn mt8">⚠️ D 단계 도달 시 <strong>AFTER_COMMIT</strong>에 발행. <code>confluent-kafka</code> + Apicurio Schema Registry 사용. events/schema/ai.session.completed-value.json과 완전 동일.</div>
+  <pre># ai-service/app/kafka/event_publisher.py
+from confluent_kafka import Producer
+from datetime import datetime, timezone
+import ulid, json
+
+
+def build_ai_session_completed_event(
+    session_id: int,
+    user_id:    int,
+    passage:    dict,    # {"bookId":1,"bookCode":"GEN","chapter":1,"verse":1}
+    final_step: str,     # "D"
+    summary:    str,
+    trace_id:   str
+) -> dict:
+    """events/schema/ai.session.completed-value.json과 완전 동일."""
+    return {
+        "eventId":         f"evt_{ulid.new().str}",
+        "eventType":       "ai.session.completed",
+        "eventVersion":    1,
+        "schemaSubject":   "ai.session.completed-value",
+        "occurredAt":      datetime.now(timezone.utc).isoformat(),
+        "traceId":         trace_id,
+        "producerService": "ai-service",
+        "idempotencyKey":  f"ai.session.completed:{session_id}",
+        "data": {
+            "sessionId": session_id,
+            "userId":    user_id,
+            "passage":   passage,
+            "finalStep": final_step,
+            "summary":   summary
+        }
+    }
+
+
+producer = Producer({"bootstrap.servers": "kafka.qtai:9092", "acks": "all"})
+
+
+def publish_session_completed(session, summary: str, trace_id: str):
+    """AFTER_COMMIT 훅에서 호출 (SQLAlchemy event listener 또는 outbox)."""
+    event = build_ai_session_completed_event(
+        session_id = session.id,
+        user_id    = session.user_id,
+        passage    = {
+            "bookId":   session.book_id,
+            "bookCode": session.book_code,
+            "chapter":  session.chapter,
+            "verse":    session.verse
+        },
+        final_step = "D",
+        summary    = summary,
+        trace_id   = trace_id
+    )
+    producer.produce(
+        topic = "ai.session.completed",
+        key   = event["idempotencyKey"].encode(),
+        value = json.dumps(event).encode()
+    )
+    producer.flush(timeout=2)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.5 KAFKA 컨슈머 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.5</span><span class="spec-title">Kafka 컨슈머 — user.deactivated + journal.creation.failed</span></summary>
+  <div class="callout warn mt8">⚠️ AI Service는 2개 토픽 구독. <strong>journal.creation.failed</strong>는 Saga 보상— 03번 §6.1 정합.</div>
+  <pre># ai-service/app/kafka/consumers.py
+from confluent_kafka import Consumer
+import json
+
+
+# ── 1) user.deactivated ──
+def handle_user_deactivated(event: dict):
+    """해당 user의 IN_PROGRESS 세션을 ABANDONED로 마킹."""
+    user_id = event["data"]["userId"]
+    db.execute(
+        "UPDATE AI_SESSIONS SET status='ABANDONED' "
+        "WHERE user_id = :uid AND status = 'IN_PROGRESS'",
+        {"uid": user_id}
+    )
+    db.commit()
+
+
+# ── 2) journal.creation.failed (Saga 보상) ──
+def handle_journal_creation_failed(event: dict):
+    """AI_SESSIONS.status → 'COMPLETED_NO_JOURNAL' (멱등 체크 필수)."""
+    session_id      = event["data"]["sessionId"]
+    idempotency_key = event["idempotencyKey"]   # journal.creation.failed:{sessionId}
+
+    # 멱등성 — 이미 처리된 이벤트 skip
+    if processed_event_repo.exists(idempotency_key):
+        return
+
+    db.execute(
+        "UPDATE AI_SESSIONS SET status='COMPLETED_NO_JOURNAL' "
+        "WHERE id = :sid",
+        {"sid": session_id}
+    )
+    processed_event_repo.save(idempotency_key)
+    db.commit()
+
+
+# Consumer 등록
+consumer = Consumer({
+    "bootstrap.servers": "kafka.qtai:9092",
+    "group.id":          "ai-service-saga-compensation-consumer",
+    "enable.auto.commit": False  # 명시적 commit
+})
+consumer.subscribe(["user.deactivated", "journal.creation.failed"])
+
+while True:
+    msg = consumer.poll(1.0)
+    if msg is None: continue
+    event = json.loads(msg.value())
+    if event["eventType"] == "user.deactivated":
+        handle_user_deactivated(event)
+    elif event["eventType"] == "journal.creation.failed":
+        handle_journal_creation_failed(event)
+    consumer.commit(msg)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.6 ANTHROPIC SDK -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.6</span><span class="spec-title">Anthropic SDK 사용 패턴</span></summary>
+  <div class="callout red mt8">⚠️ <strong>ANTHROPIC_API_KEY는 K8s Secret에서만 읽기</strong>. 코드·application.yml·Claude 대화에 어떤 형태로도 입력 금지.</div>
+  <pre># ai-service/app/llm/anthropic_client.py
+import os
+from anthropic import AsyncAnthropic
+
+
+client = AsyncAnthropic(
+    api_key = os.environ["ANTHROPIC_API_KEY"]   # K8s Secret → env
+)
+
+
+async def stream_response(
+    system_prompt: str,
+    messages:      list[dict],
+    model:         str = "claude-sonnet-4-5-20250929"
+):
+    """Anthropic 스트림 응답 제너레이터. 첫 토큰 timeout 5s, 전체 max 5분."""
+    async with client.messages.stream(
+        model      = model,
+        max_tokens = 2000,
+        system     = system_prompt,
+        messages   = messages,
+        timeout    = 300   # 5분
+    ) as stream:
+        async for text in stream.text_stream:
+            yield text<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.7 AI 테이블 스키마 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.7</span><span class="spec-title">AI Service DB 스키마 (Alembic)</span></summary>
+  <pre># ai-service/alembic/versions/001_initial.py
+"""create ai sessions and turns"""
+
+import sqlalchemy as sa
+
+
+def upgrade():
+    op.create_table("AI_SESSIONS",
+        sa.Column("id",           sa.BigInteger, primary_key=True, autoincrement=True),
+        sa.Column("user_id",      sa.BigInteger, nullable=False),
+        sa.Column("book_id",      sa.BigInteger, nullable=False),
+        sa.Column("chapter",      sa.Integer,    nullable=False),
+        sa.Column("verse",        sa.Integer,    nullable=False),
+        sa.Column("current_step", sa.String(1),  nullable=False, server_default="A"),
+        sa.Column("status",       sa.String(30), nullable=False, server_default="IN_PROGRESS"),
+            # IN_PROGRESS / COMPLETED / ABANDONED / COMPLETED_NO_JOURNAL
+        sa.Column("summary",      sa.Text,       nullable=True),
+        sa.Column("created_at",   sa.DateTime,   nullable=False),
+        sa.Column("updated_at",   sa.DateTime,   nullable=False),
+    )
+    op.create_index("idx_session_user_status", "AI_SESSIONS", ["user_id", "status"])
+
+    op.create_table("AI_TURNS",
+        sa.Column("id",                 sa.BigInteger, primary_key=True, autoincrement=True),
+        sa.Column("session_id",         sa.BigInteger, nullable=False),
+        sa.Column("role",               sa.String(20), nullable=False),  # SYSTEM/USER/ASSISTANT
+        sa.Column("step",               sa.String(1),  nullable=True),
+        sa.Column("content",            sa.Text,       nullable=False),
+        sa.Column("content_redacted",   sa.Boolean,    nullable=False, server_default="false"),
+        sa.Column("prompt_template_id", sa.Integer,    nullable=True),
+        sa.Column("rag_sources",        sa.JSON,       nullable=True),
+        sa.Column("total_tokens",       sa.Integer,    nullable=True),
+        sa.Column("elapsed_ms",         sa.Integer,    nullable=True),
+        sa.Column("created_at",         sa.DateTime,   nullable=False),
+        sa.ForeignKeyConstraint(["session_id"], ["AI_SESSIONS.id"]),
+    )
+    op.create_index("idx_turn_session", "AI_TURNS", ["session_id"])
+
+    op.create_table("PROCESSED_EVENTS",
+        sa.Column("idempotency_key", sa.String(200), primary_key=True),
+        sa.Column("processed_at",    sa.DateTime,    nullable=False),
+    )<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  </div>
+<!-- S6: WORKFLOW + REPORT -->
+<div class="sec" id="s6">
+  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
+  <div class="callout blue">ℹ️ 모든 day 카드 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서를 반드시 따릅니다. 개인 작업 폴더는 <code>workspaces/DevC_강상민/</code> 입니다.</div>
+
+  <div class="wr-flow">
+    <span class="step">📝 workflows/{date}-{task}.md 작성</span>
+    <span class="arrow">→</span>
+    <span class="step">🔍 자기 검토 (체크리스트 ✓)</span>
+    <span class="arrow">→</span>
+    <span class="step">🚀 작업 진행</span>
+    <span class="arrow">→</span>
+    <span class="step">📊 reports/{date}-{task}.md 작성</span>
+  </div>
+
+  <div class="folder-rule">
+    <strong>🚫 폴더 격리 규칙 (AGENTS.md §13)</strong><br>
+    • 본인 폴더(<code>workspaces/DevC_강상민/</code>)에서만 읽기·쓰기 허용<br>
+    • 다른 팀원의 개인 폴더는 <strong>읽기·수정·삭제 모두 금지</strong> (AI 에이전트 포함)<br>
+    • <code>workspaces/</code> 내 파일은 빌드·테스트·CI에 영향 없음 (import 금지)<br>
+    • 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject
+  </div>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.1</span><span class="spec-title">개인 작업 폴더 구조</span></summary>
+  <pre>workspaces/DevC_강상민/                  ← 나만 접근
+├── README.md                         (폴더 사용법)
+├── workflows/                        (작업 시작 전 워크플로우)
+│   ├── _template.md                  (템플릿 — 복사해서 사용)
+│   ├── 20260513-{task-slug}.md       (예시)
+│   └── 20260514-{task-slug}.md       (예시)
+├── reports/                          (작업 종료 후 리포트)
+│   ├── _template.md                  (템플릿)
+│   ├── 20260513-{task-slug}.md       (예시 — 워크플로우와 동일 이름)
+│   └── 20260514-{task-slug}.md
+├── docs/                             (개인이 작성하는 문서·명세)
+└── notes/                            (메모·로그·스크린샷)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.2</span><span class="spec-title">워크플로우 양식 — workflows/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 시작 전 반드시 작성. 파일명은 <code>YYYYMMDD-{task-slug}.md</code> 형식. 리포트와 동일 이름 사용.</div>
+  <pre># 워크플로우 — [작업명]
+
+**작성자**: 강상민 (DevC — AI/RAG Service)
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜] (예: W1 5/13 수)
+**예상 소요시간**: ?시간
+**상태**: 📝 초안 / 🔍 검토 중 / ✅ 승인됨 / 🚀 실행 중 / 🎯 완료
+
+---
+
+## 1. 작업 목표
+(1개 문장으로 명확히)
+
+## 2. 변경 대상 파일
+- `path/to/file` — 무엇을 어떻게
+
+## 3. 작업 단계 (TODO)
+1. [ ] ...
+2. [ ] ...
+
+## 4. 검증 기준 (Definition of Done)
+- [ ] 단위 테스트 통과
+- [ ] 빌드 성공
+- [ ] OpenAPI/Spectral lint 통과 (해당 시)
+- [ ] curl/시뮬레이션 결과 확인
+- [ ] PR 300줄 이내
+
+## 5. 의존성
+- 선행 작업: ...
+- 다른 개발자 작업: ...
+
+## 6. 리스크 / 의문점
+- ...
+
+## 7. 자기 검토 체크
+- [ ] AGENTS.md 금지 패턴 위반 없음
+- [ ] DECISIONS.md 기준 위반 없음
+- [ ] 04_API_명세서 정합 (해당 시)
+- [ ] events/schema 정합 (해당 시)
+- [ ] 다른 개발자의 workspaces/ 폴더 접근 없음
+
+---
+> ⚠️ 작업 시작 전 반드시 검토하고, 의문점이 남으면 보강한 후 진행하세요.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.3</span><span class="spec-title">리포트 양식 — reports/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 종료 직후 반드시 작성. 다음 작업 시작 전에 완료. 동일 워크플로우와 이름 맞추기.</div>
+  <pre># 리포트 — [작업명]
+
+**작성자**: 강상민
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜]
+**소요 시간**: ?시간 (예상 대비 +/- ?)
+**상태**: ✅ 완료 / ⚠️ 부분 완료 / ❌ 실패
+
+**대응 워크플로우**: `workflows/[동일 파일명].md`
+
+---
+
+## 1. 결과 요약
+(1~2문장)
+
+## 2. 변경 사항
+- `path/to/file` — 실제 변경 내용 + 이유
+
+## 3. 검증 결과
+| 항목 | 결과 | 증거 |
+|------|------|------|
+| 단위 테스트 | ✅ | 로그/PR 링크 |
+| 빌드 | ✅ | ... |
+| Spectral | ✅/N/A | ... |
+| curl | ✅ | ... |
+
+## 4. 산출물
+- PR: #[번호]
+- 커밋: [SHA]
+- 스크린샷/로그: `notes/...`
+
+## 5. 워크플로우 대비 차이
+(계획과 다르게 진행된 부분과 그 이유)
+
+## 6. 미해결 항목 / 후속 조치
+- [ ] ...
+
+## 7. 회고
+- 잘 된 점:
+- 개선할 점:
+- 다음에 알아야 할 점:
+
+---
+> 📌 작업 완료 직후 작성하고, 다음 작업 워크플로우의 입력으로 활용.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.4</span><span class="spec-title">작업 세트 예시</span></summary>
+  <pre># 예: 작업 시작 → 종료 시퀀스
+
+# 1. 워크플로우 작성
+cd workspaces/DevC_강상민/workflows
+cp _template.md 20260513-{task-slug}.md
+notepad 20260513-{task-slug}.md   # 내용 채우기
+
+# 2. 검토 후 작업 진행
+cd ../../../
+# (실제 코드/문서 작업)
+
+# 3. 작업 완료 후 리포트
+cd workspaces/DevC_강상민/reports
+cp _template.md 20260513-{task-slug}.md   # 워크플로우와 동일 이름
+notepad 20260513-{task-slug}.md   # 결과 작성<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  </div>
+<!-- S7: REFERENCE DOC MATRIX -->
+<div class="sec" id="s7">
+  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">원문 문서 필요 항목 매트릭스 — 언제 어떤 문서를 봐야 하는가</div></div>
+  <div class="callout blue">ℹ️ 이 실행 가이드는 자기완결성을 추구하지만, <strong>변경의 원천이 되는 결정·스키마는 반드시 원본 문서를 우선</strong>합니다. 아래 표에서 작업 유형 → 원본 문서를 매핑하여 빠르게 찾으세요.</div>
+
+  <div class="ref-matrix">
+    <table>
+      <thead>
+        <tr><th style="width:25%">작업 유형</th><th style="width:35%">원본 문서</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>API 계약 변경</strong><br>(엔드포인트·DTO·헤더·에러)</td>
+          <td><code>04_API_명세서.md</code><br><code>apis/{service}/openapi.yaml</code></td>
+          <td>OpenAPI 3.1 + Spectral lint가 단일 진실 원천. 가이드 S5는 스냅샷.</td>
+        </tr>
+        <tr>
+          <td><strong>DB 스키마 변경</strong><br>(컬럼·인덱스·관계)</td>
+          <td><code>02_ERD_문서.md</code><br>+ Flyway 마이그레이션</td>
+          <td>ERD에 ADR-0009 등 결정 근거 포함. DDL은 마이그레이션이 권위.</td>
+        </tr>
+        <tr>
+          <td><strong>Kafka 이벤트 변경</strong><br>(payload·topic·key)</td>
+          <td><code>events/schema/*.json</code><br>+ Apicurio Schema Registry</td>
+          <td>JSON Schema 8개 파일이 envelope·data 표준. <code>data</code> 키 (not <code>payload</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처 흐름</strong><br>(Saga·OICD·인증 플로우)</td>
+          <td><code>03_아키텍처_정의서.md</code></td>
+          <td>시퀀스 다이어그램·CQRS·Outbox 패턴 결정 근거.</td>
+        </tr>
+        <tr>
+          <td><strong>보안 정책</strong><br>(JWT·Rate limit·CORS)</td>
+          <td><code>05_보안_명세서.md</code></td>
+          <td>JWT RS256 키·OAuth scope·rate limit 임계값.</td>
+        </tr>
+        <tr>
+          <td><strong>K8s·Docker·Helm</strong><br>(매니페스트·ConfigMap)</td>
+          <td><code>06_DevOps_운영_매뉴얼.md</code><br><code>helm/qtai-infra/</code></td>
+          <td>네임스페이스·Secret·헬스체크 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>테스트 작성</strong><br>(단위·통합·E2E)</td>
+          <td><code>07_테스트_전략.md</code><br><code>16_API_통합_테스트_가이드.md</code></td>
+          <td>커버리지 기준·Testcontainers·Prism mock 사용법.</td>
+        </tr>
+        <tr>
+          <td><strong>Flutter 앱 가이드</strong></td>
+          <td><code>08_프론트엔드_Flutter_가이드.md</code></td>
+          <td>위젯 트리·상태관리·라우팅 표준.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 프롬프트 변경</strong></td>
+          <td><code>09_AI_프롬프트_운영_가이드.md</code></td>
+          <td>OICD 단계별 프롬프트·golden-set·injection-set.</td>
+        </tr>
+        <tr>
+          <td><strong>빌드·실행 오류</strong></td>
+          <td><code>10_트러블슈팅_FAQ.md</code></td>
+          <td>의존성 충돌·포트 충돌·Minikube 메모리 부족 등.</td>
+        </tr>
+        <tr>
+          <td><strong>최초 환경 설정</strong></td>
+          <td><code>11_개발_환경_셋업_가이드.md</code></td>
+          <td>역할별 추가 설치·.env·JWT 키 생성·DB 시드.</td>
+        </tr>
+        <tr>
+          <td><strong>도메인 모델·패키지 구조</strong></td>
+          <td><code>12_서비스별_도메인_모델_상세.md</code></td>
+          <td>Clean Architecture 계층·UseCase 패턴·예외 계층.</td>
+        </tr>
+        <tr>
+          <td><strong>Git 브랜치·PR 규칙</strong></td>
+          <td><code>14_팀_협업_규칙_Git_브랜치_전략.md</code></td>
+          <td>커밋 메시지·코드 리뷰 기준·머지 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>서비스별 W1~W5 체크리스트</strong></td>
+          <td><code>15_서비스별_구현_체크리스트.md</code></td>
+          <td>본인 day 카드 DoD가 부족할 때 더 상세한 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>데이터 시드·마이그레이션</strong></td>
+          <td><code>17_데이터_시드_마이그레이션_전략.md</code></td>
+          <td>Bible 66권·prompt template·user 시드 데이터.</td>
+        </tr>
+        <tr>
+          <td><strong>코드 품질 게이트</strong></td>
+          <td><code>18_코드_품질_게이트.md</code></td>
+          <td>SonarQube·커버리지·정적 분석 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처·기술 스택 결정 근거</strong></td>
+          <td><code>DECISIONS.md</code> ⭐</td>
+          <td><strong>단일 진실 원천</strong>. MySQL/MSA/Kafka KRaft 등 모든 결정 이유.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 에이전트 규칙·금지 패턴</strong></td>
+          <td><code>AGENTS.md</code></td>
+          <td>금지 패턴·workspaces 폴더 격리(§13)·코드 작성 가이드.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn mt16">
+    ⚠️ <strong>변경 우선순위:</strong> 원본 문서 → 코드 → 가이드 HTML 순으로 갱신합니다. 가이드 S5/S6의 스냅샷이 원본과 다르면 <strong>원본이 우선</strong>이며, Lead에게 가이드 갱신을 요청하세요.
+  </div>
+</div>
 </div>
 <script>
-const SIM_CTX={"devc-W0-0":{"date":"5/10~5/11","task":"scripts/rag_index.py 작성","result":"ChromaDB collection size ≥ 5 확인","where":["ai-service/scripts/rag_index.py","ai-service/app/infrastructure/chroma.py","ai-service/data/rag_seed/"],"what":"Matthew Henry 등 공개 도메인 자료를 JHN 3장 중심으로 적재한다. 개역개정/ESV/NIV는 넣지 않는다.","sim":"rag-seed"},"devc-W1-0":{"date":"5/12 월","task":"pip install -r requirements.txt · ChromaDB K8s 확인","result":"rag_index.py 실행 결과 기록","where":["ai-service/requirements.txt","ai-service/main.py","ai-service/scripts/rag_index.py"],"what":"FastAPI 개발 환경과 RAG 시드 실행 경로를 고정한다.","sim":"rag-seed"},"devc-W1-1":{"date":"5/13 화","task":"Alembic 초기화 · AI_SESSIONS 마이그레이션 작성","result":"AI_TURNS 마이그레이션 작성","where":["ai-service/alembic/","ai-service/app/infrastructure/database.py"],"what":"AI 세션/턴 저장 테이블을 MySQL 기준으로 만든다.","sim":"alembic"},"devc-W1-2":{"date":"5/14 수","task":"ChatUseCase.stream_response() 하드코딩 SSE 동작 확인","result":"curl -N 첫 토큰 수신","where":["ai-service/app/usecase/chat_usecase.py","ai-service/app/api/v1/messages.py"],"what":"DB 연결 전이라도 SSE 스트림 골격이 실제로 흐르는지 검증한다.","sim":"sse"},"devc-W1-3":{"date":"5/15 목","task":"큐티 A~D 시스템 프롬프트 4종 작성","result":"단계별 응답 품질 셀프 테스트","where":["ai-service/app/api/v1/templates.py","ai-service/app/prompts/templates.py","09_AI_프롬프트_운영_가이드.md"],"what":"A 관찰, B 해석, C 적용, D 결단 단계별 시스템 프롬프트를 분리한다.","sim":"prompt"},"devc-W1-4":{"date":"5/16 금","task":"SessionUseCase.create_session DB 실구현","result":"/ai/sessions POST → 201 확인","where":["ai-service/app/usecase/session_usecase.py","ai-service/app/api/v1/sessions.py"],"what":"501 stub을 실제 세션 생성 API로 교체한다.","sim":"session-create"},"devc-W1-5":{"date":"5/19 월","task":"SessionUseCase 전체 CRUD 구현","result":"세션 단계 A→B 진행 테스트","where":["ai-service/app/usecase/session_usecase.py","ai-service/app/domain/schemas.py"],"what":"get, list, advance 흐름을 Pydantic camelCase 응답과 맞춘다.","sim":"advance"},"devc-W1-6":{"date":"5/20 화","task":"messages.py 세션 존재·소유권 검증 완성","result":"pytest 기본 테스트 작성","where":["ai-service/app/api/v1/messages.py","ai-service/tests/"],"what":"없는 세션, 다른 사용자 세션, 정상 SSE 케이스를 테스트한다.","sim":"pytest"},"devc-W1-7":{"date":"5/21 수","task":"Gateway 경유 SSE 테스트 (강태오 협력)","result":"NoBufferingFilter 동작 확인","where":["gateway/","ai-service/app/api/v1/messages.py","curl 로그"],"what":"Gateway를 지나도 SSE가 버퍼링 없이 전달되는지 확인한다.","sim":"gateway-sse"},"devc-W1-8":{"date":"5/22 목","task":"W1 Lock-in 게이트 참석 (18:00)","result":"W1 회고","where":["GitHub PR","pytest 로그","curl SSE 로그","ChromaDB count"],"what":"W1 완료 기준 5개를 직접 체크하고 증거를 PR에 첨부한다.","sim":"w1gate"},"devc-W2-0":{"date":"5/26 화","task":"신학 가드레일 시스템 프롬프트 추가","result":"이단 탐지 문구 삽입 확인","where":["ai-service/app/prompts/templates.py","09_AI_프롬프트_운영_가이드.md"],"what":"모든 단계 프롬프트에 공통 가드레일을 삽입한다.","sim":"guardrail"},"devc-W2-1":{"date":"5/27 수","task":"PATCH /ai/sessions/{id}/advance A→B→C→D E2E","result":"전체 흐름 E2E 테스트","where":["ai-service/app/usecase/session_usecase.py","ai-service/tests/test_session_flow.py"],"what":"세션 단계 전이가 순서대로만 허용되는지 검증한다.","sim":"advance"},"devc-W2-2":{"date":"5/28 목","task":"GET /ai/prompt-templates DB 연결 · Bible Service 연동","result":"강태오·김태혁 협력 로그 기록","where":["ai-service/app/api/v1/templates.py","bff-aggregator/","bible-service/"],"what":"AI가 Bible DB를 직접 조회하지 않고 BFF/Bible API 경계를 지킨다.","sim":"templates"},"devc-W2-3":{"date":"5/29 금","task":"pytest 커버리지 60%+ · 목록/상세 API 완성","result":"coverage 로그 PR 첨부","where":["ai-service/tests/","coverage.xml","GitHub PR"],"what":"세션 생성/조회/전이/SSE 기본 케이스를 테스트로 잠근다.","sim":"coverage"},"devc-W3-0":{"date":"6/1~6/5","task":"ai.session.completed 이벤트 발행","result":"SSE P95 ≤ 2000ms 측정","where":["ai-service/app/kafka/event_publisher.py","events/schema/ai.session.completed-value.json","k6/ai-sse.js"],"what":"큐티 D단계 완료 시 Journal Saga가 받을 표준 envelope를 발행한다.","sim":"kafka"},"devc-W4-0":{"date":"6/8~6/12","task":"큐티 D단계 완결 시나리오 dry-run","result":"pytest 커버리지 70%+","where":["ai-service/tests/","demo/qt-d-flow.md","coverage.xml"],"what":"시연 질문 흐름에서 프롬프트 가드레일이 무너지지 않는지 확인한다.","sim":"regression"},"devc-W5-0":{"date":"6/15~6/17","task":"AI 응답 지연/장애 fallback 준비","result":"백업 응답 샘플과 로그 준비","where":["ai-service/logs/","demo/ai-response-samples.md","GitHub release notes"],"what":"시연 직전 SSE, RAG, API key, prompt 응답 샘플을 한 번 더 확인한다.","sim":"demo"}};
-const SIM_PRESETS={"default":{"cmd":"$ run verification","lines":[["검증 명령 실행 완료","sg"],["PR에 결과 로그 첨부 가능","sg"]]},"rag-seed":{"cmd":"$ python ai-service/scripts/rag_index.py --dry-run","lines":[["Chroma collection qtai_devotion size=5 이상","sg"],["JHN 3장 중심 공개 도메인 자료 적재 가능","sg"],["개역개정/ESV/NIV 금지 데이터 없음","sg"]]},"alembic":{"cmd":"$ alembic upgrade head","lines":[["AI_SESSIONS / AI_TURNS 생성 완료","sg"],["MySQL dialect 기준 DDL 확인","sg"]]},"sse":{"cmd":"$ curl -N /ai/sessions/1/messages","lines":[["event: token 수신","sg"],["첫 토큰 지연 로그 기록","sg"]]},"prompt":{"cmd":"$ pytest ai-service/tests/test_prompt_templates.py -q","lines":[["A~D STAGE_SYSTEM_PROMPTS 로드 성공","sg"],["공통 guardrail 포함","sg"]]},"session-create":{"cmd":"$ curl -i -X POST /ai/sessions","lines":[["HTTP/1.1 201 Created","sg"],["sessionId / currentStage=A 반환","sg"]]},"advance":{"cmd":"$ pytest ai-service/tests/test_session_flow.py -q","lines":[["A→B→C→D 전이 PASS","sg"],["역방향/건너뛰기 전이 차단","sg"]]},"pytest":{"cmd":"$ python -m pytest ai-service/tests -q","lines":[["세션 존재/소유권/SSE 기본 테스트 PASS","sg"]]},"gateway-sse":{"cmd":"$ curl -N http://localhost:8080/ai/sessions/1/messages","lines":[["Gateway 경유 SSE token chunk 수신","sg"],["NoBufferingFilter 적용 확인","sg"]]},"w1gate":{"cmd":"$ bash scripts/check-ai-w1.sh","lines":[["POST /ai/sessions OK","sg"],["SSE 첫 토큰 OK","sg"],["RAG context ≥ 1 OK","sg"]]},"guardrail":{"cmd":"$ pytest ai-service/tests/test_guardrail.py -q","lines":[["이단/비성경적 유도 문구 방어 PASS","sg"]]},"templates":{"cmd":"$ curl -i /ai/prompt-templates","lines":[["HTTP/1.1 200 OK","sg"],["Bible Service 직접 DB 접근 없음","sg"]]},"coverage":{"cmd":"$ pytest --cov=app","lines":[["coverage >= 60%","sg"],["term-missing 리포트 첨부 가능","sg"]]},"kafka":{"cmd":"$ pytest ai-service/tests/test_ai_completed_event.py -q","lines":[["eventType=ai.session.completed","sg"],["payload 금지, data 사용 확인","sg"],["idempotencyKey 포함","sg"]]},"regression":{"cmd":"$ pytest ai-service/tests --cov=app","lines":[["coverage >= 70%","sg"],["prompt injection regression PASS","sg"]]},"demo":{"cmd":"$ curl -N /ai/sessions/1/messages","lines":[["시연 응답 샘플 준비","sg"],["fallback 문구와 로그 위치 공유 가능","sg"]]}};
+const SIM_CTX={"devc-W0-0":{"date":"5/10~5/11","task":"scripts/rag_index.py 작성","result":"ChromaDB collection size ≥ 5 확인","where":["ai-service/scripts/rag_index.py","ai-service/app/infrastructure/chroma.py","ai-service/data/rag_seed/"],"what":"Matthew Henry 등 공개 도메인 자료를 JHN 3장 중심으로 적재한다. 개역한글/ESV/NIV는 넣지 않는다.","sim":"rag-seed"},"devc-W1-0":{"date":"5/12 화","task":"pip install -r requirements.txt · ChromaDB K8s 확인","result":"rag_index.py 실행 결과 기록","where":["ai-service/requirements.txt","ai-service/main.py","ai-service/scripts/rag_index.py"],"what":"FastAPI 개발 환경과 RAG 시드 실행 경로를 고정한다.","sim":"rag-seed"},"devc-W1-1":{"date":"5/13 수","task":"Alembic 초기화 · AI_SESSIONS 마이그레이션 작성","result":"AI_TURNS 마이그레이션 작성","where":["ai-service/alembic/","ai-service/app/infrastructure/database.py"],"what":"AI 세션/턴 저장 테이블을 MySQL 기준으로 만든다.","sim":"alembic"},"devc-W1-2":{"date":"5/14 목","task":"ChatUseCase.stream_response() 하드코딩 SSE 동작 확인","result":"curl -N 첫 토큰 수신","where":["ai-service/app/usecase/chat_usecase.py","ai-service/app/api/v1/turns.py"],"what":"DB 연결 전이라도 SSE 스트림 골격이 실제로 흐르는지 검증한다.","sim":"sse"},"devc-W1-3":{"date":"5/15 금","task":"큐티 A~D 시스템 프롬프트 4종 작성","result":"단계별 응답 품질 셀프 테스트","where":["ai-service/app/api/v1/templates.py","ai-service/app/prompts/templates.py","09_AI_프롬프트_운영_가이드.md"],"what":"A 관찰, B 해석, C 적용, D 결단 단계별 시스템 프롬프트를 분리한다.","sim":"prompt"},"devc-W1-4":{"date":"5/16 금","task":"SessionUseCase.create_session DB 실구현","result":"/ai/sessions POST → 201 확인","where":["ai-service/app/usecase/session_usecase.py","ai-service/app/api/v1/sessions.py"],"what":"501 stub을 실제 세션 생성 API로 교체한다.","sim":"session-create"},"devc-W1-5":{"date":"5/19 월","task":"SessionUseCase 전체 CRUD 구현","result":"세션 단계 A→B 진행 테스트","where":["ai-service/app/usecase/session_usecase.py","ai-service/app/domain/schemas.py"],"what":"get, list, advance 흐름을 Pydantic camelCase 응답과 맞춘다.","sim":"advance"},"devc-W1-6":{"date":"5/20 화","task":"turns.py 세션 존재·소유권 검증 완성","result":"pytest 기본 테스트 작성","where":["ai-service/app/api/v1/turns.py","ai-service/tests/"],"what":"없는 세션, 다른 사용자 세션, 정상 SSE 케이스를 테스트한다.","sim":"pytest"},"devc-W1-7":{"date":"5/21 수","task":"Gateway 경유 SSE 테스트 (강태오 협력)","result":"NoBufferingFilter 동작 확인","where":["gateway/","ai-service/app/api/v1/turns.py","curl 로그"],"what":"Gateway를 지나도 SSE가 버퍼링 없이 전달되는지 확인한다.","sim":"gateway-sse"},"devc-W1-8":{"date":"5/22 목","task":"W1 Lock-in 게이트 참석 (18:00)","result":"W1 회고","where":["GitHub PR","pytest 로그","curl SSE 로그","ChromaDB count"],"what":"W1 완료 기준 5개를 직접 체크하고 증거를 PR에 첨부한다.","sim":"w1gate"},"devc-W2-0":{"date":"5/26 화","task":"신학 가드레일 시스템 프롬프트 추가","result":"이단 탐지 문구 삽입 확인","where":["ai-service/app/prompts/templates.py","09_AI_프롬프트_운영_가이드.md"],"what":"모든 단계 프롬프트에 공통 가드레일을 삽입한다.","sim":"guardrail"},"devc-W2-1":{"date":"5/27 수","task":"PATCH /api/v1/passages/{book}/{ch}/{v} A→B→C→D E2E","result":"전체 흐름 E2E 테스트","where":["ai-service/app/usecase/session_usecase.py","ai-service/tests/test_session_flow.py"],"what":"세션 단계 전이가 순서대로만 허용되는지 검증한다.","sim":"advance"},"devc-W2-2":{"date":"5/28 목","task":"GET /ai/prompt-templates DB 연결 · Bible Service 연동","result":"강태오·김태혁 협력 로그 기록","where":["ai-service/app/api/v1/templates.py","bff-aggregator/","bible-service/"],"what":"AI가 Bible DB를 직접 조회하지 않고 BFF/Bible API 경계를 지킨다.","sim":"templates"},"devc-W2-3":{"date":"5/29 금","task":"pytest 커버리지 60%+ · 목록/상세 API 완성","result":"coverage 로그 PR 첨부","where":["ai-service/tests/","coverage.xml","GitHub PR"],"what":"세션 생성/조회/전이/SSE 기본 케이스를 테스트로 잠근다.","sim":"coverage"},"devc-W3-0":{"date":"6/1~6/5","task":"ai.session.completed 이벤트 발행","result":"SSE P95 ≤ 2000ms 측정","where":["ai-service/app/kafka/event_publisher.py","events/schema/ai.session.completed-value.json","k6/ai-sse.js"],"what":"큐티 D단계 완료 시 Journal Saga가 받을 표준 envelope를 발행한다.","sim":"kafka"},"devc-W4-0":{"date":"6/8~6/12","task":"큐티 D단계 완결 시나리오 dry-run","result":"pytest 커버리지 70%+","where":["ai-service/tests/","demo/qt-d-flow.md","coverage.xml"],"what":"시연 질문 흐름에서 프롬프트 가드레일이 무너지지 않는지 확인한다.","sim":"regression"},"devc-W5-0":{"date":"6/15~6/17","task":"AI 응답 지연/장애 fallback 준비","result":"백업 응답 샘플과 로그 준비","where":["ai-service/logs/","demo/ai-response-samples.md","GitHub release notes"],"what":"시연 직전 SSE, RAG, API key, prompt 응답 샘플을 한 번 더 확인한다.","sim":"demo"}};
+const SIM_PRESETS={"default":{"cmd":"$ run verification","lines":[["검증 명령 실행 완료","sg"],["PR에 결과 로그 첨부 가능","sg"]]},"rag-seed":{"cmd":"$ python ai-service/scripts/rag_index.py --dry-run","lines":[["Chroma collection qtai_devotion size=5 이상","sg"],["JHN 3장 중심 공개 도메인 자료 적재 가능","sg"],["개역한글/ESV/NIV 금지 데이터 없음","sg"]]},"alembic":{"cmd":"$ alembic upgrade head","lines":[["AI_SESSIONS / AI_TURNS 생성 완료","sg"],["MySQL dialect 기준 DDL 확인","sg"]]},"sse":{"cmd":"$ curl -N /ai/sessions/1/turns","lines":[["event: token 수신","sg"],["첫 토큰 지연 로그 기록","sg"]]},"prompt":{"cmd":"$ pytest ai-service/tests/test_prompt_templates.py -q","lines":[["A~D STAGE_SYSTEM_PROMPTS 로드 성공","sg"],["공통 guardrail 포함","sg"]]},"session-create":{"cmd":"$ curl -i -X POST /ai/sessions","lines":[["HTTP/1.1 201 Created","sg"],["sessionId / currentStage=A 반환","sg"]]},"advance":{"cmd":"$ pytest ai-service/tests/test_session_flow.py -q","lines":[["A→B→C→D 전이 PASS","sg"],["역방향/건너뛰기 전이 차단","sg"]]},"pytest":{"cmd":"$ python -m pytest ai-service/tests -q","lines":[["세션 존재/소유권/SSE 기본 테스트 PASS","sg"]]},"gateway-sse":{"cmd":"$ curl -N http://localhost:8080/ai/sessions/1/turns","lines":[["Gateway 경유 SSE token chunk 수신","sg"],["NoBufferingFilter 적용 확인","sg"]]},"w1gate":{"cmd":"$ bash scripts/check-ai-w1.sh","lines":[["POST /ai/sessions OK","sg"],["SSE 첫 토큰 OK","sg"],["RAG context ≥ 1 OK","sg"]]},"guardrail":{"cmd":"$ pytest ai-service/tests/test_guardrail.py -q","lines":[["이단/비성경적 유도 문구 방어 PASS","sg"]]},"templates":{"cmd":"$ curl -i /ai/prompt-templates","lines":[["HTTP/1.1 200 OK","sg"],["Bible Service 직접 DB 접근 없음","sg"]]},"coverage":{"cmd":"$ pytest --cov=app","lines":[["coverage >= 60%","sg"],["term-missing 리포트 첨부 가능","sg"]]},"kafka":{"cmd":"$ pytest ai-service/tests/test_ai_completed_event.py -q","lines":[["eventType=ai.session.completed","sg"],["payload 금지, data 사용 확인","sg"],["idempotencyKey 포함","sg"]]},"regression":{"cmd":"$ pytest ai-service/tests --cov=app","lines":[["coverage >= 70%","sg"],["prompt injection regression PASS","sg"]]},"demo":{"cmd":"$ curl -N /ai/sessions/1/turns","lines":[["시연 응답 샘플 준비","sg"],["fallback 문구와 로그 위치 공유 가능","sg"]]}};
 function copyCode(btn){const pre=btn.closest('pre');const clone=pre.cloneNode(true);const b=clone.querySelector('button');if(b)b.remove();navigator.clipboard.writeText(clone.textContent.trim());btn.textContent='복사됨';btn.classList.add('ok');setTimeout(()=>{btn.textContent='복사';btn.classList.remove('ok')},1200)}
 function g(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'})}
 function togglePanel(id){const el=document.getElementById(id);const chev=document.getElementById('chev-'+id);const open=el.classList.toggle('show');if(chev)chev.classList.toggle('open',open)}

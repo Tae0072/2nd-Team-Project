@@ -131,3 +131,32 @@ Content-Type: application/problem+json
 | **개역개정** | ❌ **사용 금지** |
 | **ESV / NIV** | ❌ **사용 금지** |
 | 한글 주석 / 신학 논문 | ❌ 더미 데이터로 대체 |
+
+## workspaces 폴더 격리 규칙 (§13)
+
+각 팀원은 ``workspaces/{본인명}/`` 폴더에서만 읽기·쓰기가 허용됩니다.
+
+| 팀원 | 개인 폴더 |
+| --- | --- |
+| Lead 강태오 | ``workspaces/Lead_강태오/`` |
+| DevA 이지윤 | ``workspaces/DevA_이지윤/`` |
+| DevB 김태혁 | ``workspaces/DevB_김태혁/`` |
+| DevC 강상민 | ``workspaces/DevC_강상민/`` |
+| DevD 이승욱 | ``workspaces/DevD_이승욱/`` |
+| DevE 김지민 | ``workspaces/DevE_김지민/`` |
+
+### 필수 규칙
+
+1. **타인 폴더 접근 금지** — 다른 팀원의 개인 폴더는 읽기·수정·삭제 모두 금지. AI 에이전트도 동일.
+2. **프로젝트 영향 금지** — ``workspaces/`` 내부 파일은 빌드·런타임·테스트·CI에 영향 0. import 대상 아님.
+3. **워크플로우 → 리포트 워크플로우** — 모든 작업은 ``workflows/{date}-{task}.md`` 작성 → 자기 검토 → 작업 → ``reports/{date}-{task}.md`` 작성 순서.
+4. **PR 교차 금지** — 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject.
+5. **템플릿 공유** — ``_template.md``는 수정 금지 (공통 양식). 변경 필요 시 Lead에게 제안.
+
+### 워크플로우/리포트 의무
+
+- 모든 day 카드에 표시된 작업 (실행 가이드 HTML 기준) 시작 전 ``workflows/`` 작성.
+- 작업 종료 직후 ``reports/`` 작성 — 다음 작업 이전에 반드시.
+- 1 워크플로우 = 1 리포트 (동일 이름)
+
+세부 내용: ``workspaces/README.md`` 참조.

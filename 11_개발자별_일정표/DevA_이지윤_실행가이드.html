@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -151,6 +151,65 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 .verify-list li::before{content:'⚠️';flex-shrink:0;font-size:11px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+
+/* ===== Spec Panel (자기완결성 명세 S5) ===== */
+.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
+.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
+.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
+.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
+.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
+.spec-panel summary.spec-sum:hover{background:var(--bg3)}
+.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
+.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
+.spec-panel[open]{background:var(--bg)}
+.spec-panel > *:not(summary){padding:0 18px 14px}
+.spec-panel pre{margin-top:6px}
+
+/* ===== Workflow/Report Section (S6) ===== */
+.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
+.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
+.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
+.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
+.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
+.wr-flow .arrow{color:var(--t2);font-weight:700}
+.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
+.folder-rule strong{color:var(--lead)}
+@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
+
+
+/* ===== 사용 규칙 박스 (S0) ===== */
+.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
+.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
+.rules-box ol li{color:var(--text);font-size:13.5px}
+.rules-box ol li strong{color:var(--blue)}
+
+/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
+.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
+.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
+.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
+.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
+@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
+
+/* ===== 원문 문서 매트릭스 (S7) ===== */
+.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
+.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
+.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
+.ref-matrix tr:hover td{background:var(--bg3)}
+
+
+/* ===== DoD 박스 (day 카드 하단) ===== */
+.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
+.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
+.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
+.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
+.dod-item label{cursor:pointer;flex:1;line-height:1.5}
+.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
+
 </style>
 </head>
 <body>
@@ -168,7 +227,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
     <button class="wnav" onclick="g('W2')">W2</button>
     <button class="wnav" onclick="g('W3')">W3</button>
     <button class="wnav" onclick="g('W4')">W4</button>
-    <button class="wnav" onclick="g('W5')">W5</button>
+    <button class="wnav" onclick="g('W5')">W5</button><button class="wnav" onclick="g('s5')" style="background:rgba(83,155,245,.15);border-color:var(--blue);color:var(--blue);font-weight:700">📋 명세</button><button class="wnav" onclick="g('s6')" style="background:rgba(87,171,90,.15);border-color:var(--green);color:var(--green);font-weight:700">📊 워크플로우</button><button class="wnav" onclick="g('s7')" style="background:rgba(224,130,61,.15);border-color:var(--orange);color:var(--orange);font-weight:700">📚 참조</button>
   </div>
 </div>
 </div>
@@ -176,6 +235,70 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 
 <div class="wrap">
 
+<!-- S0a: USAGE RULES (헤더 직후, 항상 펼쳐짐) -->
+<div class="rules-box">
+  <h2>📜 이 문서만 보고 작업하는 규칙</h2>
+  <ol>
+    <li>매일 <strong>본인 W1~W5 카드</strong>만 먼저 펼쳐서 오늘 할 일을 파악합니다.</li>
+    <li>작업 브랜치는 <code>feature/auth-{task-slug}</code> 형식 (예: <code>feature/auth-login</code>).</li>
+    <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
+    <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
+    <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
+    <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
+    <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
+  </ol>
+</div>
+
+<!-- S0b: SETUP COMMANDS (토글) -->
+<details class="spec-panel">
+  <summary class="spec-sum">
+    <span class="spec-num" style="background:var(--green)">🔧</span>
+    <span class="spec-title">환경 셋업 빠른 명령어 — 처음 시작 시 1회 실행</span>
+  </summary>
+  <div class="setup-box">
+    <div class="setup-grid">
+      <div class="setup-card">
+        <h4>1. 저장소 클론 + 브랜치</h4>
+        <pre>git clone git@github.com:Tae0072/2nd-Team-Project.git
+cd 2nd-Team-Project
+
+git checkout develop
+git pull origin develop
+
+# 작업 브랜치 생성
+git checkout -b feature/auth-login</pre>
+      </div>
+      <div class="setup-card">
+        <h4>2. 환경 검증</h4>
+        <pre>java -version    # Java 21 (Temurin)
+docker --version # Docker 4.x
+minikube status  # Running
+kubectl config set-context --current --namespace=qtai
+
+# 본인 서비스 빌드 검증
+./gradlew :auth-service:build</pre>
+      </div>
+      <div class="setup-card">
+        <h4>3. 데이터베이스 기동</h4>
+        <pre># Helm으로 DB 인프라 일괄 기동
+cd helm
+helm install qtai-infra ./qtai-infra -n qtai
+
+# 헬스체크
+kubectl get pods -n qtai
+kubectl logs -f deployment/{service-name} -n qtai</pre>
+      </div>
+      <div class="setup-card">
+        <h4>4. 본인 역할 추가 도구</h4>
+        <pre># Auth는 별도 추가 도구 없음
+
+# 본인 서비스 테스트 명령
+./gradlew :auth-service:test</pre>
+      </div>
+    </div>
+    <div class="callout warn mt12">⚠️ 자세한 셋업은 <code>11_개발_환경_셋업_가이드.md</code> 참조. 실패 시 <code>10_트러블슈팅_FAQ.md</code> §1~§3 우선 확인.</div>
+  </div>
+</details>
 <!-- S0: ROLE -->
 <div class="sec" id="s0">
   <div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div>
@@ -201,10 +324,10 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
   <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div>
   <div class="callout warn">⚠️ 아래 경로는 이지윤 전담. 수정 시 강태오(Lead)를 Reviewer 지정. JWT 관련 변경은 Gateway AuthFilter에 영향 — 반드시 사전 공지.</div>
   <div class="own-tree mt12">
-    <div class="own-item"><div class="own-path">auth-service/.../domain/user/entity/<br><span style="color:var(--t2);padding-left:12px">├── User.kt<br>├── RefreshToken.kt<br>└── OAuthLink.kt</span></div><div class="own-desc">User 도메인 엔티티 · Refresh 토큰 · OAuth 연결</div><span class="lock-tag">전담소유</span></div>
-    <div class="own-item"><div class="own-path">auth-service/.../usecase/<br><span style="color:var(--t2);padding-left:12px">├── LoginUseCase.kt<br>├── RegisterUseCase.kt<br>├── RefreshTokenUseCase.kt<br>└── OAuthUseCase.kt</span></div><div class="own-desc">인증 비즈니스 로직 전체 — @Transactional 필수</div><span class="lock-tag">전담소유</span></div>
-    <div class="own-item"><div class="own-path">auth-service/.../infrastructure/<br><span style="color:var(--t2);padding-left:12px">├── jwt/JwtProvider.kt<br>└── redis/RefreshTokenRepository.kt</span></div><div class="own-desc">JWT RS256 발급/검증 · Redis blacklist 연동 (강태오와 공동 설계)</div><span class="lock-tag">전담소유</span></div>
-    <div class="own-item"><div class="own-path">auth-service/.../api/AuthController.kt</div><div class="own-desc">인증 API 엔드포인트 전체</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">auth-service/.../domain/user/entity/<br><span style="color:var(--t2);padding-left:12px">├── User.java<br>├── RefreshToken.java<br>└── OAuthLink.java</span></div><div class="own-desc">User 도메인 엔티티 · Refresh 토큰 · OAuth 연결</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">auth-service/.../usecase/<br><span style="color:var(--t2);padding-left:12px">├── LoginUseCase.java<br>├── RegisterUseCase.java<br>├── RefreshTokenUseCase.java<br>└── OAuthUseCase.java</span></div><div class="own-desc">인증 비즈니스 로직 전체 — @Transactional 필수</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">auth-service/.../infrastructure/<br><span style="color:var(--t2);padding-left:12px">├── jwt/JwtProvider.java<br>└── redis/RefreshTokenRepository.java</span></div><div class="own-desc">JWT RS256 발급/검증 · Redis blacklist 연동 (강태오와 공동 설계)</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">auth-service/.../api/AuthController.java</div><div class="own-desc">인증 API 엔드포인트 전체</div><span class="lock-tag">전담소유</span></div>
     <div class="own-item"><div class="own-path">auth-service/src/main/resources/db/migration/V*.sql</div><div class="own-desc">Flyway 마이그레이션 파일 — 한번 적용 후 절대 수정 금지</div><span class="lock-tag">전담소유</span></div>
   </div>
 </div>
@@ -373,82 +496,667 @@ git push origin hotfix/auth-refresh-rotation
   <div id="ai-root" class="mt16"></div>
 </div>
 
+<!-- S5: SELF-CONTAINED SPEC — 자기완결성 명세 -->
+<div class="sec" id="s5">
+  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 다른 문서 참조 없이 작업 가능</div></div>
+  <div class="callout blue">ℹ️ 이 섹션은 04_API_명세서·02_ERD·events/schema·DECISIONS.md의 핵심 명세를 이식해 둔 것입니다. <strong>이 HTML만 보고 코드 작성 가능</strong>. 변경 사항이 있으면 04번 문서가 단일 진실 원천—그곳에 먼저 변경 후 이 섹션 동기화.</div>
+
+  <!-- 5.1 DTO -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.1</span><span class="spec-title">DTO 정의 — Java 21 records</span></summary>
+  <div class="callout warn mt8">⚠️ 모든 Request DTO에 <code>jakarta.validation</code> 어노테이션 필수. Spring Boot 3.x의 record 구조 사용.</div>
+  <pre>// auth-service/.../api/dto/AuthDtos.java
+package com.qtai.authservice.api.dto;
+
+import jakarta.validation.constraints.*;
+import java.time.LocalDateTime;
+
+public class AuthDtos {
+
+    // ── Request DTOs ──
+    public record LoginRequest(
+        @NotBlank @Email String email,
+        @NotBlank @Size(min = 8, max = 100) String password
+    ) {}
+
+    public record RegisterRequest(
+        @NotBlank @Email @Size(max = 255) String email,
+        @NotBlank @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$",
+            message = "영문+숫자+특수문자 포함 8자 이상"
+        )
+        String password,
+        @NotBlank @Size(min = 2, max = 50) String nickname
+    ) {}
+
+    public record RefreshRequest(
+        @NotBlank String refreshToken
+    ) {}
+
+    public record LogoutRequest(
+        @NotBlank String refreshToken
+    ) {}
+
+    public record OAuthGoogleRequest(
+        @NotBlank String idToken
+    ) {}
+
+    // ── Response DTOs ──
+    public record TokenResponse(
+        String accessToken,
+        String refreshToken,
+        long   expiresIn   // 생명—초 단위 (Access Token: 1800)
+    ) {}
+
+    public record UserResponse(
+        Long           id,
+        String         email,
+        String         nickname,
+        String         role,         // ROLE_USER
+        String         status,       // ACTIVE / SUSPENDED / DEACTIVATED
+        LocalDateTime  createdAt
+    ) {}
+
+    public record RefreshTokenDto(
+        String         jti,
+        String         token,
+        LocalDateTime  expiresAt
+    ) {}
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.2 ERROR ENUM -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.2</span><span class="spec-title">AuthError enum + 공통 에러 코드</span></summary>
+  <div class="callout warn mt8">⚠️ 04번 명세서 §2.6 표 권위. <code>BusinessException(AuthError.X)</code> 형태로 throw, 글로벌 핸들러가 ProblemDetail로 변환.</div>
+  <pre>// auth-service/.../common/error/AuthError.java
+package com.qtai.authservice.common.error;
+
+import org.springframework.http.HttpStatus;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum AuthError implements ErrorCode {
+    // ── Auth 전용 (04번 §2.6) ──
+    EMAIL_ALREADY_EXISTS    (HttpStatus.CONFLICT,     "EMAIL_ALREADY_EXISTS",     "이메일이 이미 사용 중입니다"),
+    INVALID_CREDENTIALS     (HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS",      "이메일 또는 비밀번호가 올바르지 않습니다"),
+    PASSWORD_TOO_WEAK       (HttpStatus.BAD_REQUEST,  "PASSWORD_TOO_WEAK",        "비밀번호 정책 미달"),
+    ACCOUNT_DEACTIVATED     (HttpStatus.UNAUTHORIZED, "ACCOUNT_DEACTIVATED",      "탈퇴된 계정입니다"),
+    REFRESH_TOKEN_EXPIRED   (HttpStatus.UNAUTHORIZED, "REFRESH_TOKEN_EXPIRED",    "Refresh 토큰 만료"),
+    REFRESH_TOKEN_REVOKED   (HttpStatus.UNAUTHORIZED, "REFRESH_TOKEN_REVOKED",    "Redis blacklist 차단"),
+    REFRESH_TOKEN_INVALID   (HttpStatus.UNAUTHORIZED, "REFRESH_TOKEN_INVALID",    "서명·구조 오류 또는 DB 미존재"),
+    REFRESH_TOKEN_NOT_FOUND (HttpStatus.UNAUTHORIZED, "REFRESH_TOKEN_INVALID",    "REFRESH_TOKEN_INVALID에 매핑"),
+    OAUTH_TOKEN_INVALID     (HttpStatus.UNAUTHORIZED, "OAUTH_TOKEN_INVALID",      "Google ID Token JWK 검증 실패"),
+    INVALID_GOOGLE_TOKEN    (HttpStatus.UNAUTHORIZED, "OAUTH_TOKEN_INVALID",      "OAUTH_TOKEN_INVALID에 매핑"),
+    OAUTH_PROVIDER_ERROR    (HttpStatus.BAD_GATEWAY,  "OAUTH_PROVIDER_ERROR",     "Google JWKS 서버 5xx"),
+    USER_NOT_FOUND          (HttpStatus.NOT_FOUND,    "USER_NOT_FOUND",           "사용자를 찾을 수 없습니다");
+
+    private final HttpStatus  httpStatus;
+    private final String      code;     // 04번 §2.6 표의 에러 코드 이름
+    private final String      message;
+}
+
+// auth-service/.../common/error/CommonError.java
+@Getter
+@RequiredArgsConstructor
+public enum CommonError implements ErrorCode {
+    VALIDATION_FAILED     (HttpStatus.BAD_REQUEST,           "VALIDATION_FAILED",     "검증 실패"),
+    UNAUTHORIZED          (HttpStatus.UNAUTHORIZED,          "UNAUTHORIZED",          "JWT 누락·만료"),
+    FORBIDDEN             (HttpStatus.FORBIDDEN,             "FORBIDDEN",             "권한 부족"),
+    RATE_LIMITED          (HttpStatus.TOO_MANY_REQUESTS,     "RATE_LIMITED",          "Rate limit 초과"),
+    INTERNAL_ERROR        (HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",        "알 수 없는 오류"),
+    UPSTREAM_UNAVAILABLE  (HttpStatus.SERVICE_UNAVAILABLE,   "UPSTREAM_UNAVAILABLE",  "Circuit Breaker OPEN");
+
+    private final HttpStatus httpStatus;
+    private final String     code;
+    private final String     message;
+}
+
+// 공통 인터페이스
+public interface ErrorCode {
+    HttpStatus getHttpStatus();
+    String     getCode();
+    String     getMessage();
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.3 GLOBAL EXCEPTION HANDLER + PROBLEMDETAIL -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.3</span><span class="spec-title">글로벌 익셉션 핸들러 + ProblemDetail (RFC 7807)</span></summary>
+  <div class="callout warn mt8">⚠️ 04번 §2.4 내용 그대로 구현. 모든 서비스 동일 패턴.</div>
+  <pre>// auth-service/.../common/exception/BusinessException.java
+@Getter
+public class BusinessException extends RuntimeException {
+    private final ErrorCode error;
+
+    public BusinessException(ErrorCode error) {
+        super(error.getMessage());
+        this.error = error;
+    }
+}
+
+// auth-service/.../common/exception/GlobalExceptionHandler.java
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+
+    // 도메인 에러 — 04번 §2.4 ProblemDetail
+    @ExceptionHandler(BusinessException.class)
+    public ProblemDetail handleBusinessException(BusinessException e, HttpServletRequest req) {
+        ErrorCode err = e.getError();
+        ProblemDetail pd = ProblemDetail.forStatus(err.getHttpStatus());
+        pd.setType(URI.create("https://api.qtai.app/errors/" + err.getCode().toLowerCase().replace('_', '-')));
+        pd.setTitle(err.getMessage());
+        pd.setDetail(err.getMessage());
+        pd.setInstance(URI.create(req.getRequestURI()));
+        pd.setProperty("code",      err.getCode());
+        pd.setProperty("traceId",   MDC.get("traceId"));
+        pd.setProperty("timestamp", Instant.now().toString());
+        return pd;
+    }
+
+    // Bean Validation 에러 — errors[] 배열 포함
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidation(MethodArgumentNotValidException e, HttpServletRequest req) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Validation failed");
+        pd.setProperty("code",    "VALIDATION_FAILED");
+        pd.setProperty("traceId", MDC.get("traceId"));
+        pd.setProperty("timestamp", Instant.now().toString());
+        pd.setProperty("errors",
+            e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> Map.of(
+                    "field",   fe.getField(),
+                    "code",    fe.getCode(),
+                    "message", fe.getDefaultMessage()
+                )).toList()
+        );
+        return pd;
+    }
+
+    // Circuit Breaker OPEN — 04번 §2.5 503 명시 매핑
+    @ExceptionHandler(CallNotPermittedException.class)
+    public ProblemDetail circuitBreakerOpen(CallNotPermittedException e) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.SERVICE_UNAVAILABLE);
+        pd.setProperty("code",    "UPSTREAM_UNAVAILABLE");
+        pd.setProperty("traceId", MDC.get("traceId"));
+        return pd;
+    }
+}
+
+// 응답 예시 — INVALID_CREDENTIALS
+HTTP/1.1 401 Unauthorized
+Content-Type: application/problem+json
+{
+  "type":      "https://api.qtai.app/errors/invalid-credentials",
+  "title":     "이메일 또는 비밀번호가 올바르지 않습니다",
+  "status":    401,
+  "instance":  "/auth/login",
+  "code":      "INVALID_CREDENTIALS",
+  "traceId":   "0af7651916cd43dd8448eb211c80319c",
+  "timestamp": "2026-05-26T14:30:00.123Z"
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.4 KAFKA 페이로드 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.4</span><span class="spec-title">Kafka 페이로드 스키마 — user.deactivated</span></summary>
+  <div class="callout warn mt8">⚠️ Auth Service가 발행하는 유일한 이벤트. <strong>events/schema/user.deactivated-value.json</strong>과 완전 동일. Apicurio Schema Registry에 등록 필수.</div>
+  <pre>// auth-service/.../infrastructure/kafka/event/UserDeactivatedEvent.java
+public record UserDeactivatedEvent(
+    String         eventId,
+    String         eventType,        // "user.deactivated"
+    int            eventVersion,     // 1
+    String         schemaSubject,    // "user.deactivated-value"
+    String         occurredAt,       // ISO 8601
+    String         traceId,
+    String         producerService,  // "auth-service"
+    String         idempotencyKey,   // "user.deactivated:{userId}"
+    Data           data
+) {
+    public record Data(
+        long   userId,
+        String deactivatedAt   // ISO 8601
+    ) {}
+
+    public static UserDeactivatedEvent of(long userId, LocalDateTime deactivatedAt) {
+        return new UserDeactivatedEvent(
+            UUID.randomUUID().toString(),
+            "user.deactivated",
+            1,
+            "user.deactivated-value",
+            Instant.now().toString(),
+            MDC.get("traceId"),
+            "auth-service",
+            "user.deactivated:" + userId,
+            new Data(userId, deactivatedAt.toString())
+        );
+    }
+}
+
+// 발행 예시 (DeactivateUseCase 내부)
+UserDeactivatedEvent event = UserDeactivatedEvent.of(userId, LocalDateTime.now());
+kafkaTemplate.send("user.deactivated", event.idempotencyKey(), event);<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.5 BASEENTITY 소스 복사 표준 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.5</span><span class="spec-title">BaseEntity 소스 복사 (ADR-0009)</span></summary>
+  <div class="callout warn mt8">⚠️ MSA 서비스 간 공유 라이브러리 금지. <strong>02_ERD.md §8 ADR-0009</strong>에 따라 각 서비스는 이 코드를 그대로 복사·보관.</div>
+  <pre>// auth-service/.../common/entity/BaseEntity.java
+@Getter
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity {
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
+}
+
+// Auditing 활성화 — main Application 클래스·별도 Config
+@Configuration
+@EnableJpaAuditing
+public class JpaAuditingConfig { }<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.6 USERS DDL 보완 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.6</span><span class="spec-title">USERS DDL 완성형 — status 컬럼 포함</span></summary>
+  <div class="callout red mt8">⚠️ 5/12 화 V1 SQL의 USERS 테이블에 <strong>02_ERD §2.2 status 컬럼이 누락</strong>. 여기 완성형 수록.</div>
+  <pre>-- V1__create_auth_tables.sql (완성형)
+CREATE TABLE USERS (
+    id              BIGINT       AUTO_INCREMENT PRIMARY KEY,
+    email           VARCHAR(255) NOT NULL UNIQUE,
+    password_hash   VARCHAR(255),
+    nickname        VARCHAR(50)  NOT NULL,
+    role            VARCHAR(20)  NOT NULL DEFAULT 'ROLE_USER',
+    status          VARCHAR(20)  NOT NULL DEFAULT 'ACTIVE',  -- ACTIVE / SUSPENDED / DEACTIVATED
+    is_deleted      BOOLEAN      NOT NULL DEFAULT FALSE,
+    deleted_at      DATETIME(6),
+    created_at      DATETIME(6)  NOT NULL,
+    updated_at      DATETIME(6)  NOT NULL,
+    INDEX idx_users_email_status (email, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE REFRESH_TOKENS (
+    id          BIGINT       AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT       NOT NULL,
+    token_hash  VARCHAR(255) NOT NULL,
+    jti         VARCHAR(100) NOT NULL UNIQUE,
+    expires_at  DATETIME(6)  NOT NULL,
+    revoked_at  DATETIME(6),
+    created_at  DATETIME(6)  NOT NULL,
+    INDEX idx_rt_jti     (jti),
+    INDEX idx_rt_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- V2__add_oauth_links.sql (5/28 목 수록)
+CREATE TABLE OAUTH_LINKS (
+    id          BIGINT       AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGINT       NOT NULL,
+    provider    VARCHAR(20)  NOT NULL,        -- 'GOOGLE'
+    provider_id VARCHAR(100) NOT NULL,        -- Google sub
+    created_at  DATETIME(6)  NOT NULL,
+    updated_at  DATETIME(6)  NOT NULL,
+    UNIQUE KEY uk_oauth_provider_id (provider, provider_id),
+    INDEX idx_oauth_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.7 REDIS KEY -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.7</span><span class="spec-title">Redis 키 표준 (DECISIONS.md)</span></summary>
+  <div class="callout mt8">Auth Service가 사용하는 Redis-WS(6380) 키 2개.</div>
+  <table class="tbl mt8"><thead><tr><th>키</th><th>용도</th><th>TTL</th><th>구조</th></tr></thead><tbody>
+    <tr><td><code>auth:refresh:revoked:{jti}</code></td><td>Refresh blacklist</td><td>Refresh 만료까지 (최대 14일)</td><td>String "1"</td></tr>
+    <tr><td><code>auth:refresh:rotating:{jti}</code></td><td>Rotation 분산 락</td><td>5초</td><td>String UUID (이중 Rotation 요청 방지)</td></tr>
+  </tbody></table></details>
+
+  </div>
+
+<!-- S6: WORKFLOW + REPORT -->
+<div class="sec" id="s6">
+  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
+  <div class="callout blue">ℹ️ 모든 day 카드 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서를 반드시 따릅니다. 개인 작업 폴더는 <code>workspaces/DevA_이지윤/</code> 입니다.</div>
+
+  <div class="wr-flow">
+    <span class="step">📝 workflows/{date}-{task}.md 작성</span>
+    <span class="arrow">→</span>
+    <span class="step">🔍 자기 검토 (체크리스트 ✓)</span>
+    <span class="arrow">→</span>
+    <span class="step">🚀 작업 진행</span>
+    <span class="arrow">→</span>
+    <span class="step">📊 reports/{date}-{task}.md 작성</span>
+  </div>
+
+  <div class="folder-rule">
+    <strong>🚫 폴더 격리 규칙 (AGENTS.md §13)</strong><br>
+    • 본인 폴더(<code>workspaces/DevA_이지윤/</code>)에서만 읽기·쓰기 허용<br>
+    • 다른 팀원의 개인 폴더는 <strong>읽기·수정·삭제 모두 금지</strong> (AI 에이전트 포함)<br>
+    • <code>workspaces/</code> 내 파일은 빌드·테스트·CI에 영향 없음 (import 금지)<br>
+    • 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject
+  </div>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.1</span><span class="spec-title">개인 작업 폴더 구조</span></summary>
+  <pre>workspaces/DevA_이지윤/                  ← 나만 접근
+├── README.md                         (폴더 사용법)
+├── workflows/                        (작업 시작 전 워크플로우)
+│   ├── _template.md                  (템플릿 — 복사해서 사용)
+│   ├── 20260513-jwt-provider.md      (예시)
+│   └── 20260514-refresh-rotation.md  (예시)
+├── reports/                          (작업 종료 후 리포트)
+│   ├── _template.md                  (템플릿)
+│   ├── 20260513-jwt-provider.md      (예시 — 워크플로우와 동일 이름)
+│   └── 20260514-refresh-rotation.md
+├── docs/                             (개인이 작성하는 문서·명세)
+└── notes/                            (메모·로그·스크린샷)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.2</span><span class="spec-title">워크플로우 양식 — workflows/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 시작 전 반드시 작성. 파일명은 <code>YYYYMMDD-{task-slug}.md</code> 형식. 리포트와 동일 이름 사용.</div>
+  <pre># 워크플로우 — [작업명]
+
+**작성자**: 이지윤 (DevA — Auth Service)
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜] (예: W1 5/13 수)
+**예상 소요시간**: ?시간
+**상태**: 📝 초안 / 🔍 검토 중 / ✅ 승인됨 / 🚀 실행 중 / 🎯 완료
+
+---
+
+## 1. 작업 목표
+(1개 문장으로 명확히)
+
+## 2. 변경 대상 파일
+- `auth-service/.../path/to/file.java` — 무엇을 어떻게
+
+## 3. 작업 단계 (TODO)
+1. [ ] ...
+2. [ ] ...
+
+## 4. 검증 기준 (Definition of Done)
+- [ ] 단위 테스트 통과
+- [ ] `./gradlew :auth-service:build` 성공
+- [ ] OpenAPI/Spectral lint 통과 (해당 시)
+- [ ] curl 결과 확인
+- [ ] PR 300줄 이내
+
+## 5. 의존성
+- 선행 작업: ...
+- 다른 개발자 작업: ...
+
+## 6. 리스크 / 의문점
+- ...
+
+## 7. 자기 검토 체크
+- [ ] AGENTS.md 금지 패턴 위반 없음
+- [ ] DECISIONS.md 기준 위반 없음
+- [ ] 04_API_명세서 정합 (해당 시)
+- [ ] events/schema 정합 (해당 시)
+- [ ] 다른 개발자의 workspaces/ 폴더 접근 없음
+
+---
+> ⚠️ 작업 시작 전 반드시 검토하고, 의문점이 남으면 보강한 후 진행하세요.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.3</span><span class="spec-title">리포트 양식 — reports/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 종료 직후 반드시 작성. 다음 작업 시작 전에 완료. 동일 워크플로우와 이름 맞추기.</div>
+  <pre># 리포트 — [작업명]
+
+**작성자**: 이지윤
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜]
+**소요 시간**: ?시간 (예상 대비 +/- ?)
+**상태**: ✅ 완료 / ⚠️ 부분 완료 / ❌ 실패
+
+**대응 워크플로우**: `workflows/[동일 파일명].md`
+
+---
+
+## 1. 결과 요약
+(1~2문장)
+
+## 2. 변경 사항
+- `path/to/file` — 실제 변경 내용 + 이유
+
+## 3. 검증 결과
+| 항목 | 결과 | 증거 |
+|------|------|------|
+| 단위 테스트 | ✅ | 로그/PR 링크 |
+| 빌드 | ✅ | ... |
+| Spectral | ✅/N·A | ... |
+| curl | ✅ | ... |
+
+## 4. 산출물
+- PR: #[번호]
+- 커밋: [SHA]
+- 스크린샷/로그: `notes/...`
+
+## 5. 워크플로우 대비 차이
+(계획과 다르게 진행된 부분과 그 이유)
+
+## 6. 미해결 항목 / 후속 조치
+- [ ] ...
+
+## 7. 회고
+- 잘 된 점:
+- 개선할 점:
+- 다음에 알아야 할 점:
+
+---
+> 📌 작업 완료 직후 작성하고, 다음 작업 워크플로우의 입력으로 활용.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.4</span><span class="spec-title">작업 세트 예시</span></summary>
+  <pre># 예: 5/13 JwtProvider 구현 작업 시작
+
+# 1. 워크플로우 작성
+cd workspaces/DevA_이지윤/workflows
+cp _template.md 20260513-jwt-provider.md
+notepad 20260513-jwt-provider.md   # 내용 채우기
+
+# 2. 검토 후 작업 진행
+cd ../../../
+notepad auth-service/src/main/java/.../JwtProvider.java
+
+# 3. 작업 완료 후 리포트
+cd workspaces/DevA_이지윤/reports
+cp _template.md 20260513-jwt-provider.md   # 워크플로우와 동일 이름
+notepad 20260513-jwt-provider.md   # 결과 작성<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  </div>
+<!-- S7: REFERENCE DOC MATRIX -->
+<div class="sec" id="s7">
+  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">원문 문서 필요 항목 매트릭스 — 언제 어떤 문서를 봐야 하는가</div></div>
+  <div class="callout blue">ℹ️ 이 실행 가이드는 자기완결성을 추구하지만, <strong>변경의 원천이 되는 결정·스키마는 반드시 원본 문서를 우선</strong>합니다. 아래 표에서 작업 유형 → 원본 문서를 매핑하여 빠르게 찾으세요.</div>
+
+  <div class="ref-matrix">
+    <table>
+      <thead>
+        <tr><th style="width:25%">작업 유형</th><th style="width:35%">원본 문서</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>API 계약 변경</strong><br>(엔드포인트·DTO·헤더·에러)</td>
+          <td><code>04_API_명세서.md</code><br><code>apis/{service}/openapi.yaml</code></td>
+          <td>OpenAPI 3.1 + Spectral lint가 단일 진실 원천. 가이드 S5는 스냅샷.</td>
+        </tr>
+        <tr>
+          <td><strong>DB 스키마 변경</strong><br>(컬럼·인덱스·관계)</td>
+          <td><code>02_ERD_문서.md</code><br>+ Flyway 마이그레이션</td>
+          <td>ERD에 ADR-0009 등 결정 근거 포함. DDL은 마이그레이션이 권위.</td>
+        </tr>
+        <tr>
+          <td><strong>Kafka 이벤트 변경</strong><br>(payload·topic·key)</td>
+          <td><code>events/schema/*.json</code><br>+ Apicurio Schema Registry</td>
+          <td>JSON Schema 8개 파일이 envelope·data 표준. <code>data</code> 키 (not <code>payload</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처 흐름</strong><br>(Saga·OICD·인증 플로우)</td>
+          <td><code>03_아키텍처_정의서.md</code></td>
+          <td>시퀀스 다이어그램·CQRS·Outbox 패턴 결정 근거.</td>
+        </tr>
+        <tr>
+          <td><strong>보안 정책</strong><br>(JWT·Rate limit·CORS)</td>
+          <td><code>05_보안_명세서.md</code></td>
+          <td>JWT RS256 키·OAuth scope·rate limit 임계값.</td>
+        </tr>
+        <tr>
+          <td><strong>K8s·Docker·Helm</strong><br>(매니페스트·ConfigMap)</td>
+          <td><code>06_DevOps_운영_매뉴얼.md</code><br><code>helm/qtai-infra/</code></td>
+          <td>네임스페이스·Secret·헬스체크 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>테스트 작성</strong><br>(단위·통합·E2E)</td>
+          <td><code>07_테스트_전략.md</code><br><code>16_API_통합_테스트_가이드.md</code></td>
+          <td>커버리지 기준·Testcontainers·Prism mock 사용법.</td>
+        </tr>
+        <tr>
+          <td><strong>Flutter 앱 가이드</strong></td>
+          <td><code>08_프론트엔드_Flutter_가이드.md</code></td>
+          <td>위젯 트리·상태관리·라우팅 표준.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 프롬프트 변경</strong></td>
+          <td><code>09_AI_프롬프트_운영_가이드.md</code></td>
+          <td>OICD 단계별 프롬프트·golden-set·injection-set.</td>
+        </tr>
+        <tr>
+          <td><strong>빌드·실행 오류</strong></td>
+          <td><code>10_트러블슈팅_FAQ.md</code></td>
+          <td>의존성 충돌·포트 충돌·Minikube 메모리 부족 등.</td>
+        </tr>
+        <tr>
+          <td><strong>최초 환경 설정</strong></td>
+          <td><code>11_개발_환경_셋업_가이드.md</code></td>
+          <td>역할별 추가 설치·.env·JWT 키 생성·DB 시드.</td>
+        </tr>
+        <tr>
+          <td><strong>도메인 모델·패키지 구조</strong></td>
+          <td><code>12_서비스별_도메인_모델_상세.md</code></td>
+          <td>Clean Architecture 계층·UseCase 패턴·예외 계층.</td>
+        </tr>
+        <tr>
+          <td><strong>Git 브랜치·PR 규칙</strong></td>
+          <td><code>14_팀_협업_규칙_Git_브랜치_전략.md</code></td>
+          <td>커밋 메시지·코드 리뷰 기준·머지 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>서비스별 W1~W5 체크리스트</strong></td>
+          <td><code>15_서비스별_구현_체크리스트.md</code></td>
+          <td>본인 day 카드 DoD가 부족할 때 더 상세한 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>데이터 시드·마이그레이션</strong></td>
+          <td><code>17_데이터_시드_마이그레이션_전략.md</code></td>
+          <td>Bible 66권·prompt template·user 시드 데이터.</td>
+        </tr>
+        <tr>
+          <td><strong>코드 품질 게이트</strong></td>
+          <td><code>18_코드_품질_게이트.md</code></td>
+          <td>SonarQube·커버리지·정적 분석 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처·기술 스택 결정 근거</strong></td>
+          <td><code>DECISIONS.md</code> ⭐</td>
+          <td><strong>단일 진실 원천</strong>. MySQL/MSA/Kafka KRaft 등 모든 결정 이유.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 에이전트 규칙·금지 패턴</strong></td>
+          <td><code>AGENTS.md</code></td>
+          <td>금지 패턴·workspaces 폴더 격리(§13)·코드 작성 가이드.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn mt16">
+    ⚠️ <strong>변경 우선순위:</strong> 원본 문서 → 코드 → 가이드 HTML 순으로 갱신합니다. 가이드 S5/S6의 스냅샷이 원본과 다르면 <strong>원본이 우선</strong>이며, Lead에게 가이드 갱신을 요청하세요.
+  </div>
+</div>
+
 </div>
 <script>
 var B = {infra:'인프라',code:'코드',obs:'관측성',review:'리뷰',gate:'게이트',test:'테스트',demo:'시연'};
 
+function dodFallback(badge) {
+  var common = ['단위 테스트 추가/통과', '본인 서비스 빌드 성공', 'PR draft 등록', 'workspaces/{본인}/reports/ 리포트 작성'];
+  switch(badge) {
+    case 'infra': return ['인프라 정상 기동 (kubectl get pods)', '헬스체크 200 OK', '.env / Secret 적용 검증', 'reports/ 리포트 작성'];
+    case 'code': return common;
+    case 'obs': return ['로그 출력 확인 (INFO+ 누락 없음)', 'Prometheus 메트릭 노출', 'Jaeger trace 수집 확인', 'PR draft 등록'];
+    case 'review': return ['PR 코멘트 모두 반영', '추가 테스트 케이스', 'develop conflict 해결', '리뷰어 재요청'];
+    case 'gate': return ['통합 테스트 통과 (16번)', '커버리지 80%+', 'Spectral lint 통과', 'Sonar 품질 게이트 통과'];
+    case 'test': return ['golden-set 시나리오 통과', 'injection-set 보안 테스트', '커버리지 80%+', 'PR draft 등록'];
+    case 'demo': return ['시연 시나리오 통과 (13번)', '스크린샷·녹화 확보', 'workspaces/{본인}/notes/ 저장', '발표 슬라이드 반영'];
+    default: return common;
+  }
+}
+
+
 // ── W1 DATA ──
 var W1 = [
-  {date:'5/12 월',badge:'infra',
+  {date:'5/12 화',badge:'infra',dod:['auth-service 4개 모듈 디렉토리 생성 (api·application·domain·infrastructure)','V1__create_auth_tables.sql 작성 (USERS·REFRESH_TOKENS·OAUTH_LINKS)','./gradlew :auth-service:flywayMigrate 성공 (BUILD SUCCESSFUL)','mysql -e 'SHOW TABLES' → 3개 테이블 출력 확인','workspaces/DevA_이지윤/reports/ 리포트 작성'],
    m:'킥오프 참석. git pull. 환경 확인',
    a:'auth-service/ 패키지 구조 생성. Flyway V1 SQL',
    e:'User 엔티티 기본 필드 작성',
-   where:['auth-service/src/main/kotlin/com/qtai/authservice/domain/user/entity/User.kt','auth-service/src/main/resources/db/migration/V1__create_auth_tables.sql','auth-service/src/main/kotlin/com/qtai/authservice/'],
+   where:['auth-service/src/main/java/com/qtai/authservice/domain/user/entity/User.java','auth-service/src/main/resources/db/migration/V1__create_auth_tables.sql','auth-service/src/main/java/com/qtai/authservice/'],
    what:'auth-service/ <strong>패키지 구조 전체 생성</strong> + Flyway V1 SQL — USERS · REFRESH_TOKENS · OAUTH_LINKS 3개 테이블 DDL',
    how:'-- V1__create_auth_tables.sql\nCREATE TABLE USERS (\n    id          BIGINT AUTO_INCREMENT PRIMARY KEY,\n    email       VARCHAR(255) NOT NULL UNIQUE,\n    password_hash VARCHAR(255),\n    nickname    VARCHAR(50) NOT NULL,\n    role        VARCHAR(20) NOT NULL DEFAULT \'ROLE_USER\',\n    is_deleted  BOOLEAN NOT NULL DEFAULT FALSE,\n    deleted_at  DATETIME(6),\n    created_at  DATETIME(6) NOT NULL,\n    updated_at  DATETIME(6) NOT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n\nCREATE TABLE REFRESH_TOKENS (\n    id          BIGINT AUTO_INCREMENT PRIMARY KEY,\n    user_id     BIGINT NOT NULL,\n    token_hash  VARCHAR(255) NOT NULL,\n    jti         VARCHAR(100) NOT NULL UNIQUE,\n    expires_at  DATETIME(6) NOT NULL,\n    revoked_at  DATETIME(6),\n    created_at  DATETIME(6) NOT NULL,\n    INDEX idx_rt_jti (jti),\n    INDEX idx_rt_user_id (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;\n\n# Flyway 마이그레이션 실행 확인\n./gradlew :auth-service:flywayMigrate\n# 기대: Successfully applied 1 migration to schema',
    sim:'flyway'},
 
-  {date:'5/13 화',badge:'code',
+  {date:'5/13 수',badge:'code',dod:['LoginUseCase 구현 + bcrypt(cost=12) 검증 통과','JwtProvider RS256 서명 + RSA-2048 키쌍 사용 확인','Access 1800s / Refresh 1209600s TTL 적용 (DECISIONS.md §2)','코드에 ANTHROPIC_API_KEY 등 시크릿 노출 0건','PR draft 등록 + reports/ 리포트 작성'],
    m:'Stand-up. LoginUseCase 골격 구현',
    a:'bcrypt(strength=12) 비밀번호 인코딩 + LoginUseCase 완성',
-   e:'JwtProvider.kt — RS256 키쌍 생성',
-   where:['auth-service/.../usecase/LoginUseCase.kt','auth-service/.../infrastructure/jwt/JwtProvider.kt'],
+   e:'JwtProvider.java — RS256 키쌍 생성',
+   where:['auth-service/.../usecase/LoginUseCase.java','auth-service/.../infrastructure/jwt/JwtProvider.java'],
    what:'① LoginUseCase — bcrypt 검증 + JWT Access/Refresh 발급<br>② JwtProvider — RSA-2048 키쌍 생성, RS256 서명<br>③ 토큰 정책: Access 1800s(30분) / Refresh 1209600s(14일) — DECISIONS.md §2 기준',
-   how:'// JwtProvider.kt\n@Component\nclass JwtProvider(\n    @Value("\${JWT_PRIVATE_KEY_PATH}") privateKeyPath: String,\n    @Value("\${JWT_PUBLIC_KEY_PATH}") publicKeyPath: String\n) {\n    private val privateKey: RSAPrivateKey = loadPrivateKey(privateKeyPath)\n    private val publicKey: RSAPublicKey  = loadPublicKey(publicKeyPath)\n\n    fun generateAccess(userId: Long, role: String): String =\n        JWT.create()\n            .withIssuer("qtai-auth")\n            .withSubject(userId.toString())\n            .withClaim("scope", role)\n            .withIssuedAt(Date())\n            .withExpiresAt(Date(System.currentTimeMillis() + 1_800_000L)) // 30분\n            .withJWTId("tok_" + ULID.random())\n            .sign(Algorithm.RSA256(publicKey, privateKey))\n\n    fun generateRefresh(userId: Long): RefreshTokenDto =\n        RefreshTokenDto(\n            jti = "ref_" + ULID.random(),\n            token = JWT.create()...\n                .withExpiresAt(Date(System.currentTimeMillis() + 1_209_600_000L)) // 14일\n                .sign(Algorithm.RSA256(publicKey, privateKey)),\n            expiresAt = LocalDateTime.now().plusDays(14)\n        )\n\n    fun validateAndGetUserId(token: String): Long {\n        val decoded = JWT.require(Algorithm.RSA256(publicKey, null))\n            .withIssuer("qtai-auth").build().verify(token)\n        return decoded.subject.toLong()\n    }\n}',
+   how:'// JwtProvider.java\n@Component\n@RequiredArgsConstructor\npublic class JwtProvider {\n\n    @Value("\${JWT_PRIVATE_KEY_PATH}")\n    private String privateKeyPath;\n    @Value("\${JWT_PUBLIC_KEY_PATH}")\n    private String publicKeyPath;\n\n    private RSAPrivateKey privateKey;\n    private RSAPublicKey publicKey;\n\n    @PostConstruct\n    public void init() {\n        this.privateKey = loadPrivateKey(privateKeyPath);\n        this.publicKey  = loadPublicKey(publicKeyPath);\n    }\n\n    public String generateAccess(Long userId, String role) {\n        return JWT.create()\n            .withIssuer("qtai-auth")\n            .withSubject(userId.toString())\n            .withClaim("scope", role)\n            .withIssuedAt(new Date())\n            .withExpiresAt(new Date(System.currentTimeMillis() + 1_800_000L)) // 30분\n            .withJWTId("tok_" + UlidCreator.getUlid().toString())\n            .sign(Algorithm.RSA256(publicKey, privateKey));\n    }\n\n    public RefreshTokenDto generateRefresh(Long userId) {\n        String jti = "ref_" + UlidCreator.getUlid().toString();\n        String token = JWT.create()\n            .withIssuer("qtai-auth")\n            .withSubject(userId.toString())\n            .withJWTId(jti)\n            .withExpiresAt(new Date(System.currentTimeMillis() + 1_209_600_000L)) // 14일\n            .sign(Algorithm.RSA256(publicKey, privateKey));\n        return new RefreshTokenDto(jti, token, LocalDateTime.now().plusDays(14));\n    }\n\n    public Long validateAndGetUserId(String token) {\n        DecodedJWT decoded = JWT.require(Algorithm.RSA256(publicKey, null))\n            .withIssuer("qtai-auth").build().verify(token);\n        return Long.parseLong(decoded.getSubject());\n    }\n}',
    sim:'jwtgen'},
 
-  {date:'5/14 수',badge:'code',
+  {date:'5/14 목',badge:'code',dod:['RegisterUseCase: 이메일 중복 검증 + bcrypt 해싱 + UserRepository.save','RefreshTokenUseCase: Rotation 정책 (기존 jti → Redis blacklist + 신규 발급)','Redis-WS 키 auth:refresh:revoked:{jti} TTL=만료까지 적용','단위 테스트 4개 이상 (성공 + 실패 케이스 포함)','PR draft 등록 + reports/ 리포트 작성'],
    m:'Stand-up. RegisterUseCase 구현',
    a:'이메일 중복 검증 + RegisterUseCase 완성',
    e:'RefreshTokenUseCase — Rotation 정책 구현',
-   where:['auth-service/.../usecase/RegisterUseCase.kt','auth-service/.../usecase/RefreshTokenUseCase.kt','auth-service/.../infrastructure/redis/RefreshTokenRepository.kt'],
+   where:['auth-service/.../usecase/RegisterUseCase.java','auth-service/.../usecase/RefreshTokenUseCase.java','auth-service/.../infrastructure/redis/RefreshTokenRepository.java'],
    what:'① RegisterUseCase — 이메일 중복 검증 + bcrypt 해싱 + 저장<br>② RefreshTokenUseCase — <strong>Rotation 정책</strong>: 기존 jti를 Redis blacklist에 등록 후 새 토큰 발급<br>③ RefreshTokenRepository — Redis-WS(auth:refresh:revoked:{jti}) TTL 설정',
-   how:'// RefreshTokenUseCase.kt\n@Service\n@Transactional\nclass RefreshTokenUseCase(\n    private val refreshTokenRepository: JpaRefreshTokenRepository,\n    private val redisBlacklist: RefreshTokenBlacklistRepository,\n    private val jwtProvider: JwtProvider\n) {\n    fun execute(oldRefreshToken: String): TokenResponse {\n        val decoded = jwtProvider.validateRefresh(oldRefreshToken)\n        val jti = decoded.id  // 기존 jti\n\n        // 1. blacklist에 이미 있으면 탈취 시도 — 즉시 거부\n        if (redisBlacklist.isRevoked(jti))\n            throw BusinessException(AuthError.REFRESH_TOKEN_REVOKED)\n\n        // 2. DB에서 해당 refresh 조회\n        val stored = refreshTokenRepository.findByJti(jti)\n            ?: throw BusinessException(AuthError.REFRESH_TOKEN_NOT_FOUND)\n\n        // 3. 기존 jti를 Redis blacklist에 등록 (TTL = 만료까지)\n        val ttl = Duration.between(LocalDateTime.now(), stored.expiresAt)\n        redisBlacklist.revoke(jti, ttl)\n\n        // 4. 새 토큰 발급 (Rotation)\n        val newAccess  = jwtProvider.generateAccess(stored.userId, stored.role)\n        val newRefresh = jwtProvider.generateRefresh(stored.userId)\n        refreshTokenRepository.save(newRefresh)\n\n        return TokenResponse(newAccess, newRefresh.token, expiresIn = 1800)\n    }\n}',
+   how:'// RefreshTokenUseCase.java\n@Service\n@RequiredArgsConstructor\n@Transactional\npublic class RefreshTokenUseCase {\n\n    private final JpaRefreshTokenRepository refreshTokenRepository;\n    private final RefreshTokenBlacklistRepository redisBlacklist;\n    private final JwtProvider jwtProvider;\n\n    public TokenResponse execute(String oldRefreshToken) {\n        DecodedJWT decoded = jwtProvider.validateRefresh(oldRefreshToken);\n        String jti = decoded.getId();  // 기존 jti\n\n        // 1. blacklist에 이미 있으면 탈취 시도 — 즉시 거부\n        if (redisBlacklist.isRevoked(jti)) {\n            throw new BusinessException(AuthError.REFRESH_TOKEN_REVOKED);\n        }\n\n        // 2. DB에서 해당 refresh 조회\n        RefreshToken stored = refreshTokenRepository.findByJti(jti)\n            .orElseThrow(() -> new BusinessException(AuthError.REFRESH_TOKEN_NOT_FOUND));\n\n        // 3. 기존 jti를 Redis blacklist에 등록 (TTL = 만료까지)\n        Duration ttl = Duration.between(LocalDateTime.now(), stored.getExpiresAt());\n        redisBlacklist.revoke(jti, ttl);\n\n        // 4. 새 토큰 발급 (Rotation)\n        String newAccess = jwtProvider.generateAccess(stored.getUserId(), stored.getRole());\n        RefreshTokenDto newRefresh = jwtProvider.generateRefresh(stored.getUserId());\n        refreshTokenRepository.save(newRefresh.toEntity());\n\n        return new TokenResponse(newAccess, newRefresh.getToken(), 1800);\n    }\n}',
    sim:'refresh'},
 
-  {date:'5/15 목',badge:'code',
+  {date:'5/15 금',badge:'code',dod:['AuthController 3개 endpoint (POST /auth/login, /register, /refresh)','ProblemDetail RFC 7807 형식 (application/problem+json) 적용','Redis blacklist 등록·조회 실연동 통과','curl로 /auth/login 200 OK + JWT 발급 확인','PR draft 등록'],
    m:'Stand-up. AuthController 3 엔드포인트 구현',
    a:'/auth/login, /auth/register, /auth/refresh',
    e:'Redis blacklist 연동 (RefreshTokenRepository)',
-   where:['auth-service/.../api/AuthController.kt','auth-service/.../infrastructure/redis/RefreshTokenBlacklistRepository.kt'],
+   where:['auth-service/.../api/AuthController.java','auth-service/.../infrastructure/redis/RefreshTokenBlacklistRepository.java'],
    what:'① AuthController — /auth/login · /auth/register · /auth/refresh POST 엔드포인트<br>② 에러 응답: RFC 7807 ProblemDetail 형식 (<code>application/problem+json</code>)<br>③ Redis-WS blacklist 연동 — <code>auth:refresh:revoked:{jti}</code>',
-   how:'// AuthController.kt\n@RestController\n@RequestMapping("/auth")\nclass AuthController(\n    private val loginUseCase: LoginUseCase,\n    private val registerUseCase: RegisterUseCase,\n    private val refreshTokenUseCase: RefreshTokenUseCase\n) {\n    @PostMapping("/login")\n    fun login(@RequestBody @Valid req: LoginRequest): ResponseEntity<TokenResponse> =\n        ResponseEntity.ok(loginUseCase.execute(req.email, req.password))\n\n    @PostMapping("/register")\n    fun register(@RequestBody @Valid req: RegisterRequest): ResponseEntity<UserResponse> =\n        ResponseEntity.status(HttpStatus.CREATED)\n            .body(registerUseCase.execute(req.email, req.password, req.nickname))\n\n    @PostMapping("/refresh")\n    fun refresh(@RequestBody req: RefreshRequest): ResponseEntity<TokenResponse> =\n        ResponseEntity.ok(refreshTokenUseCase.execute(req.refreshToken))\n}\n\n# 동작 확인\ncurl -X POST http://localhost:8081/auth/login \\\n  -H "Content-Type: application/json" \\\n  -d \'{"email":"test@qtai.app","password":"Test1234!"}\'\n# 기대: {"accessToken":"eyJ...","refreshToken":"eyJ...","expiresIn":1800}',
+   how:'// AuthController.java\n@RestController\n@RequestMapping("/auth")\n@RequiredArgsConstructor\npublic class AuthController {\n\n    private final LoginUseCase loginUseCase;\n    private final RegisterUseCase registerUseCase;\n    private final RefreshTokenUseCase refreshTokenUseCase;\n\n    @PostMapping("/login")\n    public ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest req) {\n        return ResponseEntity.ok(loginUseCase.execute(req.email(), req.password()));\n    }\n\n    @PostMapping("/register")\n    public ResponseEntity<UserResponse> register(@RequestBody @Valid RegisterRequest req) {\n        return ResponseEntity.status(HttpStatus.CREATED)\n            .body(registerUseCase.execute(req.email(), req.password(), req.nickname()));\n    }\n\n    @PostMapping("/refresh")\n    public ResponseEntity<TokenResponse> refresh(@RequestBody RefreshRequest req) {\n        return ResponseEntity.ok(refreshTokenUseCase.execute(req.refreshToken()));\n    }\n}\n\n# 동작 확인\ncurl -X POST http://localhost:8081/auth/login \\\n  -H "Content-Type: application/json" \\\n  -d \'{"email":"test@qtai.app","password":"Test1234!"}\'\n# 기대: {"accessToken":"eyJ...","refreshToken":"eyJ...","expiresIn":1800}',
    sim:'login'},
 
-  {date:'5/16 금',badge:'test',
+  {date:'5/16 금',badge:'test',dod:['LoginUseCase 단위 테스트 3 케이스 (성공·이메일없음·비밀번호불일치)','RegisterUseCase 단위 테스트 2 케이스 (성공·이메일중복)','실패 케이스 1개 이상 포함 (성공만 테스트 금지)','./gradlew :auth-service:test 통과 + 커버리지 70%+','PR draft 등록'],
    m:'Stand-up. 단위 테스트 작성',
    a:'LoginUseCase, RegisterUseCase Mockito 단위 테스트',
    e:'/auth/login curl 테스트 성공 확인',
-   where:['auth-service/src/test/.../usecase/LoginUseCaseTest.kt','auth-service/src/test/.../usecase/RegisterUseCaseTest.kt'],
+   where:['auth-service/src/test/.../usecase/LoginUseCaseTest.java','auth-service/src/test/.../usecase/RegisterUseCaseTest.java'],
    what:'① LoginUseCase 단위 테스트 — 성공 / 이메일 없음 / 비밀번호 불일치 3케이스<br>② RegisterUseCase 단위 테스트 — 성공 / 이메일 중복 2케이스<br>③ 실패 케이스 1개 이상 포함 강제 (성공만 테스트 금지)',
-   how:'// LoginUseCaseTest.kt\n@ExtendWith(MockitoExtension::class)\nclass LoginUseCaseTest {\n    @Mock private lateinit var userRepository: UserRepository\n    @Mock private lateinit var passwordEncoder: PasswordEncoder\n    @Mock private lateinit var jwtProvider: JwtProvider\n    @Mock private lateinit var refreshTokenRepository: JpaRefreshTokenRepository\n    @InjectMocks private lateinit var sut: LoginUseCase\n\n    @Test\n    fun `로그인 성공 - 유효한 이메일과 비밀번호`() {\n        val user = User(id=1L, email="test@qtai.app", passwordHash="hashed")\n        given(userRepository.findByEmail("test@qtai.app")).willReturn(user)\n        given(passwordEncoder.matches("Test1234!", "hashed")).willReturn(true)\n        given(jwtProvider.generateAccess(1L, "ROLE_USER")).willReturn("access_token")\n\n        val result = sut.execute("test@qtai.app", "Test1234!")\n\n        assertThat(result.accessToken).isEqualTo("access_token")\n    }\n\n    @Test\n    fun `로그인 실패 - 존재하지 않는 이메일`() {\n        given(userRepository.findByEmail(any())).willReturn(null)\n        assertThrows<BusinessException> { sut.execute("none@qtai.app", "pw") }\n    }\n\n    @Test\n    fun `로그인 실패 - 비밀번호 불일치`() {\n        val user = User(id=1L, email="test@qtai.app", passwordHash="hashed")\n        given(userRepository.findByEmail("test@qtai.app")).willReturn(user)\n        given(passwordEncoder.matches("wrong", "hashed")).willReturn(false)\n        assertThrows<BusinessException> { sut.execute("test@qtai.app", "wrong") }\n    }\n}\n\n# 테스트 실행\n./gradlew :auth-service:test',
+   how:'// LoginUseCaseTest.java\n@ExtendWith(MockitoExtension.class)\nclass LoginUseCaseTest {\n    @Mock private UserRepository userRepository;\n    @Mock private PasswordEncoder passwordEncoder;\n    @Mock private JwtProvider jwtProvider;\n    @Mock private JpaRefreshTokenRepository refreshTokenRepository;\n    @InjectMocks private LoginUseCase sut;\n\n    @Test\n    @DisplayName("로그인 성공 - 유효한 이메일과 비밀번호")\n    void loginSuccess() {\n        User user = User.builder().id(1L).email("test@qtai.app").passwordHash("hashed").build();\n        given(userRepository.findByEmail("test@qtai.app")).willReturn(Optional.of(user));\n        given(passwordEncoder.matches("Test1234!", "hashed")).willReturn(true);\n        given(jwtProvider.generateAccess(1L, "ROLE_USER")).willReturn("access_token");\n\n        TokenResponse result = sut.execute("test@qtai.app", "Test1234!");\n\n        assertThat(result.accessToken()).isEqualTo("access_token");\n    }\n\n    @Test\n    @DisplayName("로그인 실패 - 존재하지 않는 이메일")\n    void loginFailEmailNotFound() {\n        given(userRepository.findByEmail(any())).willReturn(Optional.empty());\n        assertThatThrownBy(() -> sut.execute("none@qtai.app", "pw"))\n            .isInstanceOf(BusinessException.class);\n    }\n\n    @Test\n    @DisplayName("로그인 실패 - 비밀번호 불일치")\n    void loginFailPasswordMismatch() {\n        User user = User.builder().id(1L).email("test@qtai.app").passwordHash("hashed").build();\n        given(userRepository.findByEmail("test@qtai.app")).willReturn(Optional.of(user));\n        given(passwordEncoder.matches("wrong", "hashed")).willReturn(false);\n        assertThatThrownBy(() -> sut.execute("test@qtai.app", "wrong"))\n            .isInstanceOf(BusinessException.class);\n    }\n}\n\n# 테스트 실행\n./gradlew :auth-service:test',
    sim:'unittest'},
 
-  {date:'5/19 월',badge:'code',
+  {date:'5/19 월',badge:'code',dod:['LogoutUseCase: Refresh jti → Redis blacklist 등록 (TTL=만료까지)','/auth/me GET: X-User-Id 헤더로 사용자 조회 정상','Access blacklist 없음 확인 (ADR-0012, 30분 단명)','curl로 POST /auth/logout + GET /auth/me 통과','PR draft 등록'],
    m:'Stand-up. /auth/logout 구현',
    a:'Redis blacklist 등록 + /auth/me GET',
    e:'/auth/logout curl 테스트',
-   where:['auth-service/.../usecase/LogoutUseCase.kt','auth-service/.../api/AuthController.kt (logout, me 추가)'],
+   where:['auth-service/.../usecase/LogoutUseCase.java','auth-service/.../api/AuthController.java (logout, me 추가)'],
    what:'① LogoutUseCase — Refresh jti를 Redis blacklist 등록 (TTL=만료까지)<br>② /auth/me GET — X-User-Id 헤더로 사용자 정보 조회 (Gateway가 주입한 헤더 신뢰)<br>③ Access blacklist 없음 — 30분 단명이므로 만료까지 유효 (ADR-0012)',
-   how:'// LogoutUseCase.kt\n@Service\nclass LogoutUseCase(\n    private val refreshTokenRepository: JpaRefreshTokenRepository,\n    private val redisBlacklist: RefreshTokenBlacklistRepository\n) {\n    fun execute(refreshToken: String) {\n        val jti = jwtProvider.getJti(refreshToken)\n        val stored = refreshTokenRepository.findByJti(jti) ?: return\n\n        val ttl = Duration.between(LocalDateTime.now(), stored.expiresAt)\n        redisBlacklist.revoke(jti, ttl)  // auth:refresh:revoked:{jti}\n        refreshTokenRepository.delete(stored)\n    }\n}\n\n// AuthController.kt - logout, me 추가\n@PostMapping("/logout")\nfun logout(@RequestBody req: LogoutRequest): ResponseEntity<Void> {\n    logoutUseCase.execute(req.refreshToken)\n    return ResponseEntity.noContent().build()\n}\n\n@GetMapping("/me")\nfun me(@RequestHeader("X-User-Id") userId: Long): ResponseEntity<UserResponse> =\n    ResponseEntity.ok(getUserUseCase.execute(userId))\n\n# 테스트\ncurl -X POST http://localhost:8081/auth/logout \\\n  -H "Content-Type: application/json" \\\n  -d \'{"refreshToken":"eyJ..."}\'\n# 기대: 204 No Content',
+   how:'// LogoutUseCase.java\n@Service\n@RequiredArgsConstructor\npublic class LogoutUseCase {\n\n    private final JpaRefreshTokenRepository refreshTokenRepository;\n    private final RefreshTokenBlacklistRepository redisBlacklist;\n    private final JwtProvider jwtProvider;\n\n    public void execute(String refreshToken) {\n        String jti = jwtProvider.getJti(refreshToken);\n        RefreshToken stored = refreshTokenRepository.findByJti(jti).orElse(null);\n        if (stored == null) return;\n\n        Duration ttl = Duration.between(LocalDateTime.now(), stored.getExpiresAt());\n        redisBlacklist.revoke(jti, ttl);  // auth:refresh:revoked:{jti}\n        refreshTokenRepository.delete(stored);\n    }\n}\n\n// AuthController.java - logout, me 추가\n@PostMapping("/logout")\npublic ResponseEntity<Void> logout(@RequestBody LogoutRequest req) {\n    logoutUseCase.execute(req.refreshToken());\n    return ResponseEntity.noContent().build();\n}\n\n@GetMapping("/me")\npublic ResponseEntity<UserResponse> me(@RequestHeader("X-User-Id") Long userId) {\n    return ResponseEntity.ok(getUserUseCase.execute(userId));\n}\n\n# 테스트\ncurl -X POST http://localhost:8081/auth/logout \\\n  -H "Content-Type: application/json" \\\n  -d \'{"refreshToken":"eyJ..."}\'\n# 기대: 204 No Content',
    sim:'logout'},
 
-  {date:'5/20 화',badge:'test',
+  {date:'5/20 화',badge:'test',dod:['AuthController @SpringBootTest 6개 endpoint 통합 테스트 작성','Gateway AuthFilter 연동 검증 (JWT → X-User-Id 헤더 주입)','Testcontainers MySQL + Redis 실제 연동','통합 테스트 6/6 통과 + 커버리지 80%+','PR draft 등록'],
    m:'Stand-up. AuthController @SpringBootTest',
    a:'전체 엔드포인트 통합 테스트',
    e:'Gateway AuthFilter 연동 테스트 (강태오 협력)',
-   where:['auth-service/src/test/.../api/AuthControllerTest.kt'],
+   where:['auth-service/src/test/.../api/AuthControllerTest.java'],
    what:'① AuthController 전체 @SpringBootTest + MockMvc — 6개 엔드포인트 통합 테스트<br>② Gateway AuthFilter 연동: curl로 JWT 발급 → Gateway에서 X-User-Id 주입 확인<br>③ Testcontainers MySQL + Redis 연동 (실제 DB 사용)',
-   how:'// AuthControllerTest.kt\n@SpringBootTest(webEnvironment = RANDOM_PORT)\n@Testcontainers\nclass AuthControllerTest {\n\n    @Container\n    companion object {\n        val mysql = MySQLContainer<Nothing>("mysql:8.0")\n            .apply { withDatabaseName("auth_db") }\n        val redis = GenericContainer<Nothing>("redis:7")\n            .apply { withExposedPorts(6379) }\n    }\n\n    @Autowired private lateinit var restTemplate: TestRestTemplate\n\n    @Test\n    fun `POST auth login - 성공`() {\n        // given\n        registerUser("test@qtai.app", "Test1234!")\n\n        // when\n        val response = restTemplate.postForEntity(\n            "/auth/login",\n            LoginRequest("test@qtai.app", "Test1234!"),\n            TokenResponse::class.java\n        )\n\n        // then\n        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)\n        assertThat(response.body?.accessToken).isNotBlank()\n        assertThat(response.body?.expiresIn).isEqualTo(1800)\n    }\n}\n\n# Gateway 연동 확인\nTOKEN=$(curl -s -X POST http://localhost:8081/auth/login \\\n  -d \'{"email":"test@qtai.app","password":"Test1234!"}\' | jq -r .accessToken)\ncurl -H "Authorization: Bearer $TOKEN" http://localhost:8080/auth/me\n# 기대: X-User-Id 헤더 주입 확인',
+   how:'// AuthControllerTest.java\n@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)\n@Testcontainers\nclass AuthControllerTest {\n\n    @Container\n    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")\n        .withDatabaseName("auth_db");\n\n    @Container\n    static GenericContainer<?> redis = new GenericContainer<>("redis:7")\n        .withExposedPorts(6379);\n\n    @Autowired\n    private TestRestTemplate restTemplate;\n\n    @Test\n    @DisplayName("POST /auth/login - 성공")\n    void loginSuccess() {\n        // given\n        registerUser("test@qtai.app", "Test1234!");\n\n        // when\n        ResponseEntity<TokenResponse> response = restTemplate.postForEntity(\n            "/auth/login",\n            new LoginRequest("test@qtai.app", "Test1234!"),\n            TokenResponse.class\n        );\n\n        // then\n        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);\n        assertThat(response.getBody().accessToken()).isNotBlank();\n        assertThat(response.getBody().expiresIn()).isEqualTo(1800);\n    }\n}\n\n# Gateway 연동 확인\nTOKEN=$(curl -s -X POST http://localhost:8081/auth/login \\\n  -d \'{"email":"test@qtai.app","password":"Test1234!"}\' | jq -r .accessToken)\ncurl -H "Authorization: Bearer $TOKEN" http://localhost:8080/auth/me\n# 기대: X-User-Id 헤더 주입 확인',
    sim:'springtest'},
 
-  {date:'5/21 수',badge:'code',
+  {date:'5/21 수',badge:'code',dod:['/auth/me/deactivate POST: soft delete + 이메일 마스킹 (u***@***.com)','탈퇴 후 같은 이메일로 재가입 가능 검증','@DataJpaTest로 UserRepository·RefreshTokenRepository 단위 테스트','W1 5/5 종료 기준 모두 충족 (login·refresh·me·flyway·test)','PR draft 등록 + reports/ 리포트 작성'],
    m:'Stand-up. /auth/me/deactivate 구현',
    a:'soft delete + 이메일 마스킹 (ADR-0010)',
    e:'@DataJpaTest Repository 테스트',
-   where:['auth-service/.../usecase/DeactivateUseCase.kt','auth-service/src/test/.../repository/UserRepositoryTest.kt'],
+   where:['auth-service/.../usecase/DeactivateUseCase.java','auth-service/src/test/.../repository/UserRepositoryTest.java'],
    what:'① /auth/me/deactivate POST — soft delete + 이메일 마스킹 (u***@***.com 형식)<br>② 탈퇴 후 같은 이메일로 재가입 시 마스킹 처리된 이메일과 충돌 없이 재가입 가능<br>③ @DataJpaTest — UserRepository, RefreshTokenRepository 단위 테스트',
-   how:'// DeactivateUseCase.kt\n@Service\n@Transactional\nclass DeactivateUseCase(\n    private val userRepository: UserRepository,\n    private val refreshTokenRepository: JpaRefreshTokenRepository\n) {\n    fun execute(userId: Long) {\n        val user = userRepository.findById(userId)\n            .orElseThrow { BusinessException(AuthError.USER_NOT_FOUND) }\n\n        // 이메일 마스킹: test@qtai.app → t***@***.com\n        val masked = maskEmail(user.email)\n        user.deactivate(maskedEmail = masked)\n        userRepository.save(user)\n\n        // Refresh 토큰 모두 무효화\n        refreshTokenRepository.revokeAllByUserId(userId)\n    }\n\n    private fun maskEmail(email: String): String {\n        val (local, domain) = email.split("@")\n        val maskedLocal = local.first() + "***"\n        val domainParts = domain.split(".")\n        val maskedDomain = "***." + domainParts.last()\n        return "$maskedLocal@$maskedDomain"\n    }\n}\n\n# 테스트\ncurl -X POST http://localhost:8081/auth/me/deactivate \\\n  -H "X-User-Id: 12345"\n# 기대: 204 No Content + USERS.is_deleted=true + email 마스킹',
+   how:'// DeactivateUseCase.java\n@Service\n@RequiredArgsConstructor\n@Transactional\npublic class DeactivateUseCase {\n\n    private final UserRepository userRepository;\n    private final JpaRefreshTokenRepository refreshTokenRepository;\n\n    public void execute(Long userId) {\n        User user = userRepository.findById(userId)\n            .orElseThrow(() -> new BusinessException(AuthError.USER_NOT_FOUND));\n\n        // 이메일 마스킹: test@qtai.app → t***@***.com\n        String masked = maskEmail(user.getEmail());\n        user.deactivate(masked);\n        userRepository.save(user);\n\n        // Refresh 토큰 모두 무효화\n        refreshTokenRepository.revokeAllByUserId(userId);\n    }\n\n    private String maskEmail(String email) {\n        String[] parts = email.split("@");\n        String local = parts[0];\n        String domain = parts[1];\n        String maskedLocal = local.charAt(0) + "***";\n        String[] domainParts = domain.split("\\\\.");\n        String maskedDomain = "***." + domainParts[domainParts.length - 1];\n        return maskedLocal + "@" + maskedDomain;\n    }\n}\n\n# 테스트\ncurl -X POST http://localhost:8081/auth/me/deactivate \\\n  -H "X-User-Id: 12345"\n# 기대: 204 No Content + USERS.is_deleted=true + email 마스킹',
    sim:'deactivate'},
 
   {date:'5/22 목',badge:'gate',
@@ -463,34 +1171,34 @@ var W1 = [
 
 // ── W2 DATA ──
 var W2 = [
-  {date:'5/26 화',badge:'code',
+  {date:'5/26 화',badge:'code',dod:['POST /auth/oauth/google endpoint 구현','GoogleIdTokenVerifier로 Flutter idToken JWK 검증','신규 사용자: USERS 자동 생성 + OAUTH_LINKS 연결','기존 사용자: OAUTH_LINKS 조회 후 JWT 발급','PR draft 등록'],
    m:'페이스 점검 (11:30). Google OAuth 준비',
    a:'POST /auth/oauth/google — idToken 수신 엔드포인트 구현',
    e:'Google JWK endpoint 연결 확인',
-   where:['auth-service/.../usecase/OAuthUseCase.kt','auth-service/.../api/AuthController.kt (oauth 추가)'],
+   where:['auth-service/.../usecase/OAuthUseCase.java','auth-service/.../api/AuthController.java (oauth 추가)'],
    what:'① POST /auth/oauth/google — Flutter에서 받은 Google idToken을 직접 JWK로 검증<br>② 신규 사용자: USERS 자동 생성 + OAUTH_LINKS 연결<br>③ 기존 사용자: OAUTH_LINKS 조회 후 JWT 발급',
-   how:'// OAuthUseCase.kt\n@Service\nclass OAuthUseCase(\n    private val googleOAuthVerifier: GoogleIdTokenVerifier,\n    private val userRepository: UserRepository,\n    private val jwtProvider: JwtProvider\n) {\n    @Transactional\n    fun execute(idToken: String): TokenResponse {\n        // Google JWK로 idToken 직접 검증\n        val payload = googleOAuthVerifier.verify(idToken)?.payload\n            ?: throw BusinessException(AuthError.INVALID_GOOGLE_TOKEN)\n\n        val googleId = payload.subject\n        val email    = payload["email"] as String\n\n        // 기존 계정 조회 or 신규 생성\n        val user = userRepository.findByOAuthGoogleId(googleId)\n            ?: userRepository.save(\n                User.createOAuth(email=email, googleId=googleId)\n            )\n\n        val access  = jwtProvider.generateAccess(user.id, user.role)\n        val refresh = jwtProvider.generateRefresh(user.id)\n        return TokenResponse(access, refresh.token, expiresIn = 1800)\n    }\n}\n\n# Google JWK Verifier 빈 등록\n@Bean\nfun googleIdTokenVerifier(): GoogleIdTokenVerifier =\n    GoogleIdTokenVerifier.Builder(\n        NetHttpTransport(), GsonFactory.getDefaultInstance()\n    ).setAudience(listOf(googleClientId)).build()',
+   how:'// OAuthUseCase.java\n@Service\n@RequiredArgsConstructor\npublic class OAuthUseCase {\n\n    private final GoogleIdTokenVerifier googleOAuthVerifier;\n    private final UserRepository userRepository;\n    private final JwtProvider jwtProvider;\n\n    @Transactional\n    public TokenResponse execute(String idToken) throws GeneralSecurityException, IOException {\n        // Google JWK로 idToken 직접 검증\n        GoogleIdToken token = googleOAuthVerifier.verify(idToken);\n        if (token == null) {\n            throw new BusinessException(AuthError.INVALID_GOOGLE_TOKEN);\n        }\n        Payload payload = token.getPayload();\n\n        String googleId = payload.getSubject();\n        String email    = (String) payload.get("email");\n\n        // 기존 계정 조회 or 신규 생성\n        User user = userRepository.findByOAuthGoogleId(googleId)\n            .orElseGet(() -> userRepository.save(\n                User.createOAuth(email, googleId)\n            ));\n\n        String access = jwtProvider.generateAccess(user.getId(), user.getRole());\n        RefreshTokenDto refresh = jwtProvider.generateRefresh(user.getId());\n        return new TokenResponse(access, refresh.getToken(), 1800);\n    }\n}\n\n# Google JWK Verifier 빈 등록\n@Bean\npublic GoogleIdTokenVerifier googleIdTokenVerifier() {\n    return new GoogleIdTokenVerifier.Builder(\n        new NetHttpTransport(), GsonFactory.getDefaultInstance()\n    ).setAudience(List.of(googleClientId)).build();\n}',
    sim:'oauth'},
 
-  {date:'5/27 수',badge:'code',
+  {date:'5/27 수',badge:'code',dod:['GoogleIdTokenVerifier 실제 Google JWK 엔드포인트 연결','OAuthUseCase 단위 테스트 — 신규/기존 사용자 2케이스','curl로 실제 Google idToken 검증 E2E 흐름 통과','발급된 JWT로 /auth/me 호출 200 OK','PR draft 등록'],
    m:'Stand-up. OAuth callback 완성',
    a:'JWK 검증 + JWT 발급 E2E 테스트',
    e:'OAuthLink 엔티티 연동 확인',
-   where:['auth-service/.../infrastructure/oauth/GoogleOAuthVerifier.kt','auth-service/src/test/.../usecase/OAuthUseCaseTest.kt'],
+   where:['auth-service/.../infrastructure/oauth/GoogleOAuthVerifier.java','auth-service/src/test/.../usecase/OAuthUseCaseTest.java'],
    what:'① GoogleIdTokenVerifier 실제 Google JWK 엔드포인트 연결 테스트<br>② OAuthUseCase 단위 테스트 — 신규 사용자 / 기존 사용자 2케이스<br>③ curl로 실제 Google idToken 검증 E2E 흐름 확인',
-   how:'// OAuthUseCaseTest.kt\n@ExtendWith(MockitoExtension::class)\nclass OAuthUseCaseTest {\n    @Mock private lateinit var googleOAuthVerifier: GoogleIdTokenVerifier\n    @Mock private lateinit var userRepository: UserRepository\n    @Mock private lateinit var jwtProvider: JwtProvider\n    @InjectMocks private lateinit var sut: OAuthUseCase\n\n    @Test\n    fun `OAuth 로그인 - 신규 사용자 자동 생성`() {\n        val mockPayload = mock(Payload::class.java)\n        given(mockPayload.subject).willReturn("google-12345")\n        given(mockPayload["email"]).willReturn("new@gmail.com")\n        val mockToken = mock(GoogleIdToken::class.java)\n        given(mockToken.payload).willReturn(mockPayload)\n        given(googleOAuthVerifier.verify("valid-id-token")).willReturn(mockToken)\n        given(userRepository.findByOAuthGoogleId("google-12345")).willReturn(null)\n\n        val result = sut.execute("valid-id-token")\n\n        verify(userRepository).save(any())\n        assertThat(result.expiresIn).isEqualTo(1800)\n    }\n\n    @Test\n    fun `OAuth 로그인 실패 - 유효하지 않은 idToken`() {\n        given(googleOAuthVerifier.verify(any())).willReturn(null)\n        assertThrows<BusinessException> { sut.execute("invalid-token") }\n    }\n}',
+   how:'// OAuthUseCaseTest.java\n@ExtendWith(MockitoExtension.class)\nclass OAuthUseCaseTest {\n    @Mock private GoogleIdTokenVerifier googleOAuthVerifier;\n    @Mock private UserRepository userRepository;\n    @Mock private JwtProvider jwtProvider;\n    @InjectMocks private OAuthUseCase sut;\n\n    @Test\n    @DisplayName("OAuth 로그인 - 신규 사용자 자동 생성")\n    void oauthNewUser() throws Exception {\n        Payload mockPayload = mock(Payload.class);\n        given(mockPayload.getSubject()).willReturn("google-12345");\n        given(mockPayload.get("email")).willReturn("new@gmail.com");\n        GoogleIdToken mockToken = mock(GoogleIdToken.class);\n        given(mockToken.getPayload()).willReturn(mockPayload);\n        given(googleOAuthVerifier.verify("valid-id-token")).willReturn(mockToken);\n        given(userRepository.findByOAuthGoogleId("google-12345")).willReturn(Optional.empty());\n\n        TokenResponse result = sut.execute("valid-id-token");\n\n        verify(userRepository).save(any());\n        assertThat(result.expiresIn()).isEqualTo(1800);\n    }\n\n    @Test\n    @DisplayName("OAuth 로그인 실패 - 유효하지 않은 idToken")\n    void oauthInvalidToken() throws Exception {\n        given(googleOAuthVerifier.verify(any())).willReturn(null);\n        assertThatThrownBy(() -> sut.execute("invalid-token"))\n            .isInstanceOf(BusinessException.class);\n    }\n}',
    sim:'oauthtest'},
 
-  {date:'5/28 목',badge:'code',
+  {date:'5/28 목',badge:'code',dod:['OAuthLink 엔티티 — 소셜 ↔ 이메일 계정 연결','탈퇴 마스킹 — 짧은 이메일(a@b.c) 엣지 케이스 처리','Flyway V2__add_oauth_links.sql 마이그레이션 성공','@DataJpaTest로 OAuthLinkRepository 테스트','PR draft 등록'],
    m:'Stand-up. OAuthLink 엔티티 완성',
    a:'기존 계정 연결 로직 + 탈퇴 마스킹 완성',
    e:'이메일 마스킹 엣지 케이스 확인',
-   where:['auth-service/.../domain/user/entity/OAuthLink.kt','auth-service/.../usecase/DeactivateUseCase.kt (마스킹 보완)'],
+   where:['auth-service/.../domain/user/entity/OAuthLink.java','auth-service/.../usecase/DeactivateUseCase.java (마스킹 보완)'],
    what:'① OAuthLink — 소셜 로그인과 기존 이메일 계정 연결 엔티티<br>② 탈퇴 마스킹 완성 — 짧은 이메일(a@b.c) 엣지 케이스 처리<br>③ Flyway V2 SQL — OAUTH_LINKS 테이블 마이그레이션',
-   how:'// OAuthLink.kt (Entity)\n@Entity\n@Table(name = "OAUTH_LINKS")\nclass OAuthLink(\n    @Id @GeneratedValue\n    val id: Long = 0,\n\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    val user: User,\n\n    @Enumerated(EnumType.STRING)\n    val provider: OAuthProvider,  // GOOGLE\n\n    @Column(unique = true)\n    val providerId: String,  // Google sub\n\n    override val createdAt: LocalDateTime = LocalDateTime.now(),\n    override val updatedAt: LocalDateTime = LocalDateTime.now()\n) : BaseEntity()\n\n-- V2__add_oauth_links.sql\nCREATE TABLE OAUTH_LINKS (\n    id          BIGINT AUTO_INCREMENT PRIMARY KEY,\n    user_id     BIGINT NOT NULL,\n    provider    VARCHAR(20) NOT NULL,\n    provider_id VARCHAR(100) NOT NULL,\n    created_at  DATETIME(6) NOT NULL,\n    updated_at  DATETIME(6) NOT NULL,\n    UNIQUE KEY uk_oauth_provider_id (provider, provider_id),\n    INDEX idx_oauth_user_id (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
+   how:'// OAuthLink.java (Entity)\n@Entity\n@Table(name = "OAUTH_LINKS")\n@Getter\n@NoArgsConstructor(access = AccessLevel.PROTECTED)\npublic class OAuthLink extends BaseEntity {\n\n    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n\n    @ManyToOne(fetch = FetchType.LAZY)\n    @JoinColumn(name = "user_id")\n    private User user;\n\n    @Enumerated(EnumType.STRING)\n    @Column(nullable = false)\n    private OAuthProvider provider;  // GOOGLE\n\n    @Column(name = "provider_id", nullable = false, unique = true)\n    private String providerId;  // Google sub\n\n    @Builder\n    public OAuthLink(User user, OAuthProvider provider, String providerId) {\n        this.user = user;\n        this.provider = provider;\n        this.providerId = providerId;\n    }\n}\n\n-- V2__add_oauth_links.sql\nCREATE TABLE OAUTH_LINKS (\n    id          BIGINT AUTO_INCREMENT PRIMARY KEY,\n    user_id     BIGINT NOT NULL,\n    provider    VARCHAR(20) NOT NULL,\n    provider_id VARCHAR(100) NOT NULL,\n    created_at  DATETIME(6) NOT NULL,\n    updated_at  DATETIME(6) NOT NULL,\n    UNIQUE KEY uk_oauth_provider_id (provider, provider_id),\n    INDEX idx_oauth_user_id (user_id)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
    sim:'oauthlink'},
 
-  {date:'5/29 금',badge:'test',
+  {date:'5/29 금',badge:'test',dod:['JaCoCo 커버리지 60%+ 달성 (./gradlew jacocoTestReport)','미달 시 LoginUseCase·RegisterUseCase 테스트 보강','feature/auth-google-oauth 브랜치 정리','develop rebase 후 PR 오픈 (Lead Reviewer)','reports/ W2 종합 리포트 작성'],
    m:'Stand-up. W2 커버리지 60%+ 확인',
    a:'W2 PR 정리 + 코드 리뷰 요청',
    e:'강태오 페이스 점검 피드백 반영',
@@ -502,16 +1210,16 @@ var W2 = [
 
 // ── W3 DATA ──
 var W3 = [
-  {date:'6/1 월',badge:'test',
+  {date:'6/1 월',badge:'test',dod:['Gateway AuthFilter ↔ Auth Service E2E (JWT→검증→X-User-Id)','Logback 마스킹 필터 (email·password·token 평문 노출 X)','05_보안_명세서.md 기준 체크리스트 점검','curl 통해 Gateway 경유 6 endpoint 모두 200 OK','PR draft 등록'],
    m:'Stand-up. Gateway AuthFilter E2E 통합 테스트',
    a:'Auth ↔ Gateway 전구간 통합 테스트',
    e:'Logback 마스킹 필터 확인',
-   where:['auth-service/src/test/.../integration/AuthGatewayE2ETest.kt','auth-service/src/main/resources/logback-spring.xml'],
+   where:['auth-service/src/test/.../integration/AuthGatewayE2ETest.java','auth-service/src/main/resources/logback-spring.xml'],
    what:'① Gateway AuthFilter ↔ Auth Service E2E — JWT 발급→Gateway 검증→X-User-Id 주입 전 구간<br>② Logback 마스킹 필터 — 로그에 email·password·token이 평문으로 노출되지 않는지 확인<br>③ 05번 보안 명세서 기준 점검',
-   how:'// AuthGatewayE2ETest.kt (통합 테스트)\n@SpringBootTest(webEnvironment = RANDOM_PORT)\nclass AuthGatewayE2ETest {\n\n    @Test\n    fun `로그인 - Gateway를 통한 E2E`() {\n        // 1. Auth Service에서 JWT 발급\n        val tokenResp = restTemplate.postForEntity(\n            "http://localhost:${authPort}/auth/login",\n            LoginRequest("test@qtai.app", "Test1234!"),\n            TokenResponse::class.java\n        )\n        val jwt = tokenResp.body!!.accessToken\n\n        // 2. Gateway를 통해 /auth/me 호출 (X-User-Id 주입 확인)\n        val meResp = restTemplate.exchange(\n            "http://localhost:${gatewayPort}/auth/me",\n            HttpMethod.GET,\n            HttpEntity<Unit>(HttpHeaders().apply { setBearerAuth(jwt) }),\n            UserResponse::class.java\n        )\n        assertThat(meResp.statusCode).isEqualTo(HttpStatus.OK)\n        assertThat(meResp.body?.email).isEqualTo("test@qtai.app")\n    }\n}\n\n# Logback 마스킹 확인\n# logback-spring.xml에 MaskingPatternLayout 설정\n# 로그에서 "password", "token", "Bearer" 이후 값이 ***로 표시되는지 확인',
+   how:'// AuthGatewayE2ETest.java (통합 테스트)\n@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)\nclass AuthGatewayE2ETest {\n\n    @Test\n    @DisplayName("로그인 - Gateway를 통한 E2E")\n    void loginThroughGateway() {\n        // 1. Auth Service에서 JWT 발급\n        ResponseEntity<TokenResponse> tokenResp = restTemplate.postForEntity(\n            "http://localhost:" + authPort + "/auth/login",\n            new LoginRequest("test@qtai.app", "Test1234!"),\n            TokenResponse.class\n        );\n        String jwt = tokenResp.getBody().accessToken();\n\n        // 2. Gateway를 통해 /auth/me 호출 (X-User-Id 주입 확인)\n        HttpHeaders headers = new HttpHeaders();\n        headers.setBearerAuth(jwt);\n        ResponseEntity<UserResponse> meResp = restTemplate.exchange(\n            "http://localhost:" + gatewayPort + "/auth/me",\n            HttpMethod.GET,\n            new HttpEntity<>(headers),\n            UserResponse.class\n        );\n        assertThat(meResp.getStatusCode()).isEqualTo(HttpStatus.OK);\n        assertThat(meResp.getBody().email()).isEqualTo("test@qtai.app");\n    }\n}\n\n# Logback 마스킹 확인\n# logback-spring.xml에 MaskingPatternLayout 설정\n# 로그에서 "password", "token", "Bearer" 이후 값이 ***로 표시되는지 확인',
    sim:'e2e'},
 
-  {date:'6/2 화',badge:'review',
+  {date:'6/2 화',badge:'review',dod:['감사 로그 — 로그인 성공/실패 이력 기록 확인','JWT 알고리즘 RS256 확인 (HS256 금지)','bcrypt strength=12 확인','Redis TTL 설정 검증 (auth:refresh:revoked:{jti})','PR draft 등록'],
    m:'페이스 점검 (11:30). 감사 로그 확인',
    a:'보안 취약점 점검 (05번 보안 명세서 기준)',
    e:'W3 블로커 강태오에게 공유',
@@ -520,16 +1228,16 @@ var W3 = [
    how:'# 보안 점검 체크리스트 (05번 명세서 기준)\n\n# 1. JWT 알고리즘 확인 (RS256 사용 여부)\ncurl -s http://localhost:8081/auth/login -d \'...\' \\\n  | jq -r .accessToken | cut -d. -f1 | base64 -d | jq .alg\n# 기대: "RS256"\n\n# 2. bcrypt strength 확인\ngrep "BCryptPasswordEncoder" auth-service/src -r\n# 기대: BCryptPasswordEncoder(12)\n\n# 3. Redis TTL 확인\nredis-cli -p 6380 TTL "auth:refresh:revoked:{jti}"\n# 기대: 0 < TTL <= 1209600 (14일 이내)\n\n# 4. 로그 마스킹 확인\ngrep -i "password\\|Bearer\\|token" auth-service/logs/*.log\n# 기대: 모두 *** 마스킹 처리됨',
    sim:'security'},
 
-  {date:'6/4 목',badge:'test',
+  {date:'6/4 목',badge:'test',dod:['회귀 테스트 전체 실행 — W1·W2 테스트 모두 ✅','엣지 케이스: 만료된 Access Token 사용 → 401','엣지 케이스: revoke된 Refresh Token 재사용 → REUSE_DETECTED','시나리오: revoke된 jti 재사용 → 모든 Refresh 무효화','PR draft 등록'],
    m:'Stand-up. 회귀 테스트 전체 실행',
    a:'엣지 케이스 보완 (만료 토큰, Rotation 재사용 감지)',
    e:'W3 PR 정리',
-   where:['auth-service/src/test/.../usecase/RefreshTokenUseCaseTest.kt'],
+   where:['auth-service/src/test/.../usecase/RefreshTokenUseCaseTest.java'],
    what:'① 회귀 테스트 전체 실행 — W1·W2에서 작성한 테스트 모두 통과 확인<br>② 엣지 케이스 추가: 만료된 Access Token 사용 / 이미 revoke된 Refresh Token 재사용<br>③ REUSE_DETECTED 시나리오: revoke된 jti 재사용 → 모든 Refresh 무효화',
-   how:'// RefreshTokenUseCaseTest.kt - 엣지 케이스\n@Test\nfun `Refresh 재사용 감지 - revoke된 토큰 사용 시 모든 토큰 무효화`() {\n    // given: 이미 revoke된 jti\n    given(redisBlacklist.isRevoked("revoked-jti")).willReturn(true)\n\n    // when & then\n    val ex = assertThrows<BusinessException> {\n        sut.execute("token-with-revoked-jti")\n    }\n    assertThat(ex.error).isEqualTo(AuthError.REFRESH_TOKEN_REVOKED)\n    // 탈취 시도 감지 → 해당 userId의 모든 Refresh 무효화\n    verify(refreshTokenRepository).revokeAllByUserId(any())\n}\n\n@Test\nfun `만료된 Access Token - 401 반환`() {\n    // Gateway가 만료 토큰 감지 → 401 응답\n    // Auth Service 직접 테스트: JwtProvider.validateAndGetUserId 만료 시 예외\n    val expiredToken = generateExpiredToken()\n    assertThrows<TokenExpiredException> {\n        jwtProvider.validateAndGetUserId(expiredToken)\n    }\n}\n\n./gradlew :auth-service:test\n# 기대: 전체 테스트 통과',
+   how:'// RefreshTokenUseCaseTest.java - 엣지 케이스\n@Test\n@Test\n@DisplayName("Refresh 재사용 감지 - revoke된 토큰 사용 시 모든 토큰 무효화")\nvoid detectTokenReuse() {\n    // given: 이미 revoke된 jti\n    given(redisBlacklist.isRevoked("revoked-jti")).willReturn(true)\n\n    // when & then\n    BusinessException ex = catchThrowableOfType(\n        () -> sut.execute("token-with-revoked-jti"),\n        BusinessException.class\n    );\n    assertThat(ex.getError()).isEqualTo(AuthError.REFRESH_TOKEN_REVOKED);\n    // 탈취 시도 감지 → 해당 userId의 모든 Refresh 무효화\n    verify(refreshTokenRepository).revokeAllByUserId(any());\n}\n\n@Test\n@Test\n@DisplayName("만료된 Access Token - 401 반환")\nvoid expiredAccessTokenReturns401() {\n    // Gateway가 만료 토큰 감지 → 401 응답\n    // Auth Service 직접 테스트: JwtProvider.validateAndGetUserId 만료 시 예외\n    String expiredToken = generateExpiredToken();\n    assertThatThrownBy(() -> jwtProvider.validateAndGetUserId(expiredToken))\n        .isInstanceOf(TokenExpiredException.class);\n}\n\n./gradlew :auth-service:test\n# 기대: 전체 테스트 통과',
    sim:'regression'},
 
-  {date:'6/5 금',badge:'review',
+  {date:'6/5 금',badge:'review',dod:['JaCoCo 커버리지 — Service 70%+ 근접','feature/auth-integration-test 브랜치 정리','Lead의 SSE P95 측정 시 Auth 인증 흐름 지원','주간 코드 정리 + 미해결 항목 슬랙 공유','reports/ W3 종합 리포트 작성'],
    m:'Stand-up. W3 커버리지 확인',
    a:'W3 PR 정리 + 강태오 E2E SSE 연동 확인 지원',
    e:'W4 준비',
@@ -541,7 +1249,7 @@ var W3 = [
 
 // ── W4 DATA ──
 var W4 = [
-  {date:'6/8 월',badge:'test',
+  {date:'6/8 월',badge:'test',dod:['시연 dry-run — 로그인→JWT 발급→대시보드 진입 흐름','시연용 테스트 계정 seed 데이터 확인 (Flyway + DataLoader)','시연 중 401 발생 시 즉시 대응 방법 준비','백업 시나리오: refresh 자동 재발급 확인','PR draft 등록'],
    m:'Stand-up. 시연 dry-run 인증 흐름 지원',
    a:'시연 시나리오 인증 파트 확인',
    e:'회귀 테스트 전체 재실행',
@@ -550,7 +1258,7 @@ var W4 = [
    how:'# 시연용 계정 확인\ncurl -X POST http://localhost:8080/auth/login \\\n  -H "Content-Type: application/json" \\\n  -d \'{"email":"demo@qtai.app","password":"Demo1234!"}\'\n# 기대: 200 + accessToken\n\n# 시연 중 401 발생 시 대응\n# 1. Access Token 만료: Flutter 자동 refresh 동작 확인\n# 2. Redis 장애: kubectl rollout restart redis-ws -n qtai\n# 3. Auth Pod 장애:\nkubectl rollout restart deployment/auth-service -n qtai\nkubectl logs -n qtai -l app=auth-service --tail=30\n\n# 회귀 테스트 전체\n./gradlew :auth-service:test',
    sim:'dryrunauth'},
 
-  {date:'6/9 화',badge:'test',
+  {date:'6/9 화',badge:'test',dod:['JaCoCo 커버리지 70%+ 최종 달성','미달 영역 보완 — AuthController MockMvc + OAuthUseCase','전체 테스트 통과 후 develop 최신 PR 오픈','15_체크리스트 W4 Auth 4항목 모두 마킹','PR draft 등록'],
    m:'페이스 점검. 커버리지 70%+ 달성',
    a:'미달 테스트 보완',
    e:'최종 PR 정리',
@@ -559,7 +1267,7 @@ var W4 = [
    how:'./gradlew :auth-service:jacocoTestReport\n\n# 커버리지 빠른 확인 (summary)\n./gradlew :auth-service:test jacocoTestReport\ncat auth-service/build/reports/jacoco/test/html/index.html \\\n  | grep -A 2 "Total"\n\n# 70% 미달 시 보완 순서\n# 1. AuthControllerTest - MockMvc 추가\n# 2. OAuthUseCaseTest - 케이스 추가\n# 3. DeactivateUseCaseTest\n\n# 최종 PR\ngit checkout -b feature/auth-coverage-boost\ngit commit -m "test(auth): boost coverage to 70%+"\ngit push origin feature/auth-coverage-boost',
    sim:'finalcoverage'},
 
-  {date:'6/10 수',badge:'review',
+  {date:'6/10 수',badge:'review',dod:['auth-service Pod 30분 Running 확인','Grafana — 로그인 성공률·토큰 발급량·에러율 확인','05_보안_명세서 최종 체크리스트 완료','AlertManager 5xx 알림 등록 확인','PR draft 등록'],
    m:'Stand-up. Auth 서비스 최종 확인',
    a:'시연 환경 Auth Pod 안정성 확인',
    e:'보안 최종 점검',
@@ -568,7 +1276,7 @@ var W4 = [
    how:'kubectl get pods -n qtai -l app=auth-service\n# 기대: Running\n\n# Grafana Auth 메트릭 확인\n# - http_server_requests{uri="/auth/login"} 성공률\n# - auth_token_issued_total (토큰 발급 수)\n# - auth_login_failure_total (로그인 실패 수)\n\n# 보안 최종 점검\n# [ ] JWT 알고리즘 RS256 확인\n# [ ] bcrypt strength=12 확인\n# [ ] Redis blacklist TTL 설정 확인\n# [ ] 로그 마스킹 확인\n# [ ] K8s Secret만 사용 (코드/yml 평문 0건)',
    sim:'authstable'},
 
-  {date:'6/11 목',badge:'review',
+  {date:'6/11 목',badge:'review',dod:['모든 Auth 관련 PR 최종 머지 완료','주석·TODO 정리, 불필요한 코드 제거','auth-service README — JWT 정책·OAuth 흐름·API 목록','main 브랜치 최신 동기화','PR draft 등록'],
    m:'Stand-up. 코드 리뷰 + 최종 머지',
    a:'Auth Service 최종 코드 정리',
    e:'포트폴리오 README 인증 파트 작성',
@@ -577,7 +1285,7 @@ var W4 = [
    how:'# 남은 PR 확인\ngit log --oneline develop..HEAD\n\n# 코드 정리\n# TODO 제거\ngrep -rn "TODO\\|FIXME\\|HACK" auth-service/src/\n\n# auth-service README 섹션\n# ## Auth Service\n# - JWT RS256 (Access: 30분, Refresh: 14일)\n# - Google OAuth2 + JWK 직접 검증\n# - Refresh Token Rotation\n# - Redis Blacklist (auth:refresh:revoked:{jti})\n# ### API 목록\n# POST /auth/login\n# POST /auth/register\n# POST /auth/refresh\n# POST /auth/logout\n# POST /auth/oauth/google\n# GET  /auth/me\n# POST /auth/me/deactivate',
    sim:'finalmerge'},
 
-  {date:'6/12 금',badge:'gate',
+  {date:'6/12 금',badge:'gate',dod:['v1.0.0-demo 이미지로 auth-service 정상 기동','시연 계정 로그인 → JWT 발급 → 대시보드 진입 최종 확인','백업 영상 01-login.mp4 인증 시나리오 녹화','코드 프리즈 합의 — 핫픽스만 허용','reports/ W4 종합 리포트 작성'],
    m:'Stand-up. 시연 빌드 Auth 확인',
    a:'v1.0.0-demo 태그 이미지로 배포 확인',
    e:'백업 영상 인증 시나리오 확인',
@@ -589,7 +1297,7 @@ var W4 = [
 
 // ── W5 DATA ──
 var W5 = [
-  {date:'6/15 월',badge:'demo',
+  {date:'6/15 월',badge:'demo',dod:['PPT 인증 파트 — JWT RS256·Refresh Rotation·OAuth 1장','헬스체크 스크립트에 Auth Service 항목 확인','예상 Q&A 준비 — RS256·Rotation·bcrypt 12','reports/ 시연 준비 리포트 작성','리허설 0회차 (혼자 1회 시연)'],
    m:'PPT 인증 파트 설명 준비',
    a:'D-30분 헬스체크 스크립트 인증 항목 확인',
    e:'발표 인증 Q&A 준비',
@@ -598,7 +1306,7 @@ var W5 = [
    how:'# 예상 Q&A 답변 준비\n\n# Q: 왜 RS256을 사용했나요?\n# A: Gateway가 Auth Service 없이 공개키만으로 JWT를 검증할 수 있어\n#    Gateway ↔ Auth 간 추가 네트워크 호출이 없고,\n#    개인키는 Auth Service만 보유해 보안성이 높습니다.\n\n# Q: Refresh Token Rotation이란?\n# A: Refresh Token 사용 시마다 새로운 토큰을 발급하고\n#    기존 토큰은 Redis blacklist에 등록합니다.\n#    탈취된 토큰이 사용되면 REUSE_DETECTED로 감지해\n#    해당 사용자의 모든 토큰을 무효화합니다.\n\n# Q: bcrypt strength=12?\n# A: strength가 높을수록 해시 연산이 느려져 brute-force 공격이 어렵습니다.\n#    12는 보안과 성능의 균형점입니다. (HMS 1차에서 평문 저장 실패 개선)',
    sim:'ppqna'},
 
-  {date:'6/16 화',badge:'demo',
+  {date:'6/16 화',badge:'demo',dod:['리허설 1회차 — 로그인→JWT→대시보드 시나리오','리허설 2회차 — 401 발생 시 refresh 자동 재발급 확인','인증 설명 1분 멘트 최종 정리','시연 환경 헬스체크 통과','reports/ 리허설 결과 작성'],
    m:'리허설 1회차 인증 시나리오 담당',
    a:'리허설 2회차 인증 흐름 완주',
    e:'백업 영상 인증 파트 최종 확인',
@@ -607,7 +1315,7 @@ var W5 = [
    how:'# 리허설 인증 체크리스트\n[ ] 시연 계정 로그인 (demo@qtai.app) → 200 + JWT\n[ ] Flutter 앱 로그인 화면 → 대시보드 자동 진입\n[ ] Access Token 만료 시뮬레이션 → 자동 refresh 확인\n[ ] 로그아웃 → 재로그인 필요 확인\n\n# 1분 멘트 준비\n"Auth Service는 JWT RS256으로 인증하며,\nGateway가 공개키로 직접 검증해 Auth Service 추가 호출 없이\n요청마다 사용자를 식별합니다.\nRefresh Rotation으로 토큰 탈취를 감지합니다."',
    sim:'rehearsal'},
 
-  {date:'6/17 수',badge:'demo',
+  {date:'6/17 수',badge:'demo',dod:['D-30분: auth-service Pod Running + 시연 계정 로그인 확인','발표 시연 중 로그인→대시보드 진입 시나리오 담당','이상 발생 시 kubectl rollout restart 또는 백업 영상 01','발표 후 회고 미팅 참석','reports/ W5 발표 종합 리포트 작성'],
    m:'D-30분 헬스체크 인증 항목 확인',
    a:'시연 D-Day — 로그인 시나리오 담당',
    e:'발표 완료 + 회고',
@@ -625,15 +1333,15 @@ var AI = [
    verify:['MySQL 8.0 문법 확인 (PostgreSQL 키워드 없는지)','UNIQUE 제약 모두 명시되었는지','created_at DATETIME(6) 타입 확인','INDEX 누락 없는지 (jti, user_id)']},
   {week:'W1',task:'JWT RS256 + LoginUseCase 코드 골격',
    ctx:['03_아키텍처_정의서.md §11.1 (JWT 정책)','DECISIONS.md §2 (Access 1800s, Refresh 14일)','AGENTS.md (@Transactional 누락 금지)'],
-   prompt:'[역할] QT-AI Auth Service 개발자.\n\n[컨텍스트 첨부]\n- 03_아키텍처_정의서.md §11.1 JWT 클레임 구조\n- DECISIONS.md §2 토큰 TTL 정책\n\n[요청] JwtProvider.kt + LoginUseCase.kt 골격 작성.\n\nJwtProvider 조건:\n- RSA-2048, RS256 알고리즘 (HS256 절대 금지)\n- Access: expiresIn=1800s, subject=userId, claim scope=role\n- Refresh: expiresIn=1209600s (14일), jti=ULID\n- @Value로 키 경로 주입 (K8s Secret 마운트)\n\nLoginUseCase 조건:\n- @Transactional 필수\n- BCryptPasswordEncoder(12)로 검증\n- 실패 시 BusinessException(AuthError.INVALID_CREDENTIALS)\n- Refresh Token DB 저장\n\n[절대 금지]\n- JWT 시크릿·Private Key 하드코딩\n- HS256 알고리즘\n- @Transactional 누락',
+   prompt:'[역할] QT-AI Auth Service 개발자.\n\n[컨텍스트 첨부]\n- 03_아키텍처_정의서.md §11.1 JWT 클레임 구조\n- DECISIONS.md §2 토큰 TTL 정책\n\n[요청] JwtProvider.java + LoginUseCase.java 골격 작성.\n\nJwtProvider 조건:\n- RSA-2048, RS256 알고리즘 (HS256 절대 금지)\n- Access: expiresIn=1800s, subject=userId, claim scope=role\n- Refresh: expiresIn=1209600s (14일), jti=ULID\n- @Value로 키 경로 주입 (K8s Secret 마운트)\n\nLoginUseCase 조건:\n- @Transactional 필수\n- BCryptPasswordEncoder(12)로 검증\n- 실패 시 BusinessException(AuthError.INVALID_CREDENTIALS)\n- Refresh Token DB 저장\n\n[절대 금지]\n- JWT 시크릿·Private Key 하드코딩\n- HS256 알고리즘\n- @Transactional 누락',
    verify:['RS256 알고리즘 사용 확인 (HS256 아닌지)','Access Token expiresIn=1800 (900 아님)','@Transactional 어노테이션 누락 없는지','Private Key 하드코딩 없는지 — @Value만 사용']},
   {week:'W2',task:'Google OAuth2 Spring Security 설정',
    ctx:['04_API_명세서.md §4.8 (POST /auth/oauth/google 스펙)','03_아키텍처_정의서.md §3.1 (Auth Context)','AGENTS.md (Spring Boot 3.3 표준)'],
-   prompt:'[역할] QT-AI Auth Service 개발자.\n\n[컨텍스트 첨부]\n- 04_API_명세서.md §4.8 Google OAuth 엔드포인트 스펙\n- 03_아키텍처_정의서.md §3.1 Auth Context\n\n[요청] OAuthUseCase.kt + GoogleIdTokenVerifier 빈 설정.\n조건:\n- Flutter에서 받은 Google idToken을 JWK로 직접 검증 (redirect X)\n- GoogleIdTokenVerifier.Builder 사용\n- 신규 사용자: User 자동 생성 + OAuthLink 연결\n- 기존 사용자: OAuthLink.providerId로 조회\n- 성공 시 JWT Access + Refresh 발급\n\n[주의사항]\n- JWK endpoint URL은 코드에 하드코딩하지 말고 구글 SDK 기본값 사용\n- Google Client ID는 @Value로 K8s Secret 주입\n- Spring Security OAuth2 redirect 방식이 아닌 idToken 직접 검증 방식',
+   prompt:'[역할] QT-AI Auth Service 개발자.\n\n[컨텍스트 첨부]\n- 04_API_명세서.md §4.8 Google OAuth 엔드포인트 스펙\n- 03_아키텍처_정의서.md §3.1 Auth Context\n\n[요청] OAuthUseCase.java + GoogleIdTokenVerifier 빈 설정.\n조건:\n- Flutter에서 받은 Google idToken을 JWK로 직접 검증 (redirect X)\n- GoogleIdTokenVerifier.Builder 사용\n- 신규 사용자: User 자동 생성 + OAuthLink 연결\n- 기존 사용자: OAuthLink.providerId로 조회\n- 성공 시 JWT Access + Refresh 발급\n\n[주의사항]\n- JWK endpoint URL은 코드에 하드코딩하지 말고 구글 SDK 기본값 사용\n- Google Client ID는 @Value로 K8s Secret 주입\n- Spring Security OAuth2 redirect 방식이 아닌 idToken 직접 검증 방식',
    verify:['Google Client ID @Value 주입 확인 (하드코딩 없는지)','GoogleIdTokenVerifier.verify() 결과 null 처리 (예외 발생)','신규/기존 사용자 두 경로 모두 구현됐는지','OAuthLink UNIQUE 제약 위반 처리']},
   {week:'W3',task:'단위 테스트 케이스 생성',
    ctx:['auth-service/src/test/ 기존 테스트 파일 구조','07_테스트_전략.md (실패 케이스 1개 이상 강제)','AGENTS.md (Testcontainers cp-kafka 7.6+ 기준)'],
-   prompt:'[역할] QT-AI Auth Service 테스트 담당자.\n\n[컨텍스트 첨부]\n- 기존 LoginUseCaseTest.kt 내용 (참고용)\n- 07_테스트_전략.md 테스트 원칙\n\n[요청] RefreshTokenUseCaseTest.kt 단위 테스트 작성.\n테스트 케이스:\n1. 정상 Rotation - 새 토큰 발급 + 기존 jti blacklist 등록\n2. 실패 - 이미 revoke된 jti 재사용 시 예외\n3. 실패 - DB에 없는 jti 사용 시 예외\n4. 실패 - 만료된 Refresh Token 사용 시 예외\n5. REUSE_DETECTED - revoke된 토큰 사용 시 해당 userId 전체 토큰 무효화\n\n@ExtendWith(MockitoExtension::class) 사용\n성공 케이스: 1개 이상\n실패 케이스: 반드시 1개 이상 포함 (성공만 있으면 안됨)',
+   prompt:'[역할] QT-AI Auth Service 테스트 담당자.\n\n[컨텍스트 첨부]\n- 기존 LoginUseCaseTest.java 내용 (참고용)\n- 07_테스트_전략.md 테스트 원칙\n\n[요청] RefreshTokenUseCaseTest.java 단위 테스트 작성.\n테스트 케이스:\n1. 정상 Rotation - 새 토큰 발급 + 기존 jti blacklist 등록\n2. 실패 - 이미 revoke된 jti 재사용 시 예외\n3. 실패 - DB에 없는 jti 사용 시 예외\n4. 실패 - 만료된 Refresh Token 사용 시 예외\n5. REUSE_DETECTED - revoke된 토큰 사용 시 해당 userId 전체 토큰 무효화\n\n@ExtendWith(MockitoExtension.class) 사용\n성공 케이스: 1개 이상\n실패 케이스: 반드시 1개 이상 포함 (성공만 있으면 안됨)',
    verify:['실패 케이스 최소 1개 이상 포함됐는지','@InjectMocks 사용 (수동 new X)','assertThrows 사용 (try-catch X)','verify()로 Redis blacklist.revoke() 호출 확인']},
 ];
 
@@ -686,6 +1394,11 @@ function simHtml(type, id) {
 
 function dayCard(d, id) {
   var pathItems = d.where.map(function(p){ return '<li>' + p + '</li>'; }).join('');
+  var dodList = d.dod || dodFallback(d.badge);
+  var dodItems = dodList.map(function(item, i){
+    var cid = id + '-dod-' + i;
+    return '<div class="dod-item"><input type="checkbox" id="' + cid + '"><label for="' + cid + '">' + item + '</label></div>';
+  }).join('');
   return '<div class="day-card">' +
     '<div class="dtrig" onclick="tog(this,\'' + id + '\')">' +
       '<div class="dtc"><div class="dt-date">' + d.date + '</div><span class="dt-badge ' + badgeCls(d.badge) + '">' + (B[d.badge]||d.badge) + '</span></div>' +
@@ -700,6 +1413,10 @@ function dayCard(d, id) {
         '<div class="fi"><div class="fi-label la">🎯 무엇을 (결과물)</div><div class="wt">' + d.what + '</div></div>' +
         '<div class="fi"><div class="fi-label lh">⚙️ 어떻게 (명령어·코드)</div><pre>' + esc(d.how) + '<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div>' +
         '<div class="fi"><div class="fi-label lo">✅ 최종 결과물 (시뮬레이션)</div>' + simHtml(d.sim, id) + '</div>' +
+      '</div>' +
+      '<div class="dod-box">' +
+        '<div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div>' +
+        dodItems +
       '</div>' +
     '</div>' +
   '</div>';

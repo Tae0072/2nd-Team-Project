@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -167,6 +167,65 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 /* MISC */
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+
+/* ===== Spec Panel (자기완결성 명세 S5) ===== */
+.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
+.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
+.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
+.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
+.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
+.spec-panel summary.spec-sum:hover{background:var(--bg3)}
+.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
+.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
+.spec-panel[open]{background:var(--bg)}
+.spec-panel > *:not(summary){padding:0 18px 14px}
+.spec-panel pre{margin-top:6px}
+
+/* ===== Workflow/Report Section (S6) ===== */
+.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
+.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
+.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
+.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
+.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
+.wr-flow .arrow{color:var(--t2);font-weight:700}
+.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
+.folder-rule strong{color:var(--lead)}
+@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
+
+
+/* ===== 사용 규칙 박스 (S0) ===== */
+.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
+.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
+.rules-box ol li{color:var(--text);font-size:13.5px}
+.rules-box ol li strong{color:var(--blue)}
+
+/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
+.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
+.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
+.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
+.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
+@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
+
+/* ===== 원문 문서 매트릭스 (S7) ===== */
+.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
+.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
+.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
+.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
+.ref-matrix tr:hover td{background:var(--bg3)}
+
+
+/* ===== DoD 박스 (day 카드 하단) ===== */
+.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
+.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
+.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
+.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
+.dod-item label{cursor:pointer;flex:1;line-height:1.5}
+.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
+
 </style>
 </head>
 <body>
@@ -185,7 +244,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
     <button class="wnav" onclick="g('W2')">W2</button>
     <button class="wnav" onclick="g('W3')">W3</button>
     <button class="wnav" onclick="g('W4')">W4</button>
-    <button class="wnav" onclick="g('W5')">W5</button>
+    <button class="wnav" onclick="g('W5')">W5</button><button class="wnav" onclick="g('s5')" style="background:rgba(83,155,245,.15);border-color:var(--blue);color:var(--blue);font-weight:700">📋 명세</button><button class="wnav" onclick="g('s6')" style="background:rgba(87,171,90,.15);border-color:var(--green);color:var(--green);font-weight:700">📊 워크플로우</button><button class="wnav" onclick="g('s7')" style="background:rgba(224,130,61,.15);border-color:var(--orange);color:var(--orange);font-weight:700">📚 참조</button>
   </div>
 </div>
 </div>
@@ -193,6 +252,70 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
 
 <div class="wrap">
 
+<!-- S0a: USAGE RULES (헤더 직후, 항상 펼쳐짐) -->
+<div class="rules-box">
+  <h2>📜 이 문서만 보고 작업하는 규칙</h2>
+  <ol>
+    <li>매일 <strong>본인 W1~W5 카드</strong>만 먼저 펼쳐서 오늘 할 일을 파악합니다.</li>
+    <li>작업 브랜치는 <code>feature/gateway- 또는 feature/bff-{task-slug}</code> 형식 (예: <code>feature/bff-dashboard-aggregate</code>).</li>
+    <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
+    <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
+    <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
+    <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
+    <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
+  </ol>
+</div>
+
+<!-- S0b: SETUP COMMANDS (토글) -->
+<details class="spec-panel">
+  <summary class="spec-sum">
+    <span class="spec-num" style="background:var(--green)">🔧</span>
+    <span class="spec-title">환경 셋업 빠른 명령어 — 처음 시작 시 1회 실행</span>
+  </summary>
+  <div class="setup-box">
+    <div class="setup-grid">
+      <div class="setup-card">
+        <h4>1. 저장소 클론 + 브랜치</h4>
+        <pre>git clone git@github.com:Tae0072/2nd-Team-Project.git
+cd 2nd-Team-Project
+
+git checkout develop
+git pull origin develop
+
+# 작업 브랜치 생성
+git checkout -b feature/bff-dashboard-aggregate</pre>
+      </div>
+      <div class="setup-card">
+        <h4>2. 환경 검증</h4>
+        <pre>java -version    # Java 21 (Temurin)
+docker --version # Docker 4.x
+minikube status  # Running
+kubectl config set-context --current --namespace=qtai
+
+# 본인 서비스 빌드 검증
+./gradlew :gateway:build :bff-aggregator:build</pre>
+      </div>
+      <div class="setup-card">
+        <h4>3. 데이터베이스 기동</h4>
+        <pre># Helm으로 DB 인프라 일괄 기동
+cd helm
+helm install qtai-infra ./qtai-infra -n qtai
+
+# 헬스체크
+kubectl get pods -n qtai
+kubectl logs -f deployment/{service-name} -n qtai</pre>
+      </div>
+      <div class="setup-card">
+        <h4>4. 본인 역할 추가 도구</h4>
+        <pre># Lead 추가 권장: Lens (K8s IDE) + k9s
+
+# 본인 서비스 테스트 명령
+./gradlew :gateway:test :bff-aggregator:test</pre>
+      </div>
+    </div>
+    <div class="callout warn mt12">⚠️ 자세한 셋업은 <code>11_개발_환경_셋업_가이드.md</code> 참조. 실패 시 <code>10_트러블슈팅_FAQ.md</code> §1~§3 우선 확인.</div>
+  </div>
+</details>
 <!-- SECTION 0: ROLE -->
 <div class="sec" id="s0">
   <div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">Lead 역할 핵심 선언</div></div>
@@ -216,8 +339,8 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
   <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div>
   <div class="callout warn">⚠️ 아래 경로를 수정하는 PR은 반드시 <strong>강태오를 Reviewer 지정</strong>. Lead 없이 머지 금지.</div>
   <div class="own-tree mt12">
-    <div class="own-item"><div class="own-path">gateway-service/<br><span style="color:var(--t2);padding-left:12px">├── filter/AuthFilter.kt<br>├── filter/NoBufferingFilter.kt<br>└── config/RouteConfig.kt</span></div><div class="own-desc">JWT 검증→X-User-Id 주입 / SSE 버퍼링 우회 / 6 서비스 라우팅</div><span class="lock-tag">전담소유</span></div>
-    <div class="own-item"><div class="own-path">bff-service/<br><span style="color:var(--t2);padding-left:12px">├── usecase/DashboardUseCase.kt<br>├── usecase/NotificationUseCase.kt<br>└── websocket/StompConfig.kt</span></div><div class="own-desc">4 서비스 병렬 호출 / 알림 집계 / WebSocket 세션 레지스트리</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">gateway-service/<br><span style="color:var(--t2);padding-left:12px">├── filter/AuthFilter.java<br>├── filter/NoBufferingFilter.java<br>└── config/RouteConfig.java</span></div><div class="own-desc">JWT 검증→X-User-Id 주입 / SSE 버퍼링 우회 / 6 서비스 라우팅</div><span class="lock-tag">전담소유</span></div>
+    <div class="own-item"><div class="own-path">bff-service/<br><span style="color:var(--t2);padding-left:12px">├── usecase/DashboardUseCase.java<br>├── usecase/NotificationUseCase.java<br>└── websocket/StompConfig.java</span></div><div class="own-desc">4 서비스 병렬 호출 / 알림 집계 / WebSocket 세션 레지스트리</div><span class="lock-tag">전담소유</span></div>
     <div class="own-item"><div class="own-path">helm/ (qtai-umbrella + qtai-infra)</div><div class="own-desc">K8s 배포 Helm 차트 전체 — values 수정도 Lead 협의 후 진행</div><span class="lock-tag">전담소유</span></div>
     <div class="own-item"><div class="own-path">.github/workflows/ (ci.yml, cd.yml)</div><div class="own-desc">CI/CD 파이프라인 전체</div><span class="lock-tag">전담소유</span></div>
     <div class="own-item"><div class="own-path">shared-kernel/ (BaseEntity, ErrorResponse)</div><div class="own-desc">수정 시 <code>shared-change</code> 라벨 + 전원 리뷰 필수</div><span class="lock-tag">전담소유</span></div>
@@ -432,14 +555,571 @@ git checkout main && git cherry-pick {commit-hash} && git push origin main<butto
   <div id="ai-root" class="mt16"></div>
 </div>
 
+<!-- S5: SELF-CONTAINED SPEC — 자기완결성 명세 -->
+<div class="sec" id="s5">
+  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 다른 문서 참조 없이 작업 가능</div></div>
+  <div class="callout blue">ℹ️ Lead가 구현하는 Gateway + BFF Aggregator의 핵심 명세. 04_API_명세서·events/schema·DECISIONS.md에서 이식. 변경 시 04번을 동기화 후 이 섹션 업데이트.</div>
+
+  <!-- 5.1 BFF DTO -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.1</span><span class="spec-title">BFF Aggregator DTO 정의 — Java 21 records</span></summary>
+  <div class="callout warn mt8">⚠️ 04번 §8.2 / §8.3 스키마 정합.</div>
+  <pre>// bff-aggregator/.../api/dto/BffDtos.java
+package com.qtai.bff.api.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class BffDtos {
+
+    // ── GET /api/v1/me/dashboard 응답 ──
+    public record DashboardResponse(
+        UserBrief             user,
+        Stats                 stats,
+        TodayPassage          todayPassage,
+        List<RecentJournal>   recentJournals,
+        ActiveSession         activeSession   // null 가능
+    ) {
+        public record UserBrief(Long id, String nickname) {}
+
+        public record Stats(
+            long journalCount,
+            long completedSessions,
+            int  currentStreak,
+            int  longestStreak
+        ) {}
+
+        public record TodayPassage(
+            String bookCode,
+            int    chapter,
+            int    verse
+        ) {}
+
+        public record RecentJournal(
+            Long          id,
+            String        title,
+            String        status,        // DRAFT / PUBLISHED
+            LocalDateTime createdAt
+        ) {}
+
+        public record ActiveSession(
+            Long          id,
+            TodayPassage  passage,
+            String        currentStep,    // O / I / C / D
+            LocalDateTime updatedAt
+        ) {}
+    }
+
+    // ── GET /api/v1/passages/{bookCode}/{chapter}/{verse} 응답 ──
+    public record PassageAggregateResponse(
+        Passage                  passage,
+        VerseContent             kr,
+        VerseContent             en,
+        List<Commentary>         commentaries
+    ) {
+        public record Passage(String bookCode, int chapter, int verse) {}
+
+        public record VerseContent(
+            String content,
+            String version,    // KR: "REVISED" / EN: "KJV"
+            String language    // "ko" / "en"
+        ) {}
+
+        public record Commentary(
+            Long   id,
+            String source,    // MATTHEW_HENRY / DUMMY_KR
+            String title,
+            String content
+        ) {}
+    }
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.2 GATEWAY ROUTING -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.2</span><span class="spec-title">Gateway 라우팅 표 (04번 §3)</span></summary>
+  <div class="callout mt8">Spring Cloud Gateway RouteLocatorBuilder DSL. 모든 라우트는 AuthFilter 적용 (최우선순위).</div>
+  <table class="tbl mt8"><thead><tr><th>Path</th><th>대상 Service</th><th>K8s URL</th></tr></thead><tbody>
+    <tr><td><code>/auth/**</code></td><td>auth-service</td><td>http://auth-service.qtai:8080</td></tr>
+    <tr><td><code>/bible/**</code></td><td>bible-service (직접)</td><td>http://bible-service.qtai:8080</td></tr>
+    <tr><td><code>/ai/**</code></td><td>ai-service</td><td>http://ai-service.qtai:8080</td></tr>
+    <tr><td><code>/api/v1/journals/**</code></td><td>journal-service</td><td>http://journal-service.qtai:8080</td></tr>
+    <tr><td><code>/api/v1/me/**</code>, <code>/api/v1/passages/**</code></td><td>bff-aggregator</td><td>http://bff-aggregator.qtai:8080</td></tr>
+    <tr><td><code>/ws/**</code></td><td>bff-aggregator (STOMP)</td><td>http://bff-aggregator.qtai:8080</td></tr>
+  </tbody></table>
+  <pre>// gateway/.../config/RouteConfig.java
+@Configuration
+public class RouteConfig {
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route("auth",     r -> r.path("/auth/**").uri("http://auth-service.qtai.svc.cluster.local:8080"))
+            .route("bible",    r -> r.path("/bible/**").uri("http://bible-service.qtai.svc.cluster.local:8080"))
+            .route("ai",       r -> r.path("/ai/**").uri("http://ai-service.qtai.svc.cluster.local:8080"))
+            .route("journals", r -> r.path("/api/v1/journals/**").uri("http://journal-service.qtai.svc.cluster.local:8080"))
+            .route("bff-me",   r -> r.path("/api/v1/me/**").uri("http://bff-aggregator.qtai.svc.cluster.local:8080"))
+            .route("bff-pass", r -> r.path("/api/v1/passages/**").uri("http://bff-aggregator.qtai.svc.cluster.local:8080"))
+            .route("ws",       r -> r.path("/ws/**").uri("http://bff-aggregator.qtai.svc.cluster.local:8080"))
+            .build();
+    }
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.3 ERROR ENUM -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.3</span><span class="spec-title">CommonError + Gateway/BFF 에러 코드</span></summary>
+  <pre>// 공통 ErrorCode 인터페이스
+public interface ErrorCode {
+    HttpStatus getHttpStatus();
+    String     getCode();
+    String     getMessage();
+}
+
+// gateway, bff-aggregator/.../common/error/CommonError.java
+@Getter
+@RequiredArgsConstructor
+public enum CommonError implements ErrorCode {
+    VALIDATION_FAILED     (HttpStatus.BAD_REQUEST,           "VALIDATION_FAILED",     "검증 실패"),
+    UNAUTHORIZED          (HttpStatus.UNAUTHORIZED,          "UNAUTHORIZED",          "JWT 누락·만료"),
+    FORBIDDEN             (HttpStatus.FORBIDDEN,             "FORBIDDEN",             "권한 부족"),
+    RATE_LIMITED          (HttpStatus.TOO_MANY_REQUESTS,     "RATE_LIMITED",          "Rate limit 초과"),
+    INTERNAL_ERROR        (HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",        "알 수 없는 오류"),
+    UPSTREAM_UNAVAILABLE  (HttpStatus.SERVICE_UNAVAILABLE,   "UPSTREAM_UNAVAILABLE",  "Circuit Breaker OPEN"),
+    UPSTREAM_TIMEOUT      (HttpStatus.GATEWAY_TIMEOUT,       "UPSTREAM_TIMEOUT",      "Gateway timeout");
+
+    private final HttpStatus httpStatus;
+    private final String     code;
+    private final String     message;
+}
+
+// ProblemDetail 응답 예 — Gateway 503
+HTTP/1.1 503 Service Unavailable
+Content-Type: application/problem+json
+{
+  "type":      "https://api.qtai.app/errors/upstream-unavailable",
+  "title":     "Circuit Breaker OPEN",
+  "status":    503,
+  "instance":  "/auth/login",
+  "code":      "UPSTREAM_UNAVAILABLE",
+  "traceId":   "0af7651916cd43dd8448eb211c80319c",
+  "timestamp": "2026-05-26T14:30:00.123Z"
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.4 KAFKA 페이로드 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.4</span><span class="spec-title">Kafka 페이로드 — user.activity.tracked (BFF 발행)</span></summary>
+  <div class="callout warn mt8">⚠️ BFF가 발행하는 유일한 이벤트. <code>/api/v1/passages/...</code> 조회 시 Best-effort 발행 (응답 중단 X). events/schema/user.activity.tracked-value.json과 완전 동일.</div>
+  <pre>// bff-aggregator/.../infrastructure/kafka/event/UserActivityTrackedEvent.java
+public record UserActivityTrackedEvent(
+    String         eventId,
+    String         eventType,        // "user.activity.tracked"
+    int            eventVersion,     // 1
+    String         schemaSubject,    // "user.activity.tracked-value"
+    String         occurredAt,
+    String         traceId,
+    String         producerService,  // "bff-aggregator"
+    String         idempotencyKey,   // "read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}"
+    Data           data
+) {
+    public record Data(
+        long      userId,
+        String    activityType,    // "READ_PASSAGE"
+        Passage   passage,
+        String    occurredAt
+    ) {
+        public record Passage(String bookCode, int chapter, int verse) {}
+    }
+
+    public static UserActivityTrackedEvent ofReadPassage(
+        long userId, String bookCode, int chapter, int verse
+    ) {
+        long epochMinute = Instant.now().getEpochSecond() / 60;
+        return new UserActivityTrackedEvent(
+            UUID.randomUUID().toString(),
+            "user.activity.tracked",
+            1,
+            "user.activity.tracked-value",
+            Instant.now().toString(),
+            MDC.get("traceId"),
+            "bff-aggregator",
+            String.format("read.passage:%d:%s:%d:%d:%d", userId, bookCode, chapter, verse, epochMinute),
+            new Data(userId, "READ_PASSAGE", new Data.Passage(bookCode, chapter, verse), Instant.now().toString())
+        );
+    }
+}
+
+// 발행 예 (PassageAggregateUseCase 내부, Best-effort)
+try {
+    UserActivityTrackedEvent event = UserActivityTrackedEvent.ofReadPassage(userId, bookCode, chapter, verse);
+    kafkaTemplate.send("user.activity.tracked", event.idempotencyKey(), event);
+} catch (Exception e) {
+    log.warn("Kafka publish failed (Best-effort): {}", e.getMessage());
+    // 응답에는 영향 없음
+}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.5 STOMP WebSocket -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.5</span><span class="spec-title">STOMP WebSocket 구조 (04번 §10)</span></summary>
+  <div class="callout mt8">클라이언트는 <code>/ws/notifications</code>로 CONNECT → <code>/topic/user.{userId}</code> 구독.</div>
+  <pre>// bff-aggregator/.../websocket/StompConfig.java
+@Configuration
+@EnableWebSocketMessageBroker
+public class StompConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws/notifications")
+            .setAllowedOriginPatterns("*")
+            .withSockJS();
+    }
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/topic", "/queue");
+        registry.setApplicationDestinationPrefixes("/app");
+    }
+}
+
+// 알림 전송
+simpMessagingTemplate.convertAndSend(
+    "/topic/user." + userId,
+    Map.of(
+        "type",      "AI_SESSION_COMPLETED",
+        "sessionId", sessionId,
+        "timestamp", Instant.now().toString()
+    )
+);<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.6 서비스 간 통신 (Feign/RestClient) -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.6</span><span class="spec-title">서비스 간 통신 — RestClient + Resilience4j</span></summary>
+  <div class="callout warn mt8">⚠️ BFF가 4개 서비스 호출 시 <strong>RestClient</strong> + <strong>Circuit Breaker</strong> 필수. CallNotPermittedException → 503 매핑.</div>
+  <pre>// bff-aggregator/.../infrastructure/client/AuthServiceClient.java
+@Component
+@RequiredArgsConstructor
+public class AuthServiceClient {
+
+    private final RestClient restClient;
+
+    @CircuitBreaker(name = "auth-service", fallbackMethod = "getMeFallback")
+    @TimeLimiter(name = "auth-service")
+    public UserBrief getMe(Long userId) {
+        return restClient.get()
+            .uri("http://auth-service.qtai.svc.cluster.local:8080/auth/me")
+            .header("X-User-Id", userId.toString())
+            .retrieve()
+            .body(UserBrief.class);
+    }
+
+    private UserBrief getMeFallback(Long userId, Throwable t) {
+        log.warn("Auth Service circuit open: {}", t.getMessage());
+        return null;  // partial 응답
+    }
+}
+
+# application.yml
+resilience4j:
+  circuitbreaker:
+    instances:
+      auth-service:
+        slidingWindowSize:                10
+        minimumNumberOfCalls:             5
+        failureRateThreshold:             50
+        waitDurationInOpenState:          10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      auth-service:
+        timeoutDuration: 2s<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <!-- 5.7 KAFKA TOPICS 전체 -->
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.7</span><span class="spec-title">전체 Kafka 토픽 8개 (DECISIONS.md)</span></summary>
+  <table class="tbl mt8"><thead><tr><th>토픽</th><th>발행 Service</th><th>컨슈머</th><th>용도</th></tr></thead><tbody>
+    <tr><td><code>user.deactivated</code></td><td>auth-service</td><td>journal-service</td><td>탈퇴 시 journal soft delete</td></tr>
+    <tr><td><code>user.activity.tracked</code></td><td>bff-aggregator</td><td>(미정/v1.1)</td><td>읽기 활동 통계</td></tr>
+    <tr><td><code>ai.session.completed</code></td><td>ai-service</td><td>bff-aggregator</td><td>D 단계 완료 시 알림</td></tr>
+    <tr><td><code>journal.created</code></td><td>journal-service</td><td>bff-aggregator</td><td>journal 생성 시 알림</td></tr>
+    <tr><td><code>journal.updated</code></td><td>journal-service</td><td>bff-aggregator</td><td>journal 수정 시 알림</td></tr>
+    <tr><td><code>journal.deleted</code></td><td>journal-service</td><td>bff-aggregator</td><td>journal 삭제 시 알림</td></tr>
+    <tr><td><code>journal.creation.failed</code></td><td>ai-service</td><td>journal-service</td><td>Saga 보상 — DRAFT 롤백</td></tr>
+    <tr><td><code>notification.requested</code></td><td>(각 service)</td><td>bff-aggregator</td><td>STOMP 푸시 알림</td></tr>
+  </tbody></table></details>
+
+  </div>
+<!-- S6: WORKFLOW + REPORT -->
+<div class="sec" id="s6">
+  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
+  <div class="callout blue">ℹ️ 모든 day 카드 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서를 반드시 따릅니다. 개인 작업 폴더는 <code>workspaces/Lead_강태오/</code> 입니다.</div>
+
+  <div class="wr-flow">
+    <span class="step">📝 workflows/{date}-{task}.md 작성</span>
+    <span class="arrow">→</span>
+    <span class="step">🔍 자기 검토 (체크리스트 ✓)</span>
+    <span class="arrow">→</span>
+    <span class="step">🚀 작업 진행</span>
+    <span class="arrow">→</span>
+    <span class="step">📊 reports/{date}-{task}.md 작성</span>
+  </div>
+
+  <div class="folder-rule">
+    <strong>🚫 폴더 격리 규칙 (AGENTS.md §13)</strong><br>
+    • 본인 폴더(<code>workspaces/Lead_강태오/</code>)에서만 읽기·쓰기 허용<br>
+    • 다른 팀원의 개인 폴더는 <strong>읽기·수정·삭제 모두 금지</strong> (AI 에이전트 포함)<br>
+    • <code>workspaces/</code> 내 파일은 빌드·테스트·CI에 영향 없음 (import 금지)<br>
+    • 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject
+  </div>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.1</span><span class="spec-title">개인 작업 폴더 구조</span></summary>
+  <pre>workspaces/Lead_강태오/                  ← 나만 접근
+├── README.md                         (폴더 사용법)
+├── workflows/                        (작업 시작 전 워크플로우)
+│   ├── _template.md                  (템플릿 — 복사해서 사용)
+│   ├── 20260513-{task-slug}.md       (예시)
+│   └── 20260514-{task-slug}.md       (예시)
+├── reports/                          (작업 종료 후 리포트)
+│   ├── _template.md                  (템플릿)
+│   ├── 20260513-{task-slug}.md       (예시 — 워크플로우와 동일 이름)
+│   └── 20260514-{task-slug}.md
+├── docs/                             (개인이 작성하는 문서·명세)
+└── notes/                            (메모·로그·스크린샷)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.2</span><span class="spec-title">워크플로우 양식 — workflows/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 시작 전 반드시 작성. 파일명은 <code>YYYYMMDD-{task-slug}.md</code> 형식. 리포트와 동일 이름 사용.</div>
+  <pre># 워크플로우 — [작업명]
+
+**작성자**: 강태오 (Lead — Gateway·BFF·DevOps)
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜] (예: W1 5/13 수)
+**예상 소요시간**: ?시간
+**상태**: 📝 초안 / 🔍 검토 중 / ✅ 승인됨 / 🚀 실행 중 / 🎯 완료
+
+---
+
+## 1. 작업 목표
+(1개 문장으로 명확히)
+
+## 2. 변경 대상 파일
+- `path/to/file` — 무엇을 어떻게
+
+## 3. 작업 단계 (TODO)
+1. [ ] ...
+2. [ ] ...
+
+## 4. 검증 기준 (Definition of Done)
+- [ ] 단위 테스트 통과
+- [ ] 빌드 성공
+- [ ] OpenAPI/Spectral lint 통과 (해당 시)
+- [ ] curl/시뮬레이션 결과 확인
+- [ ] PR 300줄 이내
+
+## 5. 의존성
+- 선행 작업: ...
+- 다른 개발자 작업: ...
+
+## 6. 리스크 / 의문점
+- ...
+
+## 7. 자기 검토 체크
+- [ ] AGENTS.md 금지 패턴 위반 없음
+- [ ] DECISIONS.md 기준 위반 없음
+- [ ] 04_API_명세서 정합 (해당 시)
+- [ ] events/schema 정합 (해당 시)
+- [ ] 다른 개발자의 workspaces/ 폴더 접근 없음
+
+---
+> ⚠️ 작업 시작 전 반드시 검토하고, 의문점이 남으면 보강한 후 진행하세요.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.3</span><span class="spec-title">리포트 양식 — reports/_template.md</span></summary>
+  <div class="callout warn mt8">⚠️ 작업 종료 직후 반드시 작성. 다음 작업 시작 전에 완료. 동일 워크플로우와 이름 맞추기.</div>
+  <pre># 리포트 — [작업명]
+
+**작성자**: 강태오
+**작성일**: 2026-MM-DD
+**해당 일자**: W[X] [날짜]
+**소요 시간**: ?시간 (예상 대비 +/- ?)
+**상태**: ✅ 완료 / ⚠️ 부분 완료 / ❌ 실패
+
+**대응 워크플로우**: `workflows/[동일 파일명].md`
+
+---
+
+## 1. 결과 요약
+(1~2문장)
+
+## 2. 변경 사항
+- `path/to/file` — 실제 변경 내용 + 이유
+
+## 3. 검증 결과
+| 항목 | 결과 | 증거 |
+|------|------|------|
+| 단위 테스트 | ✅ | 로그/PR 링크 |
+| 빌드 | ✅ | ... |
+| Spectral | ✅/N/A | ... |
+| curl | ✅ | ... |
+
+## 4. 산출물
+- PR: #[번호]
+- 커밋: [SHA]
+- 스크린샷/로그: `notes/...`
+
+## 5. 워크플로우 대비 차이
+(계획과 다르게 진행된 부분과 그 이유)
+
+## 6. 미해결 항목 / 후속 조치
+- [ ] ...
+
+## 7. 회고
+- 잘 된 점:
+- 개선할 점:
+- 다음에 알아야 할 점:
+
+---
+> 📌 작업 완료 직후 작성하고, 다음 작업 워크플로우의 입력으로 활용.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.4</span><span class="spec-title">작업 세트 예시</span></summary>
+  <pre># 예: 작업 시작 → 종료 시퀀스
+
+# 1. 워크플로우 작성
+cd workspaces/Lead_강태오/workflows
+cp _template.md 20260513-{task-slug}.md
+notepad 20260513-{task-slug}.md   # 내용 채우기
+
+# 2. 검토 후 작업 진행
+cd ../../../
+# (실제 코드/문서 작업)
+
+# 3. 작업 완료 후 리포트
+cd workspaces/Lead_강태오/reports
+cp _template.md 20260513-{task-slug}.md   # 워크플로우와 동일 이름
+notepad 20260513-{task-slug}.md   # 결과 작성<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
+
+  </div>
+<!-- S7: REFERENCE DOC MATRIX -->
+<div class="sec" id="s7">
+  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">원문 문서 필요 항목 매트릭스 — 언제 어떤 문서를 봐야 하는가</div></div>
+  <div class="callout blue">ℹ️ 이 실행 가이드는 자기완결성을 추구하지만, <strong>변경의 원천이 되는 결정·스키마는 반드시 원본 문서를 우선</strong>합니다. 아래 표에서 작업 유형 → 원본 문서를 매핑하여 빠르게 찾으세요.</div>
+
+  <div class="ref-matrix">
+    <table>
+      <thead>
+        <tr><th style="width:25%">작업 유형</th><th style="width:35%">원본 문서</th><th>이유</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>API 계약 변경</strong><br>(엔드포인트·DTO·헤더·에러)</td>
+          <td><code>04_API_명세서.md</code><br><code>apis/{service}/openapi.yaml</code></td>
+          <td>OpenAPI 3.1 + Spectral lint가 단일 진실 원천. 가이드 S5는 스냅샷.</td>
+        </tr>
+        <tr>
+          <td><strong>DB 스키마 변경</strong><br>(컬럼·인덱스·관계)</td>
+          <td><code>02_ERD_문서.md</code><br>+ Flyway 마이그레이션</td>
+          <td>ERD에 ADR-0009 등 결정 근거 포함. DDL은 마이그레이션이 권위.</td>
+        </tr>
+        <tr>
+          <td><strong>Kafka 이벤트 변경</strong><br>(payload·topic·key)</td>
+          <td><code>events/schema/*.json</code><br>+ Apicurio Schema Registry</td>
+          <td>JSON Schema 8개 파일이 envelope·data 표준. <code>data</code> 키 (not <code>payload</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처 흐름</strong><br>(Saga·OICD·인증 플로우)</td>
+          <td><code>03_아키텍처_정의서.md</code></td>
+          <td>시퀀스 다이어그램·CQRS·Outbox 패턴 결정 근거.</td>
+        </tr>
+        <tr>
+          <td><strong>보안 정책</strong><br>(JWT·Rate limit·CORS)</td>
+          <td><code>05_보안_명세서.md</code></td>
+          <td>JWT RS256 키·OAuth scope·rate limit 임계값.</td>
+        </tr>
+        <tr>
+          <td><strong>K8s·Docker·Helm</strong><br>(매니페스트·ConfigMap)</td>
+          <td><code>06_DevOps_운영_매뉴얼.md</code><br><code>helm/qtai-infra/</code></td>
+          <td>네임스페이스·Secret·헬스체크 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>테스트 작성</strong><br>(단위·통합·E2E)</td>
+          <td><code>07_테스트_전략.md</code><br><code>16_API_통합_테스트_가이드.md</code></td>
+          <td>커버리지 기준·Testcontainers·Prism mock 사용법.</td>
+        </tr>
+        <tr>
+          <td><strong>Flutter 앱 가이드</strong></td>
+          <td><code>08_프론트엔드_Flutter_가이드.md</code></td>
+          <td>위젯 트리·상태관리·라우팅 표준.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 프롬프트 변경</strong></td>
+          <td><code>09_AI_프롬프트_운영_가이드.md</code></td>
+          <td>OICD 단계별 프롬프트·golden-set·injection-set.</td>
+        </tr>
+        <tr>
+          <td><strong>빌드·실행 오류</strong></td>
+          <td><code>10_트러블슈팅_FAQ.md</code></td>
+          <td>의존성 충돌·포트 충돌·Minikube 메모리 부족 등.</td>
+        </tr>
+        <tr>
+          <td><strong>최초 환경 설정</strong></td>
+          <td><code>11_개발_환경_셋업_가이드.md</code></td>
+          <td>역할별 추가 설치·.env·JWT 키 생성·DB 시드.</td>
+        </tr>
+        <tr>
+          <td><strong>도메인 모델·패키지 구조</strong></td>
+          <td><code>12_서비스별_도메인_모델_상세.md</code></td>
+          <td>Clean Architecture 계층·UseCase 패턴·예외 계층.</td>
+        </tr>
+        <tr>
+          <td><strong>Git 브랜치·PR 규칙</strong></td>
+          <td><code>14_팀_협업_규칙_Git_브랜치_전략.md</code></td>
+          <td>커밋 메시지·코드 리뷰 기준·머지 정책.</td>
+        </tr>
+        <tr>
+          <td><strong>서비스별 W1~W5 체크리스트</strong></td>
+          <td><code>15_서비스별_구현_체크리스트.md</code></td>
+          <td>본인 day 카드 DoD가 부족할 때 더 상세한 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>데이터 시드·마이그레이션</strong></td>
+          <td><code>17_데이터_시드_마이그레이션_전략.md</code></td>
+          <td>Bible 66권·prompt template·user 시드 데이터.</td>
+        </tr>
+        <tr>
+          <td><strong>코드 품질 게이트</strong></td>
+          <td><code>18_코드_품질_게이트.md</code></td>
+          <td>SonarQube·커버리지·정적 분석 기준.</td>
+        </tr>
+        <tr>
+          <td><strong>아키텍처·기술 스택 결정 근거</strong></td>
+          <td><code>DECISIONS.md</code> ⭐</td>
+          <td><strong>단일 진실 원천</strong>. MySQL/MSA/Kafka KRaft 등 모든 결정 이유.</td>
+        </tr>
+        <tr>
+          <td><strong>AI 에이전트 규칙·금지 패턴</strong></td>
+          <td><code>AGENTS.md</code></td>
+          <td>금지 패턴·workspaces 폴더 격리(§13)·코드 작성 가이드.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn mt16">
+    ⚠️ <strong>변경 우선순위:</strong> 원본 문서 → 코드 → 가이드 HTML 순으로 갱신합니다. 가이드 S5/S6의 스냅샷이 원본과 다르면 <strong>원본이 우선</strong>이며, Lead에게 가이드 갱신을 요청하세요.
+  </div>
+</div>
+
 </div><!-- /wrap -->
 <script>
 // ─────────────── BADGE MAP ───────────────
 var B = {infra:'인프라',code:'코드',obs:'관측성',review:'리뷰',gate:'게이트',test:'테스트',demo:'시연'};
 
+function dodFallback(badge) {
+  var common = ['단위 테스트 추가/통과', '본인 서비스 빌드 성공', 'PR draft 등록', 'workspaces/{본인}/reports/ 리포트 작성'];
+  switch(badge) {
+    case 'infra': return ['인프라 정상 기동 (kubectl get pods)', '헬스체크 200 OK', '.env / Secret 적용 검증', 'reports/ 리포트 작성'];
+    case 'code': return common;
+    case 'obs': return ['로그 출력 확인 (INFO+ 누락 없음)', 'Prometheus 메트릭 노출', 'Jaeger trace 수집 확인', 'PR draft 등록'];
+    case 'review': return ['PR 코멘트 모두 반영', '추가 테스트 케이스', 'develop conflict 해결', '리뷰어 재요청'];
+    case 'gate': return ['통합 테스트 통과 (16번)', '커버리지 80%+', 'Spectral lint 통과', 'Sonar 품질 게이트 통과'];
+    case 'test': return ['golden-set 시나리오 통과', 'injection-set 보안 테스트', '커버리지 80%+', 'PR draft 등록'];
+    case 'demo': return ['시연 시나리오 통과 (13번)', '스크린샷·녹화 확보', 'workspaces/{본인}/notes/ 저장', '발표 슬라이드 반영'];
+    default: return common;
+  }
+}
+
+
 // ─────────────── W1 DATA ───────────────
 var W1 = [
-  {date:'5/12 월',badge:'infra',
+  {date:'5/12 화',badge:'infra',dod:['K8s namespace qtai 생성 (kubectl create namespace qtai)','Helm chart로 5개 인프라 Pod 기동 (MySQL·Redis-Cache·Redis-WS·Kafka·ChromaDB)','kubectl get pods -n qtai → 5/5 Running 확인','6 module Gradle settings 초기화 + ./gradlew build -x test BUILD SUCCESSFUL','reports/ 리포트 작성'],
    m:'킥오프 (10:00). Gradle 6 module 최종 확인',
    a:'K8s namespace qtai + Helm infra chart 기동',
    e:'Gateway 라우팅 6개 서비스 초기 설정',
@@ -448,34 +1128,34 @@ var W1 = [
    how:'# 1. Minikube 시작 (자원 충분히!)\nminikube start --cpus 4 --memory 8g --driver docker\n\n# 2. namespace + label\nkubectl create namespace qtai\nkubectl label namespace qtai name=qtai\n\n# 3. infra chart 배포\nhelm install qtai-infra helm/qtai-infra/ -n qtai \\\n  --values helm/qtai-infra/values.yaml\n\n# 4. Pod 상태 확인 (Running 될 때까지)\nkubectl get pods -n qtai -w',
    sim:'pods-infra'},
 
-  {date:'5/13 화',badge:'code',
+  {date:'5/13 수',badge:'code',dod:['Gateway JWT RS256 검증 GlobalFilter + X-User-Id 헤더 주입','Kafka 8 토픽 + 8 DLQ 자동 생성 스크립트 동작 확인','K8s Secret 4종 적용 (anthropic·mysql·jwt-keys·google-oauth)','curl 통과 — Gateway 인증 흐름 200 OK','PR draft 등록'],
    m:'Stand-up. AuthFilter (JWT→X-User-Id) 구현',
    a:'Kafka 토픽 8종 자동 생성 스크립트',
    e:'K8s Secret 4종 생성',
-   where:['gateway-service/.../filter/AuthFilter.kt','scripts/kafka-topics.sh','kubectl (Secret 생성)'],
+   where:['gateway-service/.../filter/AuthFilter.java','scripts/kafka-topics.sh','kubectl (Secret 생성)'],
    what:'① JWT RS256 검증 → <code>X-User-Id</code> 헤더 주입 GlobalFilter<br>② Kafka 8토픽 + 8 DLQ 자동 생성 스크립트<br>③ K8s Secret 4종 (anthropic / mysql / jwt-keys / google-oauth)',
-   how:'// AuthFilter.kt\n@Component\nclass AuthFilter(private val jwtService: JwtService\n) : GlobalFilter, Ordered {\n    override fun getOrder() = -100\n\n    override fun filter(\n        exchange: ServerWebExchange,\n        chain: GatewayFilterChain\n    ): Mono<Void> {\n        val token = exchange.request.headers["Authorization"]\n            ?.firstOrNull()?.removePrefix("Bearer ")\n            ?: return onError(exchange, HttpStatus.UNAUTHORIZED)\n        val userId = try {\n            jwtService.validateAndGetUserId(token)\n        } catch (e: Exception) {\n            return onError(exchange, HttpStatus.UNAUTHORIZED)\n        }\n        val req = exchange.request.mutate()\n            .header("X-User-Id", userId.toString()).build()\n        return chain.filter(exchange.mutate().request(req).build())\n    }\n}\n\n# K8s Secret 생성\nkubectl create secret generic jwt-keys \\\n  --from-file=jwt_private.pem=./keys/jwt_private.pem \\\n  --from-file=jwt_public.pem=./keys/jwt_public.pem -n qtai\nkubectl create secret generic anthropic \\\n  --from-literal=ANTHROPIC_API_KEY=sk-ant-XXX -n qtai',
+   how:'// AuthFilter.java\n@Component\n@RequiredArgsConstructor\npublic class AuthFilter implements GlobalFilter, Ordered {\n\n    private final JwtService jwtService;\n\n    @Override\n    public int getOrder() { return -100; }\n\n    @Override\n    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {\n        List<String> authHeader = exchange.getRequest().getHeaders().get("Authorization");\n        if (authHeader == null || authHeader.isEmpty()) {\n            return onError(exchange, HttpStatus.UNAUTHORIZED);\n        }\n        String token = authHeader.get(0).replaceFirst("^Bearer ", "");\n\n        Long userId;\n        try {\n            userId = jwtService.validateAndGetUserId(token);\n        } catch (Exception e) {\n            return onError(exchange, HttpStatus.UNAUTHORIZED);\n        }\n\n        ServerHttpRequest req = exchange.getRequest().mutate()\n            .header("X-User-Id", userId.toString()).build();\n        return chain.filter(exchange.mutate().request(req).build());\n    }\n}\n\n# K8s Secret 생성\nkubectl create secret generic jwt-keys \\\n  --from-file=jwt_private.pem=./keys/jwt_private.pem \\\n  --from-file=jwt_public.pem=./keys/jwt_public.pem -n qtai\nkubectl create secret generic anthropic \\\n  --from-literal=ANTHROPIC_API_KEY=sk-ant-XXX -n qtai',
    sim:'jwt'},
 
-  {date:'5/14 수',badge:'code',
+  {date:'5/14 목',badge:'code',dod:['SSE buffering 우회 NoBufferingFilter — Anthropic 첫 토큰 즉시 전달 검증','BFF DashboardUseCase — Auth+Bible+Journal CompletableFuture 병렬 호출','shared-kernel BaseEntity (createdAt·updatedAt + AuditingEntityListener)','/me/dashboard 200 OK + 응답 시간 < 500ms','PR draft 등록'],
    m:'Stand-up. NoBufferingFilter (SSE 우회)',
    a:'BFF /me/dashboard 병렬 호출 골격',
    e:'shared-kernel BaseEntity 최종화',
-   where:['gateway-service/.../filter/NoBufferingFilter.kt','bff-service/.../usecase/DashboardUseCase.kt','shared-kernel/src/main/kotlin/com/qtai/common/'],
+   where:['gateway-service/.../filter/NoBufferingFilter.java','bff-service/.../usecase/DashboardUseCase.java','shared-kernel/src/main/java/com/qtai/common/'],
    what:'① SSE buffering 우회 필터 → Anthropic 첫 토큰 즉시 통과<br>② BFF DashboardUseCase — Auth+Bible+Journal <strong>CompletableFuture 병렬 호출</strong> 골격<br>③ shared-kernel BaseEntity (createdAt, updatedAt) + RFC 7807 ErrorResponse',
-   how:'// NoBufferingFilter.kt\n@Component\nclass NoBufferingFilter : GlobalFilter, Ordered {\n    override fun getOrder() = -200\n    override fun filter(\n        exchange: ServerWebExchange,\n        chain: GatewayFilterChain\n    ): Mono<Void> {\n        return chain.filter(exchange).doOnSubscribe {\n            exchange.response.headers\n                .set(HttpHeaders.CACHE_CONTROL, "no-cache")\n            exchange.response.headers\n                .set("X-Accel-Buffering", "no")\n        }\n    }\n}\n\n// DashboardUseCase.kt\n@Service\nclass DashboardUseCase(\n    private val authClient: AuthServiceClient,\n    private val bibleClient: BibleServiceClient,\n) {\n    fun execute(userId: Long): DashboardResponse {\n        val userF = CompletableFuture.supplyAsync { authClient.getMe(userId) }\n        val passF = CompletableFuture.supplyAsync { bibleClient.getTodayPassage() }\n        CompletableFuture.allOf(userF, passF).join()\n        return DashboardResponse(user=userF.get(), todayPassage=passF.get())\n    }\n}',
+   how:'// NoBufferingFilter.java\n@Component\nclass NoBufferingFilter : GlobalFilter, Ordered {\n    override fun getOrder() = -200\n    override fun filter(\n        exchange: ServerWebExchange,\n        chain: GatewayFilterChain\n    ): Mono<Void> {\n        return chain.filter(exchange).doOnSubscribe {\n            exchange.response.headers\n                .set(HttpHeaders.CACHE_CONTROL, "no-cache")\n            exchange.response.headers\n                .set("X-Accel-Buffering", "no")\n        }\n    }\n}\n\n// DashboardUseCase.java\n@Service\n@RequiredArgsConstructor\npublic class DashboardUseCase {\n\n    private final AuthServiceClient authClient;\n    private final BibleServiceClient bibleClient;\n\n    public DashboardResponse execute(Long userId) {\n        CompletableFuture<UserResponse> userF =\n            CompletableFuture.supplyAsync(() -> authClient.getMe(userId));\n        CompletableFuture<PassageResponse> passF =\n            CompletableFuture.supplyAsync(() -> bibleClient.getTodayPassage());\n        CompletableFuture.allOf(userF, passF).join();\n        return new DashboardResponse(userF.join(), passF.join());\n    }\n}',
    sim:'sse'},
 
-  {date:'5/15 목',badge:'infra',
+  {date:'5/15 금',badge:'infra',dod:['6개 서비스 K8s Deployment + Service 매니페스트 생성','kubectl apply 후 6개 Pod 모두 Running','BFF STOMP /ws/notifications 기본 핸들러 등록','각 Pod /actuator/health 200 OK 확인','PR draft 등록'],
    m:'Stand-up. K8s 스켈레톤 6 pod health 200 확인',
    a:'STOMP WebSocket 기본 설정',
    e:'팀원 환경 막힘 지원',
-   where:['helm/qtai-umbrella/charts/*/templates/deployment.yaml','bff-service/.../websocket/StompConfig.kt'],
+   where:['helm/qtai-umbrella/charts/*/templates/deployment.yaml','bff-service/.../websocket/StompConfig.java'],
    what:'① 6개 서비스 K8s 스켈레톤 배포 — hello-world 수준 기동 확인<br>② BFF STOMP WebSocket <code>/ws/notifications</code> 기본 설정<br>③ 각 Pod <code>/actuator/health</code> 200 확인',
    how:'# 전체 umbrella chart 배포\nhelm upgrade --install qtai helm/qtai-umbrella/ \\\n  -n qtai --values helm/qtai-umbrella/values.yaml\n\n# 6 pod 상태 확인\nkubectl get pods -n qtai\n\n# 서비스 간 통신 테스트 (Gateway → Auth)\nkubectl exec -n qtai \\\n  $(kubectl get pod -n qtai -l app=gateway -o name | head -1) \\\n  -- curl -s \\\n  http://auth-service.qtai.svc.cluster.local:8080/actuator/health',
    sim:'pods-all'},
 
-  {date:'5/16 금',badge:'code',
+  {date:'5/16 금',badge:'code',dod:['GitHub Actions CI — Spectral OpenAPI lint 5종 모두 통과','각 팀원 bootRun 정상 실행 지원 (5명 환경 점검)','gitleaks 시크릿 누출 스캔 동작 확인','main 브랜치 보호 룰 + PR 리뷰 1명+ 강제 적용','PR draft 등록'],
    m:'Stand-up. CI yml Spectral lint 통과 확인',
    a:'전원 bootRun 지원 (막힌 팀원 페어)',
    e:'1차 페이스 점검 준비',
@@ -484,7 +1164,7 @@ var W1 = [
    how:'# 로컬에서 Spectral lint 전체 확인\nfor SVC in auth bible ai journal bff; do\n  npx @stoplight/spectral-cli lint apis/$SVC/openapi.yaml\ndone\n\n# 각 서비스 bootRun 확인\n./gradlew :auth-service:bootRun\n\n# gitleaks 로컬 확인\ngitleaks detect --source . --verbose',
    sim:'ci'},
 
-  {date:'5/19 월',badge:'obs',
+  {date:'5/19 월',badge:'obs',dod:['Loki + Promtail DaemonSet — 6 서비스 stdout 로그 수집','Prometheus + ServiceMonitor — /actuator/prometheus scrape 5/5','Jaeger all-in-one + OTEL Collector — 분산 trace 정상 출력','Grafana 기본 대시보드 (CPU·Memory·HTTP latency) 1개 등록','PR draft 등록'],
    m:'Stand-up. Loki + Prometheus scrape 설정',
    a:'Grafana 기본 대시보드 import',
    e:'Jaeger agent 연결 확인',
@@ -493,7 +1173,7 @@ var W1 = [
    how:'# observability namespace 생성 + 설치\nkubectl create namespace observability\nhelm install obs helm/qtai-infra/ \\\n  -n observability --set mode=observability\n\n# 접속 확인 (포트 포워딩)\nkubectl port-forward -n observability svc/grafana 3000:3000\n# 브라우저: http://localhost:3000 (admin/admin)\n\n# Prometheus 메트릭 확인\ncurl "http://localhost:9090/api/v1/query?query=up"\n\n# Loki 로그 쿼리\nlogcli query \'{namespace="qtai"}\' --limit 10',
    sim:'grafana'},
 
-  {date:'5/20 화',badge:'infra',
+  {date:'5/20 화',badge:'infra',dod:['NetworkPolicy default-deny + Gateway만 외부 노출','W3C Trace Context traceparent — Gateway → 모든 서비스 전달 검증','Jaeger UI에서 1건 이상 전 구간 trace 확인 (Gateway → Auth → Bible → BFF)','AlertManager 규칙 1개 이상 등록 (5xx 5분 5건 이상)','PR draft 등록'],
    m:'Stand-up. NetworkPolicy default-deny 적용',
    a:'OpenTelemetry traceId 전파 확인',
    e:'팀원 W1 체크리스트 점검',
@@ -502,16 +1182,16 @@ var W1 = [
    how:'# networkpolicy.yaml\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: qtai-internal\n  namespace: qtai\nspec:\n  podSelector: {}\n  policyTypes: [Ingress, Egress]\n  ingress:\n  - from:\n    - namespaceSelector:\n        matchLabels:\n          name: qtai\n    - namespaceSelector:\n        matchLabels:\n          name: ingress-nginx\n  egress:\n  - {}\n\n# application.yml — OTEL (Spring Boot 3.3 표준 키)\nmanagement:\n  otlp:\n    tracing:\n      endpoint: http://otel-collector:4318/v1/traces\n  tracing:\n    sampling:\n      probability: 1.0',
    sim:'trace'},
 
-  {date:'5/21 수',badge:'review',
+  {date:'5/21 수',badge:'review',dod:['팀원 PR 5건 이상 DoD 7항목 + 환각 체크리스트 확인 후 머지','BFF DashboardUseCase — Auth + Bible 실서비스 연결','/me/dashboard 200 OK + 실 데이터 반환 확인','CodeReview 가이드 슬랙 공지','PR draft 등록'],
    m:'Stand-up. 팀원 PR 리뷰 + 머지',
    a:'BFF dashboard 실데이터 연결',
    e:'Foundation 사전 점검',
-   where:['GitHub PR 탭','bff-service/.../usecase/DashboardUseCase.kt'],
+   where:['GitHub PR 탭','bff-service/.../usecase/DashboardUseCase.java'],
    what:'① 팀원 PR 전체 DoD 7항목 + 환각 체크리스트 확인 후 머지<br>② BFF DashboardUseCase — Auth + Bible 실 서비스 연결<br>③ <code>/me/dashboard</code> 200 반환 확인',
    how:'# PR 환각 체크 (Lead 기준)\n# 1. 금지 패턴 grep\ngrep -r "PostgreSQL|ZooKeeper|Tempo|@EnableSwagger2" {service}/src/\n\n# 2. @Transactional 누락 확인\ngrep -rn "fun save|fun update|fun delete" {service}/src/ \\\n  | grep -v "@Transactional"\n\n# 3. 평문 시크릿 확인\ngitleaks detect --source . --verbose\n\n# 4. /me/dashboard 동작 확인\ncurl -H "Authorization: Bearer {TOKEN}" \\\n  http://localhost:8083/me/dashboard',
    sim:'dashboard'},
 
-  {date:'5/22 목',badge:'gate',
+  {date:'5/22 목',badge:'gate',dod:['5/22 18:00 Foundation 5항목 전부 ✅ 최종 검증','하나라도 ❌이면 W2 진입 금지, 주말 보강 후 월요일 재검증','W1 회고 회의 진행 — AI 환각 재작업 PR 수·원인 공유','15_체크리스트 W1 항목 전수 마킹','reports/ W1 종합 리포트 작성'],
    m:'Stand-up. Foundation 최종 점검 회의',
    a:'W1 Lock-in 게이트 체크 (18:00)',
    e:'W1 회고 작성',
@@ -523,34 +1203,34 @@ var W1 = [
 
 // ─────────────── W2 DATA ───────────────
 var W2 = [
-  {date:'5/26 화',badge:'review',
+  {date:'5/26 화',badge:'review',dod:['11:30 페이스 점검 회의 진행 — 6 서비스 진척 50% 확인','6 서비스 Gateway 라우팅 curl health 모두 200 OK','진척 50% 미달 서비스 식별 → 즉시 페어 코딩 배정','15_체크리스트 W2 항목 5개 마킹','reports/ 페이스 점검 결과 작성'],
    m:'페이스 점검 주도 (11:30)',
    a:'Gateway 통합 라우팅 검증 — curl 6 서비스 health',
    e:'팀원 블로커 해소 페어',
-   where:['gateway-service/.../config/RouteConfig.kt','터미널 (curl)'],
+   where:['gateway-service/.../config/RouteConfig.java','터미널 (curl)'],
    what:'① 매주 화 11:30 페이스 점검 주도 — 서비스별 진척 50% 달성 확인<br>② 6개 서비스 Gateway 라우팅 동작 검증 — curl health 200 확인<br>③ 진척 50% 미달 서비스 → 즉시 페어 코딩',
    how:'# Gateway → 각 서비스 라우팅 검증\nfor SVC in auth bible ai journal; do\n  STATUS=$(curl -s -o /dev/null -w "%{http_code}" \\\n    http://localhost:8080/${SVC}/actuator/health)\n  echo "${SVC}: ${STATUS}"\ndone\n\n# BFF 별도 포트 (8083)\ncurl -s -o /dev/null -w "bff: %{http_code}\\n" \\\n  http://localhost:8083/actuator/health\n\n# 기대: 모두 200',
    sim:'routing'},
 
-  {date:'5/27 수',badge:'infra',
+  {date:'5/27 수',badge:'infra',dod:['NetworkPolicy default-deny + ingress 허용 매트릭스 완성','6 서비스 Gateway/BFF 외 외부 접근 차단 검증','BFF DashboardUseCase 4 서비스 실데이터 연결','Prometheus Alert: kafka_consumer_lag > 100 → Slack 알림','PR draft 등록'],
    m:'Stand-up. NetworkPolicy 6x6 매트릭스 완성',
    a:'BFF /me/dashboard 5 서비스 실데이터',
    e:'Prometheus Alert Rule 설정',
-   where:['helm/qtai-umbrella/charts/*/templates/networkpolicy.yaml','bff-service/.../usecase/DashboardUseCase.kt','observability/alerts/qtai-alerts.yaml'],
+   where:['helm/qtai-umbrella/charts/*/templates/networkpolicy.yaml','bff-service/.../usecase/DashboardUseCase.java','observability/alerts/qtai-alerts.yaml'],
    what:'① NetworkPolicy — 서비스별 ingress 허용 매트릭스 완성 (gateway/bff에서만)<br>② BFF DashboardUseCase — Auth+Bible+Journal+AI 4 서비스 실데이터 연결<br>③ Prometheus Alert: kafka_consumer_lag > 100 → Slack 알림',
    how:'# NetworkPolicy — auth-service 허용 예시\napiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: allow-to-auth\n  namespace: qtai\nspec:\n  podSelector:\n    matchLabels:\n      app: auth-service\n  ingress:\n  - from:\n    - podSelector:\n        matchLabels:\n          app: gateway\n    - podSelector:\n        matchLabels:\n          app: bff-aggregator\n\n# Prometheus Alert Rule\ngroups:\n- name: qtai-kafka\n  rules:\n  - alert: KafkaConsumerLag\n    expr: kafka_consumer_lag > 100\n    for: 5m\n    labels:\n      severity: warning',
    sim:'netpolicy'},
 
-  {date:'5/28 목',badge:'code',
-   m:'Stand-up. PATCH /ai/sessions/{id}/advance 라우팅',
+  {date:'5/28 목',badge:'code',dod:['Gateway PATCH /api/v1/passages → ai-service 라우팅 추가','BFF /me/dashboard 5 서비스 실데이터 통합 테스트','Prometheus Alert kafka_consumer_lag 동작 확인','curl 통합 테스트 — 5 서비스 모두 200 OK + 응답 시간 < 500ms','PR draft 등록'],
+   m:'Stand-up. PATCH /api/v1/passages/{book}/{ch}/{v} 라우팅',
    a:'BFF /me/dashboard 통합 테스트',
    e:'Prometheus Alert 동작 확인',
-   where:['gateway-service/.../config/RouteConfig.kt','bff-service/.../controller/DashboardController.kt'],
-   what:'① Gateway에 PATCH /ai/sessions/{id}/advance → ai-service 라우팅 추가<br>② BFF /me/dashboard 5 서비스 실데이터 통합 테스트<br>③ Prometheus Alert kafka_consumer_lag 동작 확인',
-   how:'// RouteConfig.kt — AI Service PATCH 라우팅\n@Bean\nfun aiRoutes(): RouteLocator = routes {\n    route("ai-sessions") {\n        path("/ai/sessions/**")\n        uri("http://ai-service.qtai.svc.cluster.local:8085")\n    }\n}\n\n# PATCH 라우팅 검증\ncurl -X PATCH \\\n  -H "Authorization: Bearer {TOKEN}" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"action":"advance","currentStep":"A"}\' \\\n  http://localhost:8080/ai/sessions/1/advance\n# 기대: 200 OK',
+   where:['gateway-service/.../config/RouteConfig.java','bff-service/.../controller/DashboardController.java'],
+   what:'① Gateway에 PATCH /api/v1/passages/{book}/{ch}/{v} → ai-service 라우팅 추가<br>② BFF /me/dashboard 5 서비스 실데이터 통합 테스트<br>③ Prometheus Alert kafka_consumer_lag 동작 확인',
+   how:'// RouteConfig.java — AI Service PATCH 라우팅\n@Bean\n@Bean\npublic RouteLocator aiRoutes(RouteLocatorBuilder builder) {\n    return builder.routes()\n        .route("ai-sessions", r -> r.path("/ai/sessions/**"")\n        uri("http://ai-service.qtai.svc.cluster.local:8080")\n    }\n}\n\n# PATCH 라우팅 검증\ncurl -X PATCH \\\n  -H "Authorization: Bearer {TOKEN}" \\\n  -H "Content-Type: application/json" \\\n  -d \'{"action":"advance","currentStep":"A"}\' \\\n  http://localhost:8080/api/v1/passages/GEN/1/1\n# 기대: 200 OK',
    sim:'patch'},
 
-  {date:'5/29 금',badge:'review',
+  {date:'5/29 금',badge:'review',dod:['팀원 PR 전체 DoD 체크리스트 검토 후 머지','W2 완료 게이트 — 서비스별 핵심 API 1개씩 curl 성공','develop rebase — 전원 최신 develop 동기화','주말 작업 금지 슬랙 공지','reports/ W2 종합 리포트 작성'],
    m:'Stand-up. W2 페이스 점검',
    a:'PR 리뷰 집중 머지 (DoD 기준)',
    e:'develop 브랜치 최신 상태 확인',
@@ -562,25 +1242,25 @@ var W2 = [
 
 // ─────────────── W3 DATA ───────────────
 var W3 = [
-  {date:'6/1 월',badge:'code',
+  {date:'6/1 월',badge:'code',dod:['BFF가 journal.created 컨슈밍 → notification.requested 발행','Kafka E2E: Journal → journal.created → BFF → notification.requested → WebSocket','RetryableTopic 3회 재시도 + DLQ 설정 동작 확인','consumer 멱등성 테스트 (동일 이벤트 2번 → DB 1건만)','PR draft 등록'],
    m:'Stand-up. journal.created → notification E2E',
    a:'BFF NotificationUseCase consumer 구현',
    e:'Jaeger 전 구간 traceId 추적 확인',
-   where:['bff-service/.../kafka/JournalEventConsumer.kt','bff-service/.../usecase/NotificationUseCase.kt'],
+   where:['bff-service/.../kafka/JournalEventConsumer.java','bff-service/.../usecase/NotificationUseCase.java'],
    what:'① BFF가 journal.created 컨슈밍 → notification.requested 발행<br>② Kafka E2E: Journal → journal.created → BFF → notification.requested → WebSocket<br>③ RetryableTopic 3회 재시도 + DLQ 설정',
-   how:'// JournalEventConsumer.kt\n@RetryableTopic(\n    attempts = "3",\n    backoff = @Backoff(delay = 1000, multiplier = 5.0)\n)\n@KafkaListener(\n    topics = ["journal.created"],\n    groupId = "bff-journal-notification-consumer"\n)\nfun handle(event: JournalCreatedEvent) {\n    val key = "journal.created:" + event.data.journalId\n    try {\n        notificationService.send(event.data.userId, key)\n    } catch (e: DataIntegrityViolationException) {\n        log.info("중복 이벤트 무시: {}", key)\n    }\n}\n\n@DltHandler\nfun handleDlt(event: JournalCreatedEvent,\n    @Header(KafkaHeaders.EXCEPTION_MESSAGE) error: String) {\n    log.error("DLT: journal.created, error: {}", error)\n    // journal.creation.failed 발행 (Saga 보상)\n}',
+   how:'// JournalEventConsumer.java\n@RetryableTopic(\n    attempts = "3",\n    backoff = @Backoff(delay = 1000, multiplier = 5.0)\n)\n@KafkaListener(\n    topics = ["journal.created"],\n    groupId = "bff-journal-notification-consumer"\n)\npublic void handle(JournalCreatedEvent event) {\n    String key = "journal.created:" + event.getData().getJournalId()\n    try {\n        notificationService.send(event.data.userId, key)\n    } catch (e: DataIntegrityViolationException) {\n        log.info("중복 이벤트 무시: {}", key)\n    }\n}\n\n@DltHandler\npublic void handleDlt(JournalCreatedEvent event,\n    @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorng) {\n    log.error("DLT: journal.created, error: {}", error)\n    // journal.creation.failed 발행 (Saga 보상)\n}',
    sim:'kafkae2e'},
 
-  {date:'6/2 화',badge:'infra',
+  {date:'6/2 화',badge:'infra',dod:['Gateway WS /ws/notifications → BFF 패스스루 라우팅','BFF STOMP 세션 레지스트리 (Redis-WS pub/sub로 Pod 간 공유)','Flutter STOMP 연결 → 알림 수신 E2E (DevE 협력)','11:30 페이스 점검 회의 진행','PR draft 등록'],
    m:'페이스 점검 (11:30). STOMP WebSocket 패스스루',
    a:'Gateway → BFF WS 라우팅 완성',
    e:'Flutter STOMP 연결 테스트 지원',
-   where:['gateway-service/.../config/RouteConfig.kt','bff-service/.../websocket/StompConfig.kt'],
+   where:['gateway-service/.../config/RouteConfig.java','bff-service/.../websocket/StompConfig.java'],
    what:'① Gateway WS /ws/notifications → BFF 패스스루 라우팅 완성<br>② BFF STOMP 세션 레지스트리 — Redis-WS pub/sub로 BFF Pod 간 공유<br>③ Flutter STOMP 연결 → 알림 수신 E2E (김지민 협력)',
-   how:'// RouteConfig.kt — WebSocket 라우팅\n@Bean\nfun wsRoutes(): RouteLocator = routes {\n    route("ws-notifications") {\n        path("/ws/**")\n        uri("ws://bff-aggregator.qtai.svc.cluster.local:8083")\n    }\n}\n\n# WebSocket 동작 확인 (wscat)\nnpm install -g wscat\nwscat -c "ws://localhost:8080/ws/notifications" \\\n  -H "Authorization: Bearer {TOKEN}"\n# 기대: CONNECTED 수신 후 STOMP 알림 구독 가능',
+   how:'// RouteConfig.java — WebSocket 라우팅\n@Bean\n@Bean\npublic RouteLocator wsRoutes(RouteLocatorBuilder builder) {\n    return builder.routes()\n        .route("ws-notifications", r -> r.path("/ws/**")\n        uri("ws://bff-aggregator.qtai.svc.cluster.local:8083")\n    }\n}\n\n# WebSocket 동작 확인 (wscat)\nnpm install -g wscat\nwscat -c "ws://localhost:8080/ws/notifications" \\\n  -H "Authorization: Bearer {TOKEN}"\n# 기대: CONNECTED 수신 후 STOMP 알림 구독 가능',
    sim:'stomp'},
 
-  {date:'6/3 수',badge:'gate',
+  {date:'6/3 수',badge:'gate',dod:['Feature Freeze 선언 → 신규 기능(feat) PR 거부','허용 PR: fix / docs / test / chore / ci 만','Jaeger에서 Gateway→BFF→Auth→Bible 단일 TraceID 확인','develop 브랜치 보호 룰 강화 — feat 차단','reports/ Feature Freeze 결정 사유 기록'],
    m:'Stand-up. Feature Freeze 선언 (Slack #general)',
    a:'W3C Trace Context 전 구간 확인',
    e:'Feature Freeze 이후 PR 기준 팀 공유',
@@ -589,7 +1269,7 @@ var W3 = [
    how:'# Slack #general 공지 (복사·붙여넣기)\n🔒 Feature Freeze 선언 (6/3 수 기준)\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n오늘부터 신규 기능(feat) PR은 Lead 거부.\n허용: fix / docs / test / chore / ci\n긴급 변경: 강태오 DM 후 hotfix 브랜치 사용\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n# Jaeger 전 구간 Trace 확인\nkubectl port-forward -n observability \\\n  svc/jaeger 16686:16686\n# 브라우저: http://localhost:16686\n# Service: gateway → Find Traces\n# 단일 TraceID로 Gateway→BFF→Auth 전부 확인',
    sim:'freeze'},
 
-  {date:'6/4 목',badge:'infra',
+  {date:'6/4 목',badge:'infra',dod:['AI Service K8s HPA — CPU 70% 초과 시 Pod 자동 확장 (max 3)','Grafana 6 서비스 메트릭 + Loki + Jaeger 통합 확인','JaCoCo 커버리지 취합 → 70% 미달 서비스 식별','미달 서비스 담당자에게 보강 PR 요청','PR draft 등록'],
    m:'Stand-up. K8s HPA AI Service 설정',
    a:'분산 추적 통합 최종 확인',
    e:'팀원 커버리지 현황 취합',
@@ -598,7 +1278,7 @@ var W3 = [
    how:'# hpa.yaml\napiVersion: autoscaling/v2\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: ai-service-hpa\n  namespace: qtai\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: Deployment\n    name: ai-service\n  minReplicas: 1\n  maxReplicas: 3\n  metrics:\n  - type: Resource\n    resource:\n      name: cpu\n      target:\n        type: Utilization\n        averageUtilization: 70\n\n# 적용 + 확인\nkubectl apply -f helm/.../hpa.yaml\nkubectl get hpa -n qtai',
    sim:'hpa'},
 
-  {date:'6/5 금',badge:'test',
+  {date:'6/5 금',badge:'test',dod:['k6 SSE 동시 10명 부하 테스트 — P95 ≤ 2000ms 달성','E2E 시나리오 3종: 입체화면·AI큐티·묵상노트→알림','실패 시나리오 → W4 즉시 수정 목록 작성','주말 hotfix 가능 인원 슬랙 공유','reports/ W3 종합 리포트 작성'],
    m:'Stand-up. SSE P95 ≤ 2000ms 측정',
    a:'E2E 시나리오 3종 1차 통과 확인',
    e:'W3 회고 + W4 준비',
@@ -610,7 +1290,7 @@ var W3 = [
 
 // ─────────────── W4 DATA ───────────────
 var W4 = [
-  {date:'6/8 월',badge:'gate',
+  {date:'6/8 월',badge:'gate',dod:['git tag v1.0.0-demo 생성 → CD 파이프라인 자동 트리거','6 서비스 이미지 빌드 + ghcr.io/tae0072/{svc}:1.0.0-demo 태그','helm/values-prod.yaml 시연용 최종 환경변수 검토','13_시연_가이드 §2.1 D-1 체크리스트 시작','PR draft 등록'],
    m:'Stand-up. 시연 빌드 tag 후보 생성',
    a:'Docker 이미지 빌드 + ghcr.io push 확인',
    e:'helm/values-prod.yaml 최종 검토',
@@ -619,7 +1299,7 @@ var W4 = [
    how:'# 시연 빌드 태그 생성\ngit checkout main\ngit merge develop\ngit tag v1.0.0-demo\ngit push origin v1.0.0-demo\n# CD 파이프라인 자동 트리거\n\n# 이미지 빌드 확인 (CD 완료 후)\nfor SVC in gateway bff-aggregator auth-service bible-service ai-service journal-service; do\n  docker pull ghcr.io/tae0072/${SVC}:1.0.0-demo && echo "${SVC}: OK"\ndone\n\n# K8s 시연 이미지로 배포\nhelm upgrade qtai helm/qtai-umbrella/ \\\n  -n qtai --set global.imageTag=1.0.0-demo',
    sim:'tag'},
 
-  {date:'6/9 화',badge:'test',
+  {date:'6/9 화',badge:'test',dod:['시연 시나리오 3분 완주 dry-run (13번 가이드 기준)','11:30 페이스 점검 — 시연 dry-run 결과 공유','실패 항목 P0(시연 불가)/P1(어색)/P2(사소) 분류','P0 항목은 당일 hotfix 배정','reports/ dry-run 결과 작성'],
    m:'페이스 점검 + 시연 dry-run 1회 주도',
    a:'실패 항목 버그 목록 작성 + 우선순위',
    e:'W4 hotfix 전략 팀 공유',
@@ -628,7 +1308,7 @@ var W4 = [
    how:'# 시연 dry-run 체크리스트 (타이머 3분 설정)\n[ ] 0:00 로그인 → JWT 발급 + 대시보드 진입\n[ ] 0:10 오늘의 구절 카드 표시\n[ ] 0:25 JHN 3:16 → 한/영 + 주석 Sync Scroll\n[ ] 1:00 AI 큐티 A단계 시작 → SSE 스트리밍\n[ ] 2:30 묵상 노트 자동 생성 확인\n[ ] 2:45 STOMP 알림 배지 확인\n[ ] 3:00 완료\n\n# 실패 시 즉시 원인 파악\nkubectl logs -n qtai -l app=ai-service --tail=50\nkubectl logs -n qtai -l app=gateway --tail=50',
    sim:'dryrun'},
 
-  {date:'6/10 수',badge:'infra',
+  {date:'6/10 수',badge:'infra',dod:['kubectl get pods 30분 간격 2회 → 전부 Running 확인','Grafana SSE 첫 토큰 P95 측정 + ai_sessions_started_total 확인','OOMKilled 발생 시 ai-service memory limit 1Gi로 증설','AlertManager 5xx 5분 5건 임계값 동작 확인','PR draft 등록'],
    m:'Stand-up. 전 pod Running 30분 지속 확인',
    a:'Grafana "AI 운영" 대시보드 확인',
    e:'OOMKilled 발생 시 resource limit 조정',
@@ -637,7 +1317,7 @@ var W4 = [
    how:'#!/bin/bash\n# 30분 Running 확인\necho "=== 1차 ($(date)) ==="\nkubectl get pods -n qtai\necho "Running: $(kubectl get pods -n qtai | grep -c Running)"\n\nsleep 1800\n\necho "=== 2차 ($(date)) ==="\nkubectl get pods -n qtai\necho "Running: $(kubectl get pods -n qtai | grep -c Running)"\n\n# OOMKilled 확인\nkubectl get pods -n qtai | grep -E "OOMKilled|CrashLoop" \\\n  && echo "조치 필요"\n\n# resource limit 조정 (필요 시)\n# helm/qtai-umbrella/charts/ai-service/values.yaml\n# resources.limits.memory: 1Gi',
    sim:'running'},
 
-  {date:'6/11 목',badge:'test',
+  {date:'6/11 목',badge:'test',dod:['k6 SSE 부하 테스트: 동시 10명 2분 — P95 ≤ 2000ms 통과','병목 시: ChromaDB top_k 축소 / Anthropic timeout 조정','전 서비스 JaCoCo 커버리지 70%+ 최종 확인','미달 서비스에 즉시 hotfix PR 요청','PR draft 등록'],
    m:'Stand-up. 부하 테스트 (k6 SSE 동시 10명)',
    a:'병목 지점 수정',
    e:'전 서비스 커버리지 70%+ 최종 확인',
@@ -646,7 +1326,7 @@ var W4 = [
    how:'# k6 부하 테스트 실행\nk6 run --out json=result.json k6/sse-load-test.js\n\n# P95 미달 시 응급 조치\n# 1. ChromaDB top_k: 5 → 3\n# 2. Anthropic max_tokens: 1000 → 500\n# 3. SSE 타임아웃 800ms → 1200ms\n\n# JaCoCo 커버리지\n./gradlew jacocoTestReport\n# 결과: {svc}/build/reports/jacoco/test/html/index.html',
    sim:'k6result'},
 
-  {date:'6/12 금',badge:'gate',
+  {date:'6/12 금',badge:'gate',dod:['v1.0.0-demo 최종 확정 → 이후 코드 변경 절대 금지','시연 시나리오 3분 백업 영상 6종 녹화','USB 이중 보관 + GitHub Release 영상 첨부','코드 프리즈 슬랙 공지','reports/ W4 종합 리포트 작성'],
    m:'Stand-up. tag v1.0.0-demo 최종 확정',
    a:'백업 영상 6종 녹화 지원',
    e:'USB 이중 보관 + GitHub Release 생성',
@@ -658,16 +1338,16 @@ var W4 = [
 
 // ─────────────── W5 DATA ───────────────
 var W5 = [
-  {date:'6/15 월',badge:'demo',
+  {date:'6/15 월',badge:'demo',dod:['PPT 기술 슬라이드: MSA 아키텍처 + Kafka 이벤트 흐름 + SSE','D-30분 헬스체크 스크립트 (scripts/healthcheck.sh) 최종 검증','발표 역할 분담 — Lead(기술·DevOps) + 각자 1분','리허설 0회차 (Lead 단독 시연 1회)','reports/ 시연 준비 리포트 작성'],
    m:'PPT 기술 파트 작성',
    a:'D-30분 헬스체크 스크립트 최종 검증',
    e:'전체 팀 발표 역할 최종 배분',
    where:['PPT 파일','scripts/healthcheck.sh'],
    what:'① PPT 기술 슬라이드: MSA 아키텍처 + Kafka 이벤트 흐름 + SSE 스트리밍<br>② D-30분 헬스체크 스크립트 최종 검증<br>③ 발표 역할: 강태오(기술·DevOps) + 각자 1분',
-   how:'#!/bin/bash\n# scripts/healthcheck.sh\necho "=== QT-AI 헬스체크 $(date) ==="\n\nRUNNING=$(kubectl get pods -n qtai | grep -c Running)\necho "Running Pods: $RUNNING / 11"\n[ "$RUNNING" -lt 11 ] && echo "Pod 부족!" && exit 1\n\ncurl -sf http://localhost:8080/auth/actuator/health \\\n  && echo "Auth: OK" || echo "Auth: FAIL"\ncurl -sf http://localhost:8080/bible/actuator/health \\\n  && echo "Bible: OK" || echo "Bible: FAIL"\ncurl -sf http://localhost:8085/actuator/health \\\n  && echo "AI: OK" || echo "AI: FAIL"\n\necho "=== 완료 — 이상 없으면 발표 진행 ==="',
+   how:'#!/bin/bash\n# scripts/healthcheck.sh\necho "=== QT-AI 헬스체크 $(date) ==="\n\nRUNNING=$(kubectl get pods -n qtai | grep -c Running)\necho "Running Pods: $RUNNING / 11"\n[ "$RUNNING" -lt 11 ] && echo "Pod 부족!" && exit 1\n\ncurl -sf http://localhost:8080/auth/actuator/health \\\n  && echo "Auth: OK" || echo "Auth: FAIL"\ncurl -sf http://localhost:8080/bible/actuator/health \\\n  && echo "Bible: OK" || echo "Bible: FAIL"\ncurl -sf http://localhost:8085/health \\\n  && echo "AI: OK" || echo "AI: FAIL"\n\necho "=== 완료 — 이상 없으면 발표 진행 ==="',
    sim:'healthcheck'},
 
-  {date:'6/16 화',badge:'demo',
+  {date:'6/16 화',badge:'demo',dod:['리허설 1회차 — 전체 시나리오 15분 완주 (Lead 타이머)','실패 항목 즉시 수정 후 2회차 재도전','백업 영상 6종 최종 확인 + USB 2개 복사','시연 환경 헬스체크 통과 확인','reports/ 리허설 결과 작성'],
    m:'리허설 1회차 주도 (전체 시나리오 15분)',
    a:'실패 항목 긴급 수정 + 리허설 2회차',
    e:'백업 영상 최종 확인 + USB 점검',
@@ -676,7 +1356,7 @@ var W5 = [
    how:'# 리허설 타이머 체크리스트\n[ ] 0:00  로그인 + 대시보드\n[ ] 0:25  JHN 3:16 입체 화면\n[ ] 1:00  AI 큐티 → SSE 스트리밍\n[ ] 2:30  A→B 단계 자동 진입\n[ ] 2:45  묵상 노트 자동 생성\n[ ] 2:55  STOMP 알림 배지\n[ ] 3:00  완료\n\n[ ] Q&A 예상 질문 5개 리허설\n[ ] 백업 영상 6종 재생 확인\n[ ] USB 2개 영상 복사 완료',
    sim:'rehearsal'},
 
-  {date:'6/17 수',badge:'demo',
+  {date:'6/17 수',badge:'demo',dod:['D-30분: scripts/healthcheck.sh 실행 → 이상 없으면 발표 진행','이상 발생 시 kubectl rollout restart → 안되면 백업 영상','발표 진행 — 기술 파트 + 시연 사회 (Lead 주도)','발표 후 회고 미팅 진행','reports/ W5 발표 종합 리포트 작성'],
    m:'D-30분 헬스체크 실행',
    a:'시연 D-Day — 발표 진행',
    e:'발표 완료 + 회고',
@@ -694,7 +1374,7 @@ var AI = [
    verify:['helm lint helm/qtai-umbrella/ — 문법 오류 없는지','포트가 DECISIONS.md §1과 일치하는지','PostgreSQL, ZooKeeper, Tempo 키워드 grep으로 확인']},
   {week:'W2',task:'BFF 병렬 호출 코드 · CompletableFuture',
    ctx:['apis/bff/openapi.yaml (응답 스키마)','03_아키텍처_정의서.md §5.2 (BFF UseCase 패턴 코드 예시)'],
-   prompt:'[역할] QT-AI BFF Aggregator 개발자.\n\n[컨텍스트 첨부]\n- apis/bff/openapi.yaml의 /me/dashboard 응답 스키마\n- 03_아키텍처_정의서.md §5.2 BFF UseCase 패턴\n\n[요청] DashboardUseCase.kt 완성.\n- Auth: GET /auth/me\n- Bible: GET /bible/today\n- Journal: GET /journals?limit=3\n- 3개를 CompletableFuture.allOf로 병렬 호출 (순차 X)\n- 타임아웃: 각 800ms, 실패 시 null (partial 허용)\n\n[금지]\n- TX 안에서 KafkaTemplate.send() 직접 호출\n- 서비스 간 직접 @Repository 호출\n- ApplicationEventPublisher와 KafkaTemplate 혼동',
+   prompt:'[역할] QT-AI BFF Aggregator 개발자.\n\n[컨텍스트 첨부]\n- apis/bff/openapi.yaml의 /me/dashboard 응답 스키마\n- 03_아키텍처_정의서.md §5.2 BFF UseCase 패턴\n\n[요청] DashboardUseCase.java 완성.\n- Auth: GET /auth/me\n- Bible: GET /api/v1/passages/GEN/1/1\n- Journal: GET /journals?limit=3\n- 3개를 CompletableFuture.allOf로 병렬 호출 (순차 X)\n- 타임아웃: 각 800ms, 실패 시 null (partial 허용)\n\n[금지]\n- TX 안에서 KafkaTemplate.send() 직접 호출\n- 서비스 간 직접 @Repository 호출\n- ApplicationEventPublisher와 KafkaTemplate 혼동',
    verify:['CompletableFuture.allOf 사용 (순차 호출 아닌지)','타임아웃 800ms 적용','null-safe 처리 확인','KafkaTemplate은 @TransactionalEventListener(AFTER_COMMIT)에서만']},
   {week:'W3',task:'Kafka consumer · RetryableTopic · DLQ',
    ctx:['events/schema/journal.created-value.json','03_아키텍처_정의서.md §7.5 (RetryableTopic 표준)','DECISIONS.md §4 (Kafka Envelope — data 필드, payload 금지)'],
@@ -709,6 +1389,11 @@ var AI = [
 // ─────────────── RENDER DAY CARD ───────────────
 function dayCard(d, id) {
   var pathItems = d.where.map(function(p){ return '<li>' + p + '</li>'; }).join('');
+  var dodList = d.dod || dodFallback(d.badge);
+  var dodItems = dodList.map(function(item, i){
+    var cid = id + '-dod-' + i;
+    return '<div class="dod-item"><input type="checkbox" id="' + cid + '"><label for="' + cid + '">' + item + '</label></div>';
+  }).join('');
   return '<div class="day-card">' +
     '<div class="dtrig" onclick="tog(this,\'' + id + '\')">' +
       '<div class="dtc"><div class="dt-date">' + d.date + '</div><span class="dt-badge ' + badgeCls(d.badge) + '">' + (B[d.badge]||d.badge) + '</span></div>' +
@@ -723,6 +1408,10 @@ function dayCard(d, id) {
         '<div class="fi"><div class="fi-label la">🎯 무엇을 (결과물)</div><div class="wt">' + d.what + '</div></div>' +
         '<div class="fi"><div class="fi-label lh">⚙️ 어떻게 (명령어·코드)</div><pre>' + esc(d.how) + '<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div>' +
         '<div class="fi"><div class="fi-label lo">✅ 최종 결과물 (시뮬레이션)</div>' + simHtml(d.sim, id) + '</div>' +
+      '</div>' +
+      '<div class="dod-box">' +
+        '<div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div>' +
+        dodItems +
       '</div>' +
     '</div>' +
   '</div>';
@@ -905,7 +1594,7 @@ var SIM = {
     {t:'  traceparent: 00-0af765...-a1b2c3-01 ← 생성·전파',c:'sd'},
     {t:'[BFF]      DashboardUseCase   2ms → 45ms  span:d4e5f6',c:'sg'},
     {t:'  ├─[Auth]  GET /auth/me      5ms → 18ms  span:g7h8i9',c:'sg'},
-    {t:'  └─[Bible] GET /bible/today 12ms → 40ms  span:j1k2l3',c:'sg'},
+    {t:'  └─[Bible] GET /api/v1/passages/GEN/1/1 12ms → 40ms  span:j1k2l3',c:'sg'},
     {t:'',c:''},{t:'✅ 전 구간 동일 TraceID — 분산 추적 통합 완료',c:'sg'},
   ]); },
   'dashboard': function(id) { simLines(id, [
@@ -934,7 +1623,7 @@ var SIM = {
   ]); },
   'patch': function(id) { simLines(id, [
     {t:'$ curl -X PATCH -H "Authorization: Bearer {TOKEN}" \\',c:'sc'},
-    {t:'  http://localhost:8080/ai/sessions/1/advance',c:'sc'},{t:'',c:''},
+    {t:'  http://localhost:8080/api/v1/passages/GEN/1/1',c:'sc'},{t:'',c:''},
     {t:'HTTP/1.1 200 OK',c:'sg'},
     {t:'{"sessionId":1,"currentStep":"B","nextPrompt":"..."}',c:'sg'},{t:'',c:''},
     {t:'✅ PATCH 라우팅 → AI Service 정상',c:'sg'},
