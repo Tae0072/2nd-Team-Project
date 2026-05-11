@@ -117,12 +117,16 @@
 
 | 항목 | 결정 |
 | --- | --- |
-| 구현 언어/프레임워크 | **Python FastAPI 단독** |
+| 구현 언어/프레임워크 | **Spring Boot 3.3 / Java 21** |
 | 포트 | **8085** |
 | LLM | Anthropic Claude API (SSE 스트리밍) |
-| Vector Store | ChromaDB |
-| Kafka 발행 | Python kafka-python 또는 confluent-kafka |
-| **Spring Boot 코드 금지** | ai-service 디렉토리에 Java/Kotlin 코드 생성 금지 |
+| LLM 클라이언트 | `com.anthropic:anthropic-java` (공식 Java SDK) |
+| Vector Store | ChromaDB (Spring `RestClient`로 REST 호출) |
+| SSE 스트리밍 | Spring `SseEmitter` |
+| Kafka 발행 | Spring Kafka |
+| DB | MySQL 8.0 (세션·턴 저장) |
+
+> **변경 이력:** v1.0에서는 Python FastAPI로 결정했으나, 팀의 Java/Spring Boot 숙련도와 5주 일정을 고려해 W0(2026-05-11)에 Spring Boot로 전환. 다른 5개 서비스(gateway, bff, auth, bible, journal)와 동일한 Spring Boot 3.3 / Java 21로 통일.
 
 > BFF(Java)가 `http://ai-service.qtai.svc.cluster.local:8085`로 RestClient 호출.
 
