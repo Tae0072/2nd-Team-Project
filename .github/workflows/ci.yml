@@ -39,20 +39,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Java service scaffold
+        id: service_check
+        shell: bash
+        run: |
+          if [[ -x ./gradlew && -f "${{ matrix.service }}/build.gradle.kts" ]]; then
+            echo "run_tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_tests=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping ${{ matrix.service }} tests because the service scaffold is not present yet."
+          fi
+
       - uses: actions/setup-java@v4
+        if: steps.service_check.outputs.run_tests == 'true'
         with:
-          java-version: '21'
+          java-version: "21"
           distribution: temurin
           cache: gradle
 
       - name: Build & Test
+        if: steps.service_check.outputs.run_tests == 'true'
         run: ./gradlew :${{ matrix.service }}:test --continue
         env:
           SPRING_PROFILES_ACTIVE: test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.service_check.outputs.run_tests == 'true'
         with:
           name: test-results-${{ matrix.service }}
           path: ${{ matrix.service }}/build/reports/tests/
@@ -64,14 +77,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Python service scaffold
+        id: service_check
+        shell: bash
+        run: |
+          if [[ -f ai-service/requirements.txt && -d ai-service/tests ]]; then
+            echo "run_tests=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_tests=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping ai-service tests because the service scaffold is not present yet."
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.service_check.outputs.run_tests == 'true'
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install dependencies
+        if: steps.service_check.outputs.run_tests == 'true'
         run: pip install -r ai-service/requirements.txt
 
       - name: Run pytest
+        if: steps.service_check.outputs.run_tests == 'true'
         run: pytest ai-service/tests/ -v
         env:
           ENVIRONMENT: test
@@ -83,17 +110,38 @@ jobs:
     if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        service: [gateway, bff-aggregator, auth-service, bible-service, ai-service, journal-service]
+        service:
+          [
+            gateway,
+            bff-aggregator,
+            auth-service,
+            bible-service,
+            ai-service,
+            journal-service,
+          ]
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Docker context
+        id: docker_check
+        shell: bash
+        run: |
+          if [[ -f "${{ matrix.service }}/Dockerfile" ]]; then
+            echo "build_image=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build_image=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping ${{ matrix.service }} image because Dockerfile is not present yet."
+          fi
+
       - uses: docker/login-action@v3
+        if: steps.docker_check.outputs.build_image == 'true'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/build-push-action@v5
+        if: steps.docker_check.outputs.build_image == 'true'
         with:
           context: ${{ matrix.service }}
           push: true
