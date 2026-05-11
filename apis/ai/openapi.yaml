@@ -27,6 +27,7 @@ paths:
     post:
       tags: [sessions]
       summary: 큐티 세션 시작 (04번 §6.2)
+      description: Create a new AI quiet-time session for the requested passage.
       operationId: createSession
       security:
         - BearerAuth: []
@@ -43,7 +44,10 @@ paths:
         '201':
           description: 세션 생성 성공
           headers:
-            Location: {schema: {type: string}, description: /ai/sessions/{id}}
+            Location:
+              description: Created session resource URL.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -61,6 +65,7 @@ paths:
     get:
       tags: [sessions]
       summary: 본인 세션 목록 조회 (04번 §6.5)
+      description: List the authenticated user's AI sessions with optional status filtering.
       operationId: listSessions
       security:
         - BearerAuth: []
@@ -91,6 +96,7 @@ paths:
     get:
       tags: [sessions]
       summary: 세션 + 턴 상세 조회 (04번 §6.4)
+      description: Retrieve one AI session with its turn history.
       operationId: getSession
       security:
         - BearerAuth: []
@@ -256,7 +262,7 @@ components:
           enum: [USER, ASSISTANT, SYSTEM]
         step:
           type: ["string", "null"]
-          enum: [A, B, C, D]
+          enum: [A, B, C, D, null]
           description: SYSTEM 턴은 null
         content:
           type: string

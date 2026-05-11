@@ -36,6 +36,7 @@ paths:
     get:
       tags: [bible]
       summary: 한국어 성경 구절 조회 (개역한글)
+      description: 요청한 책, 장, 절에 해당하는 한국어 성경 구절을 조회한다.
       operationId: getKrVerse
       security:
         - BearerAuth: []
@@ -67,6 +68,7 @@ paths:
     get:
       tags: [bible]
       summary: 영어 성경 구절 조회 (KJV, Public Domain)
+      description: 요청한 책, 장, 절에 해당하는 KJV 영어 성경 구절을 조회한다.
       operationId: getEnVerse
       security:
         - BearerAuth: []
@@ -158,7 +160,8 @@ paths:
                     nameKr: 출애굽기
                     nameEn: Exodus
                     chapters: 40
-        '401':\n          $ref: '#/components/responses/Unauthorized'\n
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
   securitySchemes:
     BearerAuth:
