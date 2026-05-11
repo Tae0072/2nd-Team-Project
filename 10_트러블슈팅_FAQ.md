@@ -159,8 +159,10 @@ kubectl exec -it deployment/kafka -n qtai -- kafka-console-consumer.sh \
 # ChromaDB health
 kubectl exec -it deployment/ai-service -n qtai -- curl http://chromadb:8000/api/v1/heartbeat
 
-# 임베딩 모델 로드 확인 (ai-service pod 내 Python)
-kubectl exec -it deployment/ai-service -n qtai -- python3 -c "
+# ai-service health 확인 (Spring Boot actuator)
+kubectl exec -it deployment/ai-service -n qtai -- curl -s http://localhost:8085/actuator/health
+# 또는 Anthropic 클라이언트 빈 검사:
+kubectl exec -it deployment/ai-service -n qtai -- sh -c "
 from sentence_transformers import SentenceTransformer
 m = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 print('OK:', m.encode('test').shape)
@@ -563,7 +565,8 @@ kubectl exec -it deployment/ai-service -n qtai -- \
   curl http://chromadb:8000/api/v1/heartbeat
 
 # Collection 존재 여부
-kubectl exec -it deployment/ai-service -n qtai -- python3 - <<'EOF'
+# ai-service는 Spring Boot — actuator endpoint 또는 디버그 로깅 활용
+# kubectl exec ... curl /actuator/health 또는 /actuator/metrics 사용
 import chromadb
 c = chromadb.HttpClient(host='chromadb', port=8000)
 print(c.list_collections())
@@ -577,7 +580,8 @@ kubectl describe pvc chromadb-pvc -n qtai
 **Collection 없는 경우 — 시드 재실행:**
 ```bash
 kubectl exec -it deployment/ai-service -n qtai -- \
-  python3 scripts/rag_index.py --seed-only
+  # ai-service 내부 시드 도구 (Spring Boot CommandLineRunner) 또는
+./gradlew :ai-service:seedRag  # 별도 init 스크립트
 ```
 
 **임베딩 모델 미로드 — 처음 시작 시 수 분 소요 (다운로드):**

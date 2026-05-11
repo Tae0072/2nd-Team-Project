@@ -40,7 +40,7 @@
 □ minikube status → Running
 □ docker --version → 4.x
 □ (김지민) fvm flutter --version → 3.24.5
-□ (강상민) python3 --version → 3.11.x
+□ (강상민) ai-service `./gradlew build -x test` → BUILD SUCCESSFUL
 ```
 
 미완료 시 5/12 오전 중 강태오와 즉시 페어로 해결.
@@ -84,8 +84,8 @@
 ### 강상민 (AI Service)
 
 ```
-10:30  git pull + Python 가상환경 구성 (venv or pyenv)
-11:00  pip install -r requirements.txt (chromadb, sentence-transformers, anthropic)
+10:30  git pull + ai-service `gradle wrapper --gradle-version=8.10` (첫 1회만)
+11:00  `./gradlew build -x test` → BUILD SUCCESSFUL + ANTHROPIC_API_KEY 환경변수 확인
 12:00  ChromaDB K8s 배포 + collection qtai_corpus 생성
 14:00  임베딩 모델 다운로드 확인 (paraphrase-multilingual-mpnet-base-v2)
 15:00  RAG 시드 5개 문서 큐레이션 + rag_index.py 시드 실행

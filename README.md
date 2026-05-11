@@ -12,9 +12,9 @@
 | --- | --- |
 | 모바일 | Flutter (Sliver 기반 Sync Scroll, RiverPod, DIO) |
 | API Gateway | Spring Cloud Gateway (JWT 검증, SSE 패스스루) |
-| 백엔드 (MSA) | Spring Boot 3.4 (Gateway·Auth·Bible·BFF·Journal) + **Python FastAPI** (AI/RAG) |
+| 백엔드 (MSA) | Spring Boot 3.3 / Java 21 (Gateway·BFF·Auth·Bible·AI·Journal — 전 서비스 통일) |
 | 메시징 | Kafka (이벤트 소싱 + Saga 보상 트랜잭션) |
-| AI/RAG | **Python FastAPI** (port 8085) + Anthropic Claude API (SSE 스트리밍) + ChromaDB + sentence-transformers |
+| AI/RAG | Spring Boot 3.3 + **`com.anthropic:anthropic-java`** SDK (port 8085) + Anthropic Claude API (SSE) + ChromaDB |
 | 데이터 | MySQL · Redis |
 | 인프라 | Kubernetes (Minikube) + Helm |
 | 관측성 | Loki · Prometheus · Jaeger |
