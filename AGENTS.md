@@ -7,6 +7,7 @@
 
 | 우선순위 | 파일 | 목적 |
 | --- | --- | --- |
+| 🔴 필수 | `DECISIONS.md` | 포트·TTL·스택·저작권 단일 기준 |
 | 🔴 필수 | `apis/{service}/openapi.yaml` | 작업 대상 서비스 API 계약 (요청/응답 스키마) |
 | 🔴 필수 | `events/schema/{topic}-value.json` | Kafka 이벤트 envelope 및 payload 스키마 |
 | 🟡 중요 | `02_ERD_문서.md` | 테이블 구조, 외래키 정책, 인덱스 |
@@ -26,7 +27,11 @@
 | Messaging | Apache Kafka | KRaft 모드 | **ZooKeeper 코드 생성 금지** |
 | Schema Registry | Apicurio Registry | 2.5+ | `apicurio.registry.use-id: contentId` |
 | Tracing | Jaeger + OpenTelemetry | Spring Boot 3.3 표준 키 | **Tempo 설정 생성 금지** |
+| AI LLM SDK | **`com.anthropic:anthropic-java`** | 최신 | Anthropic 공식 Java SDK (SSE 스트리밍 지원) |
+| Vector Store | ChromaDB | — | Spring `RestClient`로 REST 호출 |
 | Mobile | Flutter | 3.24+ | Dart null-safety 필수 |
+
+> **모든 백엔드 서비스는 Spring Boot 3.3 / Java 21로 통일.** (v1.0에서 ai-service만 Python FastAPI였으나 W0/2026-05-11에 Spring Boot로 전환)
 
 ## 서비스별 담당자 (코드 생성 범위)
 
@@ -36,29 +41,40 @@
 | `bff-aggregator/` | 강태오 | UseCase 패턴, CompletableFuture 병렬 호출 |
 | `auth-service/` | 이지윤 | JWT RS256, OAuth JWK 검증, Refresh Rotation |
 | `bible-service/` | 김태혁 | 성경 다중 JOIN, Redis 캐시 |
-| `ai-service/` | 강상민 | FastAPI (Python), ChromaDB RAG, SSE, 큐티 A~D 프롬프트 |
+| `ai-service/` | 강상민 | Anthropic Java SDK, ChromaDB RAG, SSE (SseEmitter), 큐티 A~D 프롬프트 |
 | `journal-service/` | 이승욱 | 이벤트 소싱, Kafka 컨슈머, @Lock PESSIMISTIC_WRITE |
 | `flutter-app/` | 김지민 | Sliver Sync Scroll, RiverPod, DIO, SSE |
 
-## AI Service 스택 확정 (단독 FastAPI — 혼용 금지)
+## AI Service 스택 (Spring Boot 3.3 / Java 21)
 
-> **ai-service는 Python FastAPI 단독.** Spring Boot WebClient로 호출하는 Java 코드 생성 금지.
+> **변경 이력:** v1.0에서는 Python FastAPI 단독으로 결정했으나, 팀의 Java/Spring Boot 숙련도와 5주 일정을 고려해 W0(2026-05-11)에 Spring Boot로 전환. 다른 5개 서비스와 동일한 스택 사용.
 
 ```
 ai-service/
-  main.py           # FastAPI app
-  routers/
-    session.py      # POST /ai/sessions, POST /ai/sessions/{id}/turns (SSE)
-  rag/
-    chroma_client.py
-    embedder.py
-  prompts/
-    templates.py    # 큐티 A~D 시스템 프롬프트
-  kafka/
-    event_publisher.py  # ai.session.completed 발행
+  build.gradle.kts                    # com.anthropic:anthropic-java 포함
+  settings.gradle.kts
+  src/main/
+    java/com/qtai/ai/
+      AiServiceApplication.java
+      controller/AiSessionController.java       # POST /ai/sessions
+                                                # POST /ai/sessions/{id}/turns  ← SSE (SseEmitter)
+      service/
+        ClaudeStreamService.java                # Anthropic Java SDK 래퍼 (SSE 스트리밍)
+        ChromaDbClient.java                     # ChromaDB REST 호출 (RestClient)
+      kafka/AiSessionCompletedPublisher.java    # ai.session.completed 발행
+      prompts/QtPromptTemplates.java            # 큐티 A~D 시스템 프롬프트
+    resources/
+      application.yml
 ```
 
 BFF → AI 서비스 호출: `RestClient.get().uri("http://ai-service.qtai.svc.cluster.local:8085/ai/sessions").retrieve()`
+
+### 사용 라이브러리 요점
+
+- **`com.anthropic:anthropic-java`** — Anthropic 공식 Java SDK, SSE 스트리밍 네이티브 지원
+- **Spring `SseEmitter`** — 클라이언트로 SSE 프록시 스트리밍
+- **Spring `RestClient`** — ChromaDB REST API 호출
+- **Spring Kafka** — `ai.session.completed` 이벤트 발행
 
 ## 금지 패턴 (환각 체크리스트 — 01번 § 10.3)
 
@@ -76,7 +92,10 @@ BFF → AI 서비스 호출: `RestClient.get().uri("http://ai-service.qtai.svc.c
    → DataIntegrityViolationException catch + skip 패턴 필수
 ❌ Spring Boot 2.x 전용 API (WebMvcConfigurerAdapter, @EnableSwagger2 등)
 ❌ PostgreSQL dialect, ZooKeeper Kafka 설정, Tempo tracing 설정
-❌ AI Service에 Spring Boot 코드 / 반대로 Java 서비스에 FastAPI 코드
+❌ LLM 공급자 교체 (Anthropic Claude 고정)
+❌ Kafka envelope에 payload 키 사용 (data 사용)
+❌ /messages 경로 (AI SSE는 /turns)
+❌ 성경 데이터에 개역개정 / ESV / NIV
 ```
 
 ## Kafka 이벤트 Envelope 표준 (events/schema/*.json 참조)
@@ -112,6 +131,16 @@ Content-Type: application/problem+json
 ```
 
 > **application/json + ErrorResponse 패턴 생성 금지** — Spectral CI 차단됨.
+
+## SSE 이벤트 계약 (AI Service `/turns` 엔드포인트)
+
+| 이벤트 | 의미 |
+| --- | --- |
+| `turn_started` | 응답 시작 신호 |
+| `token` | 스트리밍 토큰 청크 |
+| `rag_sources` | RAG 참조 출처 |
+| `turn_completed` | 응답 완료 |
+| `[DONE]` | SSE 스트림 종료 |
 
 ## 토큰 TTL 확정값
 
