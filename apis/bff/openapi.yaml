@@ -1,7 +1,7 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI BFF Aggregator API
-  version: "1.3"
+  version: "1.4"
   description: |
     BFF(Backend for Frontend) 집계 서비스.
     Gateway 사용자 컨텍스트 + Bible 묵상 기록 + AI + BFF 정적 매핑 병렬 호출,
@@ -25,25 +25,60 @@ servers:
   ## 구독: /user/queue/notifications
 tags:
   - {name: aggregate, description: 입체 묵상 화면 어그리게이션}
+  - {name: qt, description: 오늘의 QT 미리보기와 진입점}
   - {name: dashboard, description: 대시보드 집계}
 paths:
+  /api/v1/qt/today:
+    get:
+      tags: [qt]
+      summary: 오늘의 QT 본문 미리보기
+      description: |
+        첫 진입 강제 로그인 없이 오늘의 QT 본문 정보를 제공한다.
+        BFF의 config/today-passages.yml 기반 정적 매핑을 사용하며,
+        로그인 사용자는 recentJournalId 등 개인화 필드를 추가로 받을 수 있다.
+      operationId: getTodayQt
+      security:
+        - BearerAuth: []
+        - {}
+      responses:
+        '200':
+          description: 오늘의 QT 본문
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodayQtResponse'
+              example:
+                date: '2026-05-26'
+                title: 오늘의 QT
+                theme: 창조의 시작
+                passage: {bookCode: GEN, chapter: 1, verseStart: 1, verseEnd: 5}
+                recentJournalId: null
   /api/v1/passages/{bookCode}/{chapter}/{verse}:
     get:
       tags: [aggregate]
-      summary: 입체 묵상 화면 어그리게이션 (Bible 3 endpoint 병렬 호출)
+      summary: 입체 묵상 화면 어그리게이션 (절별 한/영 + 선택 주석)
       description: |
-        KR_BIBLE + EN_BIBLE + COMMENTARIES를 CompletableFuture 병렬 호출 후 단일 응답으로 묶어 반환.
-        사이드이펙트: user.activity.tracked Kafka 이벤트 발행(idempotencyKey=read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}).
+        KR_BIBLE + EN_BIBLE을 CompletableFuture 병렬 호출 후 단일 응답으로 묶어 반환한다.
+        includeCommentary=true이고 인증 사용자인 경우 COMMENTARIES를 함께 호출한다.
+        비로그인 사용자는 한/영 본문과 오늘의 QT 미리보기만 볼 수 있다.
+        사이드이펙트: 인증 사용자인 경우 user.activity.tracked Kafka 이벤트 발행(idempotencyKey=read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}).
         03번 1.3.1 시나리오1 / 04번 8.3 참조.
       operationId: getPassageAggregate
-      security: [{BearerAuth: []}]
+      security:
+        - BearerAuth: []
+        - {}
       parameters:
         - {name: bookCode, in: path, required: true, schema: {type: string, example: GEN}}
         - {name: chapter, in: path, required: true, schema: {type: integer, minimum: 1}}
         - {name: verse, in: path, required: true, schema: {type: integer, minimum: 1}}
+        - name: includeCommentary
+          in: query
+          required: false
+          schema: {type: boolean, default: false}
+          description: true면 로그인 사용자에게만 주석을 포함한다.
       responses:
         '200':
-          description: 입체 묵상 화면 데이터 (KR + EN + Commentary)
+          description: 입체 묵상 화면 데이터 (KR + EN + 선택 Commentary)
           content:
             application/json:
               schema:
@@ -52,9 +87,7 @@ paths:
                 passage: {bookCode: GEN, chapter: 1, verse: 1}
                 kr: {content: '태초에 하나님이 천지를 창조하시니라', version: REVISED, language: ko}
                 en: {content: 'In the beginning God created the heaven and the earth.', version: KJV, language: en}
-                commentaries:
-                  - {id: 11, source: MATTHEW_HENRY, title: The creation of the world, content: '...'}
-                  - {id: 12, source: DUMMY_KR, title: 창조의 시작, content: '...'}
+                commentaries: []
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -91,7 +124,7 @@ paths:
                 stats: {journalCount: 24, completedSessions: 18, currentStreak: 3, longestStreak: 12}
                 todayPassage: {bookCode: PSA, chapter: 23, verse: 1}
                 recentJournals: [{id: 12345, title: '태초의 묵상', status: PUBLISHED, createdAt: '2026-05-26T14:45:00Z'}]
-                activeSession: {id: 9012, passage: {bookCode: GEN, chapter: 1, verse: 1}, currentStep: C, updatedAt: '2026-05-26T14:42:11.789Z'}
+                activeSession: {id: 9012, passage: {bookCode: GEN, chapter: 1, verse: 1}, guideStep: A, updatedAt: '2026-05-26T14:42:11.789Z'}
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
@@ -176,8 +209,26 @@ components:
                 bookCode: {type: string}
                 chapter: {type: integer}
                 verse: {type: integer}
-            currentStep: {type: string, enum: [A, B, C, D]}
+            guideStep: {type: string, enum: [A, B, C, D]}
             updatedAt: {type: string, format: date-time}
+    TodayQtResponse:
+      type: object
+      required: [date, title, passage]
+      properties:
+        date: {type: string, format: date}
+        title: {type: string}
+        theme: {type: ["string", "null"]}
+        passage:
+          type: object
+          required: [bookCode, chapter, verseStart, verseEnd]
+          properties:
+            bookCode: {type: string}
+            chapter: {type: integer}
+            verseStart: {type: integer}
+            verseEnd: {type: integer}
+        recentJournalId:
+          type: ["integer", "null"]
+          format: int64
     ProblemDetail:
       type: object
       required: [type, title, status, code, traceId, timestamp]

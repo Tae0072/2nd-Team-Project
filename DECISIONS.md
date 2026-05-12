@@ -62,12 +62,14 @@
 
 | 용도 | External Path | 내부 서비스 | 인증 |
 | --- | --- | --- | --- |
-| 입체 묵상 화면 | `GET /api/v1/passages/{bookCode}/{chapter}/{verse}` | BFF Aggregator | ✅ |
+| 오늘의 QT 미리보기 | `GET /api/v1/qt/today` | BFF Aggregator | ❌/✅ |
+| 입체 묵상 화면 | `GET /api/v1/passages/{bookCode}/{chapter}/{verse}` | BFF Aggregator | ❌/✅ |
 | 대시보드 | `GET /api/v1/me/dashboard` | BFF Aggregator | ✅ |
-| 한글 성경 | `GET /bible/kr/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
-| 영어 성경 | `GET /bible/en/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
+| 한글 성경 | `GET /bible/kr/{bookCode}/{ch}/{v}` | Bible Service | ❌ |
+| 영어 성경 | `GET /bible/en/{bookCode}/{ch}/{v}` | Bible Service | ❌ |
+| 쉬운 본문 설명 | `GET /api/v1/explanations/{bookCode}/{ch}/{v}` | Bible Service | ❌ |
 | 주석 | `GET /api/v1/commentary/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
-| 성경 목록 | `GET /bible/books` | Bible Service | ✅ |
+| 성경 목록 | `GET /bible/books` | Bible Service | ❌ |
 | 묵상 노트 목록 | `GET /api/v1/journals` | Bible Service | ✅ |
 | 묵상 노트 단건 | `GET /api/v1/journals/{id}` | Bible Service | ✅ |
 | 묵상 노트 수정 | `PATCH /api/v1/journals/{id}` | Bible Service | ✅ |
@@ -75,12 +77,20 @@
 | 이벤트 로그 | `GET /api/v1/journals/{id}/events` | Bible Service | ✅ |
 | AI 세션 시작 | `POST /ai/sessions` | AI Service | ✅ |
 | AI 대화 (SSE) | `POST /ai/sessions/{id}/turns` | AI Service | ✅ |
+| AI 세션 묵상 완료 | `POST /ai/sessions/{id}/complete` | AI Service | ✅ |
 | AI 세션 조회 | `GET /ai/sessions/{id}` | AI Service | ✅ |
 | AI 세션 목록 | `GET /ai/sessions` | AI Service | ✅ |
+| 익명 나눔 목록 | `GET /api/v1/shares` | Bible Service | ❌ |
+| 익명 나눔 공개/취소 | `POST/DELETE /api/v1/journals/{id}/share` | Bible Service | ✅ |
+| 익명 나눔 좋아요 | `POST/DELETE /api/v1/shares/{shareId}/likes` | Bible Service | ✅ |
+| 익명 나눔 댓글 | `GET/POST /api/v1/shares/{shareId}/comments` | Bible Service | ❌/✅ |
+| 익명 나눔 신고 | `POST /api/v1/shares/{shareId}/reports` | Bible Service | ✅ |
 | WebSocket 알림 | `WS /ws/notifications` | BFF Aggregator | ❌ (STOMP CONNECT 헤더) |
 
 > **AI SSE endpoint:** `/ai/sessions/{id}/turns` (turns가 정식명, messages 아님 — 04번 §6.3 기준)
-> **Journal 수동 생성 없음:** `POST /api/v1/journals` 없음. Journal은 `ai.session.completed` Kafka 컨슈머로 자동 DRAFT 생성. 사용자는 수정·발행만.
+> **소프트 로그인 정책:** 첫 진입 강제 로그인 없음. 튜토리얼·성경 본문·오늘의 QT 미리보기는 비로그인 허용, 주석 열람·AI 질문·묵상 기록·찬양 저장/공유는 로그인 필수.
+> **BFF 입체 묵상 화면 인증:** 비로그인 요청은 한/영 본문과 오늘의 QT 미리보기만 반환하고, 주석·개인화 데이터는 로그인 후 제공한다.
+> **Journal 수동 생성 없음:** `POST /api/v1/journals` 없음. Journal은 `ai.session.completed` Kafka 컨슈머로 자동 DRAFT 생성. 사용자는 수정·발행·나눔 공개/취소만 수행한다.
 > **Journal API 참조 금지:** `/api/v1/journals...` 경로는 Bible Service의 API이며, 별도 Journal Service/OpenAPI 계약으로 작업하지 않는다.
 > **계정 탈퇴 MVP 제외:** `user.deactivated` 이벤트 및 관련 API 미구현.
 

@@ -1,7 +1,7 @@
 ﻿��� QT-AI (큐티 AI 앱) — ERD 문서 v1.1
 
-> **문서 버전:** v1.1
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치)
+> **문서 버전:** v1.4
+> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합)
 > **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서
 > **MSA 데이터 원칙:** **Database per Service** — 각 서비스가 자기 DB 소유, 서비스 간 직접 JOIN 금지, 비동기 동기화는 Kafka 이벤트로
 
@@ -16,16 +16,17 @@
 | v1.1.1 | 2026-05-06 | 강태오 | 03번 v1.1 동기화 — § 1.1 다이어그램에 Auth Redis-WS (refresh blacklist), Bible Redis-Cache 분리 표기 / § 2.3 REFRESH_TOKENS Redis blacklist 정책 노트 추가 |
 | v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 6.1 토픽 표 8번째 추가 (`journal.creation.failed` Saga 보상) + `user.activity.tracked` 멱등성 키 형식 04번과 통일 (`read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}`) + envelope에 `idempotencyKey` 필드 명시 / § 7.6 JOURNALS.status 다이어그램 정정 (PUBLISHED → DRAFT 화살표 제거 + "사용자 직접 작성" 제거 — 04번 § 7.4 INVALID_STATUS_TRANSITION 정책 정합) |
 | v1.3 | 2026-05-09 | 강태오 | DECISIONS.md 정합 패치 — § 1.1 Kafka 토픽 다이어그램에 `journal.creation.failed` 추가 / § 3 헤더 + § 9.3 Redis 캐시 키 형식 수정(`passage:` → `cache:passage:kr:`) + EN 캐시 키 추가 / § 6.1 멱등성 키 snake_case→camelCase 통일({userId},{sessionId},{journalId},{epochMinute}) / 헤더 연관문서 v1.3→v1.4 |
+| v1.4 | 2026-05-12 | 강태오 | Auth Service 제거·Gateway Auth 정리, Journal Service → Bible Service 통합, 묵상 4분할, 익명 나눔 테이블 추가 |
 
 ---
 
 ## 목차
 
 1. [데이터 아키텍처 개요](#1-데이터-아키텍처-개요)
-2. [Auth/User Service ERD](#2-authuser-service-erd) — 이지윤
-3. [Bible Service ERD](#3-bible-service-erd) — 김태혁
-4. [AI/RAG Service ERD](#4-airag-service-erd) — 강상민
-5. [Journal Service ERD](#5-journal-service-erd) — 이승욱
+2. [Gateway Auth ERD](#2-gateway-auth-erd) — 강태오
+3. [Bible Service ERD](#3-bible-service-erd) — 이지윤·이승욱
+4. [AI/RAG Service ERD](#4-airag-service-erd) — 강태오·김태혁·강상민
+5. [Bible Service Journal ERD](#5-bible-service-journal-erd) — 이지윤·이승욱
 6. [서비스 간 연결 (Kafka 이벤트)](#6-서비스-간-연결-kafka-이벤트)
 7. [상태 코드 정의](#7-상태-코드-정의)
 8. [공통 패턴](#8-공통-패턴) — BaseEntity / Soft Delete / 멱등성 키 / Charset / Migration
@@ -40,35 +41,36 @@
 ### 1.1 Database per Service 원칙
 
 ```
-┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│ Auth/User        │  │ Bible            │  │ AI/RAG           │  │ Journal          │
-│ Service          │  │ Service          │  │ Service          │  │ Service          │
-│                  │  │                  │  │                  │  │                  │
-│ MySQL: auth_db   │  │ MySQL: bible_db  │  │ MySQL: ai_db     │  │ MySQL: journal_db│
-│ + Redis-WS       │  │ + Redis-Cache    │  │ + ChromaDB       │  │                  │
+┌──────────────────┐  ┌────────────────────────┐  ┌──────────────────┐
+│ Gateway Auth     │  │ Bible Service          │  │ AI/RAG Service   │
+│ (Gateway 내부)   │  │                        │  │                  │
+│ MySQL: auth_db   │  │ MySQL: bible_db        │  │ MySQL: ai_db     │
+│ + Redis-WS       │  │ + Redis-Cache          │  │ + ChromaDB       │
 │  (refresh        │  │  (passage 24h    │  │                  │  │                  │
 │   blacklist)     │  │   TTL)           │  │                  │  │                  │
-│ - USERS          │  │ - BOOKS          │  │ - PROMPT_TEMPLATE│  │ - JOURNALS       │
-│ - REFRESH_TOKENS │  │ - KR_BIBLE       │  │ - AI_SESSIONS    │  │ - JOURNAL_EVENTS │
-│ - OAUTH_LINKS    │  │ - EN_BIBLE       │  │ - AI_TURNS       │  │                  │
-│                  │  │ - COMMENTARIES   │  │ (벡터: ChromaDB) │  │                  │
-└──────────────────┘  └──────────────────┘  └──────────────────┘  └──────────────────┘
+│ - USERS          │  │ - BOOKS                │  │ - PROMPT_TEMPLATE│
+│ - REFRESH_TOKENS │  │ - KR_BIBLE             │  │ - AI_SESSIONS    │
+│ - OAUTH_LINKS    │  │ - EN_BIBLE             │  │ - AI_TURNS       │
+│                  │  │ - COMMENTARIES         │  │ (벡터: ChromaDB) │
+│                  │  │ - JOURNALS/EVENTS      │  │                  │
+│                  │  │ - JOURNAL_SHARES       │  │                  │
+└──────────────────┘  └────────────────────────┘  └──────────────────┘
 
 ┌──────────────────┐  ┌──────────────────────────┐
-│ API Gateway      │  │ BFF Aggregator           │   ← DB 없음
-│ (DB 없음)         │  │ + Redis-WS               │     (Auth와 같은 인스턴스 공유,
+│ API Gateway      │  │ BFF Aggregator           │
+│ (Auth 포함)       │  │ + Redis-WS               │     (Gateway와 같은 인스턴스 공유,
 │                  │  │  (WS 세션 레지스트리)     │      keyspace prefix로 격리)
 └──────────────────┘  └──────────────────────────┘
 
   ※ Redis 인스턴스 분리 — 03번 § 1.1:
      - Redis-Cache: Bible 전용 (cache:* prefix)
-     - Redis-WS:    Auth refresh blacklist (auth:*) + BFF WS 세션 (ws:*)
+     - Redis-WS:    Gateway refresh blacklist (auth:*) + BFF WS 세션 (ws:*)
 
          ↓ 이벤트                 ↑ 컨슈머
    ┌─────────────────────────────────────────────────┐
    │  Kafka  (Schema Registry로 스키마 관리)           │
-   │  topics: user.deactivated / user.activity.tracked│
-   │          ai.session.completed / journal.created  │
+   │  topics: user.activity.tracked / ai.session.completed│
+   │          journal.created / journal.updated       │
    │          journal.updated / journal.deleted       │
    │          journal.creation.failed                │
    │          notification.requested                  │
@@ -83,7 +85,7 @@
 > **허용:**
 > - 비동기 데이터 동기화 → **Kafka 이벤트** (eventual consistency, Schema Registry 검증)
 > - 실시간 데이터 조회 → **API 호출** (BFF Aggregator가 병렬 호출)
-> - 외부 ID 참조 → **DB 컬럼은 단순 BIGINT, FK 제약 없음** (예: `Journal.user_id`는 Auth Service의 `users.id` 값을 저장하지만 FK 제약 없음)
+> - 외부 ID 참조 → **DB 컬럼은 단순 BIGINT, FK 제약 없음** (예: `Journal.user_id`는 Gateway Auth의 `users.id` 값을 저장하지만 FK 제약 없음)
 
 ### 1.3 BFF Aggregator의 역할
 
@@ -93,14 +95,17 @@
 
 ### 1.4 Gateway의 역할
 
-- **자체 DB 없음.** JWT 검증·라우팅·Rate Limit·SSE 패스스루.
-- JWT 검증에 필요한 공개키는 K8s Secret에 적재.
+- JWT 발급·검증·Google OAuth·Refresh Rotation을 처리한다.
+- 인증 데이터는 Gateway Auth 모듈의 `auth_db`에 저장한다.
+- JWT 검증에 필요한 키는 K8s Secret에 적재한다.
 
 ---
 
-## 2. Auth/User Service ERD
+## 2. Gateway Auth ERD
 
-> **Owner:** 이지윤 / **DB schema:** `auth_db` / **외부 노출 ID:** `users.id` (다른 서비스가 참조)
+> **Owner:** 강태오 / **DB schema:** `auth_db` / **외부 노출 ID:** `users.id` (다른 서비스가 참조)
+>
+> Auth는 독립 서비스가 아니라 Gateway 내부 인증 모듈이다. 계정 탈퇴는 MVP 범위에서 제외한다.
 
 ### 2.1 다이어그램
 
@@ -334,7 +339,7 @@ erDiagram
 
 > **Owner:** 강상민 / **DB schema:** `ai_db` (메타·로그) + ChromaDB (벡터 스토어, § 10)
 >
-> **비즈니스 책임:** 큐티 A~D형 프롬프트 설계 / 신학 가드레일 / RAG 출처 인용 강제
+> **비즈니스 책임:** QT A~D 가이드 프롬프트 설계 / 출처 기반 1회성 Q&A / RAG 출처 인용 강제
 
 ### 4.1 다이어그램
 
@@ -398,18 +403,18 @@ erDiagram
 - `uk_prompt_templates_code_version` UNIQUE ON (code, version) — 같은 code의 다른 version은 공존
 - `idx_prompt_templates_step_status` ON (step, status)
 
-### 4.3 AI_SESSIONS — AI 대화 세션
+### 4.3 AI_SESSIONS — AI 질문 세션
 
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | 외부 노출 ID (Journal이 참조) |
-| user_id | BIGINT | N | — | | Auth Service `users.id` 참조 (FK 제약 없음) |
+| user_id | BIGINT | N | — | | Gateway 인증 사용자 ID 참조 (FK 제약 없음) |
 | book_id | BIGINT | N | — | | Bible Service `books.id` 참조 (FK 제약 없음) |
 | chapter | INT | N | — | | |
 | verse | INT | N | — | | |
-| current_step | VARCHAR(2) | N | 'A' | | 진행 중인 큐티 단계 |
+| guide_step | VARCHAR(2) | N | 'A' | | 질문이 연결된 QT 가이드 단계. 자동 단계 진행 용도가 아님 |
 | status | VARCHAR(20) | N | 'IN_PROGRESS' | | § 7.5 참조 |
-| **summary** | TEXT | Y | NULL | | **세션 종료 시 자동 생성된 요약** (별도 요약 prompt 또는 마지막 ASSISTANT 턴 가공). `ai.session.completed` 이벤트의 summary 필드 source. |
+| **summary** | TEXT | Y | NULL | | **사용자가 "묵상 완료"를 선택할 때 생성된 요약**. `ai.session.completed` 이벤트의 summary 필드 source. |
 | started_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | |
 | ended_at | DATETIME(6) | Y | NULL | | 완료 시각 |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | BaseEntity |
@@ -419,7 +424,7 @@ erDiagram
 - `idx_ai_sessions_status` ON (status)
 - `idx_ai_sessions_passage` ON (book_id, chapter, verse)
 
-### 4.4 AI_TURNS — 대화 턴 (질문 + 응답 단위)
+### 4.4 AI_TURNS — 질문·응답 턴
 
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
@@ -427,7 +432,7 @@ erDiagram
 | session_id | BIGINT | N | — | FK → AI_SESSIONS.id | |
 | **used_prompt_template_id** | BIGINT | Y | NULL | FK → PROMPT_TEMPLATES.id | **이 턴에 적용된 프롬프트 템플릿 (role=ASSISTANT 시 권장, USER/SYSTEM은 NULL).** 프롬프트 개정 후 회귀 분석에 필수. |
 | role | VARCHAR(20) | N | — | | 'USER' / 'ASSISTANT' / 'SYSTEM' |
-| step | VARCHAR(2) | **Y** | **NULL** | | 'A','B','C','D' (role=SYSTEM 시 NULL) |
+| step | VARCHAR(2) | **Y** | **NULL** | | 질문이 연결된 QT 가이드 단계 'A','B','C','D' (role=SYSTEM 시 NULL) |
 | content | **MEDIUMTEXT** | N | — | | **메시지 본문 (LLM 응답이 길어 16MB까지 허용).** SSE 스트리밍 완료 후 적재 |
 | token_count | INT | Y | NULL | | LLM 토큰 사용량 (요금·메트릭) |
 | rag_sources | JSON | Y | NULL | | ChromaDB에서 인용한 출처 배열 (§ 10.3) |
@@ -442,17 +447,21 @@ erDiagram
 
 ---
 
-## 5. Journal Service ERD
+## 5. Bible Service Journal ERD
 
-> **Owner:** 이승욱 / **DB schema:** `journal_db`
+> **Owner:** 이지윤·이승욱 / **DB schema:** `bible_db`
 >
-> **이벤트 소싱 패턴:** `JOURNAL_EVENTS`가 변경 이력의 source of truth, `JOURNALS`는 재구성 가능한 read model.
+> **이벤트 소싱 패턴:** `JOURNAL_EVENTS`가 묵상 기록 변경 이력의 source of truth, `JOURNALS`는 재구성 가능한 read model. 별도 Journal Service는 사용하지 않고 Bible Service 안에서 담당한다.
 
 ### 5.1 다이어그램
 
 ```mermaid
 erDiagram
     JOURNALS ||--o{ JOURNAL_EVENTS : "1:N 이벤트 (FK 제약 없음 — 이벤트 소싱 원칙)"
+    JOURNALS ||--o| JOURNAL_SHARES : "0:1 익명 나눔"
+    JOURNAL_SHARES ||--o{ JOURNAL_SHARE_LIKES : "1:N 좋아요"
+    JOURNAL_SHARES ||--o{ JOURNAL_SHARE_COMMENTS : "1:N 댓글"
+    JOURNAL_SHARES ||--o{ JOURNAL_SHARE_REPORTS : "1:N 신고"
 
     JOURNALS {
         BIGINT id PK
@@ -461,9 +470,13 @@ erDiagram
         BIGINT book_id
         INT chapter
         INT verse
-        TEXT content
+        TEXT felt
+        TEXT memorable_verse
+        TEXT application
+        TEXT prayer
         BIGINT ai_session_id
         VARCHAR status
+        VARCHAR visibility
         BIGINT last_event_sequence
         DATETIME created_at
         DATETIME updated_at
@@ -479,6 +492,38 @@ erDiagram
         VARCHAR source_topic
         DATETIME occurred_at
     }
+    JOURNAL_SHARES {
+        BIGINT id PK
+        BIGINT journal_id UK
+        VARCHAR excerpt
+        INT like_count
+        INT comment_count
+        VARCHAR status
+        DATETIME created_at
+        DATETIME deleted_at
+    }
+    JOURNAL_SHARE_LIKES {
+        BIGINT id PK
+        BIGINT share_id
+        BIGINT user_id
+        DATETIME created_at
+    }
+    JOURNAL_SHARE_COMMENTS {
+        BIGINT id PK
+        BIGINT share_id
+        BIGINT user_id
+        VARCHAR content
+        DATETIME created_at
+        DATETIME deleted_at
+    }
+    JOURNAL_SHARE_REPORTS {
+        BIGINT id PK
+        BIGINT share_id
+        BIGINT reporter_user_id
+        VARCHAR reason
+        VARCHAR status
+        DATETIME created_at
+    }
 ```
 
 ### 5.2 JOURNALS — 묵상 노트 (read model)
@@ -486,14 +531,18 @@ erDiagram
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | |
-| user_id | BIGINT | N | — | | Auth Service `users.id` 참조 (FK 제약 없음) |
+| user_id | BIGINT | N | — | | Gateway 인증 사용자 ID 참조 (FK 제약 없음) |
 | title | VARCHAR(200) | N | — | | **자동 생성: `'{name_kr} {chapter}:{verse} 묵상'` (예: '창세기 1:1 묵상').** 사용자가 수동 변경 가능. `name_kr`은 BFF가 Bible Service에서 조회 후 저장 |
 | book_id | BIGINT | N | — | | Bible Service 참조 (FK 제약 없음) |
 | chapter | INT | N | — | | |
 | verse | INT | N | — | | |
-| content | TEXT | N | — | | 묵상 노트 본문 (사용자 메모) |
+| felt | TEXT | Y | NULL | | 본문을 읽고 느낀 점 |
+| memorable_verse | TEXT | Y | NULL | | 기억할 구절 |
+| application | TEXT | Y | NULL | | 오늘 삶에 적용할 점 |
+| prayer | TEXT | Y | NULL | | 기도 내용 |
 | ai_session_id | BIGINT | Y | NULL | | AI Service `ai_sessions.id` 참조 (FK 제약 없음) |
 | status | VARCHAR(20) | N | 'DRAFT' | | § 7.6 참조 |
+| visibility | VARCHAR(30) | N | 'PRIVATE' | | `PRIVATE`, `ANONYMOUS_SHARED` |
 | **last_event_sequence** | BIGINT | N | 0 | | **JOURNAL_EVENTS.sequence 부여 시 atomic 증분용 카운터** (§ 5.4 참조) |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | BaseEntity |
 | updated_at | DATETIME(6) | Y | NULL | | BaseEntity |
@@ -525,7 +574,34 @@ erDiagram
 
 > **이승욱 작업 카드 6개 디테일 항목** (운영 노트 § 3 참조): ① JOURNAL_EVENTS 적재 ② JOURNALS read model 재구성 ③ idempotency_key 멱등성 ④ DLQ 설정 ⑤ 재처리 시나리오 ⑥ 통합 테스트.
 
-### 5.4 JOURNAL_EVENTS.sequence 부여 메커니즘
+### 5.4 JOURNAL_SHARES — 익명 나눔
+
+| 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
+| --- | --- | --- | --- | --- | --- |
+| id | BIGINT | N | AUTO_INCREMENT | PK | |
+| journal_id | BIGINT | N | — | UK | 공개된 묵상 노트 ID. 한 묵상은 하나의 활성 나눔만 가진다 |
+| excerpt | VARCHAR(1000) | N | — | | 사용자가 공개한 일부 내용. 작성자 정보와 기도 세부 내용은 기본 노출하지 않는다 |
+| like_count | INT | N | 0 | | 목록 빠른 표시용 denormalized count |
+| comment_count | INT | N | 0 | | 목록 빠른 표시용 denormalized count |
+| status | VARCHAR(20) | N | 'ACTIVE' | | `ACTIVE`, `HIDDEN`, `DELETED` |
+| created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | |
+| deleted_at | DATETIME(6) | Y | NULL | | 공개 취소 시 soft delete |
+
+**인덱스**
+- `uk_journal_shares_journal_id` UNIQUE ON (journal_id)
+- `idx_journal_shares_status_created` ON (status, created_at DESC)
+
+### 5.5 JOURNAL_SHARE_LIKES / COMMENTS / REPORTS — 최소 나눔 기능
+
+| 테이블 | 핵심 컬럼 | 제약·정책 |
+| --- | --- | --- |
+| JOURNAL_SHARE_LIKES | share_id, user_id, created_at | `uk_share_likes_share_user` UNIQUE로 중복 좋아요 방지 |
+| JOURNAL_SHARE_COMMENTS | share_id, user_id, content, created_at, deleted_at | MVP에서는 댓글 작성만 제공하고 댓글 비활성화 옵션은 v1.1 이후 |
+| JOURNAL_SHARE_REPORTS | share_id, reporter_user_id, reason, detail, status, created_at | 신고는 관리자 확인 대상으로 저장. 자동 숨김은 v1.1 이후 검토 |
+
+> **커뮤니티 경계:** 팔로우, 실시간 댓글 피드, 랭킹 중심 추천, 세분화 공개 범위는 MVP 제외. 기본값은 항상 `PRIVATE`이며, 사용자가 명시적으로 선택한 기록만 `ANONYMOUS_SHARED`가 된다.
+
+### 5.6 JOURNAL_EVENTS.sequence 부여 메커니즘
 
 > `sequence`는 journal 단위로 1부터 증가. 단순 AUTO_INCREMENT는 전역 ID라 부적절. 다음 패턴으로 atomic 증분 보장.
 
@@ -563,9 +639,9 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 **대안 (v1.1 검토):** Outbox 패턴 + 이벤트 소비자가 sequence 부여. ADR 후보 0011.
 
-### 5.5 JOURNAL_EVENTS.event_data JSON 스키마 예시
+### 5.7 JOURNAL_EVENTS.event_data JSON 스키마 예시
 
-#### 5.5.1 `CREATED` 이벤트
+#### 5.7.1 `CREATED` 이벤트
 
 ```json
 {
@@ -579,34 +655,42 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
   },
   "ai_session_id": 9012,
   "title": "창세기 1:1 묵상",
-  "content_initial": "태초에 하나님이 천지를 창조하시니라. 묵상 시작..."
+  "felt": "",
+  "memorable_verse": "",
+  "application": "",
+  "prayer": "",
+  "visibility": "PRIVATE"
 }
 ```
 
-#### 5.5.2 `UPDATED` 이벤트
+#### 5.7.2 `UPDATED` 이벤트
 
 ```json
 {
   "journal_id": 1234,
   "delta": {
     "title": {"old": "창세기 1:1 묵상", "new": "창세기 1:1 — 시작"},
-    "content": {"old": "...", "new": "..."}
+    "felt": {"old": "...", "new": "..."},
+    "application": {"old": "...", "new": "..."}
   },
   "updated_by": 5678
 }
 ```
 
-#### 5.5.3 `PUBLISHED` / `DELETED` / `RESTORED`
+#### 5.7.3 `PUBLISHED` / `SHARED` / `UNSHARED` / `DELETED`
 
 ```json
 // PUBLISHED
 { "journal_id": 1234, "from_status": "DRAFT", "by_user_id": 5678 }
 
+// SHARED
+{ "journal_id": 1234, "visibility": "ANONYMOUS_SHARED", "share_id": 9876, "by_user_id": 5678 }
+
+// UNSHARED
+{ "journal_id": 1234, "visibility": "PRIVATE", "share_id": 9876, "by_user_id": 5678 }
+
 // DELETED (soft)
 { "journal_id": 1234, "by_user_id": 5678, "soft_delete": true }
-
-// RESTORED
-{ "journal_id": 1234, "from_status": "DELETED", "by_user_id": 5678 }
 ```
 
 ---
@@ -617,14 +701,13 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 | 토픽 | Producer | Consumer | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject | DLQ 토픽 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `user.activity.tracked` | BFF Aggregator | Journal Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
-| `user.deactivated` | Auth Service | AI, Journal | `user_id`, `deactivated_at` | `user.deactivated:{userId}` | `user.deactivated-value` | `user.deactivated.DLQ` |
-| `ai.session.completed` | AI Service | Journal Service | `session_id`, `user_id`, `passage`, `final_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
-| `journal.created` | Journal Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
-| `journal.updated` | Journal Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
-| `journal.deleted` | Journal Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
+| `user.activity.tracked` | BFF Aggregator | Bible Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
+| `ai.session.completed` | AI Service | Bible Service | `session_id`, `user_id`, `passage`, `guide_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
+| `journal.created` | Bible Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
+| `journal.updated` | Bible Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
+| `journal.deleted` | Bible Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
 | `notification.requested` | (다수 서비스) | Notification Aggregator (BFF의 일부) | `user_id`, `type`, `payload` | `{type}:{userId}:{occurredAt}` | `notification.requested-value` | `notification.requested.DLQ` |
-| **`journal.creation.failed`** ⭐v1.2 | **Journal Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{sessionId}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
+| **`journal.creation.failed`** ⭐v1.2 | **Bible Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{sessionId}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
 
 > **Schema Registry:** Confluent Schema Registry 또는 Apicurio Registry를 W1 Lock-in 3번에서 셋업. 모든 토픽은 위 `Schema Subject`로 등록. **검증 실패 메시지는 producer에서 reject** (DLQ 전송 X — DLQ는 컨슈머 처리 실패용).
 
@@ -655,11 +738,11 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 ```
 [1] AI Service: AI_SESSIONS.status = 'COMPLETED' (로컬 트랜잭션 + summary 생성)
 [2] AI Service: ai.session.completed 이벤트 발행 (v1.0: direct publish)
-[3] Journal Service: 컨슈머 수신 → JOURNALS 자동 생성 (DRAFT) + JOURNAL_EVENTS CREATED 적재 (멱등성 키 검증)
+[3] Bible Service: 컨슈머 수신 → JOURNALS 자동 생성 (DRAFT) + JOURNAL_EVENTS CREATED 적재 (멱등성 키 검증)
 [4] 영구 실패 시: journal.creation.failed 이벤트 발행 → AI Service가 status = COMPLETED_NO_JOURNAL 마킹
 
 실패 시:
-- [3] 1차 실패: Journal Service 자동 재시도 (3회) → 영구 실패 시 DLQ + journal.creation.failed
+- [3] 1차 실패: Bible Service 자동 재시도 (3회) → 영구 실패 시 DLQ + journal.creation.failed
 - [2] 발행 실패: v1.0 한계 — 이벤트 유실 가능 (§ 11.2 Outbox 한계)
 ```
 
@@ -695,16 +778,15 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 stateDiagram-v2
     [*] --> ACTIVE: 회원가입
     ACTIVE --> SUSPENDED: 관리자 제재
-    ACTIVE --> DEACTIVATED: 사용자 탈퇴
     SUSPENDED --> ACTIVE: 제재 해제
-    DEACTIVATED --> [*]: 30일 후 hard delete (email 마스킹 후)
 ```
 
 | 상태 | 설명 | 다음 상태 | 전이 트리거 |
 | --- | --- | --- | --- |
-| ACTIVE | 정상 | SUSPENDED, DEACTIVATED | — |
+| ACTIVE | 정상 | SUSPENDED | — |
 | SUSPENDED | 제재 | ACTIVE | 관리자 (ROLE_ADMIN) |
-| DEACTIVATED | 탈퇴 (email 마스킹 + soft delete) | (30일 후 hard delete 후보) | 사용자 본인 → `user.deactivated` 이벤트 발행 |
+
+> 계정 탈퇴와 `DEACTIVATED` 상태, `user.deactivated` 이벤트는 MVP 제외이며 v1.1 이후 검토한다.
 
 ### 7.2 (예약) 향후 회원 부가 상태
 
@@ -734,20 +816,17 @@ stateDiagram-v2
 ```mermaid
 stateDiagram-v2
     [*] --> IN_PROGRESS: 세션 시작
-    IN_PROGRESS --> COMPLETED: D형 완료 또는 사용자 종료
-    IN_PROGRESS --> ABANDONED: 24h 이상 무활동
-    COMPLETED --> COMPLETED_NO_JOURNAL: Saga 보상 (Journal 생성 영구 실패)
+    IN_PROGRESS --> COMPLETED: 사용자 묵상 완료
+    COMPLETED --> COMPLETED_NO_JOURNAL: Saga 보상 (묵상 초안 생성 영구 실패)
     COMPLETED --> [*]
     COMPLETED_NO_JOURNAL --> [*]
-    ABANDONED --> [*]
 ```
 
 | 상태 | 설명 | 다음 상태 | 전이 트리거 |
 | --- | --- | --- | --- |
-| IN_PROGRESS | 진행 중 | COMPLETED, ABANDONED | — |
-| COMPLETED | 완료 (D형 도달 또는 사용자 종료) | COMPLETED_NO_JOURNAL | 사용자 액션 또는 step=D 확정 |
-| ABANDONED | 무활동 폐기 | — | 배치 (24h 이상 무활동) |
-| COMPLETED_NO_JOURNAL | 완료했으나 Journal 생성 영구 실패 | — | Saga 보상 (§ 6.3) |
+| IN_PROGRESS | 진행 중 | COMPLETED | — |
+| COMPLETED | 완료 (사용자가 "묵상 완료" 선택) | COMPLETED_NO_JOURNAL | `POST /ai/sessions/{sessionId}/complete` |
+| COMPLETED_NO_JOURNAL | 완료했으나 묵상 초안 생성 영구 실패 | — | Saga 보상 (§ 6.3) |
 
 ### 7.6 JOURNALS.status (v1.2 정정 — 04번 § 7.4 정합)
 
@@ -837,14 +916,7 @@ public class User extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    public void deactivate() {
-        // email 마스킹 (재가입 UNIQUE 충돌 회피, § 2.2.1)
-        long epoch = System.currentTimeMillis();
-        this.email = "u_" + this.id + "_deactivated_" + epoch + "@deleted.local";
-        this.deletedAt = LocalDateTime.now();
-        this.status = UserStatus.DEACTIVATED;
-        // user.deactivated 이벤트 발행은 Service 레이어에서
-    }
+    // 계정 탈퇴는 MVP 제외. 필요 시 v1.1에서 별도 정책과 함께 추가한다.
 }
 ```
 
@@ -1030,7 +1102,7 @@ CREATE TABLE users (
 ### 11.1 핵심 설계 결정 (ADR 후보)
 
 1. **Database per Service** (ADR 0003) — 각 서비스가 자기 DB schema를 소유. 서비스 간 직접 JOIN·FK 절대 금지.
-2. **이벤트 소싱은 Journal Service에만** (ADR 0004) — 큐티 기록은 변경 이력이 핵심 자산.
+2. **이벤트 소싱은 Bible Service의 Journal 도메인에만** (ADR 0004) — 큐티 기록은 변경 이력이 핵심 자산.
 3. **외부 ID는 단순 BIGINT 컬럼, FK 제약 없음** (ADR 0005)
 4. **소프트 딜리트는 USERS와 JOURNALS만** (ADR 0006) — 30일 복구 + 감사 가치.
 5. **Kafka 멱등성 키는 컨슈머 측 UNIQUE 제약으로 강제** (ADR 0007)
@@ -1070,7 +1142,7 @@ CREATE TABLE users (
 | --- | --- |
 | 트랜잭션 누락 | BaseEntity + JPA `@Transactional` 표준 + Saga 패턴 명시 (§ 6.3) + JOURNAL_EVENTS sequence 트랜잭션 (§ 5.4) |
 | Spring Boot 메서드 환각 | BOM 의존성 픽스 + `@SQLRestriction` 같은 Jakarta 표준 사용 |
-| 평문 시크릿 커밋 | DB 비밀번호·Anthropic 키 모두 K8s Secret. ERD 컬럼에 평문 토큰 저장 X (`token_hash` 만 저장) |
+| 평문 시크릿 커밋 | DB 비밀번호·DeepSeek 키 모두 K8s Secret. ERD 컬럼에 평문 토큰 저장 X (`token_hash` 만 저장) |
 | (신규) Kafka 멱등성 누락 | `JOURNAL_EVENTS.idempotency_key UNIQUE` 강제 (§ 8.3) + `(journal_id, sequence) UNIQUE` |
 | (신규) 신학적 오류 | `rag_sources` 빈 ASSISTANT 턴 머지 금지 (§ 10.3) |
 | (신규) 한글 깨짐 | utf8mb4 / utf8mb4_unicode_ci 강제 (§ 8.4) |
@@ -1093,10 +1165,10 @@ CREATE TABLE users (
             └── ...
 ```
 
-**예시 (Journal Service):**
+**예시 (Bible Service Journal 도메인):**
 
 ```
-journal-service/src/main/java/com/qtai/journal/domain/
+bible-service/src/main/java/com/qtai/bible/journal/domain/
 ├── journal/
 │   ├── Journal.java
 │   ├── JournalRepository.java
