@@ -39,6 +39,7 @@
 
 > **Auth Service 제거 (2026-05-12):** 독립 서비스 불필요 판단. JWT 발급·검증은 Gateway 필터에서 처리.
 > **Journal Service 제거 (2026-05-12):** 묵상일지 기능 Bible Service로 통합.
+> **Journal API 폐기:** 별도 `apis/journal/openapi.yaml`은 사용하지 않는다. 묵상 기록 API 계약은 `apis/bible/openapi.yaml` 안에 포함한다.
 > **Schema Registry 포트:** 로컬 `8086`. .env.example과 일치시킬 것.
 
 ---
@@ -80,6 +81,7 @@
 
 > **AI SSE endpoint:** `/ai/sessions/{id}/turns` (turns가 정식명, messages 아님 — 04번 §6.3 기준)
 > **Journal 수동 생성 없음:** `POST /api/v1/journals` 없음. Journal은 `ai.session.completed` Kafka 컨슈머로 자동 DRAFT 생성. 사용자는 수정·발행만.
+> **Journal API 참조 금지:** `/api/v1/journals...` 경로는 Bible Service의 API이며, 별도 Journal Service/OpenAPI 계약으로 작업하지 않는다.
 > **계정 탈퇴 MVP 제외:** `user.deactivated` 이벤트 및 관련 API 미구현.
 
 ---

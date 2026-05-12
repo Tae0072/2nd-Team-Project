@@ -12,13 +12,13 @@
 | --- | --- |
 | 모바일 | Flutter (Sliver 기반 Sync Scroll, RiverPod, DIO) |
 | API Gateway | Spring Cloud Gateway (JWT 검증, SSE 패스스루) |
-| 백엔드 (MSA) | Spring Boot 3.3 / Java 21 (Gateway·BFF·Auth·Bible·AI·Journal — 전 서비스 통일) |
+| 백엔드 (MSA) | Spring Boot 3.3 / Java 21 (Gateway·BFF·Bible·AI — Auth·Journal 독립 서비스 제거) |
 | 메시징 | Kafka (이벤트 소싱 + Saga 보상 트랜잭션) |
-| AI/RAG | Spring Boot 3.3 + **`com.anthropic:anthropic-java`** SDK (port 8085) + Anthropic Claude API (SSE) + ChromaDB |
+| AI/RAG | Spring Boot 3.3 + DeepSeek API(OpenAI 호환, RestClient, SSE) + ChromaDB |
 | 데이터 | MySQL · Redis |
 | 인프라 | Kubernetes (Minikube) + Helm |
 | 관측성 | Loki · Prometheus · Jaeger |
-| CI/CD | GitHub Actions → Docker Hub → Helm Upgrade |
+| CI/CD | GitHub Actions → GHCR → Helm Upgrade |
 
 ## 📅 일정 (총 25 영업일, 5/12 화 ~ 6/17 수)
 
@@ -38,13 +38,13 @@
 | 담당자 | 역할 | 담당 |
 | --- | --- | --- |
 | **강태오** | Lead + DevOps 총괄 | BFF Aggregator + 공유 레이어 + Gateway + K8s/Helm/CI |
-| **이지윤** | Auth Owner | Auth/User Service (JWT, OAuth) |
-| **김태혁** | Bible Owner | Bible Service (다중 JOIN, Redis 캐시) |
-| **강상민** | AI/RAG Owner (팀 내 기술적 깊이 최고) | AI/RAG Service — RAG·SSE·프롬프트 인젝션 방어·신학 가드레일 (큐티 A~D 프롬프트) |
-| **이승욱** | Journal + Kafka Owner | Journal Service (이벤트 소싱, 컨슈머 멱등성) |
+| **이지윤** | Bible Owner | Bible Service (성경·주석·QT·묵상일지 통합) |
+| **김태혁** | AI Owner | AI Service (큐티 A~D 프롬프트, RAG 보조) |
+| **강상민** | AI/RAG Owner (팀 내 기술적 깊이 최고) | AI/RAG Service — DeepSeek·RAG·SSE·프롬프트 인젝션 방어·신학 가드레일 |
+| **이승욱** | Bible + Kafka Owner | Bible Service 묵상일지 통합 (이벤트 소싱, 컨슈머 멱등성) |
 | **김지민** | Flutter Owner | Flutter App (Sliver Sync Scroll, AI 대화, 알림) |
 
-> 매핑은 default. W0 킥오프(5/8 금)에서 개인 강점 기반 swap 가능.
+> 2026-05-12 기준: Auth Service와 Journal Service는 독립 서비스로 두지 않는다. 묵상 기록 API는 Bible Service에서 담당한다.
 
 ## 🔒 W1 Foundation Lock-in (기능보다 우선)
 

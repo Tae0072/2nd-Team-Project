@@ -14,6 +14,8 @@
 | 🟡 중요 | `03_아키텍처_정의서.md` | 서비스 경계, 통신 패턴, 기술 스택 |
 | 🟢 참고 | `docs/adr/` | 기술 결정 근거 |
 
+> **묵상 기록 API 작업 기준:** Journal API는 별도로 사용하지 않는다. 묵상 기록(`/api/v1/journals...`) 계약은 `apis/bible/openapi.yaml`을 기준으로 한다.
+
 ## 기술 스택 확정 목록 (환각 방지)
 
 | 영역 | 확정 스택 | 버전 | 주의 |
@@ -46,6 +48,7 @@
 
 > **Auth Service 제거 (2026-05-12):** 독립 서비스 불필요. JWT 처리는 Gateway 담당.
 > **Journal Service 제거 (2026-05-12):** 묵상일지 기능 Bible Service로 통합.
+> **Journal API 폐기:** `apis/journal/openapi.yaml` 참조 금지. `/api/v1/journals...`는 Bible Service API로 구현한다.
 
 ## AI Service 스택 (Spring Boot 3.3 / Java 21)
 
@@ -95,6 +98,8 @@ BFF → AI 서비스 호출: `RestClient.get().uri("http://ai-service.qtai.svc.c
    → 이벤트 소싱: append-only
 ❌ Kafka 컨슈머에 idempotency_key 검증 없음
    → DataIntegrityViolationException catch + skip 패턴 필수
+❌ 별도 Journal API 또는 apis/journal/openapi.yaml 기준 코드 생성
+   → 묵상 기록 API는 apis/bible/openapi.yaml 기준으로 Bible Service에서 구현
 ❌ Spring Boot 2.x 전용 API (WebMvcConfigurerAdapter, @EnableSwagger2 등)
 ❌ PostgreSQL dialect, ZooKeeper Kafka 설정, Tempo tracing 설정
 ❌ Anthropic SDK 코드 (com.anthropic:anthropic-java) — DeepSeek 사용

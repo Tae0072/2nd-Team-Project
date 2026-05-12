@@ -26,7 +26,6 @@ jobs:
             apis/auth/openapi.yaml \
             apis/bible/openapi.yaml \
             apis/ai/openapi.yaml \
-            apis/journal/openapi.yaml \
             apis/bff/openapi.yaml
 
   test-java:
@@ -35,7 +34,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        service: [auth-service, bible-service, journal-service, bff-aggregator]
+        service: [auth-service, bible-service, bff-aggregator]
     steps:
       - uses: actions/checkout@v4
 
@@ -117,7 +116,6 @@ jobs:
             auth-service,
             bible-service,
             ai-service,
-            journal-service,
           ]
     steps:
       - uses: actions/checkout@v4

@@ -4,7 +4,8 @@ info:
   version: "1.3"
   description: |
     BFF(Backend for Frontend) 집계 서비스.
-    4 서비스 병렬 호출, 입체 묵상 화면 어그리게이션, 대시보드 집계.
+    Gateway 사용자 컨텍스트 + Bible 묵상 기록 + AI + BFF 정적 매핑 병렬 호출,
+    입체 묵상 화면 어그리게이션, 대시보드 집계.
     실시간 알림은 STOMP WebSocket 전용(stateless, ADR-0012).
     v1.0에서 알림 REST API 없음 — NOTIFICATION_LOG 테이블 없음(ADR-0012).
   contact:
@@ -63,11 +64,11 @@ paths:
   /api/v1/me/dashboard:
     get:
       tags: [dashboard]
-      summary: 내 대시보드 집계 (Auth + AI + Journal + BFF정적 병렬)
+      summary: 내 대시보드 집계 (Gateway user context + Bible journal + AI + BFF 정적 병렬)
       description: |
-        4개 호출 CompletableFuture.allOf 병렬:
-        1. Auth /auth/me -> user
-        2. Journal /api/v1/journals?size=5 -> recentJournals + stats.journalCount
+        4개 작업 CompletableFuture.allOf 병렬:
+        1. Gateway 인증 컨텍스트 -> user
+        2. Bible /api/v1/journals?size=5 -> recentJournals + stats.journalCount
         3. AI /ai/sessions?status=IN_PROGRESS&size=1 -> activeSession + completedSessions
         4. BFF 정적 매핑 -> todayPassage (Bible /bible/today 없음 v1.0, config/hot-passages.yml)
         하위 서비스 장애 시 partial 응답 (해당 필드만 null + X-Partial-Response 헤더).
