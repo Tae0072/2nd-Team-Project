@@ -1,7 +1,7 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI BFF Aggregator API
-  version: "1.4"
+  version: "1.5"
   description: |
     BFF(Backend for Frontend) 집계 서비스.
     Gateway 사용자 컨텍스트 + Bible 묵상 기록 + AI + BFF 정적 매핑 병렬 호출,
@@ -27,6 +27,7 @@ tags:
   - {name: aggregate, description: 입체 묵상 화면 어그리게이션}
   - {name: qt, description: 오늘의 QT 미리보기와 진입점}
   - {name: dashboard, description: 대시보드 집계}
+  - {name: admin, description: 관리자 P0 운영 기능 집계}
 paths:
   /api/v1/qt/today:
     get:
@@ -127,6 +128,140 @@ paths:
                 activeSession: {id: 9012, passage: {bookCode: GEN, chapter: 1, verse: 1}, guideStep: A, updatedAt: '2026-05-26T14:42:11.789Z'}
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /api/v1/admin/dashboard:
+    get:
+      tags: [admin]
+      summary: 관리자 운영 대시보드
+      description: 총 묵상 수, 인기 구절, AI 호출량, 신고 대기 수를 집계한다. ROLE_ADMIN 전용.
+      operationId: getAdminDashboard
+      security: [{BearerAuth: []}]
+      responses:
+        '200':
+          description: 관리자 운영 지표
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDashboardResponse'
+              example:
+                journalTotal: 120
+                todayJournalCount: 17
+                aiTurnCount: 88
+                pendingReportCount: 3
+                popularPassages: [{bookCode: JHN, chapter: 3, verse: 16, count: 12}]
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/v1/admin/qt-passages:
+    get:
+      tags: [admin]
+      summary: 오늘의 QT 본문 목록
+      operationId: listAdminQtPassages
+      security: [{BearerAuth: []}]
+      responses:
+        '200':
+          description: 날짜별 QT 본문 목록
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminQtPassage'
+    post:
+      tags: [admin]
+      summary: 오늘의 QT 본문 등록
+      operationId: createAdminQtPassage
+      security: [{BearerAuth: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminQtPassageUpsertRequest'
+      responses:
+        '201':
+          description: 등록 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminQtPassage'
+  /api/v1/admin/qt-passages/{id}:
+    patch:
+      tags: [admin]
+      summary: 오늘의 QT 본문 수정
+      operationId: updateAdminQtPassage
+      security: [{BearerAuth: []}]
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer, format: int64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminQtPassageUpsertRequest'
+      responses:
+        '200':
+          description: 수정 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminQtPassage'
+    delete:
+      tags: [admin]
+      summary: 오늘의 QT 본문 삭제
+      operationId: deleteAdminQtPassage
+      security: [{BearerAuth: []}]
+      parameters:
+        - {name: id, in: path, required: true, schema: {type: integer, format: int64}}
+      responses:
+        '204': {description: 삭제 완료}
+  /api/v1/admin/ai/turns:
+    get:
+      tags: [admin]
+      summary: AI 답변 로그 조회
+      operationId: listAdminAiTurns
+      security: [{BearerAuth: []}]
+      parameters:
+        - {name: userId, in: query, required: false, schema: {type: integer, format: int64}}
+        - {name: riskOnly, in: query, required: false, schema: {type: boolean, default: false}}
+      responses:
+        '200':
+          description: AI 질문·답변 로그
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminAiTurnLog'
+  /api/v1/admin/shares/reports:
+    get:
+      tags: [admin]
+      summary: 익명 나눔 신고 목록
+      operationId: listAdminShareReports
+      security: [{BearerAuth: []}]
+      responses:
+        '200':
+          description: 신고 목록
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AdminShareReport'
+  /api/v1/admin/shares/{shareId}/moderation:
+    patch:
+      tags: [admin]
+      summary: 익명 나눔 삭제 또는 비공개 처리
+      operationId: moderateAdminShare
+      security: [{BearerAuth: []}]
+      parameters:
+        - {name: shareId, in: path, required: true, schema: {type: integer, format: int64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminShareModerationRequest'
+      responses:
+        '204': {description: 처리 완료}
 components:
   securitySchemes:
     BearerAuth:
@@ -229,6 +364,74 @@ components:
         recentJournalId:
           type: ["integer", "null"]
           format: int64
+    AdminDashboardResponse:
+      type: object
+      properties:
+        journalTotal: {type: integer}
+        todayJournalCount: {type: integer}
+        aiTurnCount: {type: integer}
+        pendingReportCount: {type: integer}
+        popularPassages:
+          type: array
+          items:
+            type: object
+            properties:
+              bookCode: {type: string}
+              chapter: {type: integer}
+              verse: {type: integer}
+              count: {type: integer}
+    AdminQtPassage:
+      type: object
+      properties:
+        id: {type: integer, format: int64}
+        date: {type: string, format: date}
+        title: {type: string}
+        theme: {type: string}
+        bookCode: {type: string}
+        chapter: {type: integer}
+        verseStart: {type: integer}
+        verseEnd: {type: integer}
+    AdminQtPassageUpsertRequest:
+      type: object
+      required: [date, title, bookCode, chapter, verseStart, verseEnd]
+      properties:
+        date: {type: string, format: date}
+        title: {type: string}
+        theme: {type: string}
+        bookCode: {type: string}
+        chapter: {type: integer}
+        verseStart: {type: integer}
+        verseEnd: {type: integer}
+    AdminAiTurnLog:
+      type: object
+      properties:
+        turnId: {type: integer, format: int64}
+        userId: {type: integer, format: int64}
+        passage: {type: string}
+        question: {type: string}
+        answer: {type: string}
+        ragSources:
+          type: array
+          items: {type: object}
+        promptSummary: {type: string}
+        riskDetected: {type: boolean}
+        createdAt: {type: string, format: date-time}
+    AdminShareReport:
+      type: object
+      properties:
+        reportId: {type: integer, format: int64}
+        shareId: {type: integer, format: int64}
+        reporterUserId: {type: integer, format: int64}
+        reason: {type: string}
+        detail: {type: string}
+        status: {type: string, enum: [PENDING, RESOLVED, REJECTED]}
+        createdAt: {type: string, format: date-time}
+    AdminShareModerationRequest:
+      type: object
+      required: [action]
+      properties:
+        action: {type: string, enum: [HIDE, DELETE, RESTORE]}
+        reason: {type: string}
     ProblemDetail:
       type: object
       required: [type, title, status, code, traceId, timestamp]

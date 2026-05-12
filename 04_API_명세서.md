@@ -261,7 +261,7 @@ HTTP/1.1 400 Bad Request
 | Auth | `EMAIL_ALREADY_EXISTS` | 409 | 회원가입 시 이메일 중복 |
 | Auth | `INVALID_CREDENTIALS` | 401 | 로그인 실패 |
 | Auth | `PASSWORD_TOO_WEAK` ⭐ | 400 | 비밀번호 정책 미달 (영문+숫자+특수문자) |
-| Auth | `ACCOUNT_DEACTIVATED` ⭐ | 401 | 탈퇴된 계정 (`status='DEACTIVATED'`) |
+| Auth | `ACCOUNT_SUSPENDED` ⭐ | 403 | 관리자 제재 계정 (`status='SUSPENDED'`) |
 | Auth | `REFRESH_TOKEN_EXPIRED` | 401 | refresh token 만료 |
 | Auth | `REFRESH_TOKEN_REVOKED` | 401 | Redis blacklist 차단 |
 | Auth | `REFRESH_TOKEN_INVALID` ⭐ | 401 | 서명·구조 오류, 또는 DB 미존재 |
@@ -445,6 +445,7 @@ spring:
 | journal | `/api/v1/journals/**` | GET, PATCH, DELETE | bible-service | ✅ | 묵상 기록은 Bible Service 통합 |
 | share-list | `/api/v1/shares` | GET | bible-service | ❌ | 익명 나눔 목록 |
 | share-actions | `/api/v1/shares/**` | GET, POST, DELETE | bible-service | ❌/✅ | 댓글 목록은 공개, 댓글 작성·좋아요·신고는 인증 |
+| admin | `/api/v1/admin/**` | GET, POST, PATCH, DELETE | bff-aggregator | ✅ ROLE_ADMIN | 관리자 P0 운영 기능 집계 |
 | me | `/api/v1/me/**` | GET | bff-aggregator | ✅ | 대시보드 |
 | ws | `/ws/**` | WebSocket | bff-aggregator | ❌ ⭐ | v1.2 — Gateway 단순 패스스루 (HTTP handshake에는 JWT 헤더 없음). BFF가 STOMP CONNECT 프레임 헤더 검증 (§ 10.2) |
 | health | `/actuator/health` | GET | gateway 자체 | ❌ | |
@@ -558,7 +559,7 @@ Content-Type: application/json
 
 **Errors:**
 - 401 `INVALID_CREDENTIALS` — 이메일/비밀번호 불일치 (구체적 사유 노출 X)
-- 401 `ACCOUNT_DEACTIVATED` — `status='DEACTIVATED'`
+- 403 `ACCOUNT_SUSPENDED` — `status='SUSPENDED'`
 - 429 `RATE_LIMITED` — 5회/분 초과
 
 ### 4.4 POST /auth/refresh — Token Rotation + race condition 방지
@@ -1566,13 +1567,13 @@ message-id:msg-12345
 
 ```
 apis/
-├── auth/openapi.yaml
+├── auth/openapi.yaml      # Gateway Auth 계약 (독립 Auth Service 아님)
 ├── bible/openapi.yaml
 ├── ai/openapi.yaml
 └── bff/openapi.yaml
 ```
 
-> Gateway Auth는 별도 서비스 OpenAPI를 두지 않는다. 인증 계약은 본 문서 § 4와 Gateway 라우팅 표가 기준이다.
+> `apis/auth/openapi.yaml`은 Gateway 내부 Auth 모듈의 API 계약이다. 독립 `auth-service` 배포나 라우팅을 의미하지 않는다.
 
 ### 11.2 OpenAPI 골격 표준 (예: bible) — v1.1 info.contact 추가
 
@@ -1736,7 +1737,7 @@ rules:
 - name: Spectral OpenAPI lint
   working-directory: ${{ github.workspace }}
   run: |
-    npx @stoplight/spectral-cli lint apis/auth/openapi.yaml
+    npx @stoplight/spectral-cli lint apis/auth/openapi.yaml   # Gateway Auth 계약
     npx @stoplight/spectral-cli lint apis/bible/openapi.yaml
     npx @stoplight/spectral-cli lint apis/ai/openapi.yaml
     npx @stoplight/spectral-cli lint apis/bff/openapi.yaml
@@ -1755,10 +1756,10 @@ rules:
 ### 12.2 가동 명령
 
 ```bash
-# 4개 OpenAPI mock 동시 가동 (각자 다른 포트, § 11.2 servers URL과 일관)
+# 4개 OpenAPI mock 동시 가동. auth는 Gateway Auth 계약 mock이다.
 npm install -g @stoplight/prism-cli@^5
 
-prism mock apis/auth/openapi.yaml    --port 4011 &
+prism mock apis/auth/openapi.yaml    --port 4010 &
 prism mock apis/bible/openapi.yaml   --port 4012 &
 prism mock apis/ai/openapi.yaml      --port 4013 &
 prism mock apis/bff/openapi.yaml     --port 4015 &
@@ -1882,7 +1883,7 @@ W1 5/22 금 회고 시 다음 점검:
 ## 📋 v1.0 → v1.1 패치 36항목 요약
 
 **🔴 필수 수정 12개**
-1. § 2.6 도메인 에러 코드 표 — 5개 추가 (ACCOUNT_DEACTIVATED·REFRESH_TOKEN_INVALID·OAUTH_TOKEN_INVALID·SESSION_ALREADY_COMPLETED·INVALID_STATUS_TRANSITION)
+1. § 2.6 도메인 에러 코드 표 — 5개 추가 (ACCOUNT_SUSPENDED·REFRESH_TOKEN_INVALID·OAUTH_TOKEN_INVALID·SESSION_ALREADY_COMPLETED·INVALID_STATUS_TRANSITION)
 2. § 2.7 페이지네이션 — Custom `PageResponse<T>` DTO 명시 (Spring Data Page 기본 직렬화 ≠ 04번 정의)
 3. § 2.10 Rate Limiter — Spring Cloud Gateway 내장 RedisRateLimiter (Lua) 정확화
 4. § 4.5 logout 인증 ❌ — refresh token만 검증 (access 만료 후에도 logout 가능)
@@ -1892,7 +1893,7 @@ W1 5/22 금 회고 시 다음 점검:
 8. § 10.2 WebSocket — query param token → STOMP CONNECT 헤더 (HTTPS여도 위험)
 9. § 11.2 yaml 예시 `info.contact` 추가 (자기 룰 위반 해결)
 10. § 11.3 Spectral `problem-json-on-errors` 룰 — `function: truthy`로 정정
-11. § 11.2 servers URL ↔ § 12.2 포트 일관성 (auth=4011, bible=4012, ai=4013, bff=4015)
+11. § 11.2 servers URL ↔ § 12.2 포트 일관성 (gateway-auth=4010, bible=4012, ai=4013, bff=4015)
 12. § 2.5 503 Circuit Breaker — Custom Exception Handler 매핑 책임 명시
 
 **🟡 일관성 보강 12개**

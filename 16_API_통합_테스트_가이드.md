@@ -1,6 +1,6 @@
 ﻿��� QT-AI (큐티 AI 앱) — API 통합 테스트 가이드 v1.0
 
-> **문서 버전:** v1.0
+> **문서 버전:** v1.1
 > **작성일:** 2026-05-08
 > **연관 문서:** [04_API_명세서 v1.5](./04_API_명세서.md) / [07_테스트_전략 v1.0](./07_테스트_전략.md) / [10_트러블슈팅_FAQ v1.0](./10_트러블슈팅_FAQ.md)
 > **owner:** 강태오 (Lead) · 각 서비스 owner (서비스별 계약 테스트)
@@ -13,6 +13,7 @@
 | 버전 | 날짜 | 작성자 | 주요 변경 |
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-08 | 강태오 (Lead) | 초기 작성 |
+| v1.1 | 2026-05-13 | Codex | Gateway Auth 계약, Bible Service 묵상 통합, DeepSeek SSE 기준으로 정합성 보강 |
 
 ---
 
@@ -20,9 +21,9 @@
 
 1. [테스트 계층 + 도구 선택](#1-테스트-계층--도구-선택)
 2. [Prism mock 서버 활용 (W1)](#2-prism-mock-서버-활용-w1)
-3. [Auth Service 계약 테스트](#3-auth-service-계약-테스트)
+3. [Gateway Auth 계약 테스트](#3-gateway-auth-계약-테스트)
 4. [AI Service SSE 계약 테스트](#4-ai-service-sse-계약-테스트)
-5. [Journal Service Kafka 계약 테스트](#5-journal-service-kafka-계약-테스트)
+5. [Bible Service 묵상 Kafka 계약 테스트](#5-bible-service-묵상-kafka-계약-테스트)
 6. [Flutter 클라이언트 통합 테스트](#6-flutter-클라이언트-통합-테스트)
 7. [전체 E2E 시나리오 (W3 기준)](#7-전체-e2e-시나리오-w3-기준)
 8. [CI 통합 게이트](#8-ci-통합-게이트)
@@ -57,17 +58,14 @@ OpenAPI 파일 기반으로 실제 백엔드 없이 mock 응답 제공. W1에 Fl
 # 설치
 npm install -g @stoplight/prism-cli
 
-# Auth Service mock (포트 4011)
-prism mock apis/auth/openapi.yaml --port 4011
+# Gateway Auth mock (포트 4010)
+prism mock apis/auth/openapi.yaml --port 4010
 
 # Bible Service mock (포트 4012)
 prism mock apis/bible/openapi.yaml --port 4012
 
 # AI Service mock (포트 4013)
 prism mock apis/ai/openapi.yaml --port 4013
-
-# Journal Service mock (포트 4014)
-prism mock apis/journal/openapi.yaml --port 4014
 
 # BFF Aggregator mock (포트 4015)
 prism mock apis/bff/openapi.yaml --port 4015
@@ -77,7 +75,7 @@ prism mock apis/bff/openapi.yaml --port 4015
 
 ```bash
 # 요청 스키마 검증까지 활성화
-prism mock apis/auth/openapi.yaml --port 4011 --validate-request
+prism mock apis/auth/openapi.yaml --port 4010 --validate-request
 ```
 
 ---
@@ -88,7 +86,7 @@ prism mock apis/auth/openapi.yaml --port 4011 --validate-request
 
 ```
 백엔드 개발 중  →  Prism mock 서버  →  Flutter 개발
-(이지윤·강상민)       (4011~4015)       (김지민)
+(강태오·강상민)       (4010~4015)       (김지민)
 ```
 
 ```dart
@@ -107,20 +105,20 @@ static const Env _dev = Env._(
 | 주차 | 백엔드 대상 | 비고 |
 | --- | --- | --- |
 | W1 | Prism mock | 백엔드 미완성 |
-| W2 | 실제 서비스 (dev Minikube) | Auth·Bible 완성 후 |
+| W2 | 실제 서비스 (dev Minikube) | Gateway Auth·Bible 완성 후 |
 | W3+ | 실제 서비스 전체 | E2E |
 
 ---
 
-## 3. Auth Service 계약 테스트
+## 3. Gateway Auth 계약 테스트
 
 ### 3.1 RestAssured 계약 테스트
 
 ```kotlin
-// auth-service/src/test/java/com/qtai/auth/contract/AuthContractTest.java
+// gateway/src/test/java/com/qtai/gateway/auth/contract/GatewayAuthContractTest.java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(properties = ["spring.profiles.active=test"])
-class AuthContractTest {
+class GatewayAuthContractTest {
 
     @LocalServerPort
     private var port: Int = 0
@@ -184,7 +182,7 @@ class AuthContractTest {
 ### 3.2 Testcontainers 설정
 
 ```kotlin
-// auth-service/src/test/java/com/qtai/auth/TestContainersConfig.java
+// gateway/src/test/java/com/qtai/gateway/auth/TestContainersConfig.java
 @TestConfiguration
 class TestContainersConfig {
 
@@ -221,24 +219,24 @@ class TestContainersConfig {
 
 ## 4. AI Service SSE 계약 테스트
 
-### 4.1 Anthropic mock 서버 (WireMock)
+### 4.1 DeepSeek mock 서버 (WireMock)
 
 ```kotlin
 // ai-service/src/test/java/com/qtai/ai/contract/AiServiceSseContractTest.java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AiServiceSseContractTest {
 
-    // WireMock으로 Anthropic API mock
+    // WireMock으로 DeepSeek OpenAI 호환 API mock
     @RegisterExtension
-    static WireMockExtension anthropicMock = WireMockExtension.newInstance()
+    static WireMockExtension deepSeekMock = WireMockExtension.newInstance()
         .options(wireMockConfig().port(18443))
         .build();
 
     @Test
     fun `POST turns returns SSE stream with token and end events`() {
-        // Anthropic mock 응답 설정
-        anthropicMock.stubFor(
-            post(urlEqualTo("/v1/messages"))
+        // DeepSeek mock 응답 설정
+        deepSeekMock.stubFor(
+            post(urlEqualTo("/chat/completions"))
                 .willReturn(aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "text/event-stream")
@@ -314,12 +312,12 @@ fun parseSseEvents(rawStream: String): List<SseEvent> {
 
 ---
 
-## 5. Journal Service Kafka 계약 테스트
+## 5. Bible Service 묵상 Kafka 계약 테스트
 
 ### 5.1 EmbeddedKafka 통합 테스트
 
 ```kotlin
-// journal-service/src/test/java/com/qtai/journal/kafka/JournalKafkaIntegrationTest.java
+// bible-service/src/test/java/com/qtai/bible/journal/kafka/JournalKafkaIntegrationTest.java
 @SpringBootTest
 @EmbeddedKafka(
     partitions = 3,
@@ -453,7 +451,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('로그인 → 대시보드 진입 E2E', (tester) async {
-    // Prism mock 서버가 localhost:4011에서 실행 중이어야 함
+    // Prism mock 서버가 localhost:4010에서 실행 중이어야 함
     app.main();
     await tester.pumpAndSettle();
 
@@ -528,7 +526,7 @@ class QTaiE2eTest {
 | Auth 로그인 실패 | Gateway AuthFilter 로그 | 10번 § 4.1 |
 | Bible 구절 조회 실패 | Bible Service 시드 확인 | 10번 § 7.1 |
 | AI SSE 미수신 | Gateway buffering 우회 | 10번 § 3.4 |
-| Journal 미생성 | Kafka consumer lag | 10번 § 6.1 |
+| 묵상 DRAFT 미생성 | Bible Service Kafka consumer lag | 10번 § 6.1 |
 | STOMP 알림 미수신 | BFF STOMP 로그 | 10번 § 3.5 |
 
 ---
@@ -558,7 +556,7 @@ jobs:
   contract-test:
     needs: [unit-test]
     steps:
-      - run: ./gradlew :auth-service:test -Ptest.tags="contract"
+      - run: ./gradlew :gateway:test -Ptest.tags="contract"
       # 실패 시 PR 머지 차단
 ```
 
@@ -585,4 +583,4 @@ jobs:
         run: python3 tests/eval/run_eval.py  # golden 100건 회귀
 ```
 
-> **비용 주의:** nightly E2E는 Anthropic API 실제 호출. 09번 § 11.4 비용 한도(USD 2.0/실행) 설정 필수.
+> **비용 주의:** nightly E2E는 DeepSeek API 실제 호출 가능. 09번 § 11.4 비용 한도(USD 2.0/실행) 설정 필수.

@@ -97,7 +97,7 @@
 | 영역 | Primary | 페어 백업 |
 | --- | --- | --- |
 | Flutter 프로젝트 골격·라우팅·상태 관리 | 김지민 | 강태오 (Lead) |
-| 인증 토큰·secure_storage·Refresh 흐름 | 김지민 | 이지윤 (Auth Service Owner — API 계약 합의) |
+| 인증 토큰·secure_storage·Refresh 흐름 | 김지민 | 강태오·이지윤 (Gateway Auth API 계약 합의) |
 | AI SSE 클라이언트 | 김지민 | 강상민 (AI Service Owner — SSE 이벤트 4종류 합의) |
 | STOMP 알림 클라이언트 | 김지민 | 강태오 (BFF Aggregator Owner — STOMP CONNECT 합의) |
 | 디자인 시스템·테마·국제화 | 김지민 | (단독) |
@@ -643,9 +643,6 @@ abstract class AuthApi {
   @GET('/auth/me')
   Future<User> me();
 
-  @POST('/auth/me/deactivate')
-  Future<void> deactivate();
-
   @POST('/auth/oauth/google')
   Future<TokenPair> oauthGoogle(@Body() OAuthGoogleRequest request);
 }
@@ -779,7 +776,7 @@ class AuthInterceptor extends QueuedInterceptor {
 
 #### 6.4.1 TraceInterceptor — W3C Trace Context 자동 생성
 
-분산 추적은 Flutter 요청이 Gateway → BFF → 4 service → Kafka envelope까지 **같은 traceId로 연결**되어야 Tempo에서 전 구간 span tree로 조회 가능. Flutter가 요청 마다 W3C traceparent 헤더를 생성해서 보내야 함.
+분산 추적은 Flutter 요청이 Gateway → BFF → Bible/AI → Kafka envelope까지 **같은 traceId로 연결**되어야 Jaeger에서 전 구간 span tree로 조회 가능. Flutter가 요청 마다 W3C traceparent 헤더를 생성해서 보내야 함.
 
 ```dart
 // lib/core/network/trace_interceptor.dart
@@ -818,7 +815,7 @@ dio.interceptors.add(LogInterceptor(...));          // 3. 로그
 ```
 
 **사용 시나리오:**
-- 사용자가 "AI 답변이 이상해요" 신고 → Sentry에 필수로 traceId 포함 (§ 15.3) → 운영자가 Tempo에서 해당 traceId 검색 → Flutter→Gateway→BFF→AI Service→Anthropic 전 구간 로그 1회 조회.
+- 사용자가 "AI 답변이 이상해요" 신고 → Sentry에 필수로 traceId 포함 (§ 15.3) → 운영자가 Jaeger에서 해당 traceId 검색 → Flutter→Gateway→BFF→AI Service→DeepSeek 전 구간 로그 1회 조회.
 - 06번 § 12와 정합 (W3C Trace Context 표준).
 
 ### 6.5 ProblemDetail 매핑
@@ -971,7 +968,7 @@ final auth = await account.authentication;
 final idToken = auth.idToken;
 if (idToken == null) throw Exception('idToken 누락');
 
-// 2. Auth Service에 ID Token 전송 → 백엔드가 JWK로 검증
+// 2. Gateway Auth에 ID Token 전송 → 백엔드가 JWK로 검증
 final tokens = await ref.read(authRepositoryProvider).oauthGoogle(idToken: idToken);
 // → AuthRepository.oauthGoogle은 내부적으로 secure_storage에 저장
 ```
@@ -1232,7 +1229,7 @@ class AiSessionTurns extends _$AiSessionTurns {
 | 위험 | 가드레일 |
 | --- | --- |
 | 사용자가 화면 나가도 스트림 계속 흐름 → 메모리·네트워크 누수 | `StreamNotifier`의 `ref.onDispose`로 stream subscription cancel |
-| Anthropic 응답 30초+ 멈춤 | Dio `receiveTimeout: 60s` (4분 LLM 응답 대비), 타임아웃 시 ApiException 변환 |
+| DeepSeek 응답 30초+ 멈춤 | Dio `receiveTimeout: 60s` (4분 LLM 응답 대비), 타임아웃 시 ApiException 변환 |
 | event 파싱 실패 (서버가 잘못된 JSON 보냄) | try-catch로 감싸고 ApiException error code `MALFORMED_SSE` 처리 |
 | 동시에 같은 세션에 2 SSE 연결 | AI Service가 409 Conflict 반환 (04번 § 6.3) → 클라이언트가 SnackBar 표시 |
 | Gateway buffering filter 적용 (SSE 끊김) | 04번 § 9.6 — Gateway가 SSE path 우회 (강태오 owner) |
@@ -2208,7 +2205,7 @@ Future<void> main() async {
 }
 ```
 
-ApiException을 Sentry에 보고할 때 `traceId`를 fingerprint에 추가 — 백엔드 Tempo trace와 매칭.
+ApiException을 Sentry에 보고할 때 `traceId`를 fingerprint에 추가 — 백엔드 Jaeger trace와 매칭.
 
 ---
 
@@ -2382,7 +2379,7 @@ void main() {
 }
 ```
 
-> **백엔드 의존:** Integration 테스트는 실제 BFF + 4 service가 필요. CI에서는 docker-compose로 `auth-service` + `bible-service` + `bff-aggregator` + `mysql` + `redis` + WireMock(Anthropic) 띄우고 실행 (06번 § 3.3과 정합).
+> **백엔드 의존:** Integration 테스트는 실제 Gateway + BFF + Bible + AI가 필요. CI에서는 `gateway` + `bible-service` + `ai-service` + `bff-aggregator` + `mysql` + `redis` + WireMock(DeepSeek)을 띄우고 실행 (06번 § 3.3과 정합).
 
 ### 13.6 Golden 테스트 — 디자인 시스템 회귀
 
@@ -2616,7 +2613,7 @@ CI 5 jobs (06번 § 3.3과 일관):
 ### 15.3 관측성 — Sentry + Trace ID 매칭
 
 - **Sentry breadcrumbs**: 각 Page 진입 시 `Sentry.addBreadcrumb(Breadcrumb(category: 'navigation', message: 'PassageViewPage entered'))` 자동 추가 (커스텀 NavigatorObserver)
-- **Trace ID 전파**: 백엔드가 응답 헤더에 `X-Trace-Id` 또는 ProblemDetail의 `traceId`로 보냄 → ApiException 발생 시 fingerprint에 추가 → Tempo trace와 매칭
+- **Trace ID 전파**: 백엔드가 응답 헤더에 `X-Trace-Id` 또는 ProblemDetail의 `traceId`로 보냄 → ApiException 발생 시 fingerprint에 추가 → Jaeger trace와 매칭
 - **사용자 식별**: 로그인 후 `Sentry.configureScope((scope) => scope.setUser(SentryUser(id: userId.toString())))` — 로그아웃 시 clear
 
 ```dart

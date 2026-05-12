@@ -1,22 +1,20 @@
 ﻿openapi: 3.1.0
 info:
-  title: QT-AI Auth Service API
-  version: "1.3"
+  title: QT-AI Gateway Auth API
+  version: "1.4"
   description: |
-    인증/인가 서비스. JWT RS256 발급/검증/갱신, Google OAuth 2.0 (idToken POST).
+    Gateway가 직접 처리하는 인증/인가 API 계약.
+    2026-05-12 결정에 따라 독립 Auth Service는 사용하지 않는다.
+    JWT RS256 발급/검증/갱신, Google OAuth 2.0 (idToken POST)을 Gateway Auth 모듈에서 처리한다.
     토큰 정책(03번 11.1): Access=30분(1800s), Refresh=14일. blacklist=Redis-WS(Refresh jti만). Access blacklist 없음.
   contact:
-    name: 이지윤 (Auth Owner)
+    name: 강태오 (Gateway Owner)
 servers:
-  - url: http://localhost:4011
-    description: Prism mock (04번 12.2 기준 포트)
-  - url: http://localhost:8081
-    description: Local 직접 접근
   - url: http://localhost:8080
-    description: Gateway 경유
+    description: Gateway local
 tags:
   - {name: auth, description: 로그인/로그아웃/토큰갱신}
-  - {name: user, description: 회원가입/탈퇴/내정보}
+  - {name: user, description: 회원가입/내정보}
   - {name: oauth, description: Google OAuth 2.0}
 paths:
   /auth/register:
@@ -161,25 +159,6 @@ paths:
                 oauthLinks: [{provider: GOOGLE, linkedAt: '2026-05-15T10:00:00Z'}]
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /auth/me/deactivate:
-    post:
-      tags: [user]
-      summary: 회원 탈퇴 (Soft Delete + email 마스킹 + user.deactivated 이벤트)
-      description: "TX: status=DEACTIVATED, deleted_at=NOW(), email 마스킹, refresh revoke. AFTER_COMMIT: Kafka user.deactivated 발행."
-      operationId: deactivateMe
-      security: [{BearerAuth: []}]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeactivateRequest'
-      responses:
-        '204': {description: 탈퇴 성공}
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
   /auth/oauth/google:
     post:
       tags: [oauth]
@@ -245,11 +224,6 @@ components:
       required: [refreshToken]
       properties:
         refreshToken: {type: string}
-    DeactivateRequest:
-      type: object
-      properties:
-        password: {type: string, description: 이메일 가입자 본인확인}
-        confirmText: {type: string, enum: ['탈퇴'], description: 소셜 전용 가입자}
     GoogleOAuthRequest:
       type: object
       required: [idToken]
@@ -279,7 +253,7 @@ components:
         email: {type: string, format: email}
         nickname: {type: string}
         role: {type: string, enum: [ROLE_USER, ROLE_ADMIN]}
-        status: {type: string, enum: [ACTIVE, SUSPENDED, DEACTIVATED]}
+        status: {type: string, enum: [ACTIVE, SUSPENDED], description: '계정 탈퇴 상태는 MVP 제외'}
         createdAt: {type: string, format: date-time}
         updatedAt: {type: string, format: date-time}
         oauthLinks:

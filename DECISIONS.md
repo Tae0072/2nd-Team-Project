@@ -85,6 +85,7 @@
 | 익명 나눔 좋아요 | `POST/DELETE /api/v1/shares/{shareId}/likes` | Bible Service | ✅ |
 | 익명 나눔 댓글 | `GET/POST /api/v1/shares/{shareId}/comments` | Bible Service | ❌/✅ |
 | 익명 나눔 신고 | `POST /api/v1/shares/{shareId}/reports` | Bible Service | ✅ |
+| 관리자 운영 API | `/api/v1/admin/**` | BFF Aggregator | ✅ ROLE_ADMIN |
 | WebSocket 알림 | `WS /ws/notifications` | BFF Aggregator | ❌ (STOMP CONNECT 헤더) |
 
 > **AI SSE endpoint:** `/ai/sessions/{id}/turns` (turns가 정식명, messages 아님 — 04번 §6.3 기준)
