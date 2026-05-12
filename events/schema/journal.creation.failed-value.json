@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.creation.failed-value",
   "title": "JournalCreationFailedEvent",
@@ -12,7 +12,7 @@
     "schemaSubject":  { "type": "string", "const": "journal.creation.failed-value" },
     "occurredAt":     { "type": "string", "format": "date-time" },
     "traceId":        { "type": "string" },
-    "producerService":{ "type": "string", "const": "journal-service" },
+    "producerService":{ "type": "string", "const": "bible-service" },
     "idempotencyKey": { "type": "string", "description": "journal.creation.failed:{sessionId}" },
     "data": {
       "type": "object",

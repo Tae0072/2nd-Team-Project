@@ -1,4 +1,4 @@
-﻿{
+{
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.created-value",
   "title": "JournalCreatedEvent",
@@ -12,7 +12,7 @@
     "schemaSubject":  { "type": "string", "const": "journal.created-value" },
     "occurredAt":     { "type": "string", "format": "date-time" },
     "traceId":        { "type": "string" },
-    "producerService":{ "type": "string", "const": "journal-service" },
+    "producerService":{ "type": "string", "const": "bible-service" },
     "idempotencyKey": { "type": "string", "description": "journal.created:{journalId}" },
     "data": {
       "type": "object",

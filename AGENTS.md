@@ -1,4 +1,4 @@
-﻿# AGENTS.md — QT-AI AI 에이전트 협업 가이드
+# AGENTS.md — QT-AI AI 에이전트 협업 가이드
 
 > **이 파일은 Claude Code / Cursor 등 AI 에이전트가 코드를 생성할 때 반드시 참조해야 하는 컨텍스트 파일이다.**
 > 01번 § 9.1·9.3·10.3, 03번 § 16에서 "AI 컨텍스트에 OpenAPI yaml 강제 주입"으로 참조.
@@ -27,11 +27,12 @@
 | Messaging | Apache Kafka | KRaft 모드 | **ZooKeeper 코드 생성 금지** |
 | Schema Registry | Apicurio Registry | 2.5+ | `apicurio.registry.use-id: contentId` |
 | Tracing | Jaeger + OpenTelemetry | Spring Boot 3.3 표준 키 | **Tempo 설정 생성 금지** |
-| AI LLM SDK | **`com.anthropic:anthropic-java`** | 최신 | Anthropic 공식 Java SDK (SSE 스트리밍 지원) |
+| AI LLM | **DeepSeek API** | OpenAI 호환 | **Anthropic SDK 코드 생성 금지** |
+| LLM 클라이언트 | Spring `RestClient` | — | OpenAI 호환 엔드포인트 직접 호출 |
 | Vector Store | ChromaDB | — | Spring `RestClient`로 REST 호출 |
 | Mobile | Flutter | 3.24+ | Dart null-safety 필수 |
 
-> **모든 백엔드 서비스는 Spring Boot 3.3 / Java 21로 통일.** (v1.0에서 ai-service만 Python FastAPI였으나 W0/2026-05-11에 Spring Boot로 전환)
+> **모든 백엔드 서비스는 Spring Boot 3.3 / Java 21로 통일.**
 
 ## 서비스별 담당자 (코드 생성 범위)
 
@@ -39,19 +40,23 @@
 | --- | --- | --- |
 | `gateway/` | 강태오 | JWT 필터, 라우팅, Rate Limit |
 | `bff-aggregator/` | 강태오 | UseCase 패턴, CompletableFuture 병렬 호출 |
-| `auth-service/` | 이지윤 | JWT RS256, OAuth JWK 검증, Refresh Rotation |
-| `bible-service/` | 김태혁 | 성경 다중 JOIN, Redis 캐시 |
-| `ai-service/` | 강상민 | Anthropic Java SDK, ChromaDB RAG, SSE (SseEmitter), 큐티 A~D 프롬프트 |
-| `journal-service/` | 이승욱 | 이벤트 소싱, Kafka 컨슈머, @Lock PESSIMISTIC_WRITE |
-| `flutter-app/` | 김지민 | Sliver Sync Scroll, RiverPod, DIO, SSE |
+| `bible-service/` | 이지윤·이승욱 | 성경 다중 JOIN, Redis 캐시, 묵상일지(journal) 통합 |
+| `ai-service/` | 강태오(팀장)·김태혁·강상민 | DeepSeek API, ChromaDB RAG, SSE (SseEmitter) |
+| `flutter-app/` | 김지민 | Sliver Sync Scroll, RiverPod, DIO, SSE, 관리자 웹 |
+
+> **Auth Service 제거 (2026-05-12):** 독립 서비스 불필요. JWT 처리는 Gateway 담당.
+> **Journal Service 제거 (2026-05-12):** 묵상일지 기능 Bible Service로 통합.
 
 ## AI Service 스택 (Spring Boot 3.3 / Java 21)
 
-> **변경 이력:** v1.0에서는 Python FastAPI 단독으로 결정했으나, 팀의 Java/Spring Boot 숙련도와 5주 일정을 고려해 W0(2026-05-11)에 Spring Boot로 전환. 다른 5개 서비스와 동일한 스택 사용.
+> **변경 이력:**
+> - v1.0: Python FastAPI 단독 결정
+> - W0 (2026-05-11): Spring Boot 3.3 전환
+> - W1 (2026-05-12): LLM Anthropic Claude → **DeepSeek** 전환
 
 ```
 ai-service/
-  build.gradle.kts                    # com.anthropic:anthropic-java 포함
+  build.gradle.kts                    # DeepSeek API 호출 (RestClient, 별도 SDK 없음)
   settings.gradle.kts
   src/main/
     java/com/qtai/ai/
@@ -59,7 +64,7 @@ ai-service/
       controller/AiSessionController.java       # POST /ai/sessions
                                                 # POST /ai/sessions/{id}/turns  ← SSE (SseEmitter)
       service/
-        ClaudeStreamService.java                # Anthropic Java SDK 래퍼 (SSE 스트리밍)
+        DeepSeekStreamService.java              # DeepSeek API 래퍼 (OpenAI 호환 RestClient 호출)
         ChromaDbClient.java                     # ChromaDB REST 호출 (RestClient)
       kafka/AiSessionCompletedPublisher.java    # ai.session.completed 발행
       prompts/QtPromptTemplates.java            # 큐티 A~D 시스템 프롬프트
@@ -71,7 +76,7 @@ BFF → AI 서비스 호출: `RestClient.get().uri("http://ai-service.qtai.svc.c
 
 ### 사용 라이브러리 요점
 
-- **`com.anthropic:anthropic-java`** — Anthropic 공식 Java SDK, SSE 스트리밍 네이티브 지원
+- **Spring `RestClient`** — DeepSeek OpenAI 호환 엔드포인트 호출 (별도 SDK 없음)
 - **Spring `SseEmitter`** — 클라이언트로 SSE 프록시 스트리밍
 - **Spring `RestClient`** — ChromaDB REST API 호출
 - **Spring Kafka** — `ai.session.completed` 이벤트 발행
@@ -92,7 +97,8 @@ BFF → AI 서비스 호출: `RestClient.get().uri("http://ai-service.qtai.svc.c
    → DataIntegrityViolationException catch + skip 패턴 필수
 ❌ Spring Boot 2.x 전용 API (WebMvcConfigurerAdapter, @EnableSwagger2 등)
 ❌ PostgreSQL dialect, ZooKeeper Kafka 설정, Tempo tracing 설정
-❌ LLM 공급자 교체 (Anthropic Claude 고정)
+❌ Anthropic SDK 코드 (com.anthropic:anthropic-java) — DeepSeek 사용
+❌ LLM 공급자 교체 (DeepSeek 고정)
 ❌ Kafka envelope에 payload 키 사용 (data 사용)
 ❌ /messages 경로 (AI SSE는 /turns)
 ❌ 성경 데이터에 개역개정 / ESV / NIV
@@ -163,29 +169,29 @@ Content-Type: application/problem+json
 
 ## workspaces 폴더 격리 규칙 (§13)
 
-각 팀원은 ``workspaces/{본인명}/`` 폴더에서만 읽기·쓰기가 허용됩니다.
+각 팀원은 `workspaces/{본인명}/` 폴더에서만 읽기·쓰기가 허용됩니다.
 
 | 팀원 | 개인 폴더 |
 | --- | --- |
-| Lead 강태오 | ``workspaces/Lead_강태오/`` |
-| DevA 이지윤 | ``workspaces/DevA_이지윤/`` |
-| DevB 김태혁 | ``workspaces/DevB_김태혁/`` |
-| DevC 강상민 | ``workspaces/DevC_강상민/`` |
-| DevD 이승욱 | ``workspaces/DevD_이승욱/`` |
-| DevE 김지민 | ``workspaces/DevE_김지민/`` |
+| Lead 강태오 | `workspaces/Lead_강태오/` |
+| DevA 이지윤 | `workspaces/DevA_이지윤/` |
+| DevB 김태혁 | `workspaces/DevB_김태혁/` |
+| DevC 강상민 | `workspaces/DevC_강상민/` |
+| DevD 이승욱 | `workspaces/DevD_이승욱/` |
+| DevE 김지민 | `workspaces/DevE_김지민/` |
 
 ### 필수 규칙
 
 1. **타인 폴더 접근 금지** — 다른 팀원의 개인 폴더는 읽기·수정·삭제 모두 금지. AI 에이전트도 동일.
-2. **프로젝트 영향 금지** — ``workspaces/`` 내부 파일은 빌드·런타임·테스트·CI에 영향 0. import 대상 아님.
-3. **워크플로우 → 리포트 워크플로우** — 모든 작업은 ``workflows/{date}-{task}.md`` 작성 → 자기 검토 → 작업 → ``reports/{date}-{task}.md`` 작성 순서.
+2. **프로젝트 영향 금지** — `workspaces/` 내부 파일은 빌드·런타임·테스트·CI에 영향 0. import 대상 아님.
+3. **워크플로우 → 리포트 워크플로우** — 모든 작업은 `workflows/{date}-{task}.md` 작성 → 자기 검토 → 작업 → `reports/{date}-{task}.md` 작성 순서.
 4. **PR 교차 금지** — 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject.
-5. **템플릿 공유** — ``_template.md``는 수정 금지 (공통 양식). 변경 필요 시 Lead에게 제안.
+5. **템플릿 공유** — `_template.md`는 수정 금지 (공통 양식). 변경 필요 시 Lead에게 제안.
 
 ### 워크플로우/리포트 의무
 
-- 모든 day 카드에 표시된 작업 (실행 가이드 HTML 기준) 시작 전 ``workflows/`` 작성.
-- 작업 종료 직후 ``reports/`` 작성 — 다음 작업 이전에 반드시.
+- 모든 day 카드에 표시된 작업 (실행 가이드 HTML 기준) 시작 전 `workflows/` 작성.
+- 작업 종료 직후 `reports/` 작성 — 다음 작업 이전에 반드시.
 - 1 워크플로우 = 1 리포트 (동일 이름)
 
-세부 내용: ``workspaces/README.md`` 참조.
+세부 내용: `workspaces/README.md` 참조.
