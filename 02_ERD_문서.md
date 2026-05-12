@@ -1,8 +1,8 @@
-﻿��� QT-AI (큐티 AI 앱) — ERD 문서 v1.1
+# 📊 QT-AI (큐티 AI 앱) — ERD 문서 v1.5
 
-> **문서 버전:** v1.4
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합)
-> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서
+> **문서 버전:** v1.5
+> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합) / 2026-05-12 (v1.5 — D형 QT 도메인 반영)
+> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서 / [23_도메인_용어사전](./23_도메인_용어사전.md)
 > **MSA 데이터 원칙:** **Database per Service** — 각 서비스가 자기 DB 소유, 서비스 간 직접 JOIN 금지, 비동기 동기화는 Kafka 이벤트로
 
 ---
@@ -17,6 +17,7 @@
 | v1.2 | 2026-05-07 | 강태오 | **외부 검토 9항목 일괄 패치** — § 6.1 토픽 표 8번째 추가 (`journal.creation.failed` Saga 보상) + `user.activity.tracked` 멱등성 키 형식 04번과 통일 (`read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}`) + envelope에 `idempotencyKey` 필드 명시 / § 7.6 JOURNALS.status 다이어그램 정정 (PUBLISHED → DRAFT 화살표 제거 + "사용자 직접 작성" 제거 — 04번 § 7.4 INVALID_STATUS_TRANSITION 정책 정합) |
 | v1.3 | 2026-05-09 | 강태오 | DECISIONS.md 정합 패치 — § 1.1 Kafka 토픽 다이어그램에 `journal.creation.failed` 추가 / § 3 헤더 + § 9.3 Redis 캐시 키 형식 수정(`passage:` → `cache:passage:kr:`) + EN 캐시 키 추가 / § 6.1 멱등성 키 snake_case→camelCase 통일({userId},{sessionId},{journalId},{epochMinute}) / 헤더 연관문서 v1.3→v1.4 |
 | v1.4 | 2026-05-12 | 강태오 | Auth Service 제거·Gateway Auth 정리, Journal Service → Bible Service 통합, 묵상 4분할, 익명 나눔 테이블 추가 |
+| v1.5 | 2026-05-12 | 강태오 | **D형 QT 도메인 용어사전 반영** — JOURNALS에 `observation` / `interpretation` / `qt_type` 컬럼 추가. D형 QT 4단계 완전 지원 |
 
 ---
 
@@ -470,6 +471,9 @@ erDiagram
         BIGINT book_id
         INT chapter
         INT verse
+        VARCHAR qt_type
+        TEXT observation
+        TEXT interpretation
         TEXT felt
         TEXT memorable_verse
         TEXT application
@@ -536,9 +540,12 @@ erDiagram
 | book_id | BIGINT | N | — | | Bible Service 참조 (FK 제약 없음) |
 | chapter | INT | N | — | | |
 | verse | INT | N | — | | |
-| felt | TEXT | Y | NULL | | 본문을 읽고 느낀 점 |
+| **qt_type** | **VARCHAR(2)** | **Y** | **NULL** | | **A/B/C/D형 QT 유형. 23_도메인_용어사전 참조** |
+| **observation** | **TEXT** | **Y** | **NULL** | | **관찰 단계: 단락나누기, 재진술, 육하원칙 분석 내용** |
+| **interpretation** | **TEXT** | **Y** | **NULL** | | **해석/연구와묵상 단계: 하나님은 어떤 분이신가? + 연구 내용** |
+| felt | TEXT | Y | NULL | | 본문을 읽고 느낌 단계: 마음의 반응 |
 | memorable_verse | TEXT | Y | NULL | | 기억할 구절 |
-| application | TEXT | Y | NULL | | 오늘 삶에 적용할 점 |
+| application | TEXT | Y | NULL | | 적용 단계: 구체적 행동 결단 |
 | prayer | TEXT | Y | NULL | | 기도 내용 |
 | ai_session_id | BIGINT | Y | NULL | | AI Service `ai_sessions.id` 참조 (FK 제약 없음) |
 | status | VARCHAR(20) | N | 'DRAFT' | | § 7.6 참조 |
@@ -551,6 +558,7 @@ erDiagram
 **인덱스**
 - `idx_journals_user_id_created` ON (user_id, created_at DESC) — 마이페이지 리스트
 - `idx_journals_user_id_status` ON (user_id, status)
+- `idx_journals_user_id_qt_type` ON (user_id, qt_type) — QT 유형별 필터링
 - `idx_journals_passage` ON (book_id, chapter, verse) — 인기 구절 통계용
 - `idx_journals_ai_session_id` ON (ai_session_id) — AI 대화 → Journal 연결 조회
 
@@ -655,6 +663,9 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
   },
   "ai_session_id": 9012,
   "title": "창세기 1:1 묵상",
+  "qt_type": "D",
+  "observation": "",
+  "interpretation": "",
   "felt": "",
   "memorable_verse": "",
   "application": "",
@@ -670,6 +681,9 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
   "journal_id": 1234,
   "delta": {
     "title": {"old": "창세기 1:1 묵상", "new": "창세기 1:1 — 시작"},
+    "qt_type": {"old": "A", "new": "D"},
+    "observation": {"old": "", "new": "하나님이 말씀으로 천지를 창조하셨다..."},
+    "interpretation": {"old": "", "new": "하나님은 능력의 하나님이시다..."},
     "felt": {"old": "...", "new": "..."},
     "application": {"old": "...", "new": "..."}
   },
@@ -979,6 +993,7 @@ CREATE TABLE users (
 ├── V1__init.sql                 # 초기 스키마
 ├── V2__seed_master.sql          # 시드 데이터 (BOOKS·관리자 계정 등)
 ├── V3__add_summary_to_sessions.sql  # 컬럼 추가
+├── V4__add_qt_columns_to_journals.sql  # D형 QT 컬럼 추가 (qt_type, observation, interpretation)
 └── R__rebuild_views.sql         # repeatable (뷰·인덱스 재생성)
 ```
 
@@ -1018,6 +1033,7 @@ CREATE TABLE users (
 | AI | AI_TURNS | (session_id, created_at) | INDEX | 세션별 시간순 |
 | AI | AI_TURNS | used_prompt_template_id | INDEX | 프롬프트별 응답 회귀 분석 |
 | Journal | JOURNALS | (user_id, created_at DESC) | INDEX | 마이페이지 리스트 |
+| Journal | JOURNALS | (user_id, qt_type) | INDEX | QT 유형별 필터링 (v1.5) |
 | Journal | JOURNALS | (book_id, chapter, verse) | INDEX | 인기 구절 통계 |
 | Journal | JOURNAL_EVENTS | idempotency_key | UNIQUE | **외부 이벤트 멱등성 핵심** |
 | Journal | JOURNAL_EVENTS | (journal_id, sequence) | UNIQUE | **순서 무결성 + replay** |
@@ -1201,7 +1217,7 @@ bff-aggregator/src/main/java/com/qtai/bff/
 
 ## 📋 전체 테이블 요약
 
-| # | 서비스 | 테이블 | Owner | 주요 외부 참조 (FK 제약 없음) | 주요 컬럼 변경 (v1.1) |
+| # | 서비스 | 테이블 | Owner | 주요 외부 참조 (FK 제약 없음) | 주요 컬럼 변경 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Auth | USERS | 이지윤 | (외부 노출) | email 재가입 정책 |
 | 2 | Auth | REFRESH_TOKENS | 이지윤 | users.id | — |
@@ -1213,47 +1229,12 @@ bff-aggregator/src/main/java/com/qtai/bff/
 | 8 | AI | PROMPT_TEMPLATES | 강상민 | — | status DRAFT→EDITING |
 | 9 | AI | AI_SESSIONS | 강상민 | (외부 참조) auth.users.id, bible.books.id | **summary 컬럼 추가** |
 | 10 | AI | AI_TURNS | 강상민 | ai_sessions.id, prompt_templates.id | **used_prompt_template_id 추가, content MEDIUMTEXT, step nullable** |
-| 11 | Journal | JOURNALS | 이승욱 | (외부 참조) auth.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence 컬럼 추가** |
+| 11 | Journal | JOURNALS | 이승욱 | (외부 참조) auth.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence + qt_type/observation/interpretation 추가 (v1.5)** |
 | 12 | Journal | JOURNAL_EVENTS | 이승욱 | journals.id (유연 결합) | (journal_id, sequence) UNIQUE 추가 |
 | — | AI | (ChromaDB) commentary_embeddings | 강상민 | bible.commentaries.id | — |
 | — | AI | (ChromaDB) dummy_paper_embeddings | 강상민 | — | — |
 
 **총 12개 RDBMS 테이블 + 2개 ChromaDB Collection**
-
----
-
-## 📋 v1.0 → v1.1 패치 항목 25개 요약
-
-**🔴 필수 수정 (정확성·구현 시 막힘) — 9개**
-1. § 4.1 PROMPT_TEMPLATES UK 다이어그램 정정 (code 단독 UK 제거)
-2. § 4.4 AI_TURNS에 `used_prompt_template_id` FK 추가
-3. § 4.3 AI_SESSIONS에 `summary` 컬럼 추가
-4. § 5.4 JOURNAL_EVENTS.sequence 부여 메커니즘 명시 (last_event_sequence + FOR UPDATE)
-5. § 3.2~3.5 BOOKS는 W0, KR_BIBLE/EN_BIBLE/COMMENTARIES는 W1 ETL로 정정
-6. § 8.4 utf8mb4 / utf8mb4_unicode_ci 표준 명시
-7. § 4.4 AI_TURNS.content TEXT → MEDIUMTEXT
-8. § 4.4 AI_TURNS.step nullable
-9. § 2.2.1 USERS.email 재가입 정책 (마스킹)
-
-**🟡 일관성·완결성 보강 — 8개**
-10. § 7.4 PROMPT_TEMPLATES.status DRAFT → EDITING (JOURNALS와 명칭 분리)
-11. 01번 § 1.4 Kafka 토픽 4개 → 7개로 동기화 (별도 commit)
-12. § 8.2 BOOKS 행 추가
-13. § 9.2 PROMPT_TEMPLATES, BOOKS, AI_TURNS.template_id 인덱스 추가
-14. § 6.2 Schema Registry + producerService + schemaSubject 명시
-15. § 7.5 AI_SESSIONS 다이어그램에 COMPLETED_NO_JOURNAL 전이 추가
-16. § 6.4 Notification v1.0 stateless 정책 명시
-17. § 6.1 토픽 표에 Schema Subject + DLQ 토픽 컬럼 추가
-
-**🟢 선택적 개선 — 8개**
-18. § 11.2.1 Outbox v1.0 한계 + 운영 대응 명시
-19. § 7.3 ROLE_ADMIN 첫 부여 방법 (Flyway 시드)
-20. § 8.1.1 BaseEntity 배포 방식 (v1.0 소스 복사 / v1.1 maven artifact)
-21. § 11.4.2 인프라 서비스(Gateway, BFF) 패키지 구조 예외
-22. § 5.2 JOURNALS.title 자동 생성 규칙 (`name_kr` 사용)
-23. § 8.5 Flyway 마이그레이션 표준
-24. § 5.5 JOURNAL_EVENTS.event_data JSON 스키마 예시 4종
-25. § 1.1 다이어그램에 BFF/Gateway 추가 (DB 없음 표시)
 
 ---
 
