@@ -74,6 +74,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>5/20: ChromaDB metadata schema와 today QT/explanation source rag_sources 예시 고정</li>
 <li>5/21: DevC SSE payload와 PromptTemplate 저장 구조 맞춤</li>
 <li>5/22: eval 실행 방법과 통과 기준 리포트</li>
+<li><strong>✅ W1 PR 머지 조건 (필수):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :ai-service:test</code> 통과</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>RAG 검색 client와 prompt assembly 연동</li>
@@ -84,6 +85,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Bible verse_exists 또는 본문 조회와 RAG 검증 연동</li>
 <li>프롬프트 인젝션 회귀 테스트 CI 후보 작성</li>
 <li>응답 품질 로그 샘플 수집</li>
+<li><strong>✅ W3 PR 머지 조건 (필수):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :ai-service:integrationTest</code> 통과, 커버리지 70%+</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
 <li>golden/injection/theology set 확장</li>

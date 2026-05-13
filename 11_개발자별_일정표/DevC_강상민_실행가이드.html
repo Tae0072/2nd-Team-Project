@@ -75,6 +75,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>5/20: LLM_TIMEOUT, LLM_PROVIDER_ERROR ProblemDetail 매핑</li>
 <li>5/21: DevB RAG/prompt assembly 연결</li>
 <li>5/22: 1턴 E2E와 DeepSeek 장애 fallback 검증</li>
+<li><strong>✅ W1 PR 머지 조건 (필수):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :ai-service:test</code> 통과</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>실제 DeepSeek streaming 연동</li>
@@ -85,6 +86,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Kafka Saga 보상과 E2E 통합</li>
 <li>SSE buffering, gateway timeout, client cancel 장애 처리</li>
 <li>provider 비용/latency metric 발행</li>
+<li><strong>✅ W3 PR 머지 조건 (필수):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :ai-service:integrationTest</code> 통과, 커버리지 70%+</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
 <li>회귀 테스트와 eval 안정화</li>
