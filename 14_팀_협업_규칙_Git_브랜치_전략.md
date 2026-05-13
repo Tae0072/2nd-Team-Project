@@ -55,24 +55,25 @@ master        ← 최종 배포 브랜치 (Lead 강태오 수동 머지만)
 {type}/{서비스}-{짧은-설명}
 ```
 
-**서비스 scope (담당 디렉토리):**
+**서비스 scope (담당 디렉토리) — DECISIONS.md §0 기준:**
 
 | scope | 담당자 | 디렉토리 |
 | --- | --- | --- |
-| `gateway` | 강태오 | `services/gateway/` |
+| `gateway` | 강태오 | `services/gateway/` (JWT 발급·검증·OAuth 필터 포함 — Auth Service 독립 없음) |
 | `bff` | 강태오 | `services/bff-aggregator/` |
-| `auth` | 이지윤 | `services/auth-service/` |
-| `bible` | 김태혁 | `services/bible-service/` |
-| `ai` | 강상민 | `services/ai-service/` |
-| `journal` | 이승욱 | `services/journal-service/` |
-| `mobile` | 김지민 | `apps/mobile/` |
+| `bible` | 이지윤·이승욱 | `services/bible-service/` (성경·QT·주석·묵상일지·나눔 — Journal Service 독립 없음) |
+| `ai` | 강태오(팀장)·김태혁·강상민(메인) | `services/ai-service/` |
+| `mobile` | 김지민 | `apps/mobile/` (+ 관리자 웹) |
+
+> **삭제된 scope (2026-05-12 결정):** `auth` (Gateway 내부 모듈로 통합), `journal` (Bible Service 내부 모듈로 통합). 두 scope의 브랜치 명은 사용하지 않는다.
 
 **예시:**
 ```bash
 git checkout dev
-git checkout -b feature/auth-google-oauth
+git checkout -b feature/gateway-google-oauth      # Auth Service 아닌 Gateway 필터에 구현
 git checkout -b bugfix/ai-sse-turn-completed
 git checkout -b feature/bible-today-passage-api
+git checkout -b feature/bible-journal-event-sourcing  # Journal Service 아닌 Bible Service 안에 구현
 ```
 
 ### 1.3 브랜치 운영 규칙

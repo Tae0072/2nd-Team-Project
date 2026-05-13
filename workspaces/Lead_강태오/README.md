@@ -1,6 +1,6 @@
 ﻿# Lead_강태오 개인 작업 공간
 
-이 폴더는 **Lead_강태오 (Lead · Gateway · BFF Aggregator · DevOps)** 의 개인 작업 공간입니다.
+이 폴더는 **Lead_강태오 (Lead · Gateway · BFF Aggregator · DevOps · AI 서버 팀장)** 의 개인 작업 공간입니다.
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

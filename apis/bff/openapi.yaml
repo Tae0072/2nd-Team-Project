@@ -158,6 +158,7 @@ paths:
     get:
       tags: [admin]
       summary: 오늘의 QT 본문 목록
+      description: 관리자 페이지에서 등록된 오늘의 QT 본문을 날짜 역순으로 조회한다. 운영자 확인용.
       operationId: listAdminQtPassages
       security: [{BearerAuth: []}]
       responses:
@@ -172,6 +173,7 @@ paths:
     post:
       tags: [admin]
       summary: 오늘의 QT 본문 등록
+      description: 운영자가 특정 날짜의 QT 본문(책·장·절·해설 시드)을 신규 등록한다. MVP는 한 절 고정(verseStart == verseEnd).
       operationId: createAdminQtPassage
       security: [{BearerAuth: []}]
       requestBody:
@@ -191,6 +193,7 @@ paths:
     patch:
       tags: [admin]
       summary: 오늘의 QT 본문 수정
+      description: 등록된 오늘 QT 본문의 해설, 출처, 노출 날짜 등 메타데이터를 부분 수정한다.
       operationId: updateAdminQtPassage
       security: [{BearerAuth: []}]
       parameters:
@@ -211,6 +214,7 @@ paths:
     delete:
       tags: [admin]
       summary: 오늘의 QT 본문 삭제
+      description: 잘못 등록된 오늘 QT 본문을 soft-delete 처리한다. 이미 노출된 본문은 운영자만 삭제 가능.
       operationId: deleteAdminQtPassage
       security: [{BearerAuth: []}]
       parameters:
@@ -221,6 +225,7 @@ paths:
     get:
       tags: [admin]
       summary: AI 답변 로그 조회
+      description: AI 응답 모니터링용. riskOnly=true 지정 시 신학 가드레일·인젝션 등 위험 분류된 턴만 반환한다.
       operationId: listAdminAiTurns
       security: [{BearerAuth: []}]
       parameters:
@@ -239,6 +244,7 @@ paths:
     get:
       tags: [admin]
       summary: 익명 나눔 신고 목록
+      description: 사용자가 신고한 익명 나눔 게시글 목록을 관리자가 확인한다. 검토 후 moderation 처리로 이어진다.
       operationId: listAdminShareReports
       security: [{BearerAuth: []}]
       responses:
@@ -254,6 +260,7 @@ paths:
     patch:
       tags: [admin]
       summary: 익명 나눔 삭제 또는 비공개 처리
+      description: 신고된 익명 나눔에 대해 관리자가 비공개 전환 또는 삭제 처리한다. 처리 사유는 감사 로그에 기록된다.
       operationId: moderateAdminShare
       security: [{BearerAuth: []}]
       parameters:

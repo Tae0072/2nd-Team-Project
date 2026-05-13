@@ -1,6 +1,6 @@
 ﻿# DevC_강상민 개인 작업 공간
 
-이 폴더는 **DevC_강상민 (AI/RAG Service (FastAPI))** 의 개인 작업 공간입니다.
+이 폴더는 **DevC_강상민 (AI/RAG Service Main · Spring Boot 3.3 / DeepSeek SSE · 관리자 웹 보조)** 의 개인 작업 공간입니다.
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

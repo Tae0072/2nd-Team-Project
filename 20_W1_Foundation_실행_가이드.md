@@ -103,7 +103,7 @@
 17:00  Kafka consumer 설정 + CreateJournalUseCase 골격
 ```
 
-### 김태혁 (Bible Service)
+### 김태혁 (AI/RAG Service 보조)
 
 ```
 10:30  git pull → Gradle wrapper 확인
@@ -198,7 +198,7 @@
 
 ```
 5/15 오전  BFF Aggregator 기본 집계 (/me/dashboard 병렬 호출)
-5/15 오후  Kafka 토픽 8종 자동 생성 스크립트 검증
+5/15 오후  Kafka 토픽 7종 + 각 DLQ 자동 생성 스크립트 검증 (DECISIONS.md §4)
 5/16 오전  Prometheus scrape 설정 + Grafana 기본 대시보드
 5/16 오후  CI yml 전체 구성 (build + Spectral + flutter analyze)
 ```
@@ -293,12 +293,12 @@ curl -N http://$(minikube ip):30080/api/v1/ai/sessions/$SESSION/turns \
 
 | 역할 | 5/19 | 5/20 |
 | --- | --- | --- |
-| 강태오 | Gateway AuthFilter 통합 검증 | AI SSE buffering 우회 filter |
-| 이지윤 | Google OAuth 구현 시작 | Auth ↔ Gateway X-User-Id 통합 |
+| 강태오 | Gateway JWT 필터 + Google OAuth 통합 검증 | AI SSE buffering 우회 filter |
+| 이지윤 | Bible 성경 조회 API 통합 | Bible ↔ AI Service verse_exists 연결 |
 | 강상민 | DeepSeek mock → 실제 API 전환 | 1턴 E2E 완성 |
 | 이승욱 | Kafka consumer 통합 테스트 | notification.requested E2E |
-| 김태혁 | Bible ↔ AI Service verse_exists 연결 | 캐시 히트율 확인 |
-| 김지민 | Flutter ↔ Auth API 실제 연동 | STOMP client 골격 |
+| 김태혁 | AI RAG 검색 통합 테스트 | DeepSeek 프롬프트 정확성 검증 |
+| 김지민 | Flutter ↔ Gateway 인증 API 실제 연동 | STOMP client 골격 |
 
 ---
 

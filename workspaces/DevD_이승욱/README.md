@@ -1,6 +1,6 @@
 ﻿# DevD_이승욱 개인 작업 공간
 
-이 폴더는 **DevD_이승욱 (Journal Service · Kafka)** 의 개인 작업 공간입니다.
+이 폴더는 **DevD_이승욱 (Bible Service Journal · Kafka · 이벤트 소싱)** 의 개인 작업 공간입니다.
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

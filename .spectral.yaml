@@ -28,9 +28,9 @@ rules:
       function: truthy
 
   error-response-traceId:
-    description: 에러 응답 스키마에 traceId 필드 필수
+    description: 에러 응답 스키마(RFC 7807 ProblemDetail)에 traceId 필드 필수
     severity: warn
-    given: "$.components.schemas.ErrorResponse.properties"
+    given: "$.components.schemas.ProblemDetail.properties"
     then:
       field: traceId
       function: truthy

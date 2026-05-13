@@ -1,6 +1,6 @@
 ﻿# DevB_김태혁 개인 작업 공간
 
-이 폴더는 **DevB_김태혁 (Bible Service)** 의 개인 작업 공간입니다.
+이 폴더는 **DevB_김태혁 (AI/RAG Service 보조 — Prompt/RAG/ChromaDB 시드)** 의 개인 작업 공간입니다.
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

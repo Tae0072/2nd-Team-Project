@@ -939,8 +939,8 @@ scrape_configs:
 | `jvm_memory_used_bytes / jvm_memory_max_bytes` | JVM heap 사용률 | > 90% for 10m → P1 |
 | `mysql_global_status_threads_running` | MySQL 활성 쓰레드 | > 50 → P2 |
 | `redis_connected_clients` | Redis 연결 수 | > 100 → P2 |
-| `anthropic_api_request_duration_seconds` | Claude 응답 latency | p95 > 10s for 5m → P2 |
-| `anthropic_api_failure_total` | Claude 호출 실패 | rate > 5/m → P1 |
+| `deepseek_api_request_duration_seconds` | DeepSeek 응답 latency | p95 > 10s for 5m → P2 |
+| `deepseek_api_failure_total` | DeepSeek 호출 실패 | rate > 5/m → P1 |
 
 #### 8.3.2 alert rule 예
 
@@ -1222,13 +1222,13 @@ kubectl exec -it kafka-0 -n qtai -- \
 ### 10.5 시나리오: DeepSeek API 5xx 다발 (P1)
 
 **증상:**
-- alert: `anthropic_api_failure_total rate > 5/m`
+- alert: `deepseek_api_failure_total rate > 5/m`
 - AI 응답 SSE 504 응답 (04번 § 6.3 `LLM_TIMEOUT`)
 
 **대응:**
-- DeepSeek Status 페이지 확인 → provider 사이드 장애면 대기 + 사용자 안내
+- DeepSeek Status 페이지 (https://status.deepseek.com) 확인 → provider 사이드 장애면 대기 + 사용자 안내
 - 자체 사이드 → API key 만료? Rate limit (분당 호출 한도) ? `kubectl logs -n qtai deployment/ai-service`
-- 일시 fallback (v1.1): 다른 모델 (claude-haiku-4-5)로 자동 전환. v1.0은 사용자 안내만
+- 일시 fallback (v1.1): 다른 DeepSeek 모델 또는 OpenAI 호환 대체 endpoint로 자동 전환. v1.0은 사용자 안내만
 
 ### 10.6 시나리오: SSE 끊김 다발 (P2)
 
@@ -1357,7 +1357,7 @@ kubectl exec -it kafka-0 -n qtai -- \
 - [ ] GitHub Secrets 적재 (`KUBECONFIG_DEV`, `SLACK_WEBHOOK_*`)
 - [ ] Minikube 가동 (4 CPU, 6Gi RAM 이상) — 03번 § 9.2
 - [ ] Minikube 첫 부팅 + `kubectl create ns qtai` + `kubectl create ns observability`
-- [ ] K8s Secret `qtai-secrets` 적재 (jwt-keys, mysql-password, anthropic-api-key, google-oauth-client-id) — 05번 § 5.4
+- [ ] K8s Secret `qtai-secrets` 적재 (jwt-keys, mysql-password, deepseek-api-key, google-oauth-client-id) — 05번 § 5.4
 
 ### 13.2 W1 (5/22 금까지) — 4 service hello-world 배포
 

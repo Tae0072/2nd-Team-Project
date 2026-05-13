@@ -29,7 +29,7 @@
 2. [공통 표준 (Cross-cutting Standards)](#2-공통-표준-cross-cutting-standards)
 3. [Gateway 라우팅 표](#3-gateway-라우팅-표)
 4. [Gateway Auth API](#4-gateway-auth-api) — 강태오
-5. [Bible Service API](#5-bible-service-api) — 김태혁
+5. [Bible Service API](#5-bible-service-api) — 이지윤·이승욱
 6. [AI/RAG Service API](#6-airag-service-api) — 강상민
 7. [Bible Service 묵상 기록 API](#7-bible-service-묵상-기록-api) — 이지윤·이승욱
 8. [BFF Aggregator API](#8-bff-aggregator-api) — 강태오
@@ -1807,14 +1807,15 @@ rules:
 ### 12.2 가동 명령
 
 ```bash
-# 4개 OpenAPI mock 동시 가동. auth는 Gateway Auth 계약 mock이다.
+# 3개 OpenAPI mock 동시 가동. (auth는 Gateway 내부 모듈로 별도 Prism mock 없음 — DECISIONS.md §1 표 참조)
 npm install -g @stoplight/prism-cli@^5
 
-prism mock apis/auth/openapi.yaml    --port 4010 &
 prism mock apis/bible/openapi.yaml   --port 4012 &
 prism mock apis/ai/openapi.yaml      --port 4013 &
 prism mock apis/bff/openapi.yaml     --port 4015 &
 ```
+
+> **auth Prism mock 없는 이유:** Auth는 독립 서비스가 아니라 Gateway 필터로 구현되므로 OpenAPI 계약 검증은 `apis/auth/openapi.yaml`의 정적 분석(Spectral)로만 수행한다. Flutter 클라이언트는 Auth API를 Gateway 경유(8080)로 호출한다.
 
 ### 12.3 Flutter `dev` 환경 base URL
 
@@ -1944,7 +1945,7 @@ W1 5/22 금 회고 시 다음 점검:
 8. § 10.2 WebSocket — query param token → STOMP CONNECT 헤더 (HTTPS여도 위험)
 9. § 11.2 yaml 예시 `info.contact` 추가 (자기 룰 위반 해결)
 10. § 11.3 Spectral `problem-json-on-errors` 룰 — `function: truthy`로 정정
-11. § 11.2 servers URL ↔ § 12.2 포트 일관성 (gateway-auth=4010, bible=4012, ai=4013, bff=4015)
+11. § 11.2 servers URL ↔ § 12.2 포트 일관성 (auth Prism mock 없음 — Gateway 필터로 구현, bible=4012, ai=4013, bff=4015)
 12. § 2.5 503 Circuit Breaker — Custom Exception Handler 매핑 책임 명시
 
 **🟡 일관성 보강 12개**

@@ -19,6 +19,7 @@
 | v1.4 | 2026-05-12 | 강태오 | Auth Service 제거·Gateway Auth 정리, Journal Service → Bible Service 통합, 묵상 4분할, 익명 나눔 테이블 추가 |
 | v1.5 | 2026-05-12 | 강태오 | **D형 QT 도메인 용어사전 반영** — JOURNALS에 `observation` / `interpretation` / `qt_type` 컬럼 추가. D형 QT 4단계 완전 지원 |
 | v1.6 | 2026-05-13 | 강태오 | 오전 회의 결정 반영 — 오늘 QT 기준 묵상 자동 저장을 위해 `JOURNALS.qt_date` 추가, 자유 본문 AI/묵상 제외, 사용자 입력 글자 수 제한 없음 |
+| v1.7 | 2026-05-13 | 강태오 | **§ 5.2 JOURNALS `verse` 단일 컬럼 → `verse_start` + `verse_end` 분리** (DECISIONS.md §3.1·Kafka `journal.created`/`ai.session.completed` payload schema와 정합 — MVP는 verse_start == verse_end 고정, v1.1 구절 범위 확장 대비) / `idx_journals_passage` 컬럼명 갱신 / Mermaid 다이어그램 동일 적용 |
 
 ---
 
@@ -215,7 +216,7 @@ ADR 후보 0010.
 
 ## 3. Bible Service ERD
 
-> **Owner:** 김태혁 / **DB schema:** `bible_db` + Redis 캐시 (`cache:passage:kr:{book}:{ch}:{v}`, TTL 24h) — DECISIONS.md §7
+> **Owner:** 이지윤·이승욱 (Bible Service 통합 Owner) / **DB schema:** `bible_db` + Redis 캐시 (`cache:passage:kr:{book}:{ch}:{v}`, TTL 24h) — DECISIONS.md §7
 >
 > **데이터 출처:** § [01번 § 3.1 데이터 저작권 표](./01_프로젝트_계획서.md) — KJV (PD) + Matthew Henry (PD) + 개역한글(출처 표기) + 한글 주석 더미데이터
 
@@ -472,7 +473,8 @@ erDiagram
         VARCHAR title
         BIGINT book_id
         INT chapter
-        INT verse
+        INT verse_start
+        INT verse_end
         VARCHAR qt_type
         TEXT observation
         TEXT interpretation
@@ -542,7 +544,8 @@ erDiagram
 | book_id | BIGINT | N | — | | Bible Service 참조 (FK 제약 없음) |
 | qt_date | DATE | N | — | | 오늘 QT 기준 날짜. MVP에서는 사용자별·날짜별 묵상 DRAFT를 1개만 둔다 |
 | chapter | INT | N | — | | |
-| verse | INT | N | — | | |
+| **verse_start** | INT | N | — | | **오늘 QT 본문 시작 절. MVP는 한 절 고정이므로 verse_start == verse_end (DECISIONS.md §3.1)** |
+| **verse_end** | INT | N | — | | **오늘 QT 본문 끝 절. v1.1에서 구절 범위 확장 시 사용** |
 | **qt_type** | **VARCHAR(2)** | **Y** | **NULL** | | **A/B/C/D형 QT 유형. 23_도메인_용어사전 참조** |
 | **observation** | **TEXT** | **Y** | **NULL** | | **관찰 단계: 단락나누기, 재진술, 육하원칙 분석 내용** |
 | **interpretation** | **TEXT** | **Y** | **NULL** | | **해석/연구와묵상 단계: 하나님은 어떤 분이신가? + 연구 내용** |
@@ -563,7 +566,7 @@ erDiagram
 - `idx_journals_user_id_status` ON (user_id, status)
 - `uk_journals_user_qt_date` UNIQUE ON (user_id, qt_date) — 오늘 QT DRAFT 멱등 생성/조회
 - `idx_journals_user_id_qt_type` ON (user_id, qt_type) — QT 유형별 필터링
-- `idx_journals_passage` ON (book_id, chapter, verse) — 인기 구절 통계용
+- `idx_journals_passage` ON (book_id, chapter, verse_start) — 인기 구절 통계용 (MVP는 verse_start == verse_end 고정이므로 verse_start만 인덱스. v1.1 범위 확장 시 (verse_start, verse_end) 복합 인덱스 검토)
 - `idx_journals_ai_session_id` ON (ai_session_id) — AI 대화 → Journal 연결 조회
 
 ### 5.3 JOURNAL_EVENTS — 이벤트 소싱 스토어 (source of truth)
@@ -1224,20 +1227,20 @@ bff-aggregator/src/main/java/com/qtai/bff/
 
 | # | 서비스 | 테이블 | Owner | 주요 외부 참조 (FK 제약 없음) | 주요 컬럼 변경 |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Auth | USERS | 이지윤 | (외부 노출) | email 재가입 정책 |
-| 2 | Auth | REFRESH_TOKENS | 이지윤 | users.id | — |
-| 3 | Auth | OAUTH_LINKS | 이지윤 | users.id | — |
-| 4 | Bible | BOOKS | 김태혁 | — | — |
-| 5 | Bible | KR_BIBLE | 김태혁 | books.id | — |
-| 6 | Bible | EN_BIBLE | 김태혁 | books.id | — |
-| 7 | Bible | COMMENTARIES | 김태혁 | books.id | — |
+| 1 | Gateway (Auth) | USERS | 강태오 | (외부 노출) | email 재가입 정책 |
+| 2 | Gateway (Auth) | REFRESH_TOKENS | 강태오 | users.id | — |
+| 3 | Gateway (Auth) | OAUTH_LINKS | 강태오 | users.id | — |
+| 4 | Bible | BOOKS | 이지윤 | — | — |
+| 5 | Bible | KR_BIBLE | 이지윤 | books.id | — |
+| 6 | Bible | EN_BIBLE | 이지윤 | books.id | — |
+| 7 | Bible | COMMENTARIES | 이지윤 | books.id | — |
 | 8 | AI | PROMPT_TEMPLATES | 강상민 | — | status DRAFT→EDITING |
-| 9 | AI | AI_SESSIONS | 강상민 | (외부 참조) auth.users.id, bible.books.id | **summary 컬럼 추가** |
+| 9 | AI | AI_SESSIONS | 강상민 | (외부 참조) gateway.users.id, bible.books.id | **summary 컬럼 추가** |
 | 10 | AI | AI_TURNS | 강상민 | ai_sessions.id, prompt_templates.id | **used_prompt_template_id 추가, content MEDIUMTEXT, step nullable** |
-| 11 | Journal | JOURNALS | 이승욱 | (외부 참조) auth.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence + qt_type/observation/interpretation 추가 (v1.5)** |
-| 12 | Journal | JOURNAL_EVENTS | 이승욱 | journals.id (유연 결합) | (journal_id, sequence) UNIQUE 추가 |
-| — | AI | (ChromaDB) commentary_embeddings | 강상민 | bible.commentaries.id | — |
-| — | AI | (ChromaDB) dummy_paper_embeddings | 강상민 | — | — |
+| 11 | Bible (Journal) | JOURNALS | 이승욱 | (외부 참조) gateway.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence + qt_type/observation/interpretation 추가 (v1.5)** |
+| 12 | Bible (Journal) | JOURNAL_EVENTS | 이승욱 | journals.id (유연 결합) | (journal_id, sequence) UNIQUE 추가 |
+| — | AI | (ChromaDB) commentary_embeddings | 김태혁 | bible.commentaries.id | — |
+| — | AI | (ChromaDB) dummy_paper_embeddings | 김태혁 | — | — |
 
 **총 12개 RDBMS 테이블 + 2개 ChromaDB Collection**
 

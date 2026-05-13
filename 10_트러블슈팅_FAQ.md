@@ -168,9 +168,9 @@ m = SentenceTransformer('paraphrase-multilingual-mpnet-base-v2')
 print('OK:', m.encode('test').shape)
 "
 
-# DeepSeek API key 유효성 (비용 없음)
-kubectl exec -it deployment/ai-service -n qtai -- curl https://api.anthropic.com/v1/models \
-  -H "x-api-key: $DEEPSEEK_API_KEY" -H "anthropic-version: 2023-06-01"
+# DeepSeek API key 유효성 (OpenAI 호환, 비용 없음 — models 엔드포인트)
+kubectl exec -it deployment/ai-service -n qtai -- curl https://api.deepseek.com/v1/models \
+  -H "Authorization: Bearer $DEEPSEEK_API_KEY"
 ```
 
 ### 2.5 Flutter / 개발 환경
@@ -519,14 +519,13 @@ if (auth.idToken == null) {
 # 1. AI Service pod 상태
 kubectl get pod -n qtai | grep ai-service
 
-# 2. DeepSeek API key 유효성 (실제 모델 목록 호출)
+# 2. DeepSeek API key 유효성 (OpenAI 호환 models 엔드포인트)
 kubectl exec -it deployment/ai-service -n qtai -- \
-  curl https://api.anthropic.com/v1/models \
-  -H "x-api-key: $DEEPSEEK_API_KEY" \
-  -H "anthropic-version: 2023-06-01"
+  curl https://api.deepseek.com/v1/models \
+  -H "Authorization: Bearer $DEEPSEEK_API_KEY"
 
 # 3. DeepSeek API status 확인 (외부)
-# https://status.anthropic.com 접속
+# https://status.deepseek.com 접속
 
 # 4. AI Service 로그 — timeout / rate limit grep
 kubectl logs deployment/ai-service -n qtai --tail=100 | \
@@ -630,7 +629,7 @@ kubectl logs deployment/ai-service -n qtai | grep "PROMPT_INJECTION_DETECTED" | 
 정규식이 너무 광범위한 경우 → 패턴 수정 + injection-set 30건 회귀 확인 후 PR.
 
 **false negative — 인젝션 통과:**
-injection-set에 새 case 추가 + 패턴 강화 → PR (Reviewer: 강태오 + 이지윤).
+injection-set에 새 case 추가 + 패턴 강화 → PR (Reviewer: 강태오 + 강상민 — AI Main Owner).
 
 ---
 
@@ -1353,13 +1352,12 @@ kubectl exec -it deployment/kafka -n qtai -- kafka-topics.sh \
   --topic ai.session.completed --partitions 3 --replication-factor 1
 ```
 
-**Helm chart values.yaml에 토픽 8종 전부 있는지 확인** (03번 § 2.2):
+**Helm chart values.yaml에 토픽 7종 전부 있는지 확인** (DECISIONS.md §4 — user.deactivated는 탈퇴 기능 MVP 제외로 삭제됨):
 ```
 ai.session.completed
 journal.created / journal.updated / journal.deleted
 journal.creation.failed
 notification.requested
-user.deactivated
 user.activity.tracked
 ```
 
