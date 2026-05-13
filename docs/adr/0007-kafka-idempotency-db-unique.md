@@ -41,7 +41,7 @@ idempotencyKey pattern은 토픽별 (events/schema/*.json):
 
 ## Alternatives
 - **application layer 중복 체크 (\SELECT 후 INSERT\)**: race condition 위험
-- **Kafka transactional producer + exactly-once**: 6 service 모두 transactional producer 설정 부담. 학습 곡선 + 시연 6주 무리
+- **Kafka transactional producer + exactly-once**: 모든 producer에 transactional producer를 강제하면 설정 부담과 학습 곡선이 커져 6주 시연에 무리
 - **idempotent consumer 안 함 (중복 허용)**: 1차 사고 패턴 — Journal 중복 생성 등
 
 ## Consequences

@@ -1,159 +1,121 @@
-﻿# 📋 QT-AI — Dev D (이승욱) 상세 일정표
+# QT-AI 개인 공식 일정표 - 이승욱
 
-문서 버전: v1.0
-작성일: 2026-05-08
-담당자: 이승욱
-역할: Journal Service Owner + Kafka Owner
-담당 서비스: Journal Service — 묵상 노트 이벤트 소싱 · Outbox · Saga 보상 트랜잭션
-개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5 / 03_아키텍처_정의서 v1.3 §6
+> 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
 
----
+## 1. 내 역할
 
-## 0. 역할 핵심 선언
+- 담당자: 이승욱
+- 역할: Bible Service - Journal/Kafka/Event Sourcing
+- 개인 작업 폴더: `workspaces/DevD_이승욱/`
+- 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
-> **"이벤트 소싱과 Saga를 실제로 돌려본 개발자가 된다."**
-> Journal Service는 단순 CRUD가 아니라 이벤트 소싱 + Kafka Outbox + Saga 보상 트랜잭션이
-> 결합된 가장 복잡한 서비스다. W3 Kafka 통합 주간의 핵심 카운터파트.
-> Kafka 토픽 설계·컨슈머 멱등성·DLQ 처리를 팀에서 가장 깊이 이해하는 사람이 된다.
+## 2. 반드시 지킬 최신 결정
 
----
+- 백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.
+- 인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.
+- 묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.
+- LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.
+- Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.
+- Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
+- 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
+- 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
 
-## 1. 소유권 선언
+## 3. 내가 주로 만지는 경로
 
-```
-journal-service/
-  └── src/main/kotlin/com/qtai/journalservice/
-      ├── domain/
-      │   ├── entity/Journal.java
-      │   ├── entity/JournalEvent.java      (이벤트 소싱 로그)
-      │   ├── entity/OutboxEvent.java       (Kafka Outbox 패턴)
-      │   └── repository/
-      ├── usecase/
-      │   ├── CreateJournalUseCase.java
-      │   ├── PublishJournalUseCase.java    (Outbox + 멱등성 키)
-      │   └── SagaCompensationUseCase.java  (journal.creation.failed 컨슈머)
-      ├── infrastructure/
-      │   ├── kafka/
-      │   │   ├── JournalEventProducer.java  (Outbox 발행)
-      │   │   └── SagaCompensationConsumer.java
-      │   └── scheduler/OutboxScheduler.java (Outbox polling)
-      └── api/
-          └── JournalController.java
-  └── src/main/resources/
-      └── db/migration/
-          ├── V1__create_journal_tables.sql
-          └── V2__create_outbox_table.sql
-```
+- services/bible-service/src/main/java/com/qtai/bible/domain/journal/
+- services/bible-service/src/main/java/com/qtai/bible/application/journal/
+- services/bible-service/src/main/java/com/qtai/bible/infrastructure/kafka/
+- events/schema/
 
-**팀에 제공하는 공개 인터페이스**
-- Kafka 토픽 발행: `journal.created`, `journal.updated`, `journal.deleted`
-- Saga 보상 컨슈머: `journal.creation.failed` 수신 → 롤백 처리
-- BFF에서 알림 발행: `notification.requested` (journal.created 처리 후)
+## 4. 담당 범위
 
----
+- JOURNALS read model과 JOURNAL_EVENTS append-only 이벤트 로그
+- ai.session.completed 소비 후 Journal DRAFT 자동 생성
+- Journal 수정/삭제/발행/공유 공개와 이벤트 소싱
+- idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어
+- notification.requested와 journal.creation.failed 발행
 
-## 2. Journal Service 핵심 기술 요구사항
+## 5. API와 이벤트 계약 요약
 
-| 요구사항 | 구현 방식 | 완료 목표 | 왜 중요한가 |
-|---------|-----------|-----------|-------------|
-| 이벤트 소싱 | `JOURNAL_EVENTS` 테이블에 모든 변경 이력 기록 | W1 수 | ADR-0004 |
-| Outbox 패턴 | `OUTBOX_EVENTS` 테이블 → 스케줄러 → Kafka 발행 | W2 화 | 트랜잭션 원자성 보장 |
-| 멱등성 키 | `PublishJournalRequest.idempotencyKey` → DB UNIQUE | W2 수 | 중복 발행 방지 |
-| Saga 보상 컨슈머 | `journal.creation.failed` 수신 → Journal DRAFT 롤백 | W3 월 | 분산 트랜잭션 |
-| 낙관적 락 | `@Lock(LockModeType.PESSIMISTIC_WRITE)` 필드 — 동시 수정 충돌 방지 | W2 화 | 동시 편집 안전 |
-| Flyway | V1 (Journal+Events) + V2 (Outbox) | W1 월 | DB 스키마 관리 |
+- GET /api/v1/journals
+- GET/PATCH/DELETE /api/v1/journals/{id}
+- GET /api/v1/journals/{id}/events
+- POST/DELETE /api/v1/journals/{id}/share
+- Kafka consume: ai.session.completed
+- Kafka publish: journal.created, journal.updated, journal.deleted, journal.creation.failed, notification.requested
 
----
+## 6. W1 상세 일정 - Foundation Lock-in
 
-## 3. 일별 상세 일정
+- 5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격
+- 5/14: ai.session.completed consumer, manual ack, idempotencyKey skip 패턴
+- 5/15: AutoCreateFromSessionUseCase와 CREATED event 적재
+- 5/19: PATCH/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock
+- 5/20: sequence 동시성 테스트와 DuplicateKey skip 테스트
+- 5/21: DLQ, journal.creation.failed, notification.requested 발행
+- 5/22: AI 완료 -> Journal DRAFT 생성 Saga E2E 검증
 
-### 🟩 W1 (5/12~5/22)
+## 7. W2-W5 일정
 
-| 일자 | 오전 | 오후 코어 | 저녁 |
-|------|------|-----------|------|
-| 5/12 화 | 킥오프 참석. git pull | Flyway V1 — JOURNALS·JOURNAL_EVENTS 테이블 DDL | Journal Entity + JournalEvent Entity |
-| 5/13 화 | Stand-up | Journal Repository (findByUserId + findById + soft delete) | @DataJpaTest — 기본 CRUD 확인 |
-| 5/14 수 | Stand-up | `CreateJournalUseCase` — DRAFT 생성 + JournalEvent 기록 | 이벤트 소싱 sequence 로직 (ADR-0011) |
-| 5/15 목 | Stand-up | `JournalController` — POST/GET/PUT/DELETE 엔드포인트 | X-User-Id 헤더 → userId 추출 |
-| 5/16 금 | Stand-up | 단위 테스트 — CreateJournalUseCase Mockito | `/api/v1/journals` POST curl 테스트 |
-| 5/19 월 | Stand-up | Flyway V2 — OUTBOX_EVENTS 테이블 + OutboxEvent 엔티티 | Kafka consumer group 명명 규칙 확인 |
-| 5/20 화 | Stand-up | `PublishJournalUseCase` 골격 (DRAFT→PUBLISHED + Outbox insert) | 멱등성 키 DB UNIQUE 제약 확인 |
-| 5/21 수 | Stand-up | Kafka producer 골격 (`JournalEventProducer`) — local Kafka 연결 테스트 | W1 체크리스트 점검 |
-| 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | W1 회고 |
+### W2 - 핵심 도메인 구현
+- Journal API와 이벤트 재구성 완성
+- 공유/좋아요/댓글/신고 도메인 구현
+- Bible core migration과 통합
 
-**W1 완료 기준**
-- [ ] `POST /api/v1/journals` → 201 DRAFT 생성
-- [ ] `GET /api/v1/journals/{id}` → 상세 조회
-- [ ] `PATCH /api/v1/journals/{id}` → DRAFT 수정
-- [ ] JOURNAL_EVENTS 이벤트 소싱 기록 확인
-- [ ] Flyway V1+V2 마이그레이션 성공
+### W3 - Kafka/E2E 통합
+- Kafka 재처리, DLQ, 멱등성 E2E
+- BFF/Flutter 묵상 화면 연동
+- 동시 수정 충돌 처리
 
----
+### W4 - 안정화와 시연 환경
+- 이벤트 로그 리플레이 리포트
+- 데이터 정합성/락 타임아웃 테스트
+- 시연용 Journal 데이터 고정
 
-### 🟨 W2 (5/26~5/29)
+### W5 - 발표와 리허설
+- 묵상 저장/수정/나눔 시연 책임
+- Kafka Saga Q&A 준비
+- 장애 시 DLQ/consumer lag 점검
 
-| 일자 | 주요 작업 |
-|------|-----------|
-| 5/26 화 | 페이스 점검. `PATCH /api/v1/journals/{id}/publish` → Outbox insert + PUBLISHED 상태 전이 |
-| 5/27 수 | `OutboxScheduler` — 5초 주기 polling → KafkaTemplate 발행 |
-| 5/28 목 | `@Lock(LockModeType.PESSIMISTIC_WRITE)` 낙관적 락 적용. 멱등성 키 중복 발행 테스트 |
-| 5/29 금 | Kafka consumer 로그 확인 (`kafka-console-consumer.sh`). Service 커버리지 60%+ |
+## 8. 매일 작업 순서
 
----
+- 작업 시작 전 git pull 방식으로 최신 dev 동기화
+- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
+- 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
+- 작업 후 본인 서비스 build/test와 금지 패턴 검색
+- 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
+- PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
 
-### 🟧 W3 (6/1~6/5) ← **Kafka 통합 핵심 주간**
+## 9. 검증 명령
 
-| 일자 | 주요 작업 |
-|------|-----------|
-| 6/1 월 | `SagaCompensationConsumer` — `journal.creation.failed` 수신 → DRAFT 롤백 |
-| 6/2 화 | 페이스 점검 (11:30). Kafka 이벤트 유실률 0% 검증 (`consumer lag` 모니터링) |
-| 6/3 수 | Feature Freeze. `@RetryableTopic` DLQ 설정. consumer 멱등성 검증 (중복 메시지 처리) |
-| 6/4 목 | journal.created → notification.requested E2E 흐름 (강태오 협력) |
-| 6/5 금 | 통합 시나리오: 묵상 노트 발행 → AI 완료 알림 수신 전체 흐름 확인 |
-
----
-
-### 🟥 W4 (6/8~6/12) + ⬛ W5 (6/15~6/17)
-
-| 주차 | 주요 작업 |
-|------|-----------|
-| W4 | 회귀 테스트. Saga 보상 시나리오 시연 dry-run. 커버리지 70%+ |
-| W5 | 시연 시나리오 묵상 노트 발행 흐름 리허설 지원 |
-
----
-
-## 4. Kafka 설계 핵심 원칙
-
-```kotlin
-// ✅ Outbox 패턴 — 트랜잭션 안에서 DB 삽입, 스케줄러가 Kafka 발행
-@Transactional
-fun publishJournal(journalId: Long, idempotencyKey: String) {
-    val journal = journalRepository.findById(journalId) ?: throw JournalNotFoundException()
-    journal.publish()  // DRAFT → PUBLISHED
-    outboxRepository.save(OutboxEvent(
-        topic = "journal.created",
-        payload = objectMapper.writeValueAsString(JournalCreatedPayload(journal)),
-        idempotencyKey = idempotencyKey  // DB UNIQUE 제약
-    ))
-    journalEventRepository.save(JournalEvent(journal, "PUBLISHED"))
-}
-
-// ✅ Saga 보상 컨슈머 — DLQ + 멱등성 처리
-@RetryableTopic(attempts = "3", backoff = @Backoff(delay = 1000))
-@KafkaListener(topics = ["journal.creation.failed"], groupId = "journal-saga-compensation")
-fun consumeJournalCreationFailed(event: JournalCreationFailedEvent) {
-    if (processedEventRepository.exists(event.idempotencyKey)) return  // 멱등성
-    // 보상 처리: PUBLISHED → DRAFT 롤백
-}
+```powershell
+cd C:\workspace\QT-AI-2nd-Team-Project-master
+.\gradlew.bat -p services\bible-service build --no-daemon
+.\gradlew.bat -p services\bible-service test --no-daemon
+rg -n "JOURNAL_EVENTS|ai.session.completed|idempotencyKey|PESSIMISTIC" services\bible-service events\schema
 ```
 
----
+## 10. 금지 패턴
 
-## 5. AI 에이전트 활용 가이드
+- PostgreSQL, ZooKeeper, Tempo 설정 추가 금지
+- application.yml이나 코드에 API key, DB password, private key 평문 작성 금지
+- 트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용
+- 서비스 간 DB 직접 JOIN 또는 Repository 공유 금지
+- JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지
+- AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용
+- OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지
 
-| 단계 | Claude 활용처 | 주의사항 |
-|------|--------------|----------|
-| W1 | Flyway DDL 초안, 이벤트 소싱 Entity 구조 | 03번 ERD §5와 대조 필수 |
-| W2 | Outbox 스케줄러 코드, KafkaTemplate 설정 | 토픽명 `events/schema/` JSON과 일치 확인 |
-| W3 | @RetryableTopic 설정, DLQ consumer 코드 | Kafka 버전(KRaft single-node) 환경 확인 |
+## 11. 산출물
+
+- Journal/Event Flyway와 Entity
+- ai.session.completed consumer
+- Journal 수정/삭제/공유 UseCase
+- 멱등성/동시성 테스트
+
+## 12. PR 전에 확인
+
+- 내 담당 경로 밖 변경이 섞이지 않았는가
+- OpenAPI, event schema, DECISIONS.md와 충돌하지 않는가
+- ProblemDetail, Kafka data envelope, DeepSeek, 4서비스 기준을 지켰는가
+- 로컬 build/test 결과를 PR 본문에 적었는가
+- 막힌 점은 추측으로 넘기지 않고 Lead에게 질문으로 남겼는가

@@ -1,10 +1,14 @@
-﻿name: CI/CD
+name: CI/CD
 
 on:
   push:
-    branches: [develop, main]
+    branches: [master, main, dev, develop]
   pull_request:
-    branches: [develop]
+    branches: [master, main, dev, develop]
+
+env:
+  JAVA_VERSION: "21"
+  SPRING_PROFILES_ACTIVE: test
 
 jobs:
   lint:
@@ -15,26 +19,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: gitleaks — 시크릿 누출 방지 (PR 머지 차단)
+      - name: gitleaks — 시크릿 누출 방지
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Spectral OpenAPI lint (에러 1개라도 있으면 머지 차단)
+      - name: Spectral OpenAPI lint
         run: |
           npx --yes @stoplight/spectral-cli@6 lint \
             apis/auth/openapi.yaml \
+            apis/bff/openapi.yaml \
             apis/bible/openapi.yaml \
-            apis/ai/openapi.yaml \
-            apis/bff/openapi.yaml
+            apis/ai/openapi.yaml
 
   test-java:
     name: Java Unit Test (${{ matrix.service }})
     runs-on: ubuntu-latest
     needs: lint
     strategy:
+      fail-fast: false
       matrix:
-        service: [auth-service, bible-service, bff-aggregator]
+        service: [gateway, bff-aggregator, bible-service, ai-service]
     steps:
       - uses: actions/checkout@v4
 
@@ -52,15 +57,13 @@ jobs:
       - uses: actions/setup-java@v4
         if: steps.service_check.outputs.run_tests == 'true'
         with:
-          java-version: "21"
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
           cache: gradle
 
       - name: Build & Test
         if: steps.service_check.outputs.run_tests == 'true'
         run: ./gradlew :${{ matrix.service }}:test --continue
-        env:
-          SPRING_PROFILES_ACTIVE: test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -69,54 +72,15 @@ jobs:
           name: test-results-${{ matrix.service }}
           path: ${{ matrix.service }}/build/reports/tests/
 
-  test-python:
-    name: Python Unit Test (ai-service)
-    runs-on: ubuntu-latest
-    needs: lint
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check Python service scaffold
-        id: service_check
-        shell: bash
-        run: |
-          if [[ -f ai-service/requirements.txt && -d ai-service/tests ]]; then
-            echo "run_tests=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_tests=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::Skipping ai-service tests because the service scaffold is not present yet."
-          fi
-
-      - uses: actions/setup-python@v5
-        if: steps.service_check.outputs.run_tests == 'true'
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        if: steps.service_check.outputs.run_tests == 'true'
-        run: pip install -r ai-service/requirements.txt
-
-      - name: Run pytest
-        if: steps.service_check.outputs.run_tests == 'true'
-        run: pytest ai-service/tests/ -v
-        env:
-          ENVIRONMENT: test
-
   build-and-push:
     name: Docker build & push (${{ matrix.service }})
     runs-on: ubuntu-latest
-    needs: [test-java, test-python]
-    if: github.ref == 'refs/heads/main'
+    needs: test-java
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     strategy:
+      fail-fast: false
       matrix:
-        service:
-          [
-            gateway,
-            bff-aggregator,
-            auth-service,
-            bible-service,
-            ai-service,
-          ]
+        service: [gateway, bff-aggregator, bible-service, ai-service]
     steps:
       - uses: actions/checkout@v4
 
@@ -149,7 +113,7 @@ jobs:
     name: Helm lint
     runs-on: ubuntu-latest
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
 
@@ -158,8 +122,3 @@ jobs:
 
       - name: Lint umbrella chart
         run: helm lint helm/qtai-umbrella
-
-      # v1.0: Minikube는 로컬 전용 — GHA에서 자동 helm upgrade 비활성
-      # v1.1에서 운영 K8s 추가 시 아래 step 활성화
-      # - name: Helm dry-run
-      #   run: helm upgrade --install qtai helm/qtai-umbrella --dry-run

@@ -1,200 +1,120 @@
-﻿# 📋 QT-AI — Flutter (김지민) 상세 일정표
+# QT-AI 개인 공식 일정표 - 김지민
 
-문서 버전: v1.0
-작성일: 2026-05-08
-담당자: 김지민
-역할: Flutter App Owner
-담당 영역: Flutter 모바일 앱 — Sliver 기반 Sync Scroll · RiverPod · DIO · SSE 스트리밍 UI
-개발 기간: W1(5/15 이후) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 04_API_명세서 v1.5 / 08_프론트엔드_Flutter_가이드 v1.0
+> 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
 
----
+## 1. 내 역할
 
-## 0. 역할 핵심 선언
+- 담당자: 김지민
+- 역할: Flutter App Owner
+- 개인 작업 폴더: `workspaces/DevE_김지민/`
+- 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
-> **"사용자가 처음 보는 것이 Flutter 화면이다."**
-> 시연에서 심사위원이 직접 손으로 만지는 유일한 인터페이스.
-> Sliver 기반 Sync Scroll과 AI SSE 스트리밍 실시간 타이핑 효과가
-> 포트폴리오의 'WOW 포인트'가 된다.
-> 백엔드 API가 완성되기 전에도 Mock 데이터로 화면을 미리 완성한다.
+## 2. 반드시 지킬 최신 결정
 
----
+- 백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.
+- 인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.
+- 묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.
+- LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.
+- Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.
+- Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
+- 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
+- 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
 
-## 1. 소유권 선언
+## 3. 내가 주로 만지는 경로
 
-```
-flutter-app/
-  ├── pubspec.yaml
-  ├── lib/
-  │   ├── main.dart
-  │   ├── core/
-  │   │   ├── network/
-  │   │   │   ├── dio_client.dart         (DIO 기본 설정 + JWT interceptor)
-  │   │   │   └── sse_client.dart         (dio_sse SSE 수신)
-  │   │   ├── router/
-  │   │   │   └── app_router.dart         (go_router 라우팅)
-  │   │   └── theme/
-  │   │       └── app_theme.dart
-  │   ├── features/
-  │   │   ├── auth/                       (로그인·회원가입)
-  │   │   ├── bible/                      (성경 구절 조회 — Sliver Sync Scroll)
-  │   │   ├── ai_chat/                    (AI 대화 — SSE 스트리밍 UI)
-  │   │   ├── journal/                    (묵상 노트 CRUD)
-  │   │   └── home/                       (대시보드)
-  │   └── shared/
-  │       ├── providers/                  (RiverPod providers)
-  │       └── widgets/                    (공통 위젯)
-  └── test/
-      └── widget/                         (Widget 테스트)
-```
+- apps/mobile/
+- flutter-app/
+- 08_프론트엔드_Flutter_가이드.md
+- apis/*/openapi.yaml
 
----
+## 4. 담당 범위
 
-## 2. Flutter App 핵심 기술 요구사항
+- Flutter 3.24+, Riverpod, Dio, go_router, flutter_secure_storage
+- 소프트 로그인: 튜토리얼/성경 본문/오늘의 QT 미리보기는 비로그인 허용
+- 로그인 후 AI 질문, 묵상 기록, 익명 나눔, 알림, 관리자 화면 접근
+- AI SSE token/rag_sources/turn_completed 수신과 화면 상태 관리
+- ProblemDetail code를 사용자 메시지로 매핑
 
-| 요구사항 | 구현 방식 | 완료 목표 | 왜 중요한가 |
-|---------|-----------|-----------|-------------|
-| DIO + JWT Interceptor | `dio_interceptors` — 401 시 자동 토큰 갱신 | W1 후반 | 모든 API 호출 기반 |
-| Sliver Sync Scroll | `CustomScrollView` + `SliverList` — 한/영 병기 동기화 스크롤 | W2 수 | 포트폴리오 WOW 포인트 |
-| SSE 스트리밍 UI | `dio_sse` → `StreamBuilder` → 타이핑 애니메이션 | W2 목 | 시연 핵심 장면 |
-| RiverPod 상태 관리 | `StateNotifierProvider` — 세션·메시지 상태 | W1 후반 | 상태 관리 일관성 |
-| STOMP WebSocket 알림 | `stomp_dart_client` → 알림 배지 | W3 수 | 실시간 알림 |
-| Google OAuth | `google_sign_in` → Auth Service 연동 | W2 화 | 소셜 로그인 |
+## 5. API와 이벤트 계약 요약
 
----
+- Auth: /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, /auth/me
+- BFF: /api/v1/qt/today, /api/v1/passages/{bookCode}/{chapter}/{verse}, /api/v1/me/dashboard
+- AI SSE: POST /ai/sessions/{id}/turns
+- Journal: /api/v1/journals..., /api/v1/shares...
+- WS: /ws/notifications
 
-## 3. 주요 패키지 (pubspec.yaml)
+## 6. W1 상세 일정 - Foundation Lock-in
 
-```yaml
-dependencies:
-  flutter_riverpod: ^2.5.1
-  dio: ^5.4.3
-  dio_sse: ^0.2.0            # SSE 스트리밍
-  go_router: ^13.2.0
-  stomp_dart_client: ^1.0.0  # STOMP WebSocket
-  google_sign_in: ^6.2.1
-  cached_network_image: ^3.3.1
-  intl: ^0.19.0
+- 5/13: Flutter project/FVM, Riverpod providers, Dio base client
+- 5/14: AuthState, secure storage, refresh retry interceptor
+- 5/15: Sliver 기반 본문 화면 골격과 비로그인 미리보기
+- 5/19: AI session/chat 화면과 SSE parser
+- 5/20: Journal edit/publish/share 화면 골격
+- 5/21: notification WebSocket, ProblemDetail error mapper
+- 5/22: Gateway/BFF/Bible/AI 연결 smoke test
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  mocktail: ^1.0.3
-```
+## 7. W2-W5 일정
 
----
+### W2 - 핵심 도메인 구현
+- 성경 본문/주석/AI 코칭 UX 완성
+- 묵상 작성/발행/공유 플로우 구현
+- 로그인/refresh/logout 안정화
 
-## 4. 일별 상세 일정
+### W3 - Kafka/E2E 통합
+- E2E 통합과 느린 네트워크/토큰 만료 처리
+- SSE 재연결/취소 UX
+- 관리자/알림 화면 연결
 
-### 🟩 W1 — Flutter 환경 세팅 + 기반 구축 (5/15~5/22)
+### W4 - 안정화와 시연 환경
+- 모바일 폴리싱, 접근성, empty/error/loading 상태
+- 시연 기기에서 FPS/스크롤 안정성 점검
+- 백업 데이터와 demo 계정 고정
 
-> ⚠️ W1 초반(5/12~14)은 백엔드 API가 아직 없으므로 Mock 데이터로 선행
+### W5 - 발표와 리허설
+- 모바일 시연 책임
+- 시연 동선 리허설과 백업 영상 준비
+- 발표 Q&A: Flutter 상태관리와 SSE 설명
 
-| 일자 | 오전 | 오후 코어 | 저녁 |
-|------|------|-----------|------|
-| 5/12 화 | 킥오프 참석 | Flutter SDK + FVM 3.24.5 환경 확인. `flutter create flutter-app` | pubspec.yaml 의존성 추가 + `flutter pub get` |
-| 5/13 화 | Stand-up | `go_router` 라우팅 설정 (5개 화면). `app_theme.dart` 기본 테마 | Mock 데이터로 홈 화면 기본 레이아웃 |
-| 5/14 수 | Stand-up | `DioClient` 설정 (baseUrl, timeout, JWT interceptor 골격) | RiverPod Provider 기본 구조 설계 |
-| 5/15 목 | Stand-up | 로그인·회원가입 화면 UI (Auth API 연동 전 Mock) | `auth` feature 디렉토리 구조 완성 |
-| 5/16 금 | Stand-up | Auth API 연동 — `POST /auth/login` DIO 호출 + JWT 저장 | 로그인 성공 → 홈 이동 플로우 |
-| 5/19 월 | Stand-up | DIO JWT Interceptor 완성 (401 → 자동 토큰 갱신) | RiverPod auth 상태 관리 완성 |
-| 5/20 화 | Stand-up | 성경 조회 화면 골격 — Mock 데이터로 한/영 병기 리스트 | `bible` feature UI 기본 |
-| 5/21 수 | Stand-up | AI 채팅 화면 골격 — Mock 메시지 리스트 + 입력창 | SSE 수신 구조 설계 |
-| 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | `flutter analyze` 오류 0건 확인 |
+## 8. 매일 작업 순서
 
-**W1 완료 기준**
-- [ ] `flutter analyze` 오류 0건
-- [ ] `flutter test` 기본 통과
-- [ ] 로그인 → JWT 저장 → 보호 API 호출 플로우
-- [ ] `go_router` 5개 화면 라우팅
+- 작업 시작 전 git pull 방식으로 최신 dev 동기화
+- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
+- 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
+- 작업 후 본인 서비스 build/test와 금지 패턴 검색
+- 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
+- PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
 
----
+## 9. 검증 명령
 
-### 🟨 W2 (5/26~5/29) — 핵심 화면 완성
-
-| 일자 | 주요 작업 |
-|------|-----------|
-| 5/26 화 | 페이스 점검 (11:30). Bible API 연동 — `GET /api/v1/passages/JHN/3` 실데이터 표시 |
-| 5/27 수 | **Sliver Sync Scroll** — `CustomScrollView` + `SliverList` 한/영 병기 동기화 구현 |
-| 5/28 목 | **AI SSE 스트리밍 UI** — `dio_sse` + `StreamBuilder` 타이핑 애니메이션 |
-| 5/29 금 | Journal CRUD 화면 + API 연동. 전체 화면 Flow 연결 확인 |
-
----
-
-### 🟧 W3 (6/1~6/5) + 🟥 W4 (6/8~6/12) + ⬛ W5 (6/15~6/17)
-
-| 주차 | 주요 작업 |
-|------|-----------|
-| W3 | STOMP WebSocket 알림 배지 구현. 큐티 A→B→C→D 단계 진행 UI. Google OAuth 연동 |
-| W4 | 전체 화면 UI polish. 시연 시나리오 dry-run 반복. Widget 테스트 보강 |
-| W5 | 시연 데모 기기 세팅. 리허설 화면 흐름 주도. 발표 PPT 화면 설명 파트 담당 |
-
----
-
-## 5. Sliver Sync Scroll 핵심 구현 패턴
-
-```dart
-// 한/영 성경 병기 동기화 스크롤
-class BibleSyncScrollView extends StatefulWidget {
-  @override
-  State<BibleSyncScrollView> createState() => _BibleSyncScrollViewState();
-}
-
-class _BibleSyncScrollViewState extends State<BibleSyncScrollView> {
-  final ScrollController _koController = ScrollController();
-  final ScrollController _enController = ScrollController();
-  bool _isSyncing = false;
-
-  void _syncScroll(ScrollController master, ScrollController slave) {
-    if (_isSyncing) return;
-    _isSyncing = true;
-    slave.jumpTo(master.offset);
-    _isSyncing = false;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: _buildScrollView(_koController, isKorean: true)),
-        Expanded(child: _buildScrollView(_enController, isKorean: false)),
-      ],
-    );
-  }
-}
+```powershell
+cd C:\workspace\QT-AI-2nd-Team-Project-master
+fvm flutter analyze
+fvm flutter test
+rg -n "ProblemDetail|Sse|EventSource|Dio|Riverpod" apps mobile flutter-app
 ```
 
----
+## 10. 금지 패턴
 
-## 6. SSE 스트리밍 UI 핵심 구현 패턴
+- PostgreSQL, ZooKeeper, Tempo 설정 추가 금지
+- application.yml이나 코드에 API key, DB password, private key 평문 작성 금지
+- 트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용
+- 서비스 간 DB 직접 JOIN 또는 Repository 공유 금지
+- JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지
+- AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용
+- OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지
 
-```dart
-// AI 응답 SSE 스트리밍 — 타이핑 애니메이션
-class AiChatWidget extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final stream = ref.watch(aiStreamProvider);
-    return StreamBuilder<String>(
-      stream: stream,
-      builder: (context, snapshot) {
-        final text = snapshot.data ?? '';
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 50),
-          child: Text(text, key: ValueKey(text.length)),
-        );
-      },
-    );
-  }
-}
-```
+## 11. 산출물
 
----
+- Flutter app scaffold와 routing
+- Dio/Auth/SSE client
+- 본문/AI/Journal 핵심 화면
+- 시연용 모바일 체크리스트
 
-## 7. AI 에이전트 활용 가이드
+## 12. PR 전에 확인
 
-| 단계 | Claude 활용처 | 주의사항 |
-|------|--------------|----------|
-| W1 | DIO interceptor 패턴, RiverPod provider 구조 | flutter 3.24.5 + null safety 환경 확인 |
-| W2 | Sliver 스크롤 패턴, StreamBuilder SSE 처리 | 노션 기술 블로그 Flutter Sliver 챕터 먼저 확인 |
-| W3 | STOMP 연결 코드, Widget 테스트 작성 | 패키지 버전 pubspec.yaml과 일치 확인 |
-| 전체 | 화면 레이아웃 코드 초안 생성 | 실제 API 응답 형식(camelCase) 확인 후 모델 생성 |
+- 내 담당 경로 밖 변경이 섞이지 않았는가
+- OpenAPI, event schema, DECISIONS.md와 충돌하지 않는가
+- ProblemDetail, Kafka data envelope, DeepSeek, 4서비스 기준을 지켰는가
+- 로컬 build/test 결과를 PR 본문에 적었는가
+- 막힌 점은 추측으로 넘기지 않고 Lead에게 질문으로 남겼는가

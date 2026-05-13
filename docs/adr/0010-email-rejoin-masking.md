@@ -1,7 +1,7 @@
-# ADR-0010: 탈퇴자 이메일 마스킹으로 재가입 가능
+# ADR-0010: 탈퇴자 이메일 마스킹 정책은 v1.1로 연기한다
 
 ## 상태
-Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
+Deferred (v1.1)
 
 ## 날짜
 2026-05-15
@@ -10,44 +10,38 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민
 
 ## Context
-USERS.email은 UNIQUE 제약. 탈퇴 시 row를 그대로 두면 같은 이메일로 재가입 X. row를 hard delete하면 이전 묵상 데이터 유실 (ADR-0006 위배). 사용자 가치(재가입 가능) + 데이터 보존 + UNIQUE 제약을 동시에 만족해야 함.
+USERS.email은 UNIQUE 제약이다. 계정 탈퇴를 구현하면 탈퇴 사용자가 같은 이메일로 재가입할 수 있도록 이메일 마스킹 또는 archive 정책이 필요하다. 그러나 2026-05-12 결정으로 계정 탈퇴 기능과 `user.deactivated` 이벤트는 MVP 범위에서 제외되었다.
 
 ## Decision
-**탈퇴 시 email 컬럼 마스킹** (02번 § 2.2.1):
+v1.0에서는 계정 탈퇴 API와 이메일 마스킹을 구현하지 않는다. 정책 초안은 v1.1 후보로 보존한다.
 
-탈퇴 트리거 시:
-\\\sql
-UPDATE USERS
-SET deleted_at = NOW(),
+v1.1에서 계정 탈퇴를 구현할 경우 기본 후보는 다음과 같다.
+
+```sql
+UPDATE users
+SET deleted_at = NOW(6),
     email = CONCAT('u_', id, '_deactivated_', UNIX_TIMESTAMP(), '@deleted.local')
 WHERE id = ?;
-\\\
+```
 
-마스킹된 이메일은:
-- 도메인 \@deleted.local\ 가 실재하지 않아 외부 발신 사고 X
-- id + epoch로 UNIQUE 제약 자동 충족
-- 원본 이메일 추적 X (개인정보 최소화)
-
-새 회원가입은 \SQLRestriction("deleted_at IS NULL")\ 적용된 query로 활성 USERS만 검사 → 같은 이메일로 새 row INSERT 가능
+마스킹된 이메일은 UNIQUE 제약 충돌을 피하고 원본 이메일 노출을 줄인다. 원본 이메일 보관이 필요하면 보관 기간과 접근 권한을 별도 보안 ADR로 결정한다.
 
 ## Alternatives
-- **탈퇴 시 row hard delete**: ADR-0006 위배 (Journal 등 보존 필요)
-- **탈퇴 시 email 컬럼 NULL**: UNIQUE 제약에 NULL 다중 허용되지만 일관성 X
-- **탈퇴자도 같은 이메일로 재가입 못 함**: UX 손실
-- **별도 DEACTIVATED_USERS 테이블로 archive**: schema 복잡 + JOIN 필요
+- **v1.0에 탈퇴까지 구현**: MVP 범위 대비 인증·보안·보상 이벤트 작업이 과도하다.
+- **탈퇴 시 hard delete**: Journal 보존과 감사 요구에 맞지 않는다.
+- **탈퇴자 재가입 금지**: 사용자 경험이 나쁘고 추후 정책 변경이 어렵다.
 
 ## Consequences
 **긍정:**
-- 같은 이메일로 재가입 가능 (사용자 가치)
-- 탈퇴자 데이터 보존 (Journal 등 — ADR-0006)
-- UNIQUE 제약 자동 충족
+- v1.0 인증 범위가 회원가입·로그인·로그아웃·refresh·Google OAuth로 단순해진다.
+- `user.deactivated` Kafka topic과 보상 흐름을 만들지 않아도 된다.
 
 **부정:**
-- email 컬럼이 PII가 아닌 형태로 변형됨 (단, 원본 추적 불가)
-- Audit log에 원본 이메일 보존 필요 (별도 테이블 + 90일 보관 — 05번 § 9.2)
+- v1.0에서는 사용자가 계정을 탈퇴할 수 없다.
+- ERD와 보안 문서에 남은 탈퇴 관련 표현은 "v1.1 후보"로 분명히 표기해야 한다.
 
 ## 검증 방법
-W1 통합 테스트: alice@example.com 탈퇴 → 같은 이메일로 재가입 → 새 USERS row 생성 (탈퇴자 row는 마스킹된 채 유지)
+OpenAPI에 `/auth/me/deactivate`가 없어야 하며, Kafka schema와 `DECISIONS.md`에 `user.deactivated`를 v1.0 구현 토픽으로 두지 않는다.

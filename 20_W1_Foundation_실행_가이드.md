@@ -1,8 +1,8 @@
-# 📖 QT-AI (큐티 AI 앱) — W1 Foundation 실행 가이드 v1.0
+# QT-AI (큐티 AI 앱) — W1 Foundation 실행 가이드 v1.1
 
-> **문서 버전:** v1.0
+> **문서 버전:** v1.1
 > **작성일:** 2026-05-08
-> **연관 문서:** [11_개발_환경_셋업_가이드 v1.0](./11_개발_환경_셋업_가이드.md) / [15_서비스별_구현_체크리스트 v1.0](./15_서비스별_구현_체크리스트.md) / [14_팀_협업_규칙_Git_브랜치_전략 v1.0](./14_팀_협업_규칙_Git_브랜치_전략.md)
+> **연관 문서:** [11_개발_환경_셋업_가이드 v1.1](./11_개발_환경_셋업_가이드.md) / [15_서비스별_구현_체크리스트 v1.0](./15_서비스별_구현_체크리스트.md) / [14_팀_협업_규칙_Git_브랜치_전략 v1.0](./14_팀_협업_규칙_Git_브랜치_전략.md)
 > **owner:** 강태오 (Lead)
 > **목적:** W1 첫날(5/12 화)부터 W1 종료(5/22 금)까지 6명이 겹치지 않고 Foundation을 쌓는 구체적 행동 순서. "오늘 뭐 해요?"를 없애기 위한 step-by-step.
 
@@ -13,6 +13,7 @@
 | 버전 | 날짜 | 작성자 | 주요 변경 |
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-08 | 강태오 (Lead) | 초기 작성 |
+| v1.1 | 2026-05-13 | Codex | 2026-05-12 결정 반영 — 4모듈 기준, Gateway Auth, Bible Service Journal 통합, DeepSeek 기준으로 W1 작업 지시 정리 |
 
 ---
 
@@ -63,40 +64,40 @@
 ### 강태오 (Lead, Gateway, DevOps)
 
 ```
-10:30  Gradle root settings.gradle.kts + 6 module build.gradle.kts 초기화
-12:00  ./gradlew build -x test → BUILD SUCCESSFUL (빈 모듈 6개)
-13:00  GitHub main 브랜치에 Gradle wrapper commit + push
+10:30  Gradle root settings.gradle.kts + 4 module build.gradle.kts 초기화
+12:00  ./gradlew build -x test → BUILD SUCCESSFUL (빈 모듈 4개)
+13:00  GitHub master/dev 브랜치 기준 Gradle wrapper commit + push
 14:00  K8s namespace qtai + Helm infra (MySQL·Redis·Kafka) 기동
-16:00  Gateway Spring Cloud Gateway 라우팅 6개 서비스 설정
+16:00  Gateway Spring Cloud Gateway 라우팅 4개 서비스 영역 설정
 17:30  .github/workflows/ci.yml Gradle build job 초기 구성
 ```
 
-### 이지윤 (Auth Service)
+### 이지윤 (Bible Service)
 
 ```
 10:30  git pull → Gradle wrapper 확인
-11:00  auth-service/ 패키지 구조 생성 (12번 § 1.2 기준)
-13:00  Flyway V1__create_tables.sql (USERS·REFRESH_TOKENS) 작성
-15:00  User·RefreshToken 도메인 엔티티 구현 (순수 Kotlin)
-17:00  LoginUseCase 골격 + 단위 테스트 시작
+11:00  bible-service/ 성경·주석 패키지 구조 생성 (12번 § Bible 기준)
+13:00  Flyway V1__create_bible_tables.sql (BOOKS·KR_BIBLE·EN_BIBLE) 작성
+15:00  Book·Verse 도메인 엔티티 구현
+17:00  Bible 조회 UseCase 골격 + 단위 테스트 시작
 ```
 
 ### 강상민 (AI Service)
 
 ```
 10:30  git pull + ai-service `gradle wrapper --gradle-version=8.10` (첫 1회만)
-11:00  `./gradlew build -x test` → BUILD SUCCESSFUL + ANTHROPIC_API_KEY 환경변수 확인
+11:00  `./gradlew build -x test` → BUILD SUCCESSFUL + DEEPSEEK_API_KEY 환경변수 확인
 12:00  ChromaDB K8s 배포 + collection qtai_corpus 생성
 14:00  임베딩 모델 다운로드 확인 (paraphrase-multilingual-mpnet-base-v2)
-15:00  RAG 시드 5개 문서 큐레이션 + rag_index.py 시드 실행
+15:00  RAG 시드 5개 문서 큐레이션 + Spring/CLI 시드 실행
 17:00  시스템 프롬프트 4종 초안 작성 (step_a ~ step_d)
 ```
 
-### 이승욱 (Journal Service)
+### 이승욱 (Bible Service · Journal/Kafka)
 
 ```
 10:30  git pull → Gradle wrapper 확인
-11:00  journal-service/ 패키지 구조 생성
+11:00  bible-service/ journal 패키지 구조 생성
 13:00  Flyway V1 migration (JOURNALS·JOURNAL_EVENTS)
 15:00  Journal·JournalEvent 도메인 엔티티 구현
 17:00  Kafka consumer 설정 + CreateJournalUseCase 골격
@@ -106,10 +107,10 @@
 
 ```
 10:30  git pull → Gradle wrapper 확인
-11:00  bible-service/ 패키지 구조 생성
-13:00  Flyway V1~V2 migration (BOOKS·KR_BIBLE 스키마 + BOOKS 시드 66권)
-15:00  KR_BIBLE 시드 데이터 준비 (개역개정 CSV 확인)
-17:00  Book·Verse 도메인 엔티티 + BibleDataLoader 골격
+11:00  ai-service/ RAG 보조 패키지 구조 확인
+13:00  PromptTemplate·RagSource 모델 검토
+15:00  KJV·Matthew Henry·팀 작성 더미 자료 seed 범위 확인
+17:00  DeepSeek 프롬프트 템플릿 리뷰 보조
 ```
 
 ### 김지민 (Flutter)
@@ -139,24 +140,24 @@
 
 ```
 5/13 오전  AuthFilter (JWT 검증 → X-User-Id 헤더) 구현
-5/13 오후  Gateway → Auth/Bible 라우팅 curl 검증
+5/13 오후  Gateway → Gateway Auth/Bible 라우팅 curl 검증
 5/14 오전  NetworkPolicy default-deny + 서비스 허용 정책
-5/14 오후  K8s Secret 4종 등록 (anthropic, mysql, jwt-keys, google-oauth)
+5/14 오후  K8s Secret 4종 등록 (deepseek, mysql, jwt-keys, google-oauth)
 ```
 
 ### 이지윤
 
 ```
-5/13 오전  LoginUseCase 구현 완료 + 단위 테스트 통과
-5/13 오후  JWT RS256 발급 (JwtService) + 키 생성 팀 공유
-5/14 오전  RefreshTokenUseCase + Rotation 로직
-5/14 오후  Redis Distributed Lock (login rate 1회/5초)
+5/13 오전  Book/Verse 조회 UseCase 구현 완료 + 단위 테스트 통과
+5/13 오후  KR/EN 본문 조회 API DTO 정리
+5/14 오전  Commentary 조회 + Redis cache 키 정책 구현
+5/14 오후  Bible Service 통합 테스트 골격
 ```
 
 ### 강상민
 
 ```
-5/13 오전  AnthropicClient WebClient + 4분 timeout + semaphore 10
+5/13 오전  DeepSeekStreamService + 4분 timeout + semaphore 10
 5/13 오후  AiSession·Turn 도메인 엔티티 + Flyway V1 migration
 5/14 오전  강태오 신학 검수 30분 페어 (시스템 프롬프트 4종)
 5/14 오후  ProcessTurnUseCase 골격 (인젝션 방어 계층 1 구현)
@@ -294,7 +295,7 @@ curl -N http://$(minikube ip):30080/api/v1/ai/sessions/$SESSION/turns \
 | --- | --- | --- |
 | 강태오 | Gateway AuthFilter 통합 검증 | AI SSE buffering 우회 filter |
 | 이지윤 | Google OAuth 구현 시작 | Auth ↔ Gateway X-User-Id 통합 |
-| 강상민 | Anthropic mock → 실제 API 전환 | 1턴 E2E 완성 |
+| 강상민 | DeepSeek mock → 실제 API 전환 | 1턴 E2E 완성 |
 | 이승욱 | Kafka consumer 통합 테스트 | notification.requested E2E |
 | 김태혁 | Bible ↔ AI Service verse_exists 연결 | 캐시 히트율 확인 |
 | 김지민 | Flutter ↔ Auth API 실제 연동 | STOMP client 골격 |
@@ -324,9 +325,9 @@ curl -N http://$(minikube ip):30080/api/v1/ai/sessions/$SESSION/turns \
 **5/22 금 17:00까지 모두 ✅:**
 
 **인프라:**
-- [ ] `./gradlew build -x test` → BUILD SUCCESSFUL (6 modules)
-- [ ] Minikube 전체 pod Running (MySQL·Redis·Kafka·ChromaDB·6 services)
-- [ ] Gateway → 6 서비스 라우팅 curl 검증 통과
+- [ ] `./gradlew build -x test` → BUILD SUCCESSFUL (4 modules)
+- [ ] Minikube 전체 pod Running (MySQL·Redis·Kafka·ChromaDB·4 services)
+- [ ] Gateway → 4 서비스 영역 라우팅 curl 검증 통과
 - [ ] CI yml → Gradle build + Spectral lint green
 
 **Auth:**
@@ -342,7 +343,7 @@ curl -N http://$(minikube ip):30080/api/v1/ai/sessions/$SESSION/turns \
 - [ ] 강태오 신학 검수 완료
 
 **Kafka:**
-- [ ] `ai.session.completed` → Journal 자동 생성 E2E
+- [ ] `ai.session.completed` → Bible Service Journal DRAFT 자동 생성 E2E
 
 **Flutter:**
 - [ ] `flutter analyze` 0 issue

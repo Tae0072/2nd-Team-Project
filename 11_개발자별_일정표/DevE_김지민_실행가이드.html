@@ -1,932 +1,120 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI — Dev E 김지민 실행가이드</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QT-AI 개인 실행가이드 - 김지민</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;--text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;--pink:#db61a2;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre-wrap}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer}.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}.wrap{max-width:1180px;margin:0 auto;padding:0 24px}header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.proj{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}.wnav:hover{border-color:var(--t2);color:var(--text)}.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}.sec-title{font-size:15px;font-weight:700}.callout{background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-left:3px solid var(--accent);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}.callout strong{color:var(--text)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.ok{background:rgba(87,171,90,.08);border-color:rgba(87,171,90,.25);border-left-color:var(--green)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600;white-space:nowrap}.tbl tr:last-child td{border-bottom:none}.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:330px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(87,171,90,.12);color:var(--green);border:1px solid rgba(87,171,90,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.btype{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px}.btype-name{font-family:var(--mono);color:var(--teal);font-weight:700;font-size:11px;margin-bottom:4px}.btype-ex{color:var(--t2);font-size:11px}.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.wblock{padding:18px 0 8px}.whdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.wdot{width:13px;height:13px;border-radius:50%;flex-shrink:0}.wlabel{font-size:14px;font-weight:700}.wperiod{font-size:12px;color:var(--t2)}.wgoal{font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:4px}.col-hdr{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden}.col-hdr div{padding:8px 13px;font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}.day-card{border:1px solid var(--border);border-top:none;overflow:hidden}.day-card:last-child{border-radius:0 0 8px 8px}.dtrig{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;cursor:pointer;transition:background .1s}.dtrig:hover,.dtrig.open{background:var(--bg2)}.dtc{padding:11px 13px;font-size:12px;color:var(--t2);line-height:1.5}.dt-date{font-weight:700;color:var(--text);font-size:13px;line-height:1.4}.dt-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-top:3px}.bd{background:rgba(224,130,61,.12);color:var(--orange)}.bo{background:rgba(87,171,90,.12);color:var(--green)}.bc{background:rgba(83,155,245,.12);color:var(--blue)}.bi{background:rgba(57,197,207,.12);color:var(--teal)}.bk{background:rgba(227,179,65,.12);color:var(--yellow)}.bt{background:rgba(248,81,73,.12);color:var(--lead)}.br{background:rgba(176,131,240,.12);color:var(--purple)}.bp{background:rgba(219,97,162,.12);color:var(--pink)}.bg{background:rgba(227,179,65,.12);color:var(--yellow)}.be{background:rgba(57,197,207,.12);color:var(--teal)}.dt-chev{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;transition:transform .2s}.dt-chev.open{transform:rotate(180deg)}.day-detail{display:none;border-top:1px solid var(--border)}.day-detail.show{display:block}.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi:nth-last-child(-n+2){border-bottom:none}.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}.path-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}.criteria{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;padding:13px;margin-top:12px}.crit-title{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.crit-item{display:flex;gap:8px;padding:5px 0;font-size:12px;color:var(--t2);align-items:flex-start}.pbar{height:5px;background:var(--bg3);border-radius:3px;margin:10px 0 5px;overflow:hidden}.pfill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}.ptxt{font-size:11px;color:var(--t2)}.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:260px;overflow-y:auto}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.sd{color:var(--t3)}.sy{color:var(--yellow)}.ai-stage{margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}.ai-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);cursor:pointer}.ai-hdr:hover{background:var(--bg4)}.ai-w{font-size:10px;font-weight:700;background:var(--bg4);color:var(--t2);padding:2px 8px;border-radius:4px;flex-shrink:0}.ai-spacer{margin-left:auto}.ai-body{padding:16px;border-top:1px solid var(--border);display:none}.ai-body.show{display:block}.ai-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}.ai-lbl:not(:first-child){margin-top:14px}.ctx-list,.verify-list{list-style:none}.ctx-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:3px 0;line-height:1.5}.ctx-list li::before{content:'📄 ';font-size:10px}.verify-list li{font-size:12px;color:var(--t2);padding:4px 0;display:flex;gap:6px;line-height:1.55}.verify-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}.prompt-box{background:#010409;border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:#adbac7;line-height:1.75;white-space:pre-wrap;font-family:var(--sans)}@media(max-width:820px){.two,.four-grid{grid-template-columns:1fr}.branch-grid{grid-template-columns:1fr}.col-hdr,.dtrig{grid-template-columns:72px 1fr}.col-hdr div:nth-child(3),.col-hdr div:nth-child(4),.dtrig .dtc:nth-child(3),.dtrig .dtc:nth-child(4){display:none}.own-item{display:block}.own-path{min-width:auto;margin-bottom:8px}.wrap{padding:0 14px}}
-
-/* ===== Spec Panel (자기완결성 명세 S5) ===== */
-.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
-.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
-.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
-.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
-.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
-.spec-panel summary.spec-sum:hover{background:var(--bg3)}
-.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
-.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
-.spec-panel[open]{background:var(--bg)}
-.spec-panel > *:not(summary){padding:0 18px 14px}
-.spec-panel pre{margin-top:6px}
-
-/* ===== Workflow/Report Section (S6) ===== */
-.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
-.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
-.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
-.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
-.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
-.wr-flow .arrow{color:var(--t2);font-weight:700}
-.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
-.folder-rule strong{color:var(--lead)}
-@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
-
-
-/* ===== 사용 규칙 박스 (S0) ===== */
-.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
-.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
-.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
-.rules-box ol li{color:var(--text);font-size:13.5px}
-.rules-box ol li strong{color:var(--blue)}
-
-/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
-.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
-.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
-.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
-.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
-.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
-@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
-
-/* ===== 원문 문서 매트릭스 (S7) ===== */
-.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
-.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
-.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
-.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
-.ref-matrix tr:hover td{background:var(--bg3)}
-
-
-/* ===== DoD 박스 (day 카드 하단) ===== */
-.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
-.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
-.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
-.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
-.dod-item label{cursor:pointer;flex:1;line-height:1.5}
-.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
-
+:root { color-scheme: light; --ink:#172026; --muted:#5d6975; --line:#d8dee6; --bg:#f6f8fb; --card:#ffffff; --accent:#1769aa; }
+* { box-sizing: border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+header { padding:32px 24px 24px; background:#ffffff; border-bottom:1px solid var(--line); }
+.wrap { max-width:1120px; margin:0 auto; }
+h1 { margin:0 0 8px; font-size:30px; letter-spacing:0; }
+.subtitle { color:var(--muted); margin:0; }
+.badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.badge { border:1px solid var(--line); border-radius:6px; padding:6px 10px; background:#f9fbfd; font-size:13px; }
+main { max-width:1120px; margin:24px auto 48px; padding:0 24px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:18px; }
+.card.wide { grid-column:1 / -1; }
+h2 { margin:0 0 12px; font-size:18px; }
+h3 { margin:0 0 8px; font-size:15px; color:var(--accent); }
+ul { margin:0; padding-left:20px; }
+li { margin:6px 0; }
+.weeks { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.week { border:1px solid var(--line); border-radius:8px; padding:12px; background:#fbfcfe; }
+pre { margin:0; padding:14px; border-radius:8px; background:#111827; color:#e5e7eb; overflow:auto; font-size:13px; }
+code { font-family:Consolas,"JetBrains Mono",monospace; }
+@media (max-width:900px) { main { grid-template-columns:1fr; } .weeks { grid-template-columns:1fr; } h1 { font-size:24px; } }
 </style>
 </head>
-<body style="--accent:#db61a2">
-<header><div class="wrap"><div class="hdr">
-  <span class="proj">QT-AI</span>
-  <div><div class="dev-name">김지민 <span class="role-chip">Dev E · Mobile App Owner</span></div><div class="dev-sub">Flutter App · Sliver Sync Scroll · RiverPod · DIO · SSE · STOMP</div></div>
-  <div class="wnav-wrap"><button class="wnav" onclick="g('W1')">W1</button><button class="wnav" onclick="g('W2')">W2</button><button class="wnav" onclick="g('W3')">W3</button><button class="wnav" onclick="g('W4')">W4</button><button class="wnav" onclick="g('W5')">W5</button><button class="wnav" onclick="g('s5')" style="background:rgba(83,155,245,.15);border-color:var(--blue);color:var(--blue);font-weight:700">📋 명세</button><button class="wnav" onclick="g('s6')" style="background:rgba(87,171,90,.15);border-color:var(--green);color:var(--green);font-weight:700">📊 워크플로우</button><button class="wnav" onclick="g('s7')" style="background:rgba(224,130,61,.15);border-color:var(--orange);color:var(--orange);font-weight:700">📚 참조</button></div>
-</div></div></header>
-<div class="wrap">
-
-<!-- S0a: USAGE RULES (헤더 직후, 항상 펼쳐짐) -->
-<div class="rules-box">
-  <h2>📜 이 문서만 보고 작업하는 규칙</h2>
-  <ol>
-    <li>매일 <strong>본인 W1~W5 카드</strong>만 먼저 펼쳐서 오늘 할 일을 파악합니다.</li>
-    <li>작업 브랜치는 <code>feature/app-{task-slug}</code> 형식 (예: <code>feature/app-bible-screen</code>).</li>
-    <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
-    <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
-    <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
-    <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
-    <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
-  </ol>
-</div>
-
-<!-- S0b: SETUP COMMANDS (토글) -->
-<details class="spec-panel">
-  <summary class="spec-sum">
-    <span class="spec-num" style="background:var(--green)">🔧</span>
-    <span class="spec-title">환경 셋업 빠른 명령어 — 처음 시작 시 1회 실행</span>
-  </summary>
-  <div class="setup-box">
-    <div class="setup-grid">
-      <div class="setup-card">
-        <h4>1. 저장소 클론 + 브랜치</h4>
-        <pre>git clone git@github.com:Tae0072/2nd-Team-Project.git
-cd 2nd-Team-Project
-
-git checkout develop
-git pull origin develop
-
-# 작업 브랜치 생성
-git checkout -b feature/app-bible-screen</pre>
-      </div>
-      <div class="setup-card">
-        <h4>2. 환경 검증</h4>
-        <pre>java -version    # Java 21 (Temurin)
-docker --version # Docker 4.x
-minikube status  # Running
-kubectl config set-context --current --namespace=qtai
-
-# 본인 서비스 빌드 검증
-flutter build apk --debug</pre>
-      </div>
-      <div class="setup-card">
-        <h4>3. 데이터베이스 기동</h4>
-        <pre># Helm으로 DB 인프라 일괄 기동
-cd helm
-helm install qtai-infra ./qtai-infra -n qtai
-
-# 헬스체크
-kubectl get pods -n qtai
-kubectl logs -f deployment/{service-name} -n qtai</pre>
-      </div>
-      <div class="setup-card">
-        <h4>4. 본인 역할 추가 도구</h4>
-        <pre># Flutter 추가 필수: Flutter SDK 3.24 + FVM + Android Studio + AVD
-
-# 본인 서비스 테스트 명령
-flutter test</pre>
-      </div>
-    </div>
-    <div class="callout warn mt12">⚠️ 자세한 셋업은 <code>11_개발_환경_셋업_가이드.md</code> 참조. 실패 시 <code>10_트러블슈팅_FAQ.md</code> §1~§3 우선 확인.</div>
-  </div>
-</details>
-
-  <div class="sec" id="s0"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">Flutter 역할 핵심 선언</div></div><div class="callout"><strong>"사용자가 처음 보는 것이 Flutter 화면이다."</strong><br>시연에서 심사위원이 직접 손으로 만지는 유일한 인터페이스다. Sliver 기반 Sync Scroll과 AI SSE 스트리밍 실시간 타이핑 효과가 포트폴리오의 WOW 포인트가 된다. 백엔드 API가 완성되기 전에도 Mock 데이터로 화면을 미리 완성한다.</div><div class="two mt12"><table class="tbl"><thead><tr><th>담당</th><th>핵심 책임</th></tr></thead><tbody><tr><td>Network</td><td>DIO + JWT interceptor + refresh flow</td></tr><tr><td>Bible</td><td>Sliver Sync Scroll 한/영 병기 화면</td></tr><tr><td>AI Chat</td><td>SSE 수신 + 타이핑 애니메이션</td></tr><tr><td>Journal/Home</td><td>묵상 노트 CRUD와 대시보드 흐름</td></tr></tbody></table><div><div class="callout red">🚫 <strong>화면 선행 원칙</strong><br>백엔드가 늦어져도 Mock 데이터로 UI와 상태 흐름을 먼저 완성한다. API 응답 모델은 OpenAPI camelCase와 맞춘 뒤 교체한다.</div><div class="callout ok mt8">✅ <strong>완료 증거</strong><br>flutter analyze, flutter test, 화면 스크린샷, 실제 API curl/앱 로그를 PR에 첨부한다.</div></div></div></div>
-  <div class="sec" id="s1"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">아래 경로는 Flutter 김지민의 전담 영역이다. 변경 시 화면 흐름, null-safety, API 응답 모델, 토큰 저장 보안을 함께 확인한다.</div><div class="own-tree mt12"><div class="own-item"><div class="own-path">flutter-app/pubspec.yaml<br>flutter-app/lib/main.dart</div><div class="own-desc">패키지 의존성, 앱 엔트리포인트, 전역 ProviderScope</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">flutter-app/lib/core/network/<br><span style="color:var(--t2);padding-left:12px">dio_client.dart · sse_client.dart</span></div><div class="own-desc">DIO 기본 설정, JWT interceptor, SSE 수신</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">flutter-app/lib/core/router/<br>flutter-app/lib/core/theme/</div><div class="own-desc">go_router 라우팅, 앱 테마</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">flutter-app/lib/features/<br><span style="color:var(--t2);padding-left:12px">auth · bible · ai_chat · journal · home</span></div><div class="own-desc">로그인, 성경, AI 채팅, 묵상 노트, 대시보드 화면</div><span class="lock-tag">P0</span></div><div class="own-item"><div class="own-path">flutter-app/lib/shared/<br>flutter-app/test/widget/</div><div class="own-desc">RiverPod providers, 공통 위젯, Widget 테스트</div><span class="lock-tag">P1</span></div></div></div>
-  <div class="sec" id="s2"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 다른 사람한테 물어볼 필요 없음</div></div><div class="pr-panel-list"><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('flutter-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/짧은-설명 (케밥케이스)</strong><span>브랜치 타입과 예시를 먼저 맞춘다.</span></div><div class="pr-panel-chev open" id="chev-flutter-pr-1">⌄</div></div><div class="pr-panel-body show" id="flutter-pr-1"><div class="branch-grid"><div class="btype"><div class="btype-name">feature/</div><div class="btype-ex">신규 기능<br>예) feature/flutter-sse-chat</div></div><div class="btype"><div class="btype-name">fix/</div><div class="btype-ex">버그 수정<br>예) fix/flutter-token-refresh</div></div><div class="btype"><div class="btype-name">refactor/</div><div class="btype-ex">코드 개선<br>예) refactor/riverpod-auth-state</div></div><div class="btype"><div class="btype-name">test/</div><div class="btype-ex">테스트 추가<br>예) test/flutter-login-flow</div></div><div class="btype"><div class="btype-name">docs/</div><div class="btype-ex">문서 수정<br>예) docs/flutter-screen-flow</div></div><div class="btype"><div class="btype-name">chore/</div><div class="btype-ex">설정 변경<br>예) chore/flutter-packages</div></div></div></div></div><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('flutter-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 7단계 (반드시 이 순서로)</strong><span>PR 생성 전 로컬 검증까지 이 순서로 진행한다.</span></div><div class="pr-panel-chev open" id="chev-flutter-pr-2">⌄</div></div><div class="pr-panel-body show" id="flutter-pr-2"><div class="pr-step-list"><div class="pr-step"><div class="pr-step-num">1</div><div style="width:100%"><div class="pr-step-title">develop 최신 pull</div><pre>git checkout develop &amp;&amp; git pull origin develop<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div style="width:100%"><div class="pr-step-title">feature 브랜치 생성 (develop 기준)</div><pre>git checkout -b feature/flutter-sse-chat<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div style="width:100%"><div class="pr-step-title">작업 후 커밋 메시지 작성</div><pre>git add .
-git commit -m &quot;feat(flutter): render ai sse chat stream&quot;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div style="width:100%"><div class="pr-step-title">로컬 검증 실행</div><pre>cd flutter-app
-flutter pub get
-flutter analyze
-flutter test
-rg -n &quot;TODO|print\(|hardcodedToken|localhost&quot; lib test<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div style="width:100%"><div class="pr-step-title">원격 브랜치 push</div><pre>git push origin feature/flutter-sse-chat<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">6</div><div style="width:100%"><div class="pr-step-title">GitHub에서 PR 생성</div><pre>base: develop
-compare: feature/flutter-sse-chat
-reviewers: 강태오(Lead) 1명, 강태오 + 이지윤, 강태오 + 김태혁, 강태오 + 강상민<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step"><div class="pr-step-num">7</div><div style="width:100%"><div class="pr-step-title">리뷰 반영 후 Squash merge</div><pre>리뷰 승인 + CI green + 충돌 없음 확인 후 merge<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div></div></div></div><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('flutter-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>③ PR 템플릿 (.github/PULL_REQUEST_TEMPLATE.md — PR 생성 시 자동 로드)</strong><span>본문을 이 형태로 채우면 리뷰어가 바로 판단할 수 있다.</span></div><div class="pr-panel-chev " id="chev-flutter-pr-3">⌄</div></div><div class="pr-panel-body " id="flutter-pr-3"><pre>## 📋 작업 내용
-
-## 📱 화면 영향 범위
-- [ ] 변경 화면 스크린샷 첨부
-- [ ] Mock → 실제 API 교체 여부 명시
-- [ ] 모바일 화면 overflow 확인
-
-## ✅ DoD 체크리스트
-- [ ] flutter analyze 오류 0건
-- [ ] flutter test 통과
-- [ ] DIO model이 OpenAPI camelCase와 일치
-- [ ] JWT/refresh token 하드코딩 없음
-- [ ] 주요 화면 스크린샷 첨부
-
-## 🔗 관련 이슈
-Closes #<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('flutter-pr-4')"><div class="pr-panel-num">4</div><div class="pr-panel-title"><strong>④ 자동 CI 게이트 (PR 생성 시 자동 실행)</strong><span>실패하면 merge 금지. 원인을 고쳐서 다시 올린다.</span></div><div class="pr-panel-chev " id="chev-flutter-pr-4">⌄</div></div><div class="pr-panel-body " id="flutter-pr-4"><pre>cd flutter-app
-flutter pub get
-flutter analyze
-flutter test
-rg -n &quot;TODO|print\(|hardcodedToken|localhost&quot; lib test<button class="copy-btn" onclick="copyCode(this)">복사</button></pre><table class="tbl"><thead><tr><th>체크</th><th>실패 시 조치</th></tr></thead><tbody><tr><td>flutter analyze</td><td>타입/null-safety/unused import 수정</td></tr><tr><td>flutter test</td><td>Widget/provider 테스트 실패 수정</td></tr><tr><td>secret scan</td><td>토큰·API URL 하드코딩 제거</td></tr><tr><td>OpenAPI 모델</td><td>camelCase 응답 필드와 DTO 대조</td></tr><tr><td>UI smoke</td><td>로그인→홈→성경→AI→저널 흐름 확인</td></tr></tbody></table></div></div><div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('flutter-pr-5')"><div class="pr-panel-num">5</div><div class="pr-panel-title"><strong>⑤ 머지 규칙 + Hotfix 절차</strong><span>릴리즈 직전 변경은 영향 범위와 복구 명령까지 남긴다.</span></div><div class="pr-panel-chev " id="chev-flutter-pr-5">⌄</div></div><div class="pr-panel-body " id="flutter-pr-5"><div class="callout warn">UI 변경은 시연 인상에 직접 영향. Feature Freeze 이후 화면/플로우 변경은 반드시 스크린샷과 롤백 방법을 함께 남긴다.</div><pre>git checkout develop &amp;&amp; git pull origin develop
-git checkout -b hotfix/flutter-sse-render
-git commit -m &quot;fix(flutter): keep sse chat stream visible&quot;
-git push origin hotfix/flutter-sse-render<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div></div></div>
-  <div class="sec" id="s3"><div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">일별 상세 일정 + 완료 결과 미리보기</div></div><div class="criteria"><div class="crit-title">W1 완료 기준</div><label class="crit-item"><input type="checkbox" id="c1" onchange="updateProg()"> <span>flutter analyze 오류 0건</span></label><label class="crit-item"><input type="checkbox" id="c2" onchange="updateProg()"> <span>flutter test 기본 통과</span></label><label class="crit-item"><input type="checkbox" id="c3" onchange="updateProg()"> <span>로그인 → JWT 저장 → 보호 API 호출 플로우</span></label><label class="crit-item"><input type="checkbox" id="c4" onchange="updateProg()"> <span>go_router 5개 화면 라우팅</span></label><label class="crit-item"><input type="checkbox" id="c5" onchange="updateProg()"> <span>Mock 데이터 화면 흐름 완성</span></label><div class="pbar"><div class="pfill" id="prog" style="width:0%"></div></div><div class="ptxt" id="prog-txt">0 / 5 완료</div></div><div id="weeks-root"><div class="wblock mt20" id="W1"><div class="whdr"><div class="wdot" style="background:var(--blue)"></div><span class="wlabel">W1</span><span class="wperiod">5/12~5/22</span><span class="wgoal">환경 세팅 + 기반 구축</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-0')"><div class="dtc"><div class="dt-date">5/12 화</div><span class="dt-badge bd">환경</span></div><div class="dtc">킥오프 참석</div><div class="dtc">Flutter SDK + FVM 3.24.5 환경 확인 · flutter create</div><div class="dtc">pubspec.yaml 의존성 추가</div><div class="dt-chev" id="chev-flutter-W1-0">⌄</div></div><div class="day-detail" id="flutter-W1-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/pubspec.yaml</li><li>flutter-app/lib/main.dart</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Flutter 앱 뼈대와 필수 패키지 의존성을 고정한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>fvm use 3.24.5
-flutter create flutter-app
-cd flutter-app
-flutter pub get<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> pubspec.yaml 의존성 추가</div><button class="sim-btn" onclick="runSim('flutter-W1-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-0-0"><label for="dod-sflutter-W1-0-0">Flutter SDK 3.24 + FVM 설치 + flutter doctor 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-0-1"><label for="dod-sflutter-W1-0-1">pubspec.yaml 의존성 추가 (riverpod·dio·go_router·secure_storage·freezed)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-0-2"><label for="dod-sflutter-W1-0-2">flutter pub get 성공</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-0-3"><label for="dod-sflutter-W1-0-3">flutter run → 시작 화면 정상 표시</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-0-4"><label for="dod-sflutter-W1-0-4">reports/ 리포트 작성</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-1')"><div class="dtc"><div class="dt-date">5/13 화</div><span class="dt-badge bc">라우팅</span></div><div class="dtc">Stand-up</div><div class="dtc">go_router 라우팅 설정 (5개 화면)</div><div class="dtc">Mock 데이터 홈 화면 기본 레이아웃</div><div class="dt-chev" id="chev-flutter-W1-1">⌄</div></div><div class="day-detail" id="flutter-W1-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/core/router/app_router.dart</li><li>flutter-app/lib/features/home/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Auth, Home, Bible, AI Chat, Journal 화면 이동을 먼저 연결한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter analyze
-flutter test test/widget/router_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> Mock 데이터 홈 화면 기본 레이아웃</div><button class="sim-btn" onclick="runSim('flutter-W1-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-1"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-1-0"><label for="dod-sflutter-W1-1-0">lib/features/home/ + HomeScreen 위젯 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-1-1"><label for="dod-sflutter-W1-1-1">Mock JSON으로 대시보드 카드 4개 (오늘 구절·세션·저널·시작) 표시</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-1-2"><label for="dod-sflutter-W1-1-2">위젯 트리 + 색상 토큰 (08번 §3) 적용</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-1-3"><label for="dod-sflutter-W1-1-3">디자인 가이드 준수 검증 (Flutter Inspector)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-1-4"><label for="dod-sflutter-W1-1-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-2')"><div class="dtc"><div class="dt-date">5/14 수</div><span class="dt-badge bi">DIO</span></div><div class="dtc">Stand-up</div><div class="dtc">DioClient 설정 · JWT interceptor 골격</div><div class="dtc">RiverPod Provider 기본 구조 설계</div><div class="dt-chev" id="chev-flutter-W1-2">⌄</div></div><div class="day-detail" id="flutter-W1-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/core/network/dio_client.dart</li><li>flutter-app/lib/shared/providers/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">API baseUrl, timeout, auth header 주입 흐름을 만든다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/dio_client_test.dart
-rg -n &quot;baseUrl|Interceptor|Provider&quot; flutter-app/lib<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> RiverPod Provider 기본 구조 설계</div><button class="sim-btn" onclick="runSim('flutter-W1-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-2"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-2-0"><label for="dod-sflutter-W1-2-0">lib/core/providers/ 디렉토리 + Provider 패턴 정의</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-2-1"><label for="dod-sflutter-W1-2-1">StateNotifierProvider 2개 (auth·dashboard) 등록</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-2-2"><label for="dod-sflutter-W1-2-2">ProviderScope를 main.dart 루트에 적용</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-2-3"><label for="dod-sflutter-W1-2-3">ref.watch / ref.read 사용 패턴 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-2-4"><label for="dod-sflutter-W1-2-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-3')"><div class="dtc"><div class="dt-date">5/15 목</div><span class="dt-badge bd">Auth</span></div><div class="dtc">Stand-up</div><div class="dtc">로그인·회원가입 화면 UI (Mock)</div><div class="dtc">auth feature 디렉토리 구조 완성</div><div class="dt-chev" id="chev-flutter-W1-3">⌄</div></div><div class="day-detail" id="flutter-W1-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/auth/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">API 연동 전에도 입력/검증/화면 전환 UI를 완성한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter analyze
-flutter test test/widget/auth_form_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> auth feature 디렉토리 구조 완성</div><button class="sim-btn" onclick="runSim('flutter-W1-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-3"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-3-0"><label for="dod-sflutter-W1-3-0">lib/features/auth/ — data·domain·presentation 3계층 구조</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-3-1"><label for="dod-sflutter-W1-3-1">AuthRepository 인터페이스 + 구현 골격</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-3-2"><label for="dod-sflutter-W1-3-2">LoginUseCase + LoginScreen 위젯</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-3-3"><label for="dod-sflutter-W1-3-3">freezed로 LoginRequest·TokenResponse 모델 정의</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-3-4"><label for="dod-sflutter-W1-3-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-4')"><div class="dtc"><div class="dt-date">5/16 금</div><span class="dt-badge bd">Auth</span></div><div class="dtc">Stand-up</div><div class="dtc">Auth API 연동 — POST /auth/login DIO 호출</div><div class="dtc">로그인 성공 → 홈 이동 플로우</div><div class="dt-chev" id="chev-flutter-W1-4">⌄</div></div><div class="day-detail" id="flutter-W1-4"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/auth/data/</li><li>flutter-app/lib/features/auth/presentation/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">JWT 저장과 로그인 상태 Provider를 실제 API 응답에 맞춘다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/login_flow_test.dart
-curl -i -X POST http://localhost:8080/auth/login<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 로그인 성공 → 홈 이동 플로우</div><button class="sim-btn" onclick="runSim('flutter-W1-4')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-4"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-4-0"><label for="dod-sflutter-W1-4-0">POST /auth/login Dio 호출 (인터셉터 + Authorization 헤더)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-4-1"><label for="dod-sflutter-W1-4-1">TokenResponse → flutter_secure_storage 저장</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-4-2"><label for="dod-sflutter-W1-4-2">성공 시 GoRouter로 /(홈) 이동</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-4-3"><label for="dod-sflutter-W1-4-3">실패 시 ProblemDetail 파싱 + 에러 메시지 표시</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-4-4"><label for="dod-sflutter-W1-4-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-5')"><div class="dtc"><div class="dt-date">5/19 월</div><span class="dt-badge bi">DIO</span></div><div class="dtc">Stand-up</div><div class="dtc">DIO JWT Interceptor 완성 (401 자동 갱신)</div><div class="dtc">RiverPod auth 상태 관리 완성</div><div class="dt-chev" id="chev-flutter-W1-5">⌄</div></div><div class="day-detail" id="flutter-W1-5"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/core/network/dio_client.dart</li><li>flutter-app/lib/shared/providers/auth_provider.dart</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">401 발생 시 refresh token으로 재발급하고 원 요청을 재시도한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/token_refresh_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> RiverPod auth 상태 관리 완성</div><button class="sim-btn" onclick="runSim('flutter-W1-5')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-5"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-5-0"><label for="dod-sflutter-W1-5-0">AuthNotifier (StateNotifier) 구현 — login·logout·refreshToken</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-5-1"><label for="dod-sflutter-W1-5-1">401 → refreshToken 자동 호출 → 재시도 (Dio 인터셉터)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-5-2"><label for="dod-sflutter-W1-5-2">auth state 전환 (Initial·Loading·Authenticated·Unauthenticated)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-5-3"><label for="dod-sflutter-W1-5-3">단위 테스트 1개+ (riverpod_test 또는 ProviderContainer)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-5-4"><label for="dod-sflutter-W1-5-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-6')"><div class="dtc"><div class="dt-date">5/20 화</div><span class="dt-badge bg">Bible</span></div><div class="dtc">Stand-up</div><div class="dtc">성경 조회 화면 골격 — Mock 한/영 병기 리스트</div><div class="dtc">bible feature UI 기본</div><div class="dt-chev" id="chev-flutter-W1-6">⌄</div></div><div class="day-detail" id="flutter-W1-6"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/bible/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Sliver 구현 전에 데이터 모델과 화면 배치를 먼저 잡는다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/bible_screen_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> bible feature UI 기본</div><button class="sim-btn" onclick="runSim('flutter-W1-6')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-6"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-6-0"><label for="dod-sflutter-W1-6-0">lib/features/bible/ — list·detail 2화면 작성</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-6-1"><label for="dod-sflutter-W1-6-1">GET /bible/books 호출 → 66권 리스트 표시</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-6-2"><label for="dod-sflutter-W1-6-2">ListView.builder + 권 선택 → /bible/{book} 라우팅</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-6-3"><label for="dod-sflutter-W1-6-3">BibleRepository + Provider 등록</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-6-4"><label for="dod-sflutter-W1-6-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-7')"><div class="dtc"><div class="dt-date">5/21 수</div><span class="dt-badge bp">UI</span></div><div class="dtc">Stand-up</div><div class="dtc">AI 채팅 화면 골격 — Mock 메시지 리스트 + 입력창</div><div class="dtc">SSE 수신 구조 설계</div><div class="dt-chev" id="chev-flutter-W1-7">⌄</div></div><div class="day-detail" id="flutter-W1-7"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/ai_chat/</li><li>flutter-app/lib/core/network/sse_client.dart</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">실제 SSE 연동 전에 대화 리스트와 입력 상태를 완성한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/ai_chat_screen_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> SSE 수신 구조 설계</div><button class="sim-btn" onclick="runSim('flutter-W1-7')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-7"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-7-0"><label for="dod-sflutter-W1-7-0">flutter_client_sse 패키지 추가</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-7-1"><label for="dod-sflutter-W1-7-1">AiSseClient 구현 (POST /ai/sessions/{id}/turns SSE 구독)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-7-2"><label for="dod-sflutter-W1-7-2">token·turn_completed·error·end 이벤트 처리</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-7-3"><label for="dod-sflutter-W1-7-3">화면에 토큰 스트리밍 표시 (테스트 화면)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-7-4"><label for="dod-sflutter-W1-7-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W1-8')"><div class="dtc"><div class="dt-date">5/22 목</div><span class="dt-badge bt">게이트</span></div><div class="dtc">Stand-up</div><div class="dtc">W1 Lock-in 게이트 참석 (18:00)</div><div class="dtc">flutter analyze 오류 0건 확인</div><div class="dt-chev" id="chev-flutter-W1-8">⌄</div></div><div class="day-detail" id="flutter-W1-8"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/</li><li>GitHub PR</li><li>화면 스크린샷</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">W1 완료 기준을 체크하고 스크린샷과 analyze/test 결과를 PR에 첨부한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>cd flutter-app
-flutter analyze
-flutter test<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> flutter analyze 오류 0건 확인</div><button class="sim-btn" onclick="runSim('flutter-W1-8')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W1-8"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-8-0"><label for="dod-sflutter-W1-8-0">flutter analyze 통과 (warning 0건)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-8-1"><label for="dod-sflutter-W1-8-1">flutter test 통과 (단위 테스트 모두 ✅)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-8-2"><label for="dod-sflutter-W1-8-2">W1 종료 기준 모두 충족 (홈·로그인·성경·SSE)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-8-3"><label for="dod-sflutter-W1-8-3">15_체크리스트 W1 항목 마킹</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W1-8-4"><label for="dod-sflutter-W1-8-4">reports/ W1 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W2"><div class="whdr"><div class="wdot" style="background:var(--purple)"></div><span class="wlabel">W2</span><span class="wperiod">5/26~5/29</span><span class="wgoal">핵심 화면 완성</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W2-0')"><div class="dtc"><div class="dt-date">5/26 화</div><span class="dt-badge bg">Bible</span></div><div class="dtc">페이스 점검 (11:30)</div><div class="dtc">Bible API 연동 — GET /api/v1/passages/JHN/3</div><div class="dtc">실데이터 화면 표시</div><div class="dt-chev" id="chev-flutter-W2-0">⌄</div></div><div class="day-detail" id="flutter-W2-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/bible/data/</li><li>flutter-app/lib/features/bible/presentation/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">Mock Bible 데이터를 실제 API 응답 모델로 교체한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/bible_api_test.dart
-curl -i http://localhost:8080/api/v1/passages/JHN/3<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 실데이터 화면 표시</div><button class="sim-btn" onclick="runSim('flutter-W2-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W2-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-0-0"><label for="dod-sflutter-W2-0-0">Bible API 실데이터 화면 표시 (Mock → 실데이터)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-0-1"><label for="dod-sflutter-W2-0-1">GET /bible/books → ListView.builder로 66권 표시</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-0-2"><label for="dod-sflutter-W2-0-2">권 선택 → /bible/{book} 라우팅 + 상세 화면</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-0-3"><label for="dod-sflutter-W2-0-3">캐시 동작 확인 (2번째 호출 즉시 반환)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-0-4"><label for="dod-sflutter-W2-0-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W2-1')"><div class="dtc"><div class="dt-date">5/27 수</div><span class="dt-badge bg">Bible</span></div><div class="dtc">Stand-up</div><div class="dtc">Sliver Sync Scroll 구현</div><div class="dtc">한/영 병기 동기화 스크롤 확인</div><div class="dt-chev" id="chev-flutter-W2-1">⌄</div></div><div class="day-detail" id="flutter-W2-1"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/bible/presentation/bible_sync_scroll_view.dart</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">CustomScrollView + SliverList 기반으로 좌우 병기 스크롤을 맞춘다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/bible_sync_scroll_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 한/영 병기 동기화 스크롤 확인</div><button class="sim-btn" onclick="runSim('flutter-W2-1')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W2-1"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-1-0"><label for="dod-sflutter-W2-1-0">한/영 병기 동기화 스크롤 (Sliver Sync Scroll)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-1-1"><label for="dod-sflutter-W2-1-1">스크롤 위치 동기화 검증 (한국어·영어 동시 이동)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-1-2"><label for="dod-sflutter-W2-1-2">lang=both 파라미터로 한·영 동시 호출</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-1-3"><label for="dod-sflutter-W2-1-3">구절 단위 정확한 매칭 검증</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-1-4"><label for="dod-sflutter-W2-1-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W2-2')"><div class="dtc"><div class="dt-date">5/28 목</div><span class="dt-badge bi">SSE</span></div><div class="dtc">Stand-up</div><div class="dtc">AI SSE 스트리밍 UI — dio_sse + StreamBuilder</div><div class="dtc">타이핑 애니메이션 확인</div><div class="dt-chev" id="chev-flutter-W2-2">⌄</div></div><div class="day-detail" id="flutter-W2-2"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/core/network/sse_client.dart</li><li>flutter-app/lib/features/ai_chat/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">AI 응답이 토큰 단위로 추가되는 화면을 구현한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/ai_sse_stream_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 타이핑 애니메이션 확인</div><button class="sim-btn" onclick="runSim('flutter-W2-2')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W2-2"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-2-0"><label for="dod-sflutter-W2-2-0">SSE 타이핑 애니메이션 (token 단위 표시)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-2-1"><label for="dod-sflutter-W2-2-1">flutter_client_sse로 token 이벤트 수신</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-2-2"><label for="dod-sflutter-W2-2-2">실시간 화면 업데이트 (setState 또는 StateNotifier)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-2-3"><label for="dod-sflutter-W2-2-3">turn_completed 시 애니메이션 종료</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-2-4"><label for="dod-sflutter-W2-2-4">PR draft 등록</label></div></div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W2-3')"><div class="dtc"><div class="dt-date">5/29 금</div><span class="dt-badge bk">Journal</span></div><div class="dtc">Stand-up</div><div class="dtc">Journal CRUD 화면 + API 연동</div><div class="dtc">전체 화면 Flow 연결 확인</div><div class="dt-chev" id="chev-flutter-W2-3">⌄</div></div><div class="day-detail" id="flutter-W2-3"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/journal/</li><li>flutter-app/lib/features/home/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">로그인 후 홈, 성경, AI, 저널까지 시연 루프를 연결한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter analyze
-flutter test
-flutter drive --target=test_driver/smoke.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 전체 화면 Flow 연결 확인</div><button class="sim-btn" onclick="runSim('flutter-W2-3')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W2-3"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-3-0"><label for="dod-sflutter-W2-3-0">전체 화면 Flow 연결 (로그인→대시보드→Bible→AI→Journal)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-3-1"><label for="dod-sflutter-W2-3-1">GoRouter 라우팅 5 화면 정상 동작</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-3-2"><label for="dod-sflutter-W2-3-2">Auth 토큰 자동 주입 (Dio 인터셉터)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-3-3"><label for="dod-sflutter-W2-3-3">15_체크리스트 W2 4항목 마킹</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W2-3-4"><label for="dod-sflutter-W2-3-4">reports/ W2 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W3"><div class="whdr"><div class="wdot" style="background:var(--orange)"></div><span class="wlabel">W3</span><span class="wperiod">6/1~6/5</span><span class="wgoal">실시간 알림 + OAuth + 단계 진행 UI</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W3-0')"><div class="dtc"><div class="dt-date">6/1~6/5</div><span class="dt-badge be">실시간</span></div><div class="dtc">STOMP WebSocket 알림 배지 구현</div><div class="dtc">큐티 A→B→C→D 단계 진행 UI · Google OAuth 연동</div><div class="dtc">알림/단계/OAuth 스모크 테스트</div><div class="dt-chev" id="chev-flutter-W3-0">⌄</div></div><div class="day-detail" id="flutter-W3-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/home/</li><li>flutter-app/lib/features/ai_chat/</li><li>flutter-app/lib/features/auth/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">실시간 알림 배지와 큐티 단계 진행 상태를 화면에 드러낸다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter test test/widget/realtime_badge_test.dart
-flutter test test/widget/qt_stage_flow_test.dart<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 알림/단계/OAuth 스모크 테스트</div><button class="sim-btn" onclick="runSim('flutter-W3-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W3-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-0"><label for="dod-sflutter-W3-0-0">실시간 STOMP 알림 수신 (BFF /ws/notifications 구독)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-1"><label for="dod-sflutter-W3-0-1">AI 단계 전환 UI (A→B→C→D progress bar)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-2"><label for="dod-sflutter-W3-0-2">OAuth 화면 (Google 로그인 버튼 + 콜백)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-3"><label for="dod-sflutter-W3-0-3">연결·구독·재연결 backoff 정책 적용</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-4"><label for="dod-sflutter-W3-0-4">스모크 테스트 5건 통과</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W3-0-5"><label for="dod-sflutter-W3-0-5">PR draft 등록</label></div></div></div></div></div><div class="wblock mt20" id="W4"><div class="whdr"><div class="wdot" style="background:var(--lead)"></div><span class="wlabel">W4</span><span class="wperiod">6/8~6/12</span><span class="wgoal">UI polish + dry-run + 테스트 보강</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W4-0')"><div class="dtc"><div class="dt-date">6/8~6/12</div><span class="dt-badge br">리뷰</span></div><div class="dtc">전체 화면 UI polish</div><div class="dtc">시연 시나리오 dry-run 반복</div><div class="dtc">Widget 테스트 보강</div><div class="dt-chev" id="chev-flutter-W4-0">⌄</div></div><div class="day-detail" id="flutter-W4-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/lib/features/</li><li>flutter-app/test/widget/</li><li>demo/flutter-screenshots/</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">작은 화면 overflow와 상태 전환 흔들림을 정리한다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter analyze
-flutter test
-flutter test --coverage<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> Widget 테스트 보강</div><button class="sim-btn" onclick="runSim('flutter-W4-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W4-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-0"><label for="dod-sflutter-W4-0-0">4단계 전환 UI (A→B→C→D progress bar) 완성</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-1"><label for="dod-sflutter-W4-0-1">에러 화면 (ProblemDetail code → 한국어 메시지)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-2"><label for="dod-sflutter-W4-0-2">Golden test 3건 (대시보드·AI 큐티·노트 목록)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-3"><label for="dod-sflutter-W4-0-3">시연 APK 빌드 (dev flavor) + 에뮬레이터 설치</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-4"><label for="dod-sflutter-W4-0-4">3분 시연 조작 연습 5회</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W4-0-5"><label for="dod-sflutter-W4-0-5">reports/ W4 종합 리포트 작성</label></div></div></div></div></div><div class="wblock mt20" id="W5"><div class="whdr"><div class="wdot" style="background:var(--green)"></div><span class="wlabel">W5</span><span class="wperiod">6/15~6/17</span><span class="wgoal">시연 기기 세팅 + 발표 흐름 주도</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div><div class="day-card"><div class="dtrig" onclick="toggleDay('flutter-W5-0')"><div class="dtc"><div class="dt-date">6/15~6/17</div><span class="dt-badge bo">시연</span></div><div class="dtc">시연 데모 기기 세팅</div><div class="dtc">리허설 화면 흐름 주도</div><div class="dtc">발표 PPT 화면 설명 파트 준비</div><div class="dt-chev" id="chev-flutter-W5-0">⌄</div></div><div class="day-detail" id="flutter-W5-0"><div class="four-grid"><div class="fi"><div class="fi-label lw">어디서 (파일 경로)</div><ul class="path-list"><li>flutter-app/build/</li><li>demo/device-checklist.md</li><li>발표 PPT</li></ul></div><div class="fi"><div class="fi-label la">무엇을 (결과물)</div><div class="wt">실기기에서 로그인→성경→AI→저널 흐름을 끊김 없이 보여준다.</div></div><div class="fi"><div class="fi-label lh">어떻게 (명령어·코드)</div><pre>flutter build apk --release
-flutter install
-flutter logs<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">최종 결과물 (시뮬레이션)</div><div class="wt"><strong>완료 미리보기:</strong> 발표 PPT 화면 설명 파트 준비</div><button class="sim-btn" onclick="runSim('flutter-W5-0')">▶ 시뮬레이션 실행</button><div class="sim-out" id="sflutter-W5-0"></div></div></div><div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W5-0-0"><label for="dod-sflutter-W5-0-0">발표 PPT 화면 설명 파트 준비 (UI 흐름·디자인)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W5-0-1"><label for="dod-sflutter-W5-0-1">시연 APK 최종 빌드 (release flavor)</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W5-0-2"><label for="dod-sflutter-W5-0-2">에뮬레이터 + 실 기기 백업 2개 준비</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W5-0-3"><label for="dod-sflutter-W5-0-3">시연 중 화면 끊김 시 즉시 재실행 명령 준비</label></div><div class="dod-item"><input type="checkbox" id="dod-sflutter-W5-0-4"><label for="dod-sflutter-W5-0-4">reports/ W5 발표 종합 리포트 작성</label></div></div></div></div></div></div></div>
-  <div class="sec" id="s4"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드 — 컨텍스트 없이 요청 금지</div></div><div class="ai-stage"><div class="ai-hdr" onclick="togglePanel('ai-0')"><span class="ai-w">W1</span><strong>DIO interceptor·RiverPod·go_router 기반 생성</strong><span class="ai-spacer"></span><span class="pr-panel-chev open" id="chev-ai-0">⌄</span></div><div class="ai-body show" id="ai-0"><div class="ai-lbl">필수 컨텍스트</div><ul class="ctx-list"><li>08_프론트엔드_Flutter_가이드.md</li><li>apis/auth/openapi.yaml</li><li>apis/bible/openapi.yaml</li><li>AGENTS.md Flutter 3.24+ null-safety</li></ul><div class="ai-lbl">복붙 요청 프롬프트</div><div class="prompt-box">[역할] QT-AI Flutter App Owner.
-
-[요청] Flutter 3.24.5 기준 go_router 5개 화면, DioClient, JWT interceptor, RiverPod auth provider 골격을 작성해줘.
-조건:
-- null-safety 필수
-- API 응답은 camelCase OpenAPI 기준
-- 토큰 하드코딩 금지
-- 화면은 Mock 데이터로 먼저 렌더링 가능해야 함</div><div class="ai-lbl">검증 체크</div><ul class="verify-list"><li>flutter analyze 오류 0건</li><li>토큰/secret 하드코딩 없음</li><li>go_router redirect loop 없음</li><li>모델 필드가 OpenAPI와 일치</li></ul></div></div><div class="ai-stage"><div class="ai-hdr" onclick="togglePanel('ai-1')"><span class="ai-w">W2</span><strong>Sliver Sync Scroll·SSE StreamBuilder 구현</strong><span class="ai-spacer"></span><span class="pr-panel-chev " id="chev-ai-1">⌄</span></div><div class="ai-body " id="ai-1"><div class="ai-lbl">필수 컨텍스트</div><ul class="ctx-list"><li>08_프론트엔드_Flutter_가이드.md Sliver 장</li><li>apis/ai/openapi.yaml SSE endpoint</li><li>DevC_강상민_일정표.md SSE 수신 인터페이스</li></ul><div class="ai-lbl">복붙 요청 프롬프트</div><div class="prompt-box">[요청] Bible 한/영 병기 Sliver Sync Scroll과 AI SSE 스트리밍 UI를 작성해줘.
-- CustomScrollView + SliverList 사용
-- 좌우 스크롤 controller 동기화
-- dio_sse 또는 EventSource stream을 StreamBuilder로 렌더링
-- 토큰 수신 시 타이핑처럼 누적 표시
-- 작은 화면 overflow 없게 작성</div><div class="ai-lbl">검증 체크</div><ul class="verify-list"><li>좌우 offset 무한 루프 없는지</li><li>SSE disconnect 처리 있는지</li><li>텍스트 overflow 없는지</li><li>로딩/에러/빈 상태가 있는지</li></ul></div></div><div class="ai-stage"><div class="ai-hdr" onclick="togglePanel('ai-2')"><span class="ai-w">W3+</span><strong>STOMP 알림·Widget 테스트·시연 안정화</strong><span class="ai-spacer"></span><span class="pr-panel-chev " id="chev-ai-2">⌄</span></div><div class="ai-body " id="ai-2"><div class="ai-lbl">필수 컨텍스트</div><ul class="ctx-list"><li>04_API_명세서 v1.2</li><li>03_아키텍처_정의서.md notification flow</li><li>flutter-app/pubspec.yaml</li></ul><div class="ai-lbl">복붙 요청 프롬프트</div><div class="prompt-box">[요청] STOMP 알림 배지와 큐티 단계 진행 UI 테스트를 작성해줘.
-- stomp_dart_client 버전은 pubspec과 일치
-- RiverPod 상태 변경 테스트 포함
-- Widget test로 badge count와 단계 chip 검증
-- 시연 흐름 로그인→성경→AI→저널 스모크 체크리스트 작성</div><div class="ai-lbl">검증 체크</div><ul class="verify-list"><li>패키지 버전 충돌 없음</li><li>WebSocket reconnect 처리</li><li>Widget 테스트가 flaky하지 않은지</li><li>시연용 체크리스트가 실제 화면 순서와 일치</li></ul></div></div></div>
-</div>
-
-<!-- S5: SELF-CONTAINED SPEC -->
-<div class="sec" id="s5">
-  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 다른 문서 참조 없이 작업 가능</div></div>
-  <div class="callout blue">ℹ️ Flutter App은 백엔드 5개 서비스 + Gateway + WebSocket을 소비. 04_API_명세서·DECISIONS.md에서 이식. 모델은 Dart 클래스 형태.</div>
-
-  <!-- 5.1 DART 모델 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.1</span><span class="spec-title">Dart 모델 클래스 — freezed + json_serializable</span></summary>
-  <div class="callout warn mt8">⚠️ Backend의 camelCase 응답 → Dart camelCase 필드. <code>freezed</code>로 불변성, <code>json_serializable</code>로 자동 매핑.</div>
-  <pre>// flutter-app/lib/models/auth_models.dart
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'auth_models.freezed.dart';
-part 'auth_models.g.dart';
-
-@freezed
-class LoginRequest with _$LoginRequest {
-  const factory LoginRequest({
-    required String email,
-    required String password,
-  }) = _LoginRequest;
-
-  factory LoginRequest.fromJson(Map<String, dynamic> json) => _$LoginRequestFromJson(json);
-}
-
-@freezed
-class TokenResponse with _$TokenResponse {
-  const factory TokenResponse({
-    required String accessToken,
-    required String refreshToken,
-    required int    expiresIn,   // 1800 (초)
-  }) = _TokenResponse;
-
-  factory TokenResponse.fromJson(Map<String, dynamic> json) => _$TokenResponseFromJson(json);
-}
-
-@freezed
-class UserResponse with _$UserResponse {
-  const factory UserResponse({
-    required int     id,
-    required String  email,
-    required String  nickname,
-    required String  role,
-    required String  status,        // ACTIVE / SUSPENDED / DEACTIVATED
-    required DateTime createdAt,
-  }) = _UserResponse;
-
-  factory UserResponse.fromJson(Map<String, dynamic> json) => _$UserResponseFromJson(json);
-}
-
-// flutter-app/lib/models/passage_models.dart
-@freezed
-class PassageAggregateResponse with _$PassageAggregateResponse {
-  const factory PassageAggregateResponse({
-    required Passage          passage,
-    required VerseContent     kr,
-    required VerseContent     en,
-    required List<Commentary> commentaries,
-  }) = _PassageAggregateResponse;
-
-  factory PassageAggregateResponse.fromJson(Map<String, dynamic> json) =>
-      _$PassageAggregateResponseFromJson(json);
-}
-
-@freezed
-class Passage with _$Passage {
-  const factory Passage({
-    required String bookCode,
-    required int    chapter,
-    required int    verse,
-  }) = _Passage;
-
-  factory Passage.fromJson(Map<String, dynamic> json) => _$PassageFromJson(json);
-}
-
-@freezed
-class VerseContent with _$VerseContent {
-  const factory VerseContent({
-    required String content,
-    required String version,    // "REVISED" / "KJV"
-    required String language,   // "ko" / "en"
-  }) = _VerseContent;
-
-  factory VerseContent.fromJson(Map<String, dynamic> json) => _$VerseContentFromJson(json);
-}
-
-@freezed
-class Commentary with _$Commentary {
-  const factory Commentary({
-    required int    id,
-    required String source,    // MATTHEW_HENRY / DUMMY_KR
-    required String title,
-    required String content,
-  }) = _Commentary;
-
-  factory Commentary.fromJson(Map<String, dynamic> json) => _$CommentaryFromJson(json);
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.2 ProblemDetail -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.2</span><span class="spec-title">ProblemDetail (RFC 7807) 파싱 + 에러 코드</span></summary>
-  <div class="callout warn mt8">⚠️ 모든 4xx/5xx 응답은 <code>application/problem+json</code>. <code>code</code> 필드 기준으로 UI 처리.</div>
-  <pre>// flutter-app/lib/models/problem_detail.dart
-@freezed
-class ProblemDetail with _$ProblemDetail {
-  const factory ProblemDetail({
-    required String        type,
-    required String        title,
-    required int           status,
-    String?                detail,
-    String?                instance,
-    required String        code,         // INVALID_CREDENTIALS / SESSION_NOT_FOUND 등
-    required String        traceId,
-    required String        timestamp,
-    @Default([]) List<FieldError> errors,
-  }) = _ProblemDetail;
-
-  factory ProblemDetail.fromJson(Map<String, dynamic> json) => _$ProblemDetailFromJson(json);
-}
-
-@freezed
-class FieldError with _$FieldError {
-  const factory FieldError({
-    required String field,
-    required String code,
-    required String message,
-  }) = _FieldError;
-
-  factory FieldError.fromJson(Map<String, dynamic> json) => _$FieldErrorFromJson(json);
-}
-
-// flutter-app/lib/core/error_codes.dart
-class ErrorCodes {
-  // Auth
-  static const String emailAlreadyExists    = 'EMAIL_ALREADY_EXISTS';
-  static const String invalidCredentials    = 'INVALID_CREDENTIALS';
-  static const String accountDeactivated    = 'ACCOUNT_DEACTIVATED';
-  static const String refreshTokenExpired   = 'REFRESH_TOKEN_EXPIRED';
-  static const String refreshTokenInvalid   = 'REFRESH_TOKEN_INVALID';
-  static const String oauthTokenInvalid     = 'OAUTH_TOKEN_INVALID';
-
-  // Bible
-  static const String passageNotFound       = 'PASSAGE_NOT_FOUND';
-  static const String bookCodeInvalid       = 'BOOK_CODE_INVALID';
-
-  // AI
-  static const String sessionNotFound       = 'SESSION_NOT_FOUND';
-  static const String sessionAlreadyDone    = 'SESSION_ALREADY_COMPLETED';
-  static const String llmProviderError      = 'LLM_PROVIDER_ERROR';
-  static const String llmTimeout            = 'LLM_TIMEOUT';
-
-  // Journal
-  static const String journalNotFound       = 'JOURNAL_NOT_FOUND';
-  static const String journalLocked         = 'JOURNAL_LOCKED';
-
-  // Common
-  static const String unauthorized          = 'UNAUTHORIZED';
-  static const String validationFailed      = 'VALIDATION_FAILED';
-  static const String upstreamUnavailable   = 'UPSTREAM_UNAVAILABLE';
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.3 DIO + AUTH INTERCEPTOR -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.3</span><span class="spec-title">Dio 클라이언트 + JWT Auto-Refresh Interceptor</span></summary>
-  <pre>// flutter-app/lib/core/network/dio_client.dart
-import 'package:dio/dio.dart';
-
-class DioClient {
-  static Dio create({required String baseUrl, required AuthRepository auth}) {
-    final dio = Dio(BaseOptions(
-      baseUrl: baseUrl,                   // https://api.qtai.app
-      connectTimeout: Duration(seconds: 5),
-      receiveTimeout: Duration(seconds: 30),
-      headers: {'Content-Type': 'application/json'},
-    ));
-
-    // JWT 주입 + 401 자동 refresh
-    dio.interceptors.add(InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        final token = await auth.getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        handler.next(options);
-      },
-      onError: (e, handler) async {
-        // 401 → refresh 재시도 (1회만)
-        if (e.response?.statusCode == 401 && !e.requestOptions.extra.containsKey('retried')) {
-          try {
-            await auth.refreshToken();
-            final retryReq = e.requestOptions;
-            retryReq.extra['retried'] = true;
-            retryReq.headers['Authorization'] = 'Bearer ${await auth.getAccessToken()}';
-            final response = await dio.fetch(retryReq);
-            return handler.resolve(response);
-          } catch (_) {
-            await auth.logout();   // refresh 실패 → 로그아웃
-          }
-        }
-        handler.next(e);
-      },
-    ));
-
-    return dio;
-  }
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.4 SSE 클라이언트 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.4</span><span class="spec-title">SSE 클라이언트 — AI 턴 스트림</span></summary>
-  <div class="callout warn mt8">⚠️ 의존성: <code>flutter_client_sse: ^2.0.0</code>. <code>event: end</code> 도착 시 <strong>반드시 Stream 종료</strong>. error 이벤트도 end 후 상위 함수으로 종료.</div>
-  <pre>// flutter-app/lib/features/ai/data/sse_client.dart
-import 'package:flutter_client_sse/flutter_client_sse.dart';
-
-class AiSseClient {
-  Stream<SseEvent> streamTurn({
-    required int    sessionId,
-    required String userMessage,
-    required String accessToken,
-  }) async* {
-    final stream = SSEClient.subscribeToSSE(
-      method:  SSERequestType.POST,
-      url:     'https://api.qtai.app/ai/sessions/$sessionId/turns',
-      header:  {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type':  'application/json',
-        'Accept':        'text/event-stream',
-      },
-      body: {'userMessage': userMessage},
-    );
-
-    await for (final raw in stream) {
-      if (raw.event == 'end') return;   // 종료
-
-      switch (raw.event) {
-        case 'turn_started':
-          yield TurnStartedSseEvent.fromJson(jsonDecode(raw.data!));
-          break;
-        case 'token':
-          yield TokenSseEvent(text: jsonDecode(raw.data!)['text']);
-          break;
-        case 'rag_sources':
-          yield RagSourcesSseEvent.fromJson(jsonDecode(raw.data!));
-          break;
-        case 'turn_completed':
-          yield TurnCompletedSseEvent.fromJson(jsonDecode(raw.data!));
-          break;
-        case 'error':
-          final err = jsonDecode(raw.data!);
-          yield ErrorSseEvent(
-            code:    err['code'],
-            detail:  err['detail'],
-            traceId: err['traceId'],
-          );
-          // error 다음에 반드시 end 수신 → 자연 종료
-          break;
-      }
-    }
-  }
-}
-
-sealed class SseEvent {}
-class TurnStartedSseEvent  extends SseEvent { final String step; final DateTime timestamp; ... }
-class TokenSseEvent        extends SseEvent { final String text; }
-class RagSourcesSseEvent   extends SseEvent { final List<Map<String,dynamic>> sources; }
-class TurnCompletedSseEvent extends SseEvent { final int turnId; final int totalTokens; ... }
-class ErrorSseEvent        extends SseEvent { final String code; final String detail; final String traceId; }<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.5 STOMP 클라이언트 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.5</span><span class="spec-title">STOMP WebSocket 클라이언트 — 실시간 알림</span></summary>
-  <div class="callout warn mt8">⚠️ 의존성: <code>stomp_dart_client: ^2.1.4</code>. <code>/topic/user.{userId}</code> 구독 → STOMP CONNECT 헤더에 JWT.</div>
-  <pre>// flutter-app/lib/features/notifications/stomp_client.dart
-import 'package:stomp_dart_client/stomp_dart_client.dart';
-
-class StompNotificationClient {
-  StompClient? _client;
-  final void Function(NotificationEvent) onMessage;
-
-  StompNotificationClient({required this.onMessage});
-
-  void connect({required int userId, required String accessToken}) {
-    _client = StompClient(
-      config: StompConfig.sockJS(
-        url: 'https://api.qtai.app/ws/notifications',
-        onConnect: (frame) => _subscribe(userId),
-        stompConnectHeaders: {'Authorization': 'Bearer $accessToken'},
-        webSocketConnectHeaders: {'Authorization': 'Bearer $accessToken'},
-        onWebSocketError: (e) => print('WS error: $e'),
-        // 명확한 reconnect 정책
-        reconnectDelay: Duration(seconds: 5),
-      ),
-    );
-    _client!.activate();
-  }
-
-  void _subscribe(int userId) {
-    _client!.subscribe(
-      destination: '/topic/user.$userId',
-      callback: (frame) {
-        if (frame.body == null) return;
-        final json = jsonDecode(frame.body!);
-        onMessage(NotificationEvent.fromJson(json));
-      },
-    );
-  }
-
-  void disconnect() => _client?.deactivate();
-}
-
-@freezed
-class NotificationEvent with _$NotificationEvent {
-  const factory NotificationEvent({
-    required String type,        // AI_SESSION_COMPLETED / JOURNAL_CREATED 등
-    int?     sessionId,
-    int?     journalId,
-    required String timestamp,
-  }) = _NotificationEvent;
-
-  factory NotificationEvent.fromJson(Map<String, dynamic> json) =>
-      _$NotificationEventFromJson(json);
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.6 RIVERPOD AUTH PROVIDER -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.6</span><span class="spec-title">Riverpod Auth Provider 패턴</span></summary>
-  <pre>// flutter-app/lib/features/auth/auth_provider.dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-// 안전 저장소 — access/refresh 토큰
-final secureStorageProvider = Provider((_) => const FlutterSecureStorage());
-
-// 인증 상태
-class AuthState {
-  final UserResponse? user;
-  final bool isAuthenticated;
-  final bool isLoading;
-  final String? errorCode;
-
-  const AuthState({this.user, this.isAuthenticated = false, this.isLoading = false, this.errorCode});
-}
-
-class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository repo;
-  final FlutterSecureStorage storage;
-
-  AuthNotifier(this.repo, this.storage) : super(const AuthState());
-
-  Future<void> login(String email, String password) async {
-    state = AuthState(isLoading: true);
-    try {
-      final tokens = await repo.login(email, password);
-      await storage.write(key: 'access',  value: tokens.accessToken);
-      await storage.write(key: 'refresh', value: tokens.refreshToken);
-      final user = await repo.getMe();
-      state = AuthState(user: user, isAuthenticated: true);
-    } on DioException catch (e) {
-      final problem = ProblemDetail.fromJson(e.response?.data);
-      state = AuthState(errorCode: problem.code);   // INVALID_CREDENTIALS 등
-    }
-  }
-
-  Future<String?> getAccessToken() => storage.read(key: 'access');
-
-  Future<void> refreshToken() async {
-    final refresh = await storage.read(key: 'refresh');
-    if (refresh == null) throw Exception('No refresh token');
-    final tokens = await repo.refresh(refresh);
-    await storage.write(key: 'access',  value: tokens.accessToken);
-    await storage.write(key: 'refresh', value: tokens.refreshToken);
-  }
-
-  Future<void> logout() async {
-    final refresh = await storage.read(key: 'refresh');
-    if (refresh != null) await repo.logout(refresh);
-    await storage.deleteAll();
-    state = const AuthState();
-  }
-}
-
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.read(authRepositoryProvider), ref.read(secureStorageProvider));
-});<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.7 GO_ROUTER -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.7</span><span class="spec-title">go_router 라우팅 구조</span></summary>
-  <pre>// flutter-app/lib/core/router/app_router.dart
-import 'package:go_router/go_router.dart';
-
-final appRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
-
-  return GoRouter(
-    initialLocation: '/',
-    redirect: (context, routerState) {
-      final isAuthRoute = routerState.matchedLocation.startsWith('/auth');
-      // 로그인 필요 경로 → /auth로 redirect
-      if (!auth.isAuthenticated && !isAuthRoute) return '/auth/login';
-      // 이미 로그인 + /auth 경로 → 홈으로
-      if (auth.isAuthenticated && isAuthRoute) return '/';
-      return null;
-    },
-    routes: [
-      GoRoute(path: '/auth/login',     builder: (_, _) => LoginScreen()),
-      GoRoute(path: '/auth/register',  builder: (_, _) => RegisterScreen()),
-
-      ShellRoute(
-        builder: (_, _, child) => HomeShell(child: child),
-        routes: [
-          GoRoute(path: '/',                builder: (_, _) => DashboardScreen()),
-          GoRoute(path: '/bible/:bookCode', builder: (_, s) => BibleScreen(bookCode: s.pathParameters['bookCode']!)),
-          GoRoute(path: '/passages/:book/:ch/:v', builder: (_, s) =>
-              PassageDetailScreen(
-                bookCode: s.pathParameters['book']!,
-                chapter:  int.parse(s.pathParameters['ch']!),
-                verse:    int.parse(s.pathParameters['v']!),
-              ),
-          ),
-          GoRoute(path: '/ai/sessions/:id', builder: (_, s) =>
-              AiChatScreen(sessionId: int.parse(s.pathParameters['id']!))),
-          GoRoute(path: '/journals',        builder: (_, _) => JournalListScreen()),
-          GoRoute(path: '/journals/:id',    builder: (_, s) =>
-              JournalDetailScreen(journalId: int.parse(s.pathParameters['id']!))),
-        ],
-      ),
-    ],
-  );
-});<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.8 핵심 API 엔드포인트 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.8</span><span class="spec-title">사용하는 백엔드 API 엔드포인트 요약</span></summary>
-  <table class="tbl mt8"><thead><tr><th>서비스</th><th>Method + Path</th><th>용도</th></tr></thead><tbody>
-    <tr><td>Auth</td><td><code>POST /auth/register</code></td><td>회원가입</td></tr>
-    <tr><td>Auth</td><td><code>POST /auth/login</code></td><td>로그인 → TokenResponse</td></tr>
-    <tr><td>Auth</td><td><code>POST /auth/refresh</code></td><td>토큰 재발급 (Rotation)</td></tr>
-    <tr><td>Auth</td><td><code>POST /auth/logout</code></td><td>로그아웃</td></tr>
-    <tr><td>Auth</td><td><code>POST /auth/oauth/google</code></td><td>Google idToken 교환</td></tr>
-    <tr><td>Auth</td><td><code>GET /auth/me</code></td><td>내 정보 조회</td></tr>
-    <tr><td>Bible</td><td><code>GET /bible/books</code></td><td>66권 목록</td></tr>
-    <tr><td>Bible</td><td><code>GET /bible/kr/{book}/{ch}/{v}</code></td><td>국어 구절</td></tr>
-    <tr><td>Bible</td><td><code>GET /bible/en/{book}/{ch}/{v}</code></td><td>영어 구절</td></tr>
-    <tr><td>BFF</td><td><code>GET /api/v1/me/dashboard</code></td><td>대시보드 (4-service 집계)</td></tr>
-    <tr><td>BFF</td><td><code>GET /api/v1/passages/{book}/{ch}/{v}</code></td><td>구절 + 주석 통합</td></tr>
-    <tr><td>AI</td><td><code>POST /ai/sessions</code></td><td>세션 시작</td></tr>
-    <tr><td>AI</td><td><code>POST /ai/sessions/{id}/turns</code></td><td>대화 턴 추가 (SSE)</td></tr>
-    <tr><td>AI</td><td><code>GET /ai/sessions</code></td><td>내 세션 목록</td></tr>
-    <tr><td>AI</td><td><code>GET /ai/sessions/{id}</code></td><td>세션 + 턴 조회</td></tr>
-    <tr><td>Journal</td><td><code>GET /api/v1/journals</code></td><td>명상 목록</td></tr>
-    <tr><td>Journal</td><td><code>GET /api/v1/journals/{id}</code></td><td>명상 상세</td></tr>
-    <tr><td>Journal</td><td><code>PATCH /api/v1/journals/{id}</code></td><td>명상 수정</td></tr>
-    <tr><td>Journal</td><td><code>DELETE /api/v1/journals/{id}</code></td><td>명상 삭제 (soft)</td></tr>
-    <tr><td>WS</td><td><code>WS /ws/notifications</code></td><td>STOMP 실시간 알림</td></tr>
-  </tbody></table>
-  <div class="callout mt12">✨ <strong>상세 Request/Response 스키마</strong>는 동료 개발자의 실행 가이드 S5 참조 (Auth→DevA, Bible→DevB, AI→DevC, Journal→DevD, BFF→Lead).</details>
-
-  </div>
-<!-- S6: WORKFLOW + REPORT -->
-<div class="sec" id="s6">
-  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
-  <div class="callout blue">ℹ️ 모든 day 카드 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서를 반드시 따릅니다. 개인 작업 폴더는 <code>workspaces/DevE_김지민/</code> 입니다.</div>
-
-  <div class="wr-flow">
-    <span class="step">📝 workflows/{date}-{task}.md 작성</span>
-    <span class="arrow">→</span>
-    <span class="step">🔍 자기 검토 (체크리스트 ✓)</span>
-    <span class="arrow">→</span>
-    <span class="step">🚀 작업 진행</span>
-    <span class="arrow">→</span>
-    <span class="step">📊 reports/{date}-{task}.md 작성</span>
-  </div>
-
-  <div class="folder-rule">
-    <strong>🚫 폴더 격리 규칙 (AGENTS.md §13)</strong><br>
-    • 본인 폴더(<code>workspaces/DevE_김지민/</code>)에서만 읽기·쓰기 허용<br>
-    • 다른 팀원의 개인 폴더는 <strong>읽기·수정·삭제 모두 금지</strong> (AI 에이전트 포함)<br>
-    • <code>workspaces/</code> 내 파일은 빌드·테스트·CI에 영향 없음 (import 금지)<br>
-    • 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject
-  </div>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.1</span><span class="spec-title">개인 작업 폴더 구조</span></summary>
-  <pre>workspaces/DevE_김지민/                  ← 나만 접근
-├── README.md                         (폴더 사용법)
-├── workflows/                        (작업 시작 전 워크플로우)
-│   ├── _template.md                  (템플릿 — 복사해서 사용)
-│   ├── 20260513-{task-slug}.md       (예시)
-│   └── 20260514-{task-slug}.md       (예시)
-├── reports/                          (작업 종료 후 리포트)
-│   ├── _template.md                  (템플릿)
-│   ├── 20260513-{task-slug}.md       (예시 — 워크플로우와 동일 이름)
-│   └── 20260514-{task-slug}.md
-├── docs/                             (개인이 작성하는 문서·명세)
-└── notes/                            (메모·로그·스크린샷)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.2</span><span class="spec-title">워크플로우 양식 — workflows/_template.md</span></summary>
-  <div class="callout warn mt8">⚠️ 작업 시작 전 반드시 작성. 파일명은 <code>YYYYMMDD-{task-slug}.md</code> 형식. 리포트와 동일 이름 사용.</div>
-  <pre># 워크플로우 — [작업명]
-
-**작성자**: 김지민 (DevE — Flutter App)
-**작성일**: 2026-MM-DD
-**해당 일자**: W[X] [날짜] (예: W1 5/13 수)
-**예상 소요시간**: ?시간
-**상태**: 📝 초안 / 🔍 검토 중 / ✅ 승인됨 / 🚀 실행 중 / 🎯 완료
-
----
-
-## 1. 작업 목표
-(1개 문장으로 명확히)
-
-## 2. 변경 대상 파일
-- `path/to/file` — 무엇을 어떻게
-
-## 3. 작업 단계 (TODO)
-1. [ ] ...
-2. [ ] ...
-
-## 4. 검증 기준 (Definition of Done)
-- [ ] 단위 테스트 통과
-- [ ] 빌드 성공
-- [ ] OpenAPI/Spectral lint 통과 (해당 시)
-- [ ] curl/시뮬레이션 결과 확인
-- [ ] PR 300줄 이내
-
-## 5. 의존성
-- 선행 작업: ...
-- 다른 개발자 작업: ...
-
-## 6. 리스크 / 의문점
-- ...
-
-## 7. 자기 검토 체크
-- [ ] AGENTS.md 금지 패턴 위반 없음
-- [ ] DECISIONS.md 기준 위반 없음
-- [ ] 04_API_명세서 정합 (해당 시)
-- [ ] events/schema 정합 (해당 시)
-- [ ] 다른 개발자의 workspaces/ 폴더 접근 없음
-
----
-> ⚠️ 작업 시작 전 반드시 검토하고, 의문점이 남으면 보강한 후 진행하세요.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.3</span><span class="spec-title">리포트 양식 — reports/_template.md</span></summary>
-  <div class="callout warn mt8">⚠️ 작업 종료 직후 반드시 작성. 다음 작업 시작 전에 완료. 동일 워크플로우와 이름 맞추기.</div>
-  <pre># 리포트 — [작업명]
-
-**작성자**: 김지민
-**작성일**: 2026-MM-DD
-**해당 일자**: W[X] [날짜]
-**소요 시간**: ?시간 (예상 대비 +/- ?)
-**상태**: ✅ 완료 / ⚠️ 부분 완료 / ❌ 실패
-
-**대응 워크플로우**: `workflows/[동일 파일명].md`
-
----
-
-## 1. 결과 요약
-(1~2문장)
-
-## 2. 변경 사항
-- `path/to/file` — 실제 변경 내용 + 이유
-
-## 3. 검증 결과
-| 항목 | 결과 | 증거 |
-|------|------|------|
-| 단위 테스트 | ✅ | 로그/PR 링크 |
-| 빌드 | ✅ | ... |
-| Spectral | ✅/N/A | ... |
-| curl | ✅ | ... |
-
-## 4. 산출물
-- PR: #[번호]
-- 커밋: [SHA]
-- 스크린샷/로그: `notes/...`
-
-## 5. 워크플로우 대비 차이
-(계획과 다르게 진행된 부분과 그 이유)
-
-## 6. 미해결 항목 / 후속 조치
-- [ ] ...
-
-## 7. 회고
-- 잘 된 점:
-- 개선할 점:
-- 다음에 알아야 할 점:
-
----
-> 📌 작업 완료 직후 작성하고, 다음 작업 워크플로우의 입력으로 활용.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.4</span><span class="spec-title">작업 세트 예시</span></summary>
-  <pre># 예: 작업 시작 → 종료 시퀀스
-
-# 1. 워크플로우 작성
-cd workspaces/DevE_김지민/workflows
-cp _template.md 20260513-{task-slug}.md
-notepad 20260513-{task-slug}.md   # 내용 채우기
-
-# 2. 검토 후 작업 진행
-cd ../../../
-# (실제 코드/문서 작업)
-
-# 3. 작업 완료 후 리포트
-cd workspaces/DevE_김지민/reports
-cp _template.md 20260513-{task-slug}.md   # 워크플로우와 동일 이름
-notepad 20260513-{task-slug}.md   # 결과 작성<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  </div>
-<!-- S7: REFERENCE DOC MATRIX -->
-<div class="sec" id="s7">
-  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">원문 문서 필요 항목 매트릭스 — 언제 어떤 문서를 봐야 하는가</div></div>
-  <div class="callout blue">ℹ️ 이 실행 가이드는 자기완결성을 추구하지만, <strong>변경의 원천이 되는 결정·스키마는 반드시 원본 문서를 우선</strong>합니다. 아래 표에서 작업 유형 → 원본 문서를 매핑하여 빠르게 찾으세요.</div>
-
-  <div class="ref-matrix">
-    <table>
-      <thead>
-        <tr><th style="width:25%">작업 유형</th><th style="width:35%">원본 문서</th><th>이유</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>API 계약 변경</strong><br>(엔드포인트·DTO·헤더·에러)</td>
-          <td><code>04_API_명세서.md</code><br><code>apis/{service}/openapi.yaml</code></td>
-          <td>OpenAPI 3.1 + Spectral lint가 단일 진실 원천. 가이드 S5는 스냅샷.</td>
-        </tr>
-        <tr>
-          <td><strong>DB 스키마 변경</strong><br>(컬럼·인덱스·관계)</td>
-          <td><code>02_ERD_문서.md</code><br>+ Flyway 마이그레이션</td>
-          <td>ERD에 ADR-0009 등 결정 근거 포함. DDL은 마이그레이션이 권위.</td>
-        </tr>
-        <tr>
-          <td><strong>Kafka 이벤트 변경</strong><br>(payload·topic·key)</td>
-          <td><code>events/schema/*.json</code><br>+ Apicurio Schema Registry</td>
-          <td>JSON Schema 8개 파일이 envelope·data 표준. <code>data</code> 키 (not <code>payload</code>).</td>
-        </tr>
-        <tr>
-          <td><strong>아키텍처 흐름</strong><br>(Saga·OICD·인증 플로우)</td>
-          <td><code>03_아키텍처_정의서.md</code></td>
-          <td>시퀀스 다이어그램·CQRS·Outbox 패턴 결정 근거.</td>
-        </tr>
-        <tr>
-          <td><strong>보안 정책</strong><br>(JWT·Rate limit·CORS)</td>
-          <td><code>05_보안_명세서.md</code></td>
-          <td>JWT RS256 키·OAuth scope·rate limit 임계값.</td>
-        </tr>
-        <tr>
-          <td><strong>K8s·Docker·Helm</strong><br>(매니페스트·ConfigMap)</td>
-          <td><code>06_DevOps_운영_매뉴얼.md</code><br><code>helm/qtai-infra/</code></td>
-          <td>네임스페이스·Secret·헬스체크 정책.</td>
-        </tr>
-        <tr>
-          <td><strong>테스트 작성</strong><br>(단위·통합·E2E)</td>
-          <td><code>07_테스트_전략.md</code><br><code>16_API_통합_테스트_가이드.md</code></td>
-          <td>커버리지 기준·Testcontainers·Prism mock 사용법.</td>
-        </tr>
-        <tr>
-          <td><strong>Flutter 앱 가이드</strong></td>
-          <td><code>08_프론트엔드_Flutter_가이드.md</code></td>
-          <td>위젯 트리·상태관리·라우팅 표준.</td>
-        </tr>
-        <tr>
-          <td><strong>AI 프롬프트 변경</strong></td>
-          <td><code>09_AI_프롬프트_운영_가이드.md</code></td>
-          <td>OICD 단계별 프롬프트·golden-set·injection-set.</td>
-        </tr>
-        <tr>
-          <td><strong>빌드·실행 오류</strong></td>
-          <td><code>10_트러블슈팅_FAQ.md</code></td>
-          <td>의존성 충돌·포트 충돌·Minikube 메모리 부족 등.</td>
-        </tr>
-        <tr>
-          <td><strong>최초 환경 설정</strong></td>
-          <td><code>11_개발_환경_셋업_가이드.md</code></td>
-          <td>역할별 추가 설치·.env·JWT 키 생성·DB 시드.</td>
-        </tr>
-        <tr>
-          <td><strong>도메인 모델·패키지 구조</strong></td>
-          <td><code>12_서비스별_도메인_모델_상세.md</code></td>
-          <td>Clean Architecture 계층·UseCase 패턴·예외 계층.</td>
-        </tr>
-        <tr>
-          <td><strong>Git 브랜치·PR 규칙</strong></td>
-          <td><code>14_팀_협업_규칙_Git_브랜치_전략.md</code></td>
-          <td>커밋 메시지·코드 리뷰 기준·머지 정책.</td>
-        </tr>
-        <tr>
-          <td><strong>서비스별 W1~W5 체크리스트</strong></td>
-          <td><code>15_서비스별_구현_체크리스트.md</code></td>
-          <td>본인 day 카드 DoD가 부족할 때 더 상세한 기준.</td>
-        </tr>
-        <tr>
-          <td><strong>데이터 시드·마이그레이션</strong></td>
-          <td><code>17_데이터_시드_마이그레이션_전략.md</code></td>
-          <td>Bible 66권·prompt template·user 시드 데이터.</td>
-        </tr>
-        <tr>
-          <td><strong>코드 품질 게이트</strong></td>
-          <td><code>18_코드_품질_게이트.md</code></td>
-          <td>SonarQube·커버리지·정적 분석 기준.</td>
-        </tr>
-        <tr>
-          <td><strong>아키텍처·기술 스택 결정 근거</strong></td>
-          <td><code>DECISIONS.md</code> ⭐</td>
-          <td><strong>단일 진실 원천</strong>. MySQL/MSA/Kafka KRaft 등 모든 결정 이유.</td>
-        </tr>
-        <tr>
-          <td><strong>AI 에이전트 규칙·금지 패턴</strong></td>
-          <td><code>AGENTS.md</code></td>
-          <td>금지 패턴·workspaces 폴더 격리(§13)·코드 작성 가이드.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="callout warn mt16">
-    ⚠️ <strong>변경 우선순위:</strong> 원본 문서 → 코드 → 가이드 HTML 순으로 갱신합니다. 가이드 S5/S6의 스냅샷이 원본과 다르면 <strong>원본이 우선</strong>이며, Lead에게 가이드 갱신을 요청하세요.
-  </div>
-</div>
-</div>
-<script>
-const SIM_CTX={"flutter-W1-0":{"date":"5/12 화","task":"Flutter SDK + FVM 3.24.5 환경 확인 · flutter create","result":"pubspec.yaml 의존성 추가","where":["flutter-app/pubspec.yaml","flutter-app/lib/main.dart"],"what":"Flutter 앱 뼈대와 필수 패키지 의존성을 고정한다.","sim":"setup"},"flutter-W1-1":{"date":"5/13 수","task":"go_router 라우팅 설정 (5개 화면)","result":"Mock 데이터 홈 화면 기본 레이아웃","where":["flutter-app/lib/core/router/app_router.dart","flutter-app/lib/features/home/"],"what":"Auth, Home, Bible, AI Chat, Journal 화면 이동을 먼저 연결한다.","sim":"router"},"flutter-W1-2":{"date":"5/14 목","task":"DioClient 설정 · JWT interceptor 골격","result":"RiverPod Provider 기본 구조 설계","where":["flutter-app/lib/core/network/dio_client.dart","flutter-app/lib/shared/providers/"],"what":"API baseUrl, timeout, auth header 주입 흐름을 만든다.","sim":"dio"},"flutter-W1-3":{"date":"5/15 금","task":"로그인·회원가입 화면 UI (Mock)","result":"auth feature 디렉토리 구조 완성","where":["flutter-app/lib/features/auth/"],"what":"API 연동 전에도 입력/검증/화면 전환 UI를 완성한다.","sim":"auth-ui"},"flutter-W1-4":{"date":"5/16 금","task":"Auth API 연동 — POST /auth/login DIO 호출","result":"로그인 성공 → 홈 이동 플로우","where":["flutter-app/lib/features/auth/data/","flutter-app/lib/features/auth/presentation/"],"what":"JWT 저장과 로그인 상태 Provider를 실제 API 응답에 맞춘다.","sim":"login"},"flutter-W1-5":{"date":"5/19 월","task":"DIO JWT Interceptor 완성 (401 자동 갱신)","result":"RiverPod auth 상태 관리 완성","where":["flutter-app/lib/core/network/dio_client.dart","flutter-app/lib/shared/providers/auth_provider.dart"],"what":"401 발생 시 refresh token으로 재발급하고 원 요청을 재시도한다.","sim":"interceptor"},"flutter-W1-6":{"date":"5/20 화","task":"성경 조회 화면 골격 — Mock 한/영 병기 리스트","result":"bible feature UI 기본","where":["flutter-app/lib/features/bible/"],"what":"Sliver 구현 전에 데이터 모델과 화면 배치를 먼저 잡는다.","sim":"bible-ui"},"flutter-W1-7":{"date":"5/21 수","task":"AI 채팅 화면 골격 — Mock 메시지 리스트 + 입력창","result":"SSE 수신 구조 설계","where":["flutter-app/lib/features/ai_chat/","flutter-app/lib/core/network/sse_client.dart"],"what":"실제 SSE 연동 전에 대화 리스트와 입력 상태를 완성한다.","sim":"ai-ui"},"flutter-W1-8":{"date":"5/22 목","task":"W1 Lock-in 게이트 참석 (18:00)","result":"flutter analyze 오류 0건 확인","where":["flutter-app/","GitHub PR","화면 스크린샷"],"what":"W1 완료 기준을 체크하고 스크린샷과 analyze/test 결과를 PR에 첨부한다.","sim":"w1gate"},"flutter-W2-0":{"date":"5/26 화","task":"Bible API 연동 — GET /api/v1/passages/JHN/3","result":"실데이터 화면 표시","where":["flutter-app/lib/features/bible/data/","flutter-app/lib/features/bible/presentation/"],"what":"Mock Bible 데이터를 실제 API 응답 모델로 교체한다.","sim":"bible-api"},"flutter-W2-1":{"date":"5/27 수","task":"Sliver Sync Scroll 구현","result":"한/영 병기 동기화 스크롤 확인","where":["flutter-app/lib/features/bible/presentation/bible_sync_scroll_view.dart"],"what":"CustomScrollView + SliverList 기반으로 좌우 병기 스크롤을 맞춘다.","sim":"sliver"},"flutter-W2-2":{"date":"5/28 목","task":"AI SSE 스트리밍 UI — dio_sse + StreamBuilder","result":"타이핑 애니메이션 확인","where":["flutter-app/lib/core/network/sse_client.dart","flutter-app/lib/features/ai_chat/"],"what":"AI 응답이 토큰 단위로 추가되는 화면을 구현한다.","sim":"sse-ui"},"flutter-W2-3":{"date":"5/29 금","task":"Journal CRUD 화면 + API 연동","result":"전체 화면 Flow 연결 확인","where":["flutter-app/lib/features/journal/","flutter-app/lib/features/home/"],"what":"로그인 후 홈, 성경, AI, 저널까지 시연 루프를 연결한다.","sim":"journal"},"flutter-W3-0":{"date":"6/1~6/5","task":"큐티 A→B→C→D 단계 진행 UI · Google OAuth 연동","result":"알림/단계/OAuth 스모크 테스트","where":["flutter-app/lib/features/home/","flutter-app/lib/features/ai_chat/","flutter-app/lib/features/auth/"],"what":"실시간 알림 배지와 큐티 단계 진행 상태를 화면에 드러낸다.","sim":"stomp"},"flutter-W4-0":{"date":"6/8~6/12","task":"시연 시나리오 dry-run 반복","result":"Widget 테스트 보강","where":["flutter-app/lib/features/","flutter-app/test/widget/","demo/flutter-screenshots/"],"what":"작은 화면 overflow와 상태 전환 흔들림을 정리한다.","sim":"polish"},"flutter-W5-0":{"date":"6/15~6/17","task":"리허설 화면 흐름 주도","result":"발표 PPT 화면 설명 파트 준비","where":["flutter-app/build/","demo/device-checklist.md","발표 PPT"],"what":"실기기에서 로그인→성경→AI→저널 흐름을 끊김 없이 보여준다.","sim":"demo"}};
-const SIM_PRESETS={"default":{"cmd":"$ run verification","lines":[["검증 명령 실행 완료","sg"],["PR에 결과 로그 첨부 가능","sg"]]},"setup":{"cmd":"$ flutter pub get","lines":[["Flutter 3.24.5 환경 확인","sg"],["핵심 패키지 설치 완료","sg"]]},"router":{"cmd":"$ flutter test test/widget/router_test.dart","lines":[["Auth/Home/Bible/AI/Journal route PASS","sg"],["Mock 홈 화면 렌더링 확인","sg"]]},"dio":{"cmd":"$ flutter test test/widget/dio_client_test.dart","lines":[["baseUrl/timeout/interceptor 설정 PASS","sg"],["JWT header 주입 골격 확인","sg"]]},"auth-ui":{"cmd":"$ flutter test test/widget/auth_form_test.dart","lines":[["로그인/회원가입 입력 검증 PASS","sg"],["auth feature 구조 생성 완료","sg"]]},"login":{"cmd":"$ flutter test test/widget/login_flow_test.dart","lines":[["POST /auth/login 응답 모델 매핑","sg"],["로그인 성공 후 홈 이동","sg"]]},"interceptor":{"cmd":"$ flutter test test/widget/token_refresh_test.dart","lines":[["401 refresh 재시도 PASS","sg"],["auth provider 상태 갱신 확인","sg"]]},"bible-ui":{"cmd":"$ flutter test test/widget/bible_screen_test.dart","lines":[["Mock 한/영 병기 리스트 렌더링","sg"],["Sliver 전환 준비 완료","sg"]]},"ai-ui":{"cmd":"$ flutter test test/widget/ai_chat_screen_test.dart","lines":[["Mock 메시지 리스트/입력창 렌더링","sg"],["SSE client interface 확정","sg"]]},"w1gate":{"cmd":"$ flutter analyze && flutter test","lines":[["analyze 오류 0건","sg"],["기본 widget test PASS","sg"],["스크린샷 PR 첨부 가능","sg"]]},"bible-api":{"cmd":"$ curl /api/v1/passages/JHN/3 && flutter test test/widget/bible_api_test.dart","lines":[["실제 API 응답 화면 표시","sg"],["camelCase 모델 매핑 확인","sg"]]},"sliver":{"cmd":"$ flutter test test/widget/bible_sync_scroll_test.dart","lines":[["좌우 한/영 스크롤 offset 동기화","sg"],["JHN 3장 병기 표시 확인","sg"]]},"sse-ui":{"cmd":"$ flutter test test/widget/ai_sse_stream_test.dart","lines":[["SSE token 누적 렌더링 PASS","sg"],["타이핑 애니메이션 확인","sg"]]},"journal":{"cmd":"$ flutter analyze && flutter test","lines":[["Journal CRUD 화면 연결","sg"],["로그인→홈→성경→AI→저널 플로우 OK","sg"]]},"stomp":{"cmd":"$ flutter test test/widget/realtime_badge_test.dart","lines":[["STOMP 알림 배지 수신 PASS","sg"],["큐티 A→D 단계 UI PASS","sg"],["Google OAuth smoke 확인","sg"]]},"polish":{"cmd":"$ flutter test --coverage","lines":[["작은 화면 overflow 없음","sg"],["Widget test 보강 완료","sg"]]},"demo":{"cmd":"$ flutter build apk --release","lines":[["release build 성공","sg"],["실기기 설치 및 로그 확인","sg"],["PPT 화면 설명 파트 준비","sg"]]}};
-function copyCode(btn){const pre=btn.closest('pre');const clone=pre.cloneNode(true);const b=clone.querySelector('button');if(b)b.remove();navigator.clipboard.writeText(clone.textContent.trim());btn.textContent='복사됨';btn.classList.add('ok');setTimeout(()=>{btn.textContent='복사';btn.classList.remove('ok')},1200)}
-function g(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'})}
-function togglePanel(id){const el=document.getElementById(id);const chev=document.getElementById('chev-'+id);const open=el.classList.toggle('show');if(chev)chev.classList.toggle('open',open)}
-function toggleDay(id){const el=document.getElementById(id);const chev=document.getElementById('chev-'+id);const open=el.classList.toggle('show');if(chev)chev.classList.toggle('open',open)}
-function updateProg(){let total=document.querySelectorAll('.crit-item input').length;let done=document.querySelectorAll('.crit-item input:checked').length;document.getElementById('prog').style.width=(done/total*100)+'%';document.getElementById('prog-txt').textContent=done+' / '+total+' 완료'}
-function runSim(id){const ctx=SIM_CTX[id];const out=document.getElementById('s'+id);const preset=SIM_PRESETS[ctx.sim]||SIM_PRESETS.default;out.classList.add('show');out.innerHTML='';const lines=[['[완료 미리보기] '+ctx.date,'sy'],['작업: '+ctx.task,'sd'],['완료 결과: '+ctx.result,'sg'],['','sd'],[preset.cmd,'sc']].concat(preset.lines).concat([['','sd'],['산출물: '+ctx.what,'sd'],['확인 위치: '+ctx.where.join(' / '),'sd'],['PR 첨부 증거: '+ctx.result,'sg']]);lines.forEach((line,i)=>setTimeout(()=>{const div=document.createElement('div');div.className=line[1];div.textContent=line[0];out.appendChild(div)},i*55))}
-</script>
+<body>
+<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 김지민</h1><p class="subtitle">Flutter App Owner / 기준일 2026-05-13 / 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/DevE_김지민/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
+<main><section class="card"><h2>최신 결정</h2><ul>
+<li>백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.</li>
+<li>인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.</li>
+<li>묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.</li>
+<li>LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.</li>
+<li>Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.</li>
+<li>Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.</li>
+<li>에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.</li>
+<li>성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.</li>
+</ul>
+</section><section class="card"><h2>내 담당 범위</h2><ul>
+<li>Flutter 3.24+, Riverpod, Dio, go_router, flutter_secure_storage</li>
+<li>소프트 로그인: 튜토리얼/성경 본문/오늘의 QT 미리보기는 비로그인 허용</li>
+<li>로그인 후 AI 질문, 묵상 기록, 익명 나눔, 알림, 관리자 화면 접근</li>
+<li>AI SSE token/rag_sources/turn_completed 수신과 화면 상태 관리</li>
+<li>ProblemDetail code를 사용자 메시지로 매핑</li>
+</ul>
+</section><section class="card"><h2>내가 만지는 경로</h2><ul>
+<li>apps/mobile/</li>
+<li>flutter-app/</li>
+<li>08_프론트엔드_Flutter_가이드.md</li>
+<li>apis/*/openapi.yaml</li>
+</ul>
+</section><section class="card"><h2>API와 이벤트 계약</h2><ul>
+<li>Auth: /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, /auth/me</li>
+<li>BFF: /api/v1/qt/today, /api/v1/passages/{bookCode}/{chapter}/{verse}, /api/v1/me/dashboard</li>
+<li>AI SSE: POST /ai/sessions/{id}/turns</li>
+<li>Journal: /api/v1/journals..., /api/v1/shares...</li>
+<li>WS: /ws/notifications</li>
+</ul>
+</section><section class="card wide"><h2>일정</h2><div class="weeks"><div class="week"><h3>W1 - Foundation Lock-in</h3><ul>
+<li>5/13: Flutter project/FVM, Riverpod providers, Dio base client</li>
+<li>5/14: AuthState, secure storage, refresh retry interceptor</li>
+<li>5/15: Sliver 기반 본문 화면 골격과 비로그인 미리보기</li>
+<li>5/19: AI session/chat 화면과 SSE parser</li>
+<li>5/20: Journal edit/publish/share 화면 골격</li>
+<li>5/21: notification WebSocket, ProblemDetail error mapper</li>
+<li>5/22: Gateway/BFF/Bible/AI 연결 smoke test</li>
+</ul>
+</div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
+<li>성경 본문/주석/AI 코칭 UX 완성</li>
+<li>묵상 작성/발행/공유 플로우 구현</li>
+<li>로그인/refresh/logout 안정화</li>
+</ul>
+</div><div class="week"><h3>W3 - Kafka/E2E 통합</h3><ul>
+<li>E2E 통합과 느린 네트워크/토큰 만료 처리</li>
+<li>SSE 재연결/취소 UX</li>
+<li>관리자/알림 화면 연결</li>
+</ul>
+</div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
+<li>모바일 폴리싱, 접근성, empty/error/loading 상태</li>
+<li>시연 기기에서 FPS/스크롤 안정성 점검</li>
+<li>백업 데이터와 demo 계정 고정</li>
+</ul>
+</div><div class="week"><h3>W5 - 발표와 리허설</h3><ul>
+<li>모바일 시연 책임</li>
+<li>시연 동선 리허설과 백업 영상 준비</li>
+<li>발표 Q&amp;A: Flutter 상태관리와 SSE 설명</li>
+</ul>
+</div></div></section><section class="card"><h2>매일 작업 순서</h2><ul>
+<li>최신 dev 동기화</li>
+<li>workspaces/.../workflows에 오늘 DoD 작성</li>
+<li>계약 파일 기준으로 구현</li>
+<li>build/test와 금지 패턴 검색</li>
+<li>reports에 결과 기록</li>
+<li>PR 본문에 검증 명령 작성</li>
+</ul>
+</section><section class="card"><h2>검증 명령</h2><pre><code>cd C:\workspace\QT-AI-2nd-Team-Project-master
+fvm flutter analyze
+fvm flutter test
+rg -n &quot;ProblemDetail|Sse|EventSource|Dio|Riverpod&quot; apps mobile flutter-app</code></pre></section><section class="card"><h2>금지 패턴</h2><ul>
+<li>PostgreSQL, ZooKeeper, Tempo 설정 추가 금지</li>
+<li>application.yml이나 코드에 API key, DB password, private key 평문 작성 금지</li>
+<li>트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용</li>
+<li>서비스 간 DB 직접 JOIN 또는 Repository 공유 금지</li>
+<li>JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지</li>
+<li>AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용</li>
+<li>OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지</li>
+</ul>
+</section><section class="card"><h2>산출물</h2><ul>
+<li>Flutter app scaffold와 routing</li>
+<li>Dio/Auth/SSE client</li>
+<li>본문/AI/Journal 핵심 화면</li>
+<li>시연용 모바일 체크리스트</li>
+</ul>
+</section></main>
 </body>
 </html>

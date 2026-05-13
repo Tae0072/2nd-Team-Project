@@ -1,1002 +1,121 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI — Dev D 이승욱 실행가이드</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QT-AI 개인 실행가이드 - 이승욱</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
-  --text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;
-  --lead:#f85149;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;
-  --orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--pink:#db61a2;
-  --mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}
-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}
-pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre-wrap}
-.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}
-.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}
-.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}
-.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.proj{background:var(--pink);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}
-.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}
-.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}
-.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
-.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}
-.wnav:hover{border-color:var(--t2)}.wnav.cur{background:var(--pink);border-color:var(--pink);color:#fff}
-.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}
-.sec-title{font-size:15px;font-weight:700}
-.callout{background:rgba(83,155,245,.08);border:1px solid rgba(83,155,245,.25);border-left:3px solid var(--blue);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}
-.callout strong{color:var(--text)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.ok{background:rgba(87,171,90,.08);border-color:rgba(87,171,90,.25);border-left-color:var(--green)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
-.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}
-.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600;white-space:nowrap}.tbl tr:last-child td{border-bottom:none}
-.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}
-.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:330px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(219,97,162,.12);color:var(--pink);border:1px solid rgba(219,97,162,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}
-.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--pink);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.btype{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px}.btype-name{font-family:var(--mono);color:var(--teal);font-weight:700;font-size:11px;margin-bottom:4px}.btype-ex{color:var(--t2);font-size:11px}.ci-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}.ci-tbl th{background:var(--bg3);color:var(--t2);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border:1px solid var(--border);text-align:left}.ci-tbl td{padding:9px 12px;border:1px solid var(--border);color:var(--t2);vertical-align:top}.ci-tbl td:first-child{font-family:var(--mono);color:var(--text);font-weight:600}
-.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--pink,var(--bible));color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.pr-panel-body pre{margin-top:8px}
-.wblock{padding:18px 0 8px}.whdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}.wdot{width:13px;height:13px;border-radius:50%;flex-shrink:0}.wlabel{font-size:14px;font-weight:700}.wperiod{font-size:12px;color:var(--t2)}.wgoal{font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:4px}
-.col-hdr{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden}
-.col-hdr div{padding:8px 13px;font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
-.day-card{border:1px solid var(--border);border-top:none;overflow:hidden}.day-card:last-child{border-radius:0 0 8px 8px}
-.dtrig{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;cursor:pointer;transition:background .1s}.dtrig:hover{background:var(--bg2)}.dtrig.open{background:var(--bg2);border-bottom:1px solid var(--border)}
-.dtc{padding:11px 13px;font-size:12px;color:var(--t2);line-height:1.5}.dt-date{font-weight:700;color:var(--text);font-size:13px;line-height:1.4}
-.dt-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-top:3px}.bd{background:rgba(224,130,61,.12);color:var(--orange)}.bo{background:rgba(87,171,90,.12);color:var(--green)}.bc{background:rgba(83,155,245,.12);color:var(--blue)}.bi{background:rgba(57,197,207,.12);color:var(--teal)}.bk{background:rgba(227,179,65,.12);color:var(--yellow)}.bt{background:rgba(248,81,73,.12);color:var(--lead)}.br{background:rgba(176,131,240,.12);color:var(--purple)}.bp{background:rgba(219,97,162,.12);color:var(--pink)}.bg{background:rgba(227,179,65,.12);color:var(--yellow)}.be{background:rgba(57,197,207,.12);color:var(--teal)}
-.dt-chev{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;transition:transform .2s}.dt-chev.open{transform:rotate(180deg)}
-.day-detail{display:none;border-top:1px solid var(--border)}.day-detail.show{display:block}
-.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi:nth-last-child(-n+2){border-bottom:none}
-.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}
-.path-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}
-.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}
-.criteria{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--pink);border-radius:6px;padding:13px;margin-top:12px}.crit-title{font-size:11px;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}.crit-item{display:flex;gap:8px;padding:5px 0;font-size:12px;color:var(--t2);align-items:flex-start}
-.pbar{height:5px;background:var(--bg3);border-radius:3px;margin:10px 0 5px;overflow:hidden}.pfill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}.ptxt{font-size:11px;color:var(--t2)}
-.badge-block{display:inline-block;background:rgba(248,81,73,.12);color:var(--lead);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;border:1px solid rgba(248,81,73,.3)}.badge-warn{display:inline-block;background:rgba(227,179,65,.12);color:var(--yellow);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;border:1px solid rgba(227,179,65,.3)}
-.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:260px;overflow-y:auto}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.sd{color:var(--t3)}.sy{color:var(--yellow)}
-.ai-stage{margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}.ai-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);cursor:pointer}.ai-hdr:hover{background:var(--bg4)}.ai-w{font-size:10px;font-weight:700;background:var(--bg4);color:var(--t2);padding:2px 8px;border-radius:4px;flex-shrink:0}.ai-body{padding:16px;border-top:1px solid var(--border);display:none}.ai-body.show{display:block}.ai-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}.ai-lbl:not(:first-child){margin-top:14px}.ctx-list,.verify-list{list-style:none}.ctx-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:3px 0;line-height:1.5}.ctx-list li::before{content:'📎 ';font-size:10px}.verify-list li{font-size:12px;color:var(--t2);padding:4px 0;display:flex;gap:6px;line-height:1.55}.verify-list li::before{content:'⚠️';flex-shrink:0;font-size:11px}.prompt-box{background:#010409;border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:#adbac7;line-height:1.75;white-space:pre-wrap;position:relative;font-family:var(--sans)}
-@media(max-width:820px){.two,.four-grid{grid-template-columns:1fr}.col-hdr,.dtrig{grid-template-columns:72px 1fr}.col-hdr div:nth-child(3),.col-hdr div:nth-child(4),.dtrig .dtc:nth-child(3),.dtrig .dtc:nth-child(4){display:none}.own-item{display:block}.own-path{min-width:auto;margin-bottom:8px}}
-
-/* ===== Spec Panel (자기완결성 명세 S5) ===== */
-.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
-.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
-.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
-.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
-.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
-.spec-panel summary.spec-sum:hover{background:var(--bg3)}
-.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
-.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
-.spec-panel[open]{background:var(--bg)}
-.spec-panel > *:not(summary){padding:0 18px 14px}
-.spec-panel pre{margin-top:6px}
-
-/* ===== Workflow/Report Section (S6) ===== */
-.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
-.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
-.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
-.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
-.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
-.wr-flow .arrow{color:var(--t2);font-weight:700}
-.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
-.folder-rule strong{color:var(--lead)}
-@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
-
-
-/* ===== 사용 규칙 박스 (S0) ===== */
-.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
-.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
-.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
-.rules-box ol li{color:var(--text);font-size:13.5px}
-.rules-box ol li strong{color:var(--blue)}
-
-/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
-.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
-.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
-.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
-.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
-.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
-@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
-
-/* ===== 원문 문서 매트릭스 (S7) ===== */
-.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
-.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
-.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
-.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
-.ref-matrix tr:hover td{background:var(--bg3)}
-
-
-/* ===== DoD 박스 (day 카드 하단) ===== */
-.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
-.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
-.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
-.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
-.dod-item label{cursor:pointer;flex:1;line-height:1.5}
-.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
-
+:root { color-scheme: light; --ink:#172026; --muted:#5d6975; --line:#d8dee6; --bg:#f6f8fb; --card:#ffffff; --accent:#1769aa; }
+* { box-sizing: border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+header { padding:32px 24px 24px; background:#ffffff; border-bottom:1px solid var(--line); }
+.wrap { max-width:1120px; margin:0 auto; }
+h1 { margin:0 0 8px; font-size:30px; letter-spacing:0; }
+.subtitle { color:var(--muted); margin:0; }
+.badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.badge { border:1px solid var(--line); border-radius:6px; padding:6px 10px; background:#f9fbfd; font-size:13px; }
+main { max-width:1120px; margin:24px auto 48px; padding:0 24px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:18px; }
+.card.wide { grid-column:1 / -1; }
+h2 { margin:0 0 12px; font-size:18px; }
+h3 { margin:0 0 8px; font-size:15px; color:var(--accent); }
+ul { margin:0; padding-left:20px; }
+li { margin:6px 0; }
+.weeks { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.week { border:1px solid var(--line); border-radius:8px; padding:12px; background:#fbfcfe; }
+pre { margin:0; padding:14px; border-radius:8px; background:#111827; color:#e5e7eb; overflow:auto; font-size:13px; }
+code { font-family:Consolas,"JetBrains Mono",monospace; }
+@media (max-width:900px) { main { grid-template-columns:1fr; } .weeks { grid-template-columns:1fr; } h1 { font-size:24px; } }
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="hdr">
-  <span class="proj">QT-AI</span>
-  <div><div class="dev-name">이승욱 <span class="role-chip">Dev D · Journal/Kafka Owner</span></div><div class="dev-sub">Journal Service · Event Sourcing · Outbox · Saga Compensation · Kafka DLQ</div></div>
-  <div class="wnav-wrap"><button class="wnav cur" onclick="g('W1')">W1</button><button class="wnav" onclick="g('W2')">W2</button><button class="wnav" onclick="g('W3')">W3</button><button class="wnav" onclick="g('W4')">W4</button><button class="wnav" onclick="g('W5')">W5</button><button class="wnav" onclick="g('s5')" style="background:rgba(83,155,245,.15);border-color:var(--blue);color:var(--blue);font-weight:700">📋 명세</button><button class="wnav" onclick="g('s6')" style="background:rgba(87,171,90,.15);border-color:var(--green);color:var(--green);font-weight:700">📊 워크플로우</button><button class="wnav" onclick="g('s7')" style="background:rgba(224,130,61,.15);border-color:var(--orange);color:var(--orange);font-weight:700">📚 참조</button></div>
-</div></div></header>
-<div class="wrap">
-
-<!-- S0a: USAGE RULES (헤더 직후, 항상 펼쳐짐) -->
-<div class="rules-box">
-  <h2>📜 이 문서만 보고 작업하는 규칙</h2>
-  <ol>
-    <li>매일 <strong>본인 W1~W5 카드</strong>만 먼저 펼쳐서 오늘 할 일을 파악합니다.</li>
-    <li>작업 브랜치는 <code>feature/journal-{task-slug}</code> 형식 (예: <code>feature/journal-saga-compensation</code>).</li>
-    <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
-    <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
-    <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
-    <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
-    <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
-  </ol>
-</div>
-
-<!-- S0b: SETUP COMMANDS (토글) -->
-<details class="spec-panel">
-  <summary class="spec-sum">
-    <span class="spec-num" style="background:var(--green)">🔧</span>
-    <span class="spec-title">환경 셋업 빠른 명령어 — 처음 시작 시 1회 실행</span>
-  </summary>
-  <div class="setup-box">
-    <div class="setup-grid">
-      <div class="setup-card">
-        <h4>1. 저장소 클론 + 브랜치</h4>
-        <pre>git clone git@github.com:Tae0072/2nd-Team-Project.git
-cd 2nd-Team-Project
-
-git checkout develop
-git pull origin develop
-
-# 작업 브랜치 생성
-git checkout -b feature/journal-saga-compensation</pre>
-      </div>
-      <div class="setup-card">
-        <h4>2. 환경 검증</h4>
-        <pre>java -version    # Java 21 (Temurin)
-docker --version # Docker 4.x
-minikube status  # Running
-kubectl config set-context --current --namespace=qtai
-
-# 본인 서비스 빌드 검증
-./gradlew :journal-service:build</pre>
-      </div>
-      <div class="setup-card">
-        <h4>3. 데이터베이스 기동</h4>
-        <pre># Helm으로 DB 인프라 일괄 기동
-cd helm
-helm install qtai-infra ./qtai-infra -n qtai
-
-# 헬스체크
-kubectl get pods -n qtai
-kubectl logs -f deployment/{service-name} -n qtai</pre>
-      </div>
-      <div class="setup-card">
-        <h4>4. 본인 역할 추가 도구</h4>
-        <pre># Journal 추가 권장: Kafka UI (Offset Explorer)
-
-# 본인 서비스 테스트 명령
-./gradlew :journal-service:test</pre>
-      </div>
-    </div>
-    <div class="callout warn mt12">⚠️ 자세한 셋업은 <code>11_개발_환경_셋업_가이드.md</code> 참조. 실패 시 <code>10_트러블슈팅_FAQ.md</code> §1~§3 우선 확인.</div>
-  </div>
-</details>
-
-  <div class="sec" id="s0"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">Dev D 역할 핵심 선언</div></div>
-    <div class="callout"><strong>"이벤트 소싱과 Saga를 실제로 돌려본 개발자가 된다."</strong><br>Journal Service는 단순 CRUD가 아니라 이벤트 소싱 + Kafka Outbox + Saga 보상 트랜잭션이 결합된 복잡도 높은 서비스다. W3 Kafka 통합 주간의 핵심 카운터파트로, Kafka 토픽 설계·컨슈머 멱등성·DLQ 처리를 가장 깊게 이해하는 것을 목표로 한다.</div>
-    <div class="two mt12"><table class="tbl"><thead><tr><th>담당</th><th>핵심 책임</th></tr></thead><tbody><tr><td>Journal CRUD</td><td>DRAFT 생성·조회·수정·삭제와 X-User-Id 기반 사용자 분리</td></tr><tr><td>Event Sourcing</td><td>JOURNAL_EVENTS에 모든 변경 이력 기록</td></tr><tr><td>Outbox</td><td>DB 트랜잭션 안에서 OUTBOX_EVENTS 저장 후 Kafka 발행</td></tr><tr><td>Saga Compensation</td><td>journal.creation.failed 수신 시 DRAFT 롤백</td></tr></tbody></table><div><div class="callout warn">⚠️ <strong>핵심 주의</strong><br>Journal은 CRUD만 완성하면 끝이 아니다. 상태 전이, 이벤트 기록, Outbox 저장, Kafka 발행, 보상 처리까지 하나의 흐름으로 검증해야 한다.</div><div class="callout ok mt8">✅ <strong>완료 증거</strong><br>curl 결과, Flyway 마이그레이션 로그, Kafka consumer 로그, Jacoco 리포트, PR 링크를 남긴다.</div></div></div>
-  </div>
-  <div class="sec" id="s1"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">아래 경로는 Dev D 이승욱의 주 담당 영역이다. 변경 시 Journal 상태 전이, 이벤트 기록, 멱등성, Kafka 발행 여부를 함께 확인한다.</div><div class="own-tree mt12">
-    <div class="own-item"><div class="own-path">journal-service/domain/<br><span style="color:var(--t2);padding-left:12px">├── entity/Journal.java<br>├── entity/JournalEvent.java<br>├── entity/OutboxEvent.java<br>└── repository/</span></div><div class="own-desc">Journal 상태, 이벤트 소싱 로그, Outbox 저장 모델</div><span class="lock-tag">P0</span></div>
-    <div class="own-item"><div class="own-path">journal-service/usecase/<br><span style="color:var(--t2);padding-left:12px">├── CreateJournalUseCase.java<br>├── PublishJournalUseCase.java<br>└── SagaCompensationUseCase.java</span></div><div class="own-desc">DRAFT 생성, PUBLISHED 전이, journal.creation.failed 보상 처리</div><span class="lock-tag">P0</span></div>
-    <div class="own-item"><div class="own-path">journal-service/infrastructure/<br><span style="color:var(--t2);padding-left:12px">├── kafka/JournalEventProducer.java<br>├── kafka/SagaCompensationConsumer.java<br>└── scheduler/OutboxScheduler.java</span></div><div class="own-desc">Outbox polling, Kafka 발행, Retry/DLQ/멱등성 처리</div><span class="lock-tag">P0</span></div>
-    <div class="own-item"><div class="own-path">journal-service/api/<br><span style="color:var(--t2);padding-left:12px">└── JournalController.java</span></div><div class="own-desc">POST/GET/PUT/DELETE/PATCH publish API와 X-User-Id 처리</div><span class="lock-tag">P1</span></div>
-    <div class="own-item"><div class="own-path">journal-service/resources/db/migration/<br><span style="color:var(--t2);padding-left:12px">├── V1__create_journal_tables.sql<br>└── V2__create_outbox_table.sql</span></div><div class="own-desc">Flyway 기반 Journal/Event/Outbox 스키마 관리</div><span class="lock-tag">P0</span></div>
-  </div></div>
-  <div class="sec" id="s2"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 다른 사람한테 물어볼 필요 없음</div></div>
-        <div class="pr-panel-list">
-    <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devd-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/짧은-설명 (케밥케이스)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev open" id="chev-devd-pr-1">⌄</div></div><div class="pr-panel-body show" id="devd-pr-1">
-      <div class="branch-grid"><div class="btype"><div class="btype-name">feature/</div><div class="btype-ex">신규 기능<br>예) feature/journal-outbox</div></div><div class="btype"><div class="btype-name">fix/</div><div class="btype-ex">버그 수정<br>예) fix/journal-saga-idempotency</div></div><div class="btype"><div class="btype-name">refactor/</div><div class="btype-ex">코드 개선<br>예) refactor/journal-event-model</div></div><div class="btype"><div class="btype-name">test/</div><div class="btype-ex">테스트 추가<br>예) test/journal-outbox-duplicate</div></div><div class="btype"><div class="btype-name">docs/</div><div class="btype-ex">문서 수정<br>예) docs/journal-saga-flow</div></div><div class="btype"><div class="btype-name">chore/</div><div class="btype-ex">설정 변경<br>예) chore/journal-flyway</div></div></div>
-    </div></div>
-    <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devd-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 7단계 (반드시 이 순서로)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev open" id="chev-devd-pr-2">⌄</div></div><div class="pr-panel-body show" id="devd-pr-2">
-      <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden"><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">1</div><div style="width:100%"><div class="pr-step-title">develop 최신 pull</div><pre>git checkout develop && git pull origin develop<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">2</div><div style="width:100%"><div class="pr-step-title">feature 브랜치 생성 (develop 기준)</div><pre>git checkout -b feature/journal-outbox<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">3</div><div style="width:100%"><div class="pr-step-title">작업 후 커밋 — <code>type(scope): 설명</code> 형식 필수</div><pre>git add .
-git commit -m "feat(journal): add outbox publish flow"
-# type: feat | fix | refactor | test | docs | chore | ci
-# scope: auth | bible | ai | journal | bff | gateway<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">4</div><div style="width:100%"><div class="pr-step-title">develop rebase — 이 단계 빠뜨리면 머지 거부</div><pre>git fetch origin
-git rebase origin/develop
-# 충돌 시: 해결 후 git rebase --continue<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">5</div><div style="width:100%"><div class="pr-step-title">로컬 CI 확인 — push 전 반드시 통과</div><pre>./gradlew :journal-service:test
-./gradlew :journal-service:jacocoTestReport
-rg -n "KafkaTemplate\\.send\\(" journal-service/src/main/java
-rg -n "delete.*JOURNAL_EVENTS|update.*JOURNAL_EVENTS|payload" journal-service/src/main/java events/schema<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">6</div><div style="width:100%"><div class="pr-step-title">Push + GitHub PR 생성</div><pre>git push origin feature/journal-outbox
-# GitHub → Compare & pull request 클릭
-# base: develop ← compare: feature/journal-outbox
-# → PR 템플릿 자동 로드<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div></div><div class="pr-step" style="padding:13px 16px"><div class="pr-step-num">7</div><div style="width:100%"><div class="pr-step-title">Reviewer 지정 + 라벨 선택</div><table class="ci-tbl" style="margin-top:8px"><thead><tr><th>변경 범위</th><th>Reviewer (필수)</th><th>라벨</th></tr></thead><tbody><tr><td>자기 서비스 변경</td><td>강태오(Lead) 1명</td><td><code>journal</code></td></tr><tr><td>Kafka 이벤트 변경</td><td>강태오 + 영향 서비스 Owner</td><td><code>kafka</code></td></tr><tr><td>Outbox/Saga 변경</td><td>강태오 + 이승욱 셀프 체크리스트</td><td><code>journal</code></td></tr><tr><td>AI 보조 코드 포함</td><td>강태오(Lead)</td><td><code>ai-assisted</code></td></tr></tbody></table></div></div></div>
-    </div></div>
-    <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devd-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>③ PR 템플릿 (.github/PULL_REQUEST_TEMPLATE.md — PR 생성 시 자동 로드)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-devd-pr-3">⌄</div></div><div class="pr-panel-body" id="devd-pr-3">
-      <div style="position:relative"><pre>## 📋 작업 내용
-&lt;!-- Journal 상태 전이, 이벤트 기록, Outbox/Saga 변경을 한 줄로 --&gt;
-
-## 🔑 변경 이유
-
-## 🔧 주요 변경사항
-- 
-
-## 🧪 테스트 방법 (리뷰어가 직접 실행할 수 있도록)
-```bash
-./gradlew :journal-service:test
-curl -X PATCH http://localhost:8084/api/v1/journals/1/publish -H "Idempotency-Key: demo"
-```
-
-## ✅ DoD 체크리스트 (전부 체크 후 PR 오픈)
-- [ ] 도메인 코드 + 단위 테스트 (커버리지 70%+)
-- [ ] OpenAPI yaml과 응답 schema 일치
-- [ ] Kafka envelope는 data 필드 사용
-- [ ] JOURNAL_EVENTS append-only 유지
-- [ ] Outbox 발행은 TX 밖에서 수행
-- [ ] 중복 idempotencyKey 처리 확인
-
-## 🤖 AI 보조 여부
-- [ ] AI 보조 코드 포함 → ai-assisted 라벨 + 라인 단위 검토 완료
-
-## 🔗 관련 이슈
-Closes #<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div>
-    </div></div>
-    <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devd-pr-4')"><div class="pr-panel-num">4</div><div class="pr-panel-title"><strong>④ 자동 CI 게이트 (PR 생성 시 자동 실행)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-devd-pr-4">⌄</div></div><div class="pr-panel-body" id="devd-pr-4">
-      <table class="ci-tbl"><thead><tr><th>검사 항목</th><th>실패 시</th><th>해결 방법</th></tr></thead><tbody><tr><td>gitleaks</td><td><span class="badge-block">머지 차단</span></td><td>코드/yml에 평문 API Key·비밀번호 제거</td></tr><tr><td>Spectral lint</td><td><span class="badge-block">머지 차단</span></td><td><code>npx spectral lint apis/journal/openapi.yaml</code></td></tr><tr><td>JUnit 테스트</td><td><span class="badge-block">머지 차단</span></td><td><code>./gradlew :journal-service:test</code></td></tr><tr><td>Kafka schema</td><td><span class="badge-block">머지 차단</span></td><td>topic/schemaSubject/idempotencyKey를 <code>events/schema</code>와 대조</td></tr><tr><td>Code Review</td><td><span class="badge-block">머지 차단</span></td><td>Lead 승인 후 squash merge</td></tr></tbody></table>
-    </div></div>
-    <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('devd-pr-5')"><div class="pr-panel-num">5</div><div class="pr-panel-title"><strong>⑤ 머지 규칙 + Hotfix 절차</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-devd-pr-5">⌄</div></div><div class="pr-panel-body" id="devd-pr-5">
-      <div class="callout" style="margin-bottom:10px"><strong>Squash merge 사용</strong> — Feature Freeze 이후 Journal/Kafka 수정은 Lead DM 먼저. develop 빌드가 깨지면 즉시 revert + Slack 알림.</div>
-    <pre>git checkout develop && git pull origin develop
-git checkout -b hotfix/journal-saga-compensation
-git commit -m "fix(journal): skip duplicate saga compensation event"
-git push origin hotfix/journal-saga-compensation<button class="copy-btn" onclick="copyCode(this)">복사</button></pre>
-    </div></div>
-    </div>
-  </div>
-
-  <div class="sec" id="s3"><div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">일별 상세 일정 — 날짜 행 클릭 시 어디서·무엇을·어떻게·최종결과물 패널 열림</div></div>
-    <div id="weeks-root"></div>
-    <div class="criteria"><div class="crit-title">W1 완료 기준 체크</div><div class="crit-item"><input type="checkbox" id="c1" onchange="updateProg()"><label for="c1"> POST /api/v1/journals → 201 DRAFT 생성</label></div><div class="crit-item"><input type="checkbox" id="c2" onchange="updateProg()"><label for="c2"> GET /api/v1/journals/{id} → 상세 조회</label></div><div class="crit-item"><input type="checkbox" id="c3" onchange="updateProg()"><label for="c3"> PATCH /api/v1/journals/{id} → DRAFT 수정</label></div><div class="crit-item"><input type="checkbox" id="c4" onchange="updateProg()"><label for="c4"> JOURNAL_EVENTS 이벤트 소싱 기록 확인</label></div><div class="crit-item"><input type="checkbox" id="c5" onchange="updateProg()"><label for="c5"> Flyway V1+V2 마이그레이션 성공</label></div><div class="pbar mt12"><div class="pfill" id="prog" style="width:0%"></div></div><div class="ptxt" id="prog-txt">0 / 5 완료</div></div>
-  </div>
-  <div class="sec" id="s4"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드 — 컨텍스트 없이 요청 금지</div></div><div id="ai-root"></div></div>
-
-<!-- S5: SELF-CONTAINED SPEC -->
-<div class="sec" id="s5">
-  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 다른 문서 참조 없이 작업 가능</div></div>
-  <div class="callout blue">ℹ️ Journal Service는 이벤트 소싱 + Saga 패턴의 핵심. 04_API_명세서 §7·DECISIONS.md·events/schema 4개 JSON Schema에서 이식.</div>
-
-  <!-- 5.1 JOURNAL DTO -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.1</span><span class="spec-title">Journal Service DTO 정의 — Java 21 records</span></summary>
-  <div class="callout warn mt8">⚠️ <strong>POST /api/v1/journals 없음 (v1.0)</strong>. Journal은 AI 세션 완료 컨슈머로만 자동 DRAFT 생성. 사용자는 수정/삭제만 가능.</div>
-  <pre>// journal-service/.../api/dto/JournalDtos.java
-package com.qtai.journalservice.api.dto;
-
-import jakarta.validation.constraints.*;
-import java.time.LocalDateTime;
-import java.util.List;
-
-public class JournalDtos {
-
-    // ── Request ──
-    public record UpdateJournalRequest(
-        @Size(max = 200)  String title,
-        @Size(max = 50000) String content,
-        @Pattern(regexp = "^(DRAFT|PUBLISHED)$") String status
-    ) {}
-
-    // ── Response ──
-    public record JournalSummary(
-        Long           id,
-        Passage        passage,
-        String         title,
-        String         status,         // DRAFT / PUBLISHED
-        Long           aiSessionId,
-        LocalDateTime  createdAt,
-        LocalDateTime  publishedAt,
-        LocalDateTime  updatedAt
-    ) {
-        public record Passage(String bookCode, int chapter, int verse) {}
-    }
-
-    public record JournalDetail(
-        Long                  id,
-        Long                  userId,
-        JournalSummary.Passage passage,
-        String                title,
-        String                content,
-        String                status,
-        Long                  aiSessionId,
-        long                  lastEventSequence,
-        LocalDateTime         createdAt,
-        LocalDateTime         publishedAt,
-        LocalDateTime         updatedAt
-    ) {}
-
-    // ── 이벤트 로그 조회 (§7.7) ──
-    public record JournalEventsResponse(
-        Long                journalId,
-        List<EventEntry>    events
-    ) {
-        public record EventEntry(
-            Long           id,
-            long           sequence,
-            String         eventType,        // CREATED / UPDATED / PUBLISHED / DELETED
-            Object         eventData,        // JSON (Map<String,Object>)
-            String         idempotencyKey,
-            LocalDateTime  createdAt
-        ) {}
-    }
-
-    // ── 페이지네이션 ──
-    public record JournalListResponse(
-        List<JournalSummary> items,
-        PageInfo             page
-    ) {
-        public record PageInfo(int number, int size, long totalElements, int totalPages) {}
-    }
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.2 JOURNAL ERROR -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.2</span><span class="spec-title">JournalError enum (04번 §2.6)</span></summary>
-  <pre>// journal-service/.../common/error/JournalError.java
-@Getter
-@RequiredArgsConstructor
-public enum JournalError implements ErrorCode {
-    JOURNAL_NOT_FOUND          (HttpStatus.NOT_FOUND,            "JOURNAL_NOT_FOUND",          "journal을 찾을 수 없습니다"),
-    JOURNAL_NOT_OWNED          (HttpStatus.FORBIDDEN,            "JOURNAL_NOT_OWNED",          "본인 journal이 아닙니다"),
-    JOURNAL_LOCKED             (HttpStatus.CONFLICT,             "JOURNAL_LOCKED",             "동시 수정 충돌 (Lock timeout)"),
-    INVALID_STATUS_TRANSITION  (HttpStatus.UNPROCESSABLE_ENTITY, "INVALID_STATUS_TRANSITION",  "PUBLISHED → DRAFT 금지"),
-    INVALID_EVENT_SEQUENCE     (HttpStatus.UNPROCESSABLE_ENTITY, "INVALID_EVENT_SEQUENCE",     "sequence UNIQUE 위반");
-
-    private final HttpStatus httpStatus;
-    private final String     code;
-    private final String     message;
-}
-
-// CommonError는 04번 §2.6 공통 코드 그대로 사용 (DevA S5 참조)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.3 글로벌 핸들러 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.3</span><span class="spec-title">글로벌 익셉션 핸들러 + ProblemDetail (04번 §2.4)</span></summary>
-  <pre>// journal-service/.../common/exception/GlobalExceptionHandler.java
-@RestControllerAdvice
-@Slf4j
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(BusinessException.class)
-    public ProblemDetail handleBusiness(BusinessException e, HttpServletRequest req) {
-        ErrorCode err = e.getError();
-        ProblemDetail pd = ProblemDetail.forStatus(err.getHttpStatus());
-        pd.setType(URI.create("https://api.qtai.app/errors/" + err.getCode().toLowerCase().replace('_','-')));
-        pd.setTitle(err.getMessage());
-        pd.setInstance(URI.create(req.getRequestURI()));
-        pd.setProperty("code",      err.getCode());
-        pd.setProperty("traceId",   MDC.get("traceId"));
-        pd.setProperty("timestamp", Instant.now().toString());
-        return pd;
-    }
-
-    // PESSIMISTIC_WRITE Lock timeout → JOURNAL_LOCKED
-    @ExceptionHandler(PessimisticLockingFailureException.class)
-    public ProblemDetail handleLockTimeout(PessimisticLockingFailureException e) {
-        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
-        pd.setProperty("code",     "JOURNAL_LOCKED");
-        pd.setProperty("traceId",  MDC.get("traceId"));
-        return pd;
-    }
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.4 KAFKA 발행 4개 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.4</span><span class="spec-title">Kafka 발행 — 4개 토픽 (발행)</span></summary>
-  <div class="callout warn mt8">⚠️ Journal Service는 4개 토픽 발행: <code>journal.created</code>·<code>journal.updated</code>·<code>journal.deleted</code>·<code>journal.creation.failed</code>(@DltHandler). 모두 <strong>AFTER_COMMIT</strong> 발행.</div>
-  <pre>// journal-service/.../infrastructure/kafka/event/JournalEvents.java
-
-// ── 1) journal.created ──
-public record JournalCreatedEvent(
-    String         eventId,
-    String         eventType,        // "journal.created"
-    int            eventVersion,     // 1
-    String         schemaSubject,    // "journal.created-value"
-    String         occurredAt,
-    String         traceId,
-    String         producerService,  // "journal-service"
-    String         idempotencyKey,   // "journal.created:{journalId}"
-    Data           data
-) {
-    public record Data(
-        long      journalId,
-        long      userId,
-        long      aiSessionId,
-        Passage   passage,
-        String    title
-    ) {
-        public record Passage(long bookId, String bookCode, int chapter, int verse) {}
-    }
-}
-
-// ── 2) journal.updated ──
-public record JournalUpdatedEvent(
-    String         eventId,
-    String         eventType,        // "journal.updated"
-    int            eventVersion,
-    String         schemaSubject,    // "journal.updated-value"
-    String         occurredAt,
-    String         traceId,
-    String         producerService,
-    String         idempotencyKey,   // "journal.update:{ULID}"
-    Data           data
-) {
-    public record Data(
-        long      journalId,
-        long      userId,
-        long      sequence,
-        String    eventType,    // UPDATED / PUBLISHED
-        Object    changes       // {title?, content?, status?, publishedAt?}
-    ) {}
-}
-
-// ── 3) journal.deleted ──
-public record JournalDeletedEvent(
-    String         eventId,
-    String         eventType,        // "journal.deleted"
-    int            eventVersion,
-    String         schemaSubject,    // "journal.deleted-value"
-    String         occurredAt,
-    String         traceId,
-    String         producerService,
-    String         idempotencyKey,   // "journal.delete:{journalId}:{epochMs}"
-    Data           data
-) {
-    public record Data(
-        long      journalId,
-        long      userId,
-        String    deletedAt
-    ) {}
-}
-
-// ── 4) journal.creation.failed (Saga 보상 — @DltHandler) ──
-public record JournalCreationFailedEvent(
-    String         eventId,
-    String         eventType,        // "journal.creation.failed"
-    int            eventVersion,
-    String         schemaSubject,    // "journal.creation.failed-value"
-    String         occurredAt,
-    String         traceId,
-    String         producerService,  // "journal-service"
-    String         idempotencyKey,   // "journal.creation.failed:{sessionId}"
-    Data           data
-) {
-    public record Data(
-        long      sessionId,
-        long      userId,
-        String    failureReason,
-        int       retryCount
-    ) {}
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.5 KAFKA 컨슈머 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.5</span><span class="spec-title">Kafka 컨슈머 — ai.session.completed (Saga + 멱등성)</span></summary>
-  <div class="callout warn mt8">⚠️ 멱등성 필수: <code>PROCESSED_EVENTS</code> 테이블에 idempotencyKey 기록. @DltHandler에서 <code>journal.creation.failed</code> 발행 → AI Service가 컨슈밍해 세션 롤백.</div>
-  <pre>// journal-service/.../infrastructure/kafka/consumer/AiSessionCompletedConsumer.java
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class AiSessionCompletedConsumer {
-
-    private final CreateDraftFromSessionUseCase useCase;
-    private final ProcessedEventRepository       processedRepo;
-    private final KafkaTemplate<String, Object>  kafkaTemplate;
-
-    @KafkaListener(
-        topics            = "ai.session.completed",
-        groupId           = "journal-service-ai-completion-consumer",
-        containerFactory  = "kafkaListenerContainerFactory"
-    )
-    @Transactional
-    public void consume(AiSessionCompletedEvent event) {
-        String idempotencyKey = event.idempotencyKey();   // ai.session.completed:{sessionId}
-
-        // 멱등성 체크
-        if (processedRepo.exists(idempotencyKey)) {
-            log.info("Already processed: {}", idempotencyKey);
-            return;
-        }
-
-        // DRAFT Journal + JOURNAL_EVENTS (CREATED) 적재
-        useCase.execute(event);
-
-        // 멱등성 기록
-        processedRepo.save(idempotencyKey);
-    }
-
-    // ── DLT (Dead Letter Topic) 핸들러 — Saga 보상 ──
-    @DltHandler
-    public void handleDlt(
-        AiSessionCompletedEvent event,
-        @Header(KafkaHeaders.EXCEPTION_MESSAGE) String error
-    ) {
-        log.error("DLT: AI session {} — {}", event.data().sessionId(), error);
-
-        // journal.creation.failed 발행 → AI Service가 세션 롤백
-        JournalCreationFailedEvent failed = new JournalCreationFailedEvent(
-            UUID.randomUUID().toString(),
-            "journal.creation.failed", 1,
-            "journal.creation.failed-value",
-            Instant.now().toString(),
-            MDC.get("traceId"),
-            "journal-service",
-            "journal.creation.failed:" + event.data().sessionId(),
-            new JournalCreationFailedEvent.Data(
-                event.data().sessionId(),
-                event.data().userId(),
-                error,
-                3   // 재시도 횟수
-            )
-        );
-        kafkaTemplate.send("journal.creation.failed", failed.idempotencyKey(), failed);
-    }
-}
-
-// user.deactivated 컨슈머
-@KafkaListener(topics = "user.deactivated", groupId = "journal-service-user-deactivation-consumer")
-@Transactional
-public void onUserDeactivated(UserDeactivatedEvent event) {
-    long userId = event.data().userId();
-    journalRepository.softDeleteAllByUserId(userId, LocalDateTime.now());
-    // (v1.1 GDPR 검토)
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.6 OUTBOX 패턴 -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.6</span><span class="spec-title">Outbox 패턴 (Transactional Outbox)</span></summary>
-  <div class="callout warn mt8">⚠️ 이벤트 소싱에서 TX 내 KafkaTemplate 직접 호출 금지. <strong>JOURNAL_EVENTS가 outbox 역할</strong> — AFTER_COMMIT 스케줄러가 발송.</div>
-  <pre>// journal-service/.../infrastructure/outbox/OutboxPublisher.java
-@Component
-@RequiredArgsConstructor
-@Slf4j
-public class OutboxPublisher {
-
-    private final OutboxRepository              outboxRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    /** AFTER_COMMIT 직후 호출 (TransactionPhase.AFTER_COMMIT) */
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onJournalEvent(JournalDomainEvent event) {
-        Object payload = event.toKafkaPayload();
-        kafkaTemplate.send(event.getTopic(), event.getIdempotencyKey(), payload);
-    }
-
-    /** 스케줄러 — 높은 신뢰성이 필요한 경우 outbox 재발송 (5초마다) */
-    @Scheduled(fixedDelay = 5000)
-    @Transactional
-    public void publishPendingEvents() {
-        outboxRepository.findUnpublished(50).forEach(event ->
-            kafkaTemplate.send(event.getTopic(), event.getIdempotencyKey(), event.getPayload())
-        );
-    }
-}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <!-- 5.7 JOURNAL DDL -->
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">5.7</span><span class="spec-title">Journal DB 스키마 (V1 SQL)</span></summary>
-  <pre>-- V1__create_journal_tables.sql
-CREATE TABLE JOURNALS (
-    id                      BIGINT       AUTO_INCREMENT PRIMARY KEY,
-    user_id                 BIGINT       NOT NULL,
-    ai_session_id           BIGINT       NOT NULL UNIQUE,   -- 1:1
-    book_id                 BIGINT       NOT NULL,
-    chapter                 INT          NOT NULL,
-    verse                   INT          NOT NULL,
-    title                   VARCHAR(200) NOT NULL,
-    content                 TEXT         NOT NULL,
-    status                  VARCHAR(20)  NOT NULL DEFAULT 'DRAFT',  -- DRAFT / PUBLISHED
-    last_event_sequence     BIGINT       NOT NULL DEFAULT 0,
-    published_at            DATETIME(6),
-    deleted_at              DATETIME(6),                            -- soft delete
-    created_at              DATETIME(6)  NOT NULL,
-    updated_at              DATETIME(6)  NOT NULL,
-    INDEX idx_journal_user_status (user_id, status, deleted_at),
-    INDEX idx_journal_published   (user_id, published_at DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE JOURNAL_EVENTS (
-    id                  BIGINT       AUTO_INCREMENT PRIMARY KEY,
-    journal_id          BIGINT       NOT NULL,
-    sequence            BIGINT       NOT NULL,
-    event_type          VARCHAR(20)  NOT NULL,        -- CREATED / UPDATED / PUBLISHED / DELETED
-    event_data          JSON         NOT NULL,
-    idempotency_key     VARCHAR(200) NOT NULL UNIQUE,  -- 중복 차단
-    created_at          DATETIME(6)  NOT NULL,
-    UNIQUE KEY uk_journal_sequence (journal_id, sequence),
-    INDEX idx_journal_id (journal_id),
-    FOREIGN KEY (journal_id) REFERENCES JOURNALS(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE PROCESSED_EVENTS (
-    idempotency_key VARCHAR(200) PRIMARY KEY,
-    processed_at    DATETIME(6) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  </div>
-<!-- S6: WORKFLOW + REPORT -->
-<div class="sec" id="s6">
-  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
-  <div class="callout blue">ℹ️ 모든 day 카드 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서를 반드시 따릅니다. 개인 작업 폴더는 <code>workspaces/DevD_이승욱/</code> 입니다.</div>
-
-  <div class="wr-flow">
-    <span class="step">📝 workflows/{date}-{task}.md 작성</span>
-    <span class="arrow">→</span>
-    <span class="step">🔍 자기 검토 (체크리스트 ✓)</span>
-    <span class="arrow">→</span>
-    <span class="step">🚀 작업 진행</span>
-    <span class="arrow">→</span>
-    <span class="step">📊 reports/{date}-{task}.md 작성</span>
-  </div>
-
-  <div class="folder-rule">
-    <strong>🚫 폴더 격리 규칙 (AGENTS.md §13)</strong><br>
-    • 본인 폴더(<code>workspaces/DevD_이승욱/</code>)에서만 읽기·쓰기 허용<br>
-    • 다른 팀원의 개인 폴더는 <strong>읽기·수정·삭제 모두 금지</strong> (AI 에이전트 포함)<br>
-    • <code>workspaces/</code> 내 파일은 빌드·테스트·CI에 영향 없음 (import 금지)<br>
-    • 다른 팀원 폴더 변경이 PR에 포함되면 자동 reject
-  </div>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.1</span><span class="spec-title">개인 작업 폴더 구조</span></summary>
-  <pre>workspaces/DevD_이승욱/                  ← 나만 접근
-├── README.md                         (폴더 사용법)
-├── workflows/                        (작업 시작 전 워크플로우)
-│   ├── _template.md                  (템플릿 — 복사해서 사용)
-│   ├── 20260513-{task-slug}.md       (예시)
-│   └── 20260514-{task-slug}.md       (예시)
-├── reports/                          (작업 종료 후 리포트)
-│   ├── _template.md                  (템플릿)
-│   ├── 20260513-{task-slug}.md       (예시 — 워크플로우와 동일 이름)
-│   └── 20260514-{task-slug}.md
-├── docs/                             (개인이 작성하는 문서·명세)
-└── notes/                            (메모·로그·스크린샷)<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.2</span><span class="spec-title">워크플로우 양식 — workflows/_template.md</span></summary>
-  <div class="callout warn mt8">⚠️ 작업 시작 전 반드시 작성. 파일명은 <code>YYYYMMDD-{task-slug}.md</code> 형식. 리포트와 동일 이름 사용.</div>
-  <pre># 워크플로우 — [작업명]
-
-**작성자**: 이승욱 (DevD — Journal Service)
-**작성일**: 2026-MM-DD
-**해당 일자**: W[X] [날짜] (예: W1 5/13 수)
-**예상 소요시간**: ?시간
-**상태**: 📝 초안 / 🔍 검토 중 / ✅ 승인됨 / 🚀 실행 중 / 🎯 완료
-
----
-
-## 1. 작업 목표
-(1개 문장으로 명확히)
-
-## 2. 변경 대상 파일
-- `path/to/file` — 무엇을 어떻게
-
-## 3. 작업 단계 (TODO)
-1. [ ] ...
-2. [ ] ...
-
-## 4. 검증 기준 (Definition of Done)
-- [ ] 단위 테스트 통과
-- [ ] 빌드 성공
-- [ ] OpenAPI/Spectral lint 통과 (해당 시)
-- [ ] curl/시뮬레이션 결과 확인
-- [ ] PR 300줄 이내
-
-## 5. 의존성
-- 선행 작업: ...
-- 다른 개발자 작업: ...
-
-## 6. 리스크 / 의문점
-- ...
-
-## 7. 자기 검토 체크
-- [ ] AGENTS.md 금지 패턴 위반 없음
-- [ ] DECISIONS.md 기준 위반 없음
-- [ ] 04_API_명세서 정합 (해당 시)
-- [ ] events/schema 정합 (해당 시)
-- [ ] 다른 개발자의 workspaces/ 폴더 접근 없음
-
----
-> ⚠️ 작업 시작 전 반드시 검토하고, 의문점이 남으면 보강한 후 진행하세요.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.3</span><span class="spec-title">리포트 양식 — reports/_template.md</span></summary>
-  <div class="callout warn mt8">⚠️ 작업 종료 직후 반드시 작성. 다음 작업 시작 전에 완료. 동일 워크플로우와 이름 맞추기.</div>
-  <pre># 리포트 — [작업명]
-
-**작성자**: 이승욱
-**작성일**: 2026-MM-DD
-**해당 일자**: W[X] [날짜]
-**소요 시간**: ?시간 (예상 대비 +/- ?)
-**상태**: ✅ 완료 / ⚠️ 부분 완료 / ❌ 실패
-
-**대응 워크플로우**: `workflows/[동일 파일명].md`
-
----
-
-## 1. 결과 요약
-(1~2문장)
-
-## 2. 변경 사항
-- `path/to/file` — 실제 변경 내용 + 이유
-
-## 3. 검증 결과
-| 항목 | 결과 | 증거 |
-|------|------|------|
-| 단위 테스트 | ✅ | 로그/PR 링크 |
-| 빌드 | ✅ | ... |
-| Spectral | ✅/N/A | ... |
-| curl | ✅ | ... |
-
-## 4. 산출물
-- PR: #[번호]
-- 커밋: [SHA]
-- 스크린샷/로그: `notes/...`
-
-## 5. 워크플로우 대비 차이
-(계획과 다르게 진행된 부분과 그 이유)
-
-## 6. 미해결 항목 / 후속 조치
-- [ ] ...
-
-## 7. 회고
-- 잘 된 점:
-- 개선할 점:
-- 다음에 알아야 할 점:
-
----
-> 📌 작업 완료 직후 작성하고, 다음 작업 워크플로우의 입력으로 활용.<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  <details class="spec-panel"><summary class="spec-sum"><span class="spec-num">6.4</span><span class="spec-title">작업 세트 예시</span></summary>
-  <pre># 예: 작업 시작 → 종료 시퀀스
-
-# 1. 워크플로우 작성
-cd workspaces/DevD_이승욱/workflows
-cp _template.md 20260513-{task-slug}.md
-notepad 20260513-{task-slug}.md   # 내용 채우기
-
-# 2. 검토 후 작업 진행
-cd ../../../
-# (실제 코드/문서 작업)
-
-# 3. 작업 완료 후 리포트
-cd workspaces/DevD_이승욱/reports
-cp _template.md 20260513-{task-slug}.md   # 워크플로우와 동일 이름
-notepad 20260513-{task-slug}.md   # 결과 작성<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></details>
-
-  </div>
-<!-- S7: REFERENCE DOC MATRIX -->
-<div class="sec" id="s7">
-  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">원문 문서 필요 항목 매트릭스 — 언제 어떤 문서를 봐야 하는가</div></div>
-  <div class="callout blue">ℹ️ 이 실행 가이드는 자기완결성을 추구하지만, <strong>변경의 원천이 되는 결정·스키마는 반드시 원본 문서를 우선</strong>합니다. 아래 표에서 작업 유형 → 원본 문서를 매핑하여 빠르게 찾으세요.</div>
-
-  <div class="ref-matrix">
-    <table>
-      <thead>
-        <tr><th style="width:25%">작업 유형</th><th style="width:35%">원본 문서</th><th>이유</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>API 계약 변경</strong><br>(엔드포인트·DTO·헤더·에러)</td>
-          <td><code>04_API_명세서.md</code><br><code>apis/{service}/openapi.yaml</code></td>
-          <td>OpenAPI 3.1 + Spectral lint가 단일 진실 원천. 가이드 S5는 스냅샷.</td>
-        </tr>
-        <tr>
-          <td><strong>DB 스키마 변경</strong><br>(컬럼·인덱스·관계)</td>
-          <td><code>02_ERD_문서.md</code><br>+ Flyway 마이그레이션</td>
-          <td>ERD에 ADR-0009 등 결정 근거 포함. DDL은 마이그레이션이 권위.</td>
-        </tr>
-        <tr>
-          <td><strong>Kafka 이벤트 변경</strong><br>(payload·topic·key)</td>
-          <td><code>events/schema/*.json</code><br>+ Apicurio Schema Registry</td>
-          <td>JSON Schema 8개 파일이 envelope·data 표준. <code>data</code> 키 (not <code>payload</code>).</td>
-        </tr>
-        <tr>
-          <td><strong>아키텍처 흐름</strong><br>(Saga·OICD·인증 플로우)</td>
-          <td><code>03_아키텍처_정의서.md</code></td>
-          <td>시퀀스 다이어그램·CQRS·Outbox 패턴 결정 근거.</td>
-        </tr>
-        <tr>
-          <td><strong>보안 정책</strong><br>(JWT·Rate limit·CORS)</td>
-          <td><code>05_보안_명세서.md</code></td>
-          <td>JWT RS256 키·OAuth scope·rate limit 임계값.</td>
-        </tr>
-        <tr>
-          <td><strong>K8s·Docker·Helm</strong><br>(매니페스트·ConfigMap)</td>
-          <td><code>06_DevOps_운영_매뉴얼.md</code><br><code>helm/qtai-infra/</code></td>
-          <td>네임스페이스·Secret·헬스체크 정책.</td>
-        </tr>
-        <tr>
-          <td><strong>테스트 작성</strong><br>(단위·통합·E2E)</td>
-          <td><code>07_테스트_전략.md</code><br><code>16_API_통합_테스트_가이드.md</code></td>
-          <td>커버리지 기준·Testcontainers·Prism mock 사용법.</td>
-        </tr>
-        <tr>
-          <td><strong>Flutter 앱 가이드</strong></td>
-          <td><code>08_프론트엔드_Flutter_가이드.md</code></td>
-          <td>위젯 트리·상태관리·라우팅 표준.</td>
-        </tr>
-        <tr>
-          <td><strong>AI 프롬프트 변경</strong></td>
-          <td><code>09_AI_프롬프트_운영_가이드.md</code></td>
-          <td>OICD 단계별 프롬프트·golden-set·injection-set.</td>
-        </tr>
-        <tr>
-          <td><strong>빌드·실행 오류</strong></td>
-          <td><code>10_트러블슈팅_FAQ.md</code></td>
-          <td>의존성 충돌·포트 충돌·Minikube 메모리 부족 등.</td>
-        </tr>
-        <tr>
-          <td><strong>최초 환경 설정</strong></td>
-          <td><code>11_개발_환경_셋업_가이드.md</code></td>
-          <td>역할별 추가 설치·.env·JWT 키 생성·DB 시드.</td>
-        </tr>
-        <tr>
-          <td><strong>도메인 모델·패키지 구조</strong></td>
-          <td><code>12_서비스별_도메인_모델_상세.md</code></td>
-          <td>Clean Architecture 계층·UseCase 패턴·예외 계층.</td>
-        </tr>
-        <tr>
-          <td><strong>Git 브랜치·PR 규칙</strong></td>
-          <td><code>14_팀_협업_규칙_Git_브랜치_전략.md</code></td>
-          <td>커밋 메시지·코드 리뷰 기준·머지 정책.</td>
-        </tr>
-        <tr>
-          <td><strong>서비스별 W1~W5 체크리스트</strong></td>
-          <td><code>15_서비스별_구현_체크리스트.md</code></td>
-          <td>본인 day 카드 DoD가 부족할 때 더 상세한 기준.</td>
-        </tr>
-        <tr>
-          <td><strong>데이터 시드·마이그레이션</strong></td>
-          <td><code>17_데이터_시드_마이그레이션_전략.md</code></td>
-          <td>Bible 66권·prompt template·user 시드 데이터.</td>
-        </tr>
-        <tr>
-          <td><strong>코드 품질 게이트</strong></td>
-          <td><code>18_코드_품질_게이트.md</code></td>
-          <td>SonarQube·커버리지·정적 분석 기준.</td>
-        </tr>
-        <tr>
-          <td><strong>아키텍처·기술 스택 결정 근거</strong></td>
-          <td><code>DECISIONS.md</code> ⭐</td>
-          <td><strong>단일 진실 원천</strong>. MySQL/MSA/Kafka KRaft 등 모든 결정 이유.</td>
-        </tr>
-        <tr>
-          <td><strong>AI 에이전트 규칙·금지 패턴</strong></td>
-          <td><code>AGENTS.md</code></td>
-          <td>금지 패턴·workspaces 폴더 격리(§13)·코드 작성 가이드.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="callout warn mt16">
-    ⚠️ <strong>변경 우선순위:</strong> 원본 문서 → 코드 → 가이드 HTML 순으로 갱신합니다. 가이드 S5/S6의 스냅샷이 원본과 다르면 <strong>원본이 우선</strong>이며, Lead에게 가이드 갱신을 요청하세요.
-  </div>
-</div>
-</div>
-<script>
-const WEEKS = {"W1": {"period": "5/12~5/22", "goal": "Journal CRUD + 이벤트 소싱 + Flyway V1/V2 기반 완성", "color": "var(--blue)", "days": [["5/12 화", "db", "킥오프 참석 · git pull", "Flyway V1 — JOURNALS·JOURNAL_EVENTS 테이블 DDL", "Journal Entity + JournalEvent Entity", ["journal-service/src/main/resources/db/migration/V1__create_journal_tables.sql", "journal-service/src/main/java/com/qtai/journalservice/domain/entity/Journal.java", "journal-service/src/main/java/com/qtai/journalservice/domain/entity/JournalEvent.java"], "JOURNALS와 JOURNAL_EVENTS 테이블을 먼저 고정하고, Journal/JournalEvent 엔티티를 ERD와 맞춰 작성한다.", "CREATE TABLE journals (\n  id BIGINT PRIMARY KEY AUTO_INCREMENT,\n  user_id BIGINT NOT NULL,\n  status VARCHAR(20) NOT NULL,\n  title VARCHAR(200),\n  content TEXT,\n  version BIGINT DEFAULT 0,\n  created_at DATETIME NOT NULL,\n  updated_at DATETIME NOT NULL\n);\n\nCREATE TABLE journal_events (\n  id BIGINT PRIMARY KEY AUTO_INCREMENT,\n  journal_id BIGINT NOT NULL,\n  event_type VARCHAR(50) NOT NULL,\n  sequence_no BIGINT NOT NULL,\n  payload JSON,\n  created_at DATETIME NOT NULL\n);", "flyway"], ["5/13 수", "test", "Stand-up", "Journal Repository — findByUserId + findById + soft delete", "@DataJpaTest — 기본 CRUD 확인", ["journal-service/src/main/java/.../domain/repository/JournalRepository.java", "journal-service/src/test/java/.../JournalRepositoryTest.java"], "Repository 쿼리와 soft delete 조건을 먼저 테스트로 고정한다. 삭제된 노트가 목록에 노출되지 않아야 한다.", "@DataJpaTest\nclass JournalRepositoryTest {\n  @Test\n  @DisplayName(\"사용자별 묵상 노트 목록을 조회한다\")\n  void findByUserId() {\n    // given\n    // when\n    List<Journal> journals = journalRepository.findByUserIdAndDeletedFalse(1L);\n    // then\n    assertThat(journals).isNotEmpty();\n  }\n}", "repo"], ["5/14 목", "code", "Stand-up", "CreateJournalUseCase — DRAFT 생성 + JournalEvent 기록", "이벤트 소싱 sequence 로직 (ADR-0011)", ["journal-service/src/main/java/.../usecase/CreateJournalUseCase.java", "journal-service/src/main/java/.../domain/entity/JournalEvent.java"], "노트 생성과 이벤트 기록을 같은 트랜잭션에서 처리한다. sequence_no는 journal 단위로 증가해야 한다.", "@Transactional\npublic JournalResponse create(Long userId, CreateJournalRequest req) {\n  Journal journal = journalRepository.save(Journal.draft(userId, req.getTitle(), req.getContent()));\n  journalEventRepository.save(\n    JournalEvent.created(journal.getId(), 1L, req)\n  );\n  return JournalResponse.from(journal);\n}", "event"], ["5/15 금", "api", "Stand-up", "JournalController — POST/GET/PUT/DELETE 엔드포인트", "X-User-Id 헤더 → userId 추출", ["journal-service/src/main/java/.../api/JournalController.java", "apis/journal/openapi.yaml"], "Gateway가 주입한 X-User-Id를 신뢰하고, Controller에서는 userId를 직접 파싱한다. 응답 코드는 OpenAPI와 맞춘다.", "@PostMapping(\"/api/v1/journals\")\npublic ResponseEntity<JournalResponse> create(\n  @RequestHeader(\"X-User-Id\") Long userId,\n  @RequestBody CreateJournalRequest req\n)<JournalResponse> {\n  return ResponseEntity.status(HttpStatus.CREATED).body(createJournalUseCase.execute(userId, req))\n}", "curl-create"], ["5/16 금", "test", "Stand-up", "단위 테스트 — CreateJournalUseCase Mockito", "/api/v1/journals POST curl 테스트", ["journal-service/src/test/java/.../CreateJournalUseCaseTest.java", "터미널 curl"], "UseCase 단위 테스트와 실제 curl 테스트를 둘 다 남긴다. 최소한 201 생성과 이벤트 기록 여부를 확인한다.", "./gradlew :journal-service:test\n\ncurl -i -X POST http://localhost:8084/api/v1/journals \\\n  -H \"X-User-Id: 1\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"title\":\"오늘의 묵상\",\"content\":\"요한복음 3:16\"}'", "curl-create"], ["5/19 월", "db", "Stand-up", "Flyway V2 — OUTBOX_EVENTS 테이블 + OutboxEvent 엔티티", "Kafka consumer group 명명 규칙 확인", ["journal-service/src/main/resources/db/migration/V2__create_outbox_table.sql", "journal-service/src/main/java/.../domain/entity/OutboxEvent.java"], "Outbox 테이블은 Kafka 발행 이전의 안전한 저장소다. published_at, retry_count, idempotency_key를 반드시 둔다.", "CREATE TABLE outbox_events (\n  id BIGINT PRIMARY KEY AUTO_INCREMENT,\n  aggregate_type VARCHAR(50) NOT NULL,\n  aggregate_id BIGINT NOT NULL,\n  topic VARCHAR(100) NOT NULL,\n  payload JSON NOT NULL,\n  idempotency_key VARCHAR(120) NOT NULL UNIQUE,\n  published_at DATETIME NULL,\n  retry_count INT DEFAULT 0,\n  created_at DATETIME NOT NULL\n);", "outbox"], ["5/20 화", "code", "Stand-up", "PublishJournalUseCase 골격 — DRAFT→PUBLISHED + Outbox insert", "멱등성 키 DB UNIQUE 제약 확인", ["journal-service/src/main/java/.../usecase/PublishJournalUseCase.java", "journal-service/src/main/java/.../domain/entity/OutboxEvent.java"], "묵상 노트 publish 상태 전이와 outbox insert를 하나의 트랜잭션으로 묶는다. 중복 요청은 idempotencyKey로 막는다.", "@Transactional\npublic void publish(Long journalId, String idempotencyKey) {\n  Journal journal = journalRepository.findByIdOrThrow(journalId);\n  journal.publish()\n  outboxRepository.save(OutboxEvent.journalCreated(journal, idempotencyKey))\n  journalEventRepository.save(JournalEvent.published(journal))\n}", "publish"], ["5/21 수", "kafka", "Stand-up", "Kafka producer 골격 — JournalEventProducer local Kafka 연결 테스트", "W1 체크리스트 점검", ["journal-service/src/main/java/.../infrastructure/kafka/JournalEventProducer.java", "docker-compose 또는 K8s Kafka"], "아직 scheduler 완성 전이라도 KafkaTemplate 설정과 topic 발행 가능 여부를 먼저 확인한다.", "./gradlew :journal-service:bootRun\n\nkafka-console-consumer.sh \\\n  --bootstrap-server localhost:9092 \\\n  --topic journal.created \\\n  --from-beginning", "kafka"], ["5/22 목", "gate", "Stand-up", "W1 Lock-in 게이트 참석 (18:00)", "W1 회고", ["GitHub PR", "W1 체크리스트", "회고 문서"], "W1 완료 기준 5개를 검증한다. 실패 항목은 W2 진입 전 보강 대상으로 기록한다.", "W1 완료 기준\n[ ] POST /api/v1/journals → 201 DRAFT 생성\n[ ] GET /api/v1/journals/{id} → 상세 조회\n[ ] PATCH /api/v1/journals/{id} → DRAFT 수정\n[ ] JOURNAL_EVENTS 이벤트 소싱 기록 확인\n[ ] Flyway V1+V2 마이그레이션 성공", "w1gate"]]}, "W2": {"period": "5/26~5/29", "goal": "Outbox 발행 + 낙관적 락 + 멱등성 검증", "color": "var(--purple)", "days": [["5/26 화", "code", "페이스 점검", "PATCH /api/v1/journals/{id}/publish → Outbox insert + PUBLISHED 상태 전이", "발행 API 응답/상태 전이 확인", ["journal-service/src/main/java/.../api/JournalController.java", "journal-service/src/main/java/.../usecase/PublishJournalUseCase.java"], "DRAFT 상태의 묵상 노트만 PUBLISHED로 전이한다. 이미 발행된 노트는 중복 publish를 거부하거나 멱등 처리한다.", "curl -X PATCH http://localhost:8084/api/v1/journals/1/publish \\\n  -H \"X-User-Id: 1\" \\\n  -H \"Idempotency-Key: journal-1-publish-001\"", "publish"], ["5/27 수", "kafka", "Stand-up", "OutboxScheduler — 5초 주기 polling → KafkaTemplate 발행", "published_at 업데이트 확인", ["journal-service/src/main/java/.../infrastructure/scheduler/OutboxScheduler.java", "journal-service/src/main/java/.../infrastructure/kafka/JournalEventProducer.java"], "OutboxScheduler는 미발행 이벤트만 조회하고, Kafka 발행 성공 후 published_at을 업데이트한다. 실패 시 retry_count를 증가시킨다.", "@Scheduled(fixedDelay = 5000)\npublic void publishPendingEvents() {\n  outboxRepository.findUnpublished(50).forEach(event ->\n    producer.send(event.getTopic(), event.getIdempotencyKey(), event.payload)\n    event.markPublished()\n  }\n}", "scheduler"], ["5/28 목", "test", "Stand-up", "@Lock 낙관적 락 적용 · 멱등성 키 중복 발행 테스트", "동시 수정/중복 요청 테스트 통과", ["journal-service/src/main/java/.../domain/entity/Journal.java", "journal-service/src/test/java/.../PublishJournalUseCaseTest.java"], "Journal에 @Lock을 적용하고, 같은 idempotencyKey로 publish를 두 번 호출했을 때 중복 outbox가 생성되지 않아야 한다.", "@Lock\nvar version: Long = 0\n\n@Test\n@Test\n  @DisplayName(\"같은 idempotencyKey는 outbox를 중복 생성하지 않는다\")\n  void duplicateIdempotencyKeyDoesNotCreateOutbox() {\n  publishUseCase.publish(journalId, \"key-001\");\n  publishUseCase.publish(journalId, \"key-001\")\n  assertThat(outboxRepository.countByIdempotencyKey(\"key-001\")).isEqualTo(1)\n}", "idempotency"], ["5/29 금", "review", "Stand-up", "Kafka consumer 로그 확인 · Service 커버리지 60%+", "W2 PR 정리 + develop 최신화", ["터미널 kafka-console-consumer.sh", "Jacoco report", "GitHub PR"], "journal.created 메시지가 실제 Kafka에 쌓이고 consumer로 읽히는지 확인한다. 커버리지는 60% 이상을 목표로 한다.", "./gradlew :journal-service:test :journal-service:jacocoTestReport\n\nkafka-console-consumer.sh \\\n  --bootstrap-server localhost:9092 \\\n  --topic journal.created \\\n  --from-beginning", "coverage"]]}, "W3": {"period": "6/1~6/5", "goal": "Saga 보상 + DLQ + journal.created → notification.requested E2E", "color": "var(--orange)", "days": [["6/1 월", "saga", "Stand-up", "SagaCompensationConsumer — journal.creation.failed 수신 → DRAFT 롤백", "보상 처리 테스트", ["journal-service/src/main/java/.../infrastructure/kafka/SagaCompensationConsumer.java", "journal-service/src/main/java/.../usecase/SagaCompensationUseCase.java"], "BFF/AI 알림 흐름 실패 이벤트를 받으면 이미 발행된 Journal을 DRAFT로 되돌리고 보상 이벤트를 기록한다.", "@KafkaListener(topics = [\"journal.creation.failed\"], groupId = \"journal-saga-compensation\")\npublic void consume(JournalCreationFailedEvent event) {\n  sagaCompensationUseCase.rollbackToDraft(event.getJournalId(), event.getIdempotencyKey)\n}", "saga"], ["6/2 화", "obs", "페이스 점검 (11:30)", "Kafka 이벤트 유실률 0% 검증 — consumer lag 모니터링", "lag 수치 기록", ["Grafana/Prometheus", "Kafka consumer group"], "consumer lag가 증가한 채로 유지되지 않아야 한다. 장애 재현 시 lag/처리량/에러 로그를 함께 기록한다.", "kafka-consumer-groups.sh \\\n  --bootstrap-server localhost:9092 \\\n  --describe \\\n  --group journal-saga-compensation", "lag"], ["6/3 수", "gate", "Feature Freeze", "@RetryableTopic DLQ 설정 · consumer 멱등성 검증", "중복 메시지 처리 확인", ["SagaCompensationConsumer.java", "DLQ topic", "processed_event table"], "Feature Freeze 이후 신규 기능보다 안정화가 우선이다. Retry 3회 후 DLQ로 이동하고, 중복 이벤트는 processedEvent로 무시한다.", "@RetryableTopic(attempts = \"3\", backoff = @Backoff(delay = 1000))\n@KafkaListener(topics = [\"journal.creation.failed\"], groupId = \"journal-saga-compensation\")\npublic void consume(JournalCreationFailedEvent event) {\n  if (processedEventRepository.exists(event.getIdempotencyKey())) return;\n  sagaCompensationUseCase.rollbackToDraft(event.journalId, event.idempotencyKey)\n}", "dlq"], ["6/4 목", "e2e", "Stand-up", "journal.created → notification.requested E2E 흐름", "강태오 협력 통합 테스트", ["journal-service", "bff-service", "Kafka topic: journal.created / notification.requested"], "Journal이 journal.created를 발행하면 BFF가 이를 받아 notification.requested를 발행하는지 끝까지 확인한다.", "# 1. journal publish\ncurl -X PATCH http://localhost:8080/api/v1/journals/1/publish -H \"Authorization: Bearer {TOKEN}\" -H \"Idempotency-Key: e2e-001\"\n\n# 2. journal.created 확인\nkafka-console-consumer.sh --bootstrap-server localhost:9092 --topic journal.created --from-beginning\n\n# 3. notification.requested 확인\nkafka-console-consumer.sh --bootstrap-server localhost:9092 --topic notification.requested --from-beginning", "e2e"], ["6/5 금", "test", "Stand-up", "통합 시나리오: 묵상 노트 발행 → AI 완료 알림 수신", "W3 회고 + 실패 케이스 정리", ["E2E 시나리오", "Flutter/BFF 알림 흐름", "회고 문서"], "시연에 필요한 묵상 노트 발행 흐름을 한 번에 점검한다. 실패하면 원인/재현 명령/수정 담당을 기록한다.", "E2E 체크\n[ ] Journal DRAFT 생성\n[ ] Journal PUBLISHED 전이\n[ ] journal.created 발행\n[ ] BFF notification.requested 발행\n[ ] Flutter 알림 수신 또는 로그 확인", "e2e"]]}, "W4": {"period": "6/8~6/12", "goal": "회귀 테스트 + Saga 보상 시나리오 dry-run + 커버리지 70%+", "color": "var(--lead)", "days": [["6/8~6/12", "test", "회귀 테스트", "Saga 보상 시나리오 시연 dry-run", "커버리지 70%+", ["journal-service 테스트", "Saga 실패 시나리오", "Jacoco report"], "기능 추가보다 안정화가 우선이다. publish 성공/실패/중복/보상/락 충돌 케이스를 반복 확인한다.", "./gradlew :journal-service:test :journal-service:jacocoTestReport\n\n회귀 체크\n[ ] DRAFT 생성\n[ ] 수정\n[ ] publish\n[ ] 중복 publish\n[ ] journal.creation.failed 보상\n[ ] DLQ 이동", "regression"]]}, "W5": {"period": "6/15~6/17", "goal": "시연 시나리오 묵상 노트 발행 흐름 리허설 지원", "color": "var(--green)", "days": [["6/15~6/17", "demo", "시연 리허설 지원", "묵상 노트 발행 흐름 최종 확인", "백업 명령/로그 준비", ["시연 환경", "journal-service 로그", "Kafka topic 로그"], "시연 중 Journal/Kafka 흐름이 막히면 즉시 확인할 명령어를 준비한다. DB 상태와 Kafka topic 로그를 빠르게 확인할 수 있어야 한다.", "kubectl logs -n qtai deploy/journal-service --tail=100\n\nkafka-console-consumer.sh --bootstrap-server localhost:9092 --topic journal.created --from-beginning --max-messages 5\n\nSELECT id, status, version FROM journals ORDER BY id DESC LIMIT 5;", "demo"]]}};
-const BADGES = {"db": ["DB", "bd"], "test": ["테스트", "bo"], "code": ["코드", "bc"], "api": ["API", "bi"], "kafka": ["Kafka", "bk"], "gate": ["게이트", "bt"], "review": ["리뷰", "br"], "saga": ["Saga", "bp"], "obs": ["관측성", "bg"], "e2e": ["E2E", "be"], "demo": ["시연", "bo"]};
-function copyCode(btn){ const pre=btn.parentElement; const text=pre.innerText.replace('복사','').trim(); navigator.clipboard.writeText(text); btn.textContent='복사됨'; btn.classList.add('ok'); setTimeout(()=>{btn.textContent='복사';btn.classList.remove('ok')},1200); }
-function g(id){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); }
-function renderWeeks(){ const root=document.getElementById('weeks-root'); root.innerHTML=''; Object.entries(WEEKS).forEach(([wk, data])=>{ let html=`<div class="wblock mt20" id="${wk}"><div class="whdr"><div class="wdot" style="background:${data.color}"></div><span class="wlabel">${wk}</span><span class="wperiod">${data.period}</span><span class="wgoal">${data.goal}</span></div><div class="col-hdr"><div>일자</div><div>오전</div><div>오후 코어</div><div>저녁</div><div></div></div>`; data.days.forEach((d,idx)=>{ const [date,badge,m,a,e,where,what,how,sim]=d; const [btxt,bcls]=BADGES[badge]||['작업','bc']; const id=`${wk}-${idx}`; html += `<div class="day-card"><div class="dtrig" onclick="toggleDay('${id}')"><div class="dtc"><div class="dt-date">${date}</div><span class="dt-badge ${bcls}">${btxt}</span></div><div class="dtc">${m}</div><div class="dtc">${a}</div><div class="dtc">${e}</div><div class="dt-chev" id="chev-${id}">⌄</div></div><div class="day-detail" id="${id}"><div class="four-grid"><div class="fi"><div class="fi-label lw">📁 어디서 (파일 경로)</div><ul class="path-list">${where.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div><div class="fi"><div class="fi-label la">🎯 무엇을 (결과물)</div><div class="wt">${what}</div></div><div class="fi"><div class="fi-label lh">⚙️ 어떻게 (명령어·코드)</div><pre>${escapeHtml(how)}<button class="copy-btn" onclick="copyCode(this)">복사</button></pre></div><div class="fi"><div class="fi-label lo">✅ 최종 결과물 (시뮬레이션)</div>${simHtml(d,id)}</div></div>${dodHtml(badge, id)}</div></div>`; }); html += `</div>`; root.insertAdjacentHTML('beforeend', html); }); }
-function togglePanel(id){ const el=document.getElementById(id); const chev=document.getElementById('chev-'+id); const open=el.classList.toggle('show'); if(chev) chev.classList.toggle('open', open); }
-function toggleDay(id){ const el=document.getElementById(id); const chev=document.getElementById('chev-'+id); const open=el.classList.toggle('show'); chev.classList.toggle('open', open); }
-function escapeHtml(s){ return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
-function updateProg(){ let n=0; for(let i=1;i<=5;i++) if(document.getElementById('c'+i).checked) n++; document.getElementById('prog').style.width=(n*20)+'%'; document.getElementById('prog-txt').textContent=`${n} / 5 완료`; }
-const SIM_CTX={};
-const SIM_PRESETS={
-  flyway:{cmd:'$ ./gradlew :journal-service:flywayMigrate',lines:[['Flyway V1__create_journal_tables.sql 적용 완료','sg'],['journals / journal_events 테이블 생성 확인','sg'],['Journal.java + JournalEvent.java ERD 매핑 PASS','sg']]},
-  repo:{cmd:'$ ./gradlew :journal-service:test --tests *JournalRepositoryTest',lines:[['JournalRepositoryTest PASS','sg'],['findByUserIdAndDeletedFalse 결과 1건 이상','sg'],['soft delete 된 Journal은 목록에서 제외됨','sg']]},
-  event:{cmd:'$ ./gradlew :journal-service:test --tests *CreateJournalUseCaseTest',lines:[['Journal status = DRAFT','sg'],['JOURNAL_EVENTS event_type=CREATED, sequence_no=1 append','sg'],['@Transactional rollback 케이스 PASS','sg']]},
-  'curl-create':{cmd:'$ curl -i -X POST /api/v1/journals',lines:[['HTTP/1.1 201 Created','sg'],['{ id: 1, status: DRAFT, title: 오늘의 묵상 }','sg'],['JOURNAL_EVENTS CREATED 기록 확인','sg']]},
-  outbox:{cmd:'$ ./gradlew :journal-service:flywayMigrate',lines:[['OUTBOX_EVENTS 테이블 생성 완료','sg'],['idempotency_key UNIQUE 제약 확인','sg'],['published_at NULL 대기 이벤트 저장 가능','sg']]},
-  publish:{cmd:'$ curl -X PATCH /api/v1/journals/1/publish',lines:[['HTTP/1.1 200 OK','sg'],['journals.status: DRAFT -> PUBLISHED','sg'],['outbox_events topic=journal.created insert 확인','sg']]},
-  kafka:{cmd:'$ kafka-console-consumer --topic journal.created --from-beginning',lines:[['journal.created 메시지 수신','sg'],['Envelope eventType / idempotencyKey / data 필드 확인','sg'],['payload 키 미사용 확인','sg']]},
-  w1gate:{cmd:'$ bash scripts/check-journal-w1.sh',lines:[['POST /api/v1/journals -> 201','sg'],['GET/PUT Journal API 응답 shape OK','sg'],['Flyway V1+V2 + JOURNAL_EVENTS 기록 OK','sg']]},
-  scheduler:{cmd:'$ ./gradlew :journal-service:test --tests *OutboxSchedulerTest',lines:[['미발행 outbox 1건 조회','sg'],['KafkaTemplate send 후 published_at 업데이트','sg'],['실패 이벤트 retry_count 증가 케이스 PASS','sg']]},
-  idempotency:{cmd:'$ ./gradlew :journal-service:test --tests *PublishJournalUseCaseTest',lines:[['같은 idempotencyKey 2회 호출','sy'],['outbox_events count = 1','sg'],['@Lock 낙관적 락 충돌 테스트 PASS','sg']]},
-  coverage:{cmd:'$ ./gradlew :journal-service:test :journal-service:jacocoTestReport',lines:[['BUILD SUCCESSFUL','sg'],['Jacoco line coverage >= 60%','sg'],['journal.created consumer 로그 캡처 완료','sg']]},
-  saga:{cmd:'$ kafka-console-producer --topic journal.creation.failed',lines:[['journal.creation.failed 수신','sg'],['journals.status: PUBLISHED -> DRAFT 롤백','sg'],['JOURNAL_EVENTS COMPENSATED 기록 확인','sg']]},
-  lag:{cmd:'$ kafka-consumer-groups.sh --describe --group journal-saga-compensation',lines:[['CURRENT-OFFSET == LOG-END-OFFSET','sg'],['LAG 0 유지','sg'],['Grafana consumer lag 패널 캡처 완료','sg']]},
-  dlq:{cmd:'$ ./gradlew :journal-service:test --tests *SagaCompensationConsumerTest',lines:[['Retry 3회 후 DLQ 이동 케이스 PASS','sg'],['processed_event 중복 메시지 skip 확인','sg'],['중복 idempotencyKey 재처리 없음','sg']]},
-  e2e:{cmd:'$ curl PATCH /api/v1/journals/1/publish && kafka-console-consumer',lines:[['journal.created 발행 확인','sg'],['BFF notification.requested 발행 확인','sg'],['Flutter 알림 수신 또는 BFF 로그 확인','sg']]},
-  regression:{cmd:'$ ./gradlew :journal-service:test :journal-service:jacocoTestReport',lines:[['DRAFT 생성/수정/publish 회귀 PASS','sg'],['중복 publish / 보상 / DLQ 이동 PASS','sg'],['Jacoco line coverage >= 70%','sg']]},
-  demo:{cmd:'$ kubectl logs -n qtai deploy/journal-service --tail=100',lines:[['최근 Journal publish 로그 확인','sg'],['journal.created topic 백업 확인','sg'],['시연 장애 시 DB/Kafka 확인 명령 준비 완료','sg']]},
-  default:{cmd:'$ ./gradlew :journal-service:test',lines:[['BUILD SUCCESSFUL','sg'],['Journal Service 완료 증거 확인','sg']]}
-};
-function stripHtml(s){ const el=document.createElement('div'); el.innerHTML=String(s); return (el.textContent||el.innerText||'').replace(/\s+/g,' ').trim(); }
-
-function dodFallback(badge) {
-  var common = ['단위 테스트 추가/통과', '본인 서비스 빌드 성공', 'PR draft 등록', 'workspaces/{본인}/reports/ 리포트 작성'];
-  switch(badge) {
-    case 'infra': return ['인프라 정상 기동 (kubectl get pods)', '헬스체크 200 OK', '.env / Secret 적용 검증', 'reports/ 리포트 작성'];
-    case 'code': return common;
-    case 'obs': return ['로그 출력 확인 (INFO+ 누락 없음)', 'Prometheus 메트릭 노출', 'Jaeger trace 수집 확인', 'PR draft 등록'];
-    case 'review': return ['PR 코멘트 모두 반영', '추가 테스트 케이스', 'develop conflict 해결', '리뷰어 재요청'];
-    case 'gate': return ['통합 테스트 통과 (16번)', '커버리지 80%+', 'Spectral lint 통과', 'Sonar 품질 게이트 통과'];
-    case 'test': return ['golden-set 시나리오 통과', 'injection-set 보안 테스트', '커버리지 80%+', 'PR draft 등록'];
-    case 'demo': return ['시연 시나리오 통과 (13번)', '스크린샷·녹화 확보', 'workspaces/{본인}/notes/ 저장', '발표 슬라이드 반영'];
-    default: return common;
-  }
-}
-const dodMap = {
-  'W1-0': ['Flyway V1 — JOURNALS·JOURNAL_EVENTS 2테이블 DDL 작성','./gradlew :journal-service:flywayMigrate 성공','Journal·JournalEvent 도메인 엔티티 + JPA 매핑','UNIQUE 제약 (session_id) 적용 — 멱등성 보장','reports/ 리포트 작성'],
-  'W1-1': ['JournalRepository — findByUserId·findById·soft delete 메서드','단위 테스트 5케이스+ (성공·미존재·삭제·페이징)','@DataJpaTest로 Testcontainers MySQL 연동','./gradlew :journal-service:test 통과','PR draft 등록'],
-  'W1-2': ['CreateJournalUseCase 구현 — DRAFT 생성 + JournalEvent 기록','@Transactional + 낙관적 락 (version 컬럼)','sequenceNumber 단조 증가 검증','단위 테스트 3케이스+ (성공·중복·실패)','PR draft 등록'],
-  'W1-3': ['JournalController POST/GET/PUT/DELETE 4 endpoint','ProblemDetail RFC 7807 에러 응답','PATCH /api/v1/journals/{id} (제목·내용 수정)','curl 4 endpoint 모두 200 OK','PR draft 등록'],
-  'W1-4': ['CreateJournalUseCase Mockito 단위 테스트','UpdateJournalUseCase + DeleteJournalUseCase 단위 테스트','커버리지 70%+ 도달','./gradlew :journal-service:test 통과','PR draft 등록'],
-  'W1-5': ['Flyway V2 — OUTBOX_EVENTS 테이블 추가','OutboxEvent 엔티티 + Repository','TX 안에서 outbox에 INSERT (강한 일관성)','단위 테스트 — outbox 정상 기록','PR draft 등록'],
-  'W1-6': ['PublishJournalUseCase — DRAFT → PUBLISHED + Outbox insert','상태 전이 검증 (DRAFT만 PUBLISHED 가능)','@Transactional 내 outbox 동시 기록','published_at·sequenceNumber 갱신 검증','PR draft 등록'],
-  'W1-7': ['JournalEventProducer — KafkaTemplate 기반','journal.created 이벤트 publish 동작 확인','Apicurio Schema Registry 연동 (events/schema/journal.created-value.json)','local Kafka 연결 테스트 통과','PR draft 등록'],
-  'W1-8': ['5/22 18:00 Foundation 게이트 참석','Journal Service W1 종료 기준 모두 ✅ (CRUD·이벤트소싱·Outbox·Kafka)','W1 회고 — 이벤트 순서 보장·Saga 흐름 공유','15_체크리스트 W1 항목 마킹','reports/ W1 종합 리포트 작성'],
-  'W2-0': ['PATCH /api/v1/journals/{id}/publish endpoint','DRAFT → PUBLISHED 상태 전이 + Outbox insert (TX 보장)','published_at·sequenceNumber 갱신 검증','curl 통합 테스트 통과','PR draft 등록'],
-  'W2-1': ['OutboxScheduler — 5초 주기 polling → KafkaTemplate 발행','published_at IS NULL인 OutboxEvent만 polling','발행 성공 시 published_at 업데이트','단위 테스트 (Mock KafkaTemplate)','PR draft 등록'],
-  'W2-2': ['@Lock 낙관적 락 적용 — 동시 publish 시 1개만 성공','멱등성 키 (idempotency_key) 중복 발행 차단 테스트','version 컬럼 동시성 검증','OptimisticLockingFailureException 처리','PR draft 등록'],
-  'W2-3': ['Kafka consumer 로그 확인 — journal.created 정상 수신','Service 단 커버리지 60%+ 달성','feature/journal-w2 브랜치 정리 + develop rebase','15_체크리스트 W2 5항목 마킹','reports/ W2 종합 리포트 작성'],
-  'W3-0': ['SagaCompensationConsumer — journal.creation.failed 수신','DRAFT 롤백 로직 (PUBLISHED → DRAFT 또는 삭제)','@KafkaListener concurrency=3 설정','보상 트랜잭션 단위 테스트','PR draft 등록'],
-  'W3-1': ['Kafka 이벤트 유실률 0% 검증',
-    'consumer lag 모니터링 (Grafana Kafka panel)',
-    'lag > 100 시 Slack 알림 트리거 확인',
-    'Outbox 미발행 건 polling 정상 작동 (장애 후 복구)',
-    'PR draft 등록'],
-  'W3-2': ['@RetryableTopic 3회 재시도 + DLQ 설정','consumer 멱등성 검증 (동일 이벤트 2번 → DB 1건만)','11:30 페이스 점검 회의 참석','15_체크리스트 W3 3항목 마킹','PR draft 등록'],
-  'W3-3': ['journal.created → notification.requested E2E 흐름','BFF가 journal.created 컨슈밍 → notification.requested 발행','Flutter STOMP 연결 → 알림 수신 확인','전 구간 단일 TraceID 유지','PR draft 등록'],
-  'W3-4': ['통합 시나리오: 묵상 노트 발행 → AI 완료 알림 수신','E2E 테스트 1건 이상 작성 (Testcontainers Kafka)','커버리지 75%+ 달성','reports/ W3 종합 리포트 작성','PR draft 등록'],
-  'W4-0': ['./gradlew :journal-service:test :journal-service:jacocoTestReport','회귀 체크: DRAFT·수정·publish·중복publish·보상·DLQ 6 케이스','커버리지 70%+ 최종 달성','Saga 보상 dry-run (journal.creation.failed → 롤백 1건)','reports/ W4 종합 리포트 작성'],
-  'W5-0': ['kubectl logs -n qtai deploy/journal-service --tail=100 정상','kafka-console-consumer로 journal.created 5건 확인','시연 중 발행 흐름 막히면 즉시 확인 명령어 준비','SELECT * FROM journals ORDER BY id DESC LIMIT 5 (DB 상태)','reports/ W5 발표 종합 리포트 작성']
-};
-function dodHtml(badge, id){var dodList = dodMap[id] || dodFallback(badge || 'code');var items = dodList.map(function(item, i){var cid = 'dod-' + id + '-' + i;return '<div class="dod-item"><input type="checkbox" id="' + cid + '"><label for="' + cid + '">' + item + '</label></div>';}).join('');return '<div class="dod-box"><div class="dod-title">📋 DoD — Definition of Done (오늘의 완료 기준)</div>' + items + '</div>';}
-
-function simHtml(d,id){ const sid=id.replace(/[^a-z0-9]/gi,''); const [date,badge,m,task,done,where,what,how,sim]=d; SIM_CTX[sid]={date,badge,m,task,done,where,what,how,sim}; return `<div class="wt" style="margin-bottom:6px"><strong>완료 미리보기:</strong> ${escapeHtml(done)}</div><button class="sim-btn" onclick="runSim('${sid}')">▶ 시뮬레이션 실행</button><div class="sim-out" id="s${sid}"></div>`; }
-function runSim(id){ const ctx=SIM_CTX[id]; const out=document.getElementById('s'+id); const preset=SIM_PRESETS[ctx.sim]||SIM_PRESETS.default; out.classList.add('show'); out.innerHTML=''; const lines=[['[완료 미리보기] '+ctx.date,'sy'],['작업: '+ctx.task,'sd'],['완료 결과: '+ctx.done,'sg'],['','sd'],[preset.cmd,'sc'],...preset.lines,['','sd'],['산출물: '+stripHtml(ctx.what),'sd'],['확인 위치: '+ctx.where.join(' / '),'sd'],['✅ PR에 첨부할 증거: '+ctx.done,'sg']]; simLines('s'+id,lines); }
-function simLines(outId,lines){ const out=document.getElementById(outId); lines.forEach(([t,c],i)=>setTimeout(()=>{ const div=document.createElement('div'); div.className=c; div.textContent=t; out.appendChild(div); },i*70)); }
-function renderAI(){
-  const data=[
-    {week:'W1',task:'Flyway DDL · Journal/JournalEvent Entity · Repository 테스트 골격',
-      ctx:['apis/journal/openapi.yaml','02_ERD_문서.md — Journal/JOURNAL_EVENTS 테이블','03_아키텍처_정의서.md — 이벤트 소싱 원칙','AGENTS.md 금지 패턴'],
-      prompt:'[역할] QT-AI Journal Service Owner.\n\n[요청] Flyway V1 DDL과 Journal/JournalEvent Entity 초안을 작성한다.\n조건:\n- JDK 21, Spring Boot 3.3.x, Hibernate 6.x 기준\n- MySQL 8.0 Dialect 기준\n- JOURNAL_EVENTS는 append-only 이벤트 소싱 로그\n- DB 변경 UseCase는 @Transactional 필수\n- API 응답은 apis/journal/openapi.yaml과 일치\n\n[금지]\n- PostgreSQL DDL\n- @Where 사용\n- JOURNAL_EVENTS 삭제/수정 로직',
-      verify:['컬럼명·nullable·index를 ERD와 대조','openapi.yaml의 요청/응답 필드와 DTO 대조','@Transactional 없는 DB 변경 메서드 없는지 grep','JOURNAL_EVENTS append-only 유지']},
-    {week:'W2',task:'PublishJournalUseCase · OutboxScheduler · 낙관적 락/멱등성 테스트',
-      ctx:['events/schema/journal.created-value.json','events/schema/journal.updated-value.json','events/schema/journal.deleted-value.json','03_아키텍처_정의서.md — Kafka Outbox 패턴'],
-      prompt:'[역할] QT-AI Journal/Kafka 개발자.\n\n[요청] 묵상 노트 publish 흐름을 구현한다.\n- DRAFT → PUBLISHED 상태 전이\n- OUTBOX_EVENTS insert\n- idempotencyKey UNIQUE 제약 기반 중복 방지\n- @Lock 낙관적 락 적용\n- OutboxScheduler가 미발행 이벤트를 polling 후 Kafka 발행\n\n[중요]\n트랜잭션 안에서 KafkaTemplate.send()를 직접 호출하지 않는다. 트랜잭션 안에서는 Outbox 저장까지만 수행한다.',
-      verify:['KafkaTemplate.send()가 @Transactional 내부에 직접 없는지','OUTBOX_EVENTS idempotency_key UNIQUE 확인','published_at/retry_count 처리 확인','같은 idempotencyKey 중복 요청 테스트']},
-    {week:'W3',task:'RetryableTopic · DLQ consumer · Saga 보상 컨슈머 · consumer lag 점검',
-      ctx:['events/schema/journal.creation.failed-value.json','events/schema/notification.requested-value.json','03_아키텍처_정의서.md — Saga 보상 트랜잭션','DECISIONS.md — Kafka Envelope 표준'],
-      prompt:'[역할] QT-AI Saga/Kafka 통합 담당자.\n\n[요청] journal.creation.failed 보상 컨슈머를 작성한다.\n- groupId: journal-saga-compensation\n- RetryableTopic: 3회 재시도, backoff 1s\n- 중복 이벤트는 idempotencyKey로 skip\n- 실패 이벤트 수신 시 PUBLISHED → DRAFT 롤백\n- 보상 처리도 JOURNAL_EVENTS에 append-only 기록\n\n[중요]\nKafka Envelope는 data 필드를 사용한다. payload 필드 사용 금지.',
-      verify:['groupId와 topic명이 schema와 일치하는지','idempotencyKey 중복 처리 테스트','DLQ 이동 시나리오 확인','consumer lag 0 유지 여부 기록','payload 필드 사용 여부 grep']},
-    {week:'W4',task:'회귀 테스트 시나리오 · Saga 보상 dry-run · 장애 재현 로그 정리',
-      ctx:['07_테스트_전략.md','10_트러블슈팅_FAQ.md','journal-service 테스트 리포트','Kafka consumer 로그'],
-      prompt:'[역할] QT-AI Journal 안정화 담당자.\n\n[요청] Journal 회귀 테스트 체크리스트와 dry-run 절차를 작성한다.\n포함:\n- DRAFT 생성/수정/삭제\n- publish 성공\n- 중복 publish\n- 낙관적 락 충돌\n- journal.creation.failed 보상\n- DLQ 이동\n- consumer lag 확인\n\n[출력] 각 케이스별 명령어, 기대 결과, 실패 시 확인 로그.',
-      verify:['JOURNAL_EVENTS 삭제/수정 코드 없음','publish 성공/실패/중복/보상 케이스 모두 포함','커버리지 70%+ 확인','실패 재현 명령과 로그 위치 기록']},
-    {week:'W5',task:'발표용 묵상 노트 발행 시연 스크립트 · 트러블슈팅 FAQ',
-      ctx:['13_운영_시나리오_시연_가이드.md','00_개발_일정_총괄표.md — W5 체크리스트','journal-service 운영 로그 확인 명령'],
-      prompt:'[역할] QT-AI 발표 지원 담당자.\n\n[요청] 묵상 노트 발행 시연 중 Journal/Kafka 담당자가 볼 체크리스트를 작성한다.\n포함:\n- 시연 전 DB 상태 확인\n- journal-service 로그 확인\n- journal.created topic 확인\n- notification.requested 연계 확인\n- 실패 시 백업 명령\n\n[금지]\n실제 사용자 데이터, 비밀번호, API Key, Secret 값을 포함하지 않는다.',
-      verify:['민감 정보가 없는지','3분 시연 흐름을 방해하지 않는 명령만 남겼는지','장애 시 확인 순서가 DB → service log → Kafka 순서인지','백업 영상 전환 기준 명시']},
-    {week:'전체',task:'PR 전 셀프 리뷰 · 문서 문장 다듬기 · AI 산출물 검증',
-      ctx:['AGENTS.md','apis/journal/openapi.yaml','events/schema/*.json','02_ERD_문서.md','03_아키텍처_정의서.md'],
-      prompt:'[역할] QT-AI 코드 리뷰어.\n\n[요청] 아래 산출물을 PR 전에 검증한다.\n- OpenAPI와 Controller/DTO 일치\n- Kafka event envelope가 schema와 일치\n- data 필드 사용, payload 금지\n- @Transactional 누락 없음\n- TX 안 KafkaTemplate.send 직접 호출 없음\n- 서비스 간 직접 Repository 호출 없음\n- MySQL/JDK21/Spring Boot 3.3 기준 준수',
-      verify:['AGENTS 금지 패턴 체크','OpenAPI/Spectral 기준 확인','events/schema와 topic/schemaSubject 대조','AI가 만든 코드라도 직접 테스트 후 반영']}
-  ];
-  const root=document.getElementById('ai-root');
-  root.innerHTML='';
-  data.forEach((x)=>{
-    root.insertAdjacentHTML('beforeend',
-      `<div class="ai-stage"><div class="ai-hdr" onclick="this.nextElementSibling.classList.toggle('show')"><span class="ai-w">${x.week}</span><strong>${escapeHtml(x.task)}</strong></div><div class="ai-body"><div class="ai-lbl">CONTEXT</div><ul class="ctx-list">${x.ctx.map(c=>`<li>${escapeHtml(c)}</li>`).join('')}</ul><div class="ai-lbl">PROMPT</div><div class="prompt-box">${escapeHtml(x.prompt)}</div><div class="ai-lbl">검증 루틴</div><ul class="verify-list">${x.verify.map(v=>`<li>${escapeHtml(v)}</li>`).join('')}</ul></div></div>`
-    );
-  });
-}
-renderWeeks(); renderAI();
-</script>
-</body></html>
+<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 이승욱</h1><p class="subtitle">Bible Service - Journal/Kafka/Event Sourcing / 기준일 2026-05-13 / 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/DevD_이승욱/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
+<main><section class="card"><h2>최신 결정</h2><ul>
+<li>백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.</li>
+<li>인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.</li>
+<li>묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.</li>
+<li>LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.</li>
+<li>Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.</li>
+<li>Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.</li>
+<li>에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.</li>
+<li>성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.</li>
+</ul>
+</section><section class="card"><h2>내 담당 범위</h2><ul>
+<li>JOURNALS read model과 JOURNAL_EVENTS append-only 이벤트 로그</li>
+<li>ai.session.completed 소비 후 Journal DRAFT 자동 생성</li>
+<li>Journal 수정/삭제/발행/공유 공개와 이벤트 소싱</li>
+<li>idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어</li>
+<li>notification.requested와 journal.creation.failed 발행</li>
+</ul>
+</section><section class="card"><h2>내가 만지는 경로</h2><ul>
+<li>services/bible-service/src/main/java/com/qtai/bible/domain/journal/</li>
+<li>services/bible-service/src/main/java/com/qtai/bible/application/journal/</li>
+<li>services/bible-service/src/main/java/com/qtai/bible/infrastructure/kafka/</li>
+<li>events/schema/</li>
+</ul>
+</section><section class="card"><h2>API와 이벤트 계약</h2><ul>
+<li>GET /api/v1/journals</li>
+<li>GET/PATCH/DELETE /api/v1/journals/{id}</li>
+<li>GET /api/v1/journals/{id}/events</li>
+<li>POST/DELETE /api/v1/journals/{id}/share</li>
+<li>Kafka consume: ai.session.completed</li>
+<li>Kafka publish: journal.created, journal.updated, journal.deleted, journal.creation.failed, notification.requested</li>
+</ul>
+</section><section class="card wide"><h2>일정</h2><div class="weeks"><div class="week"><h3>W1 - Foundation Lock-in</h3><ul>
+<li>5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격</li>
+<li>5/14: ai.session.completed consumer, manual ack, idempotencyKey skip 패턴</li>
+<li>5/15: AutoCreateFromSessionUseCase와 CREATED event 적재</li>
+<li>5/19: PATCH/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock</li>
+<li>5/20: sequence 동시성 테스트와 DuplicateKey skip 테스트</li>
+<li>5/21: DLQ, journal.creation.failed, notification.requested 발행</li>
+<li>5/22: AI 완료 -&gt; Journal DRAFT 생성 Saga E2E 검증</li>
+</ul>
+</div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
+<li>Journal API와 이벤트 재구성 완성</li>
+<li>공유/좋아요/댓글/신고 도메인 구현</li>
+<li>Bible core migration과 통합</li>
+</ul>
+</div><div class="week"><h3>W3 - Kafka/E2E 통합</h3><ul>
+<li>Kafka 재처리, DLQ, 멱등성 E2E</li>
+<li>BFF/Flutter 묵상 화면 연동</li>
+<li>동시 수정 충돌 처리</li>
+</ul>
+</div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
+<li>이벤트 로그 리플레이 리포트</li>
+<li>데이터 정합성/락 타임아웃 테스트</li>
+<li>시연용 Journal 데이터 고정</li>
+</ul>
+</div><div class="week"><h3>W5 - 발표와 리허설</h3><ul>
+<li>묵상 저장/수정/나눔 시연 책임</li>
+<li>Kafka Saga Q&amp;A 준비</li>
+<li>장애 시 DLQ/consumer lag 점검</li>
+</ul>
+</div></div></section><section class="card"><h2>매일 작업 순서</h2><ul>
+<li>최신 dev 동기화</li>
+<li>workspaces/.../workflows에 오늘 DoD 작성</li>
+<li>계약 파일 기준으로 구현</li>
+<li>build/test와 금지 패턴 검색</li>
+<li>reports에 결과 기록</li>
+<li>PR 본문에 검증 명령 작성</li>
+</ul>
+</section><section class="card"><h2>검증 명령</h2><pre><code>cd C:\workspace\QT-AI-2nd-Team-Project-master
+.\gradlew.bat -p services\bible-service build --no-daemon
+.\gradlew.bat -p services\bible-service test --no-daemon
+rg -n &quot;JOURNAL_EVENTS|ai.session.completed|idempotencyKey|PESSIMISTIC&quot; services\bible-service events\schema</code></pre></section><section class="card"><h2>금지 패턴</h2><ul>
+<li>PostgreSQL, ZooKeeper, Tempo 설정 추가 금지</li>
+<li>application.yml이나 코드에 API key, DB password, private key 평문 작성 금지</li>
+<li>트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용</li>
+<li>서비스 간 DB 직접 JOIN 또는 Repository 공유 금지</li>
+<li>JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지</li>
+<li>AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용</li>
+<li>OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지</li>
+</ul>
+</section><section class="card"><h2>산출물</h2><ul>
+<li>Journal/Event Flyway와 Entity</li>
+<li>ai.session.completed consumer</li>
+<li>Journal 수정/삭제/공유 UseCase</li>
+<li>멱등성/동시성 테스트</li>
+</ul>
+</section></main>
+</body>
+</html>

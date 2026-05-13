@@ -1,149 +1,120 @@
-﻿# 📋 QT-AI — Dev C (강상민) 상세 일정표
+# QT-AI 개인 공식 일정표 - 강상민
 
-문서 버전: v1.0
-작성일: 2026-05-08
-담당자: 강상민
-역할: AI/RAG Service Owner (팀 내 기술적 깊이 최고)
-담당 서비스: AI/RAG Service — Python FastAPI + Anthropic Claude SSE + ChromaDB RAG
-개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5 / 09_AI_프롬프트_운영_가이드 v1.0
+> 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
 
----
+## 1. 내 역할
 
-## 0. 역할 핵심 선언
+- 담당자: 강상민
+- 역할: AI/RAG Service - DeepSeek/SSE Main Owner
+- 개인 작업 폴더: `workspaces/DevC_강상민/`
+- 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
-> **"AI 없이는 이 앱이 존재하지 않는다."**
-> AI/RAG Service는 QT-AI의 핵심 가치인 소크라테스식 큐티 코칭을 담당한다.
-> SSE 스트리밍 응답 품질, 신학 가드레일, 큐티 A~D 단계 프롬프트 설계가
-> 시연에서 가장 강렬한 인상을 남기는 부분이다.
-> 팀에서 유일한 Python FastAPI 서비스이므로 독립적으로 빌드·배포한다.
+## 2. 반드시 지킬 최신 결정
 
----
+- 백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.
+- 인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.
+- 묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.
+- LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.
+- Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.
+- Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
+- 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
+- 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
 
-## 1. 소유권 선언
+## 3. 내가 주로 만지는 경로
 
-```
-ai-service/                         ← 전담 소유 (Python FastAPI, 포트 8085)
-  ├── main.py                       (FastAPI 앱 엔트리포인트)
-  ├── requirements.txt
-  ├── Dockerfile
-  ├── app/
-  │   ├── api/v1/
-  │   │   ├── sessions.py           (세션 CRUD — 현재 501 stub)
-  │   │   ├── turns.py           (SSE 스트리밍 — ChatUseCase 연결)
-  │   │   └── templates.py          (프롬프트 템플릿 조회)
-  │   ├── domain/
-  │   │   └── schemas.py            (Pydantic 모델 — camelCase alias)
-  │   ├── infrastructure/
-  │   │   ├── chroma.py             (ChromaDB 클라이언트)
-  │   │   └── database.py           (SQLAlchemy MySQL)
-  │   └── usecase/
-  │       ├── chat_usecase.py       (AsyncAnthropic SSE 스트리밍)
-  │       └── session_usecase.py    (세션 CRUD — W1 구현 예정)
-  └── scripts/
-      └── rag_index.py              (ChromaDB 시드 스크립트 — W0 준비 필요)
+- services/ai-service/src/main/java/com/qtai/ai/
+- services/ai-service/src/main/resources/application.yml
+- apis/ai/openapi.yaml
 
-alembic/                            (DB 마이그레이션)
-```
+## 4. 담당 범위
 
-**팀에 제공하는 공개 인터페이스**
-- `POST /ai/sessions/{id}/turns` (SSE) — Flutter가 `dio_sse`로 수신
-- `- 단계 완료 시 → Kafka `ai.session.completed` 이벤트 발행 (W3)
+- AI session/turn API와 SSE streaming 구현
+- DeepSeek API(OpenAI 호환) RestClient/WebClient adapter 구현
+- AI_SESSIONS, AI_TURNS, PROMPT_TEMPLATES 저장 모델
+- ai.session.completed Kafka 발행은 AFTER_COMMIT 패턴으로 처리
+- timeout, semaphore, provider error, client cancel 처리
 
----
+## 5. API와 이벤트 계약 요약
 
-## 2. AI Service 핵심 기술 요구사항
+- POST /ai/sessions
+- POST /ai/sessions/{id}/turns - SSE
+- POST /ai/sessions/{id}/complete
+- GET /ai/sessions/{id}, GET /ai/sessions
+- SSE events: turn_started, token, rag_sources, turn_completed, [DONE]
+- Config: DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
 
-| 요구사항 | 구현 방식 | 완료 목표 | 왜 중요한가 |
-|---------|-----------|-----------|-------------|
-| RAG 시드 데이터 | `rag_index.py` — 신학 주석 5종 이상 ChromaDB 적재 | **W0 말~W1 초 (최우선)** | 없으면 W2 AI 1턴 테스트 불가 |
-| Claude SSE 스트리밍 | `AsyncAnthropic` + `async with stream` | W1 수 (골격 완료, 실DB 연결은 W2) | 시연 핵심 기능 |
-| 큐티 A~D 프롬프트 | 09번 문서 기준 시스템 프롬프트 4종 | W1 목 | 코칭 품질 좌우 |
-| 신학 가드레일 | 시스템 프롬프트에 가드레일 문구 삽입 | W2 화 | 이단·비신학적 응답 차단 |
-| DB 실구현 | Alembic + AI_SESSIONS·AI_TURNS 테이블 | W2 월 | 세션 이력 저장 |
-| Kafka 발행 | `ai.session.completed` (confluent-kafka) | W3 월 | Journal Service Saga 트리거 |
+## 6. W1 상세 일정 - Foundation Lock-in
 
----
+- 5/13: DeepSeekStreamService, timeout, semaphore, cancel hook 골격
+- 5/14: AiSession/AiTurn Entity, Flyway V1, StartSession/ProcessTurn UseCase
+- 5/15: SSE 4종 이벤트와 [DONE] 종료 흐름 구현
+- 5/19: CompleteSessionUseCase와 ai.session.completed AFTER_COMMIT 발행
+- 5/20: LLM_TIMEOUT, LLM_PROVIDER_ERROR ProblemDetail 매핑
+- 5/21: DevB RAG/prompt assembly 연결
+- 5/22: 1턴 E2E와 DeepSeek 장애 fallback 검증
 
-## 3. 일별 상세 일정
+## 7. W2-W5 일정
 
-### 🟦 W0 말 (5/10~5/11) — RAG 시드 준비 ← **최우선**
+### W2 - 핵심 도메인 구현
+- 실제 DeepSeek streaming 연동
+- RAG source 포함 답변 생성
+- AI session 완료 -> Bible Journal 자동 생성 흐름 연결
 
-```
-W1 AI 1턴 테스트를 위해 ChromaDB 시드가 W1 시작 전에 준비되어야 한다.
-```
+### W3 - Kafka/E2E 통합
+- Kafka Saga 보상과 E2E 통합
+- SSE buffering, gateway timeout, client cancel 장애 처리
+- provider 비용/latency metric 발행
 
-| 작업 | 내용 |
-|------|------|
-| `scripts/rag_index.py` 작성 | sentence-transformers 임베딩 + ChromaDB 적재 |
-| 신학 주석 원문 수집 | Matthew Henry, 한국성경주석 등 공개 도메인 5종 이상 (JHN 3장 집중) |
-| 로컬 ChromaDB 테스트 실행 | `python scripts/rag_index.py` → collection size ≥ 5 확인 |
+### W4 - 안정화와 시연 환경
+- 회귀 테스트와 eval 안정화
+- 시연용 WireMock fallback
+- 운영 로그 마스킹 점검
 
----
+### W5 - 발표와 리허설
+- AI 코칭 시연 책임
+- 장애 시 녹화 응답/fallback 전환
+- 발표 Q&A: DeepSeek, RAG, SSE 설명
 
-### 🟩 W1 (5/12~5/22)
+## 8. 매일 작업 순서
 
-| 일자 | 오전 | 오후 코어 | 저녁 |
-|------|------|-----------|------|
-| 5/12 화 | 킥오프 참석. Python venv 구성 | `pip install -r requirements.txt`. ChromaDB K8s 배포 확인 | `rag_index.py` 실행 — collection size 확인 |
-| 5/13 화 | Stand-up | Alembic 초기화. AI_SESSIONS 마이그레이션 작성 | AI_TURNS 마이그레이션 작성 |
-| 5/14 수 | Stand-up | `ChatUseCase.stream_response()` — DB 연결 없이 하드코딩으로 SSE 동작 확인 | curl SSE 테스트: `curl -N http://localhost:8085/ai/sessions/1/turns` |
-| 5/15 목 | Stand-up | 큐티 A~D 시스템 프롬프트 4종 (`STAGE_SYSTEM_PROMPTS`) 작성 (09번 참조) | 단계별 응답 품질 셀프 테스트 |
-| 5/16 금 | Stand-up | `SessionUseCase` DB 실구현 시작 (create_session) | `/ai/sessions` POST → 201 반환 확인 |
-| 5/19 월 | Stand-up | `SessionUseCase` 전체 CRUD 구현 (get, list, advance) | 세션 단계 진행 (A→B) 테스트 |
-| 5/20 화 | Stand-up | `turns.py` — 세션 존재·소유권 검증 완성 | pytest 기본 테스트 작성 |
-| 5/21 수 | Stand-up | Gateway 경유 SSE 테스트 (강태오 협력) — NoBufferingFilter 동작 확인 | 단계별 프롬프트 품질 재검토 |
-| 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | W1 회고 |
+- 작업 시작 전 git pull 방식으로 최신 dev 동기화
+- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
+- 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
+- 작업 후 본인 서비스 build/test와 금지 패턴 검색
+- 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
+- PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
 
-**W1 완료 기준**
-- [ ] `POST /ai/sessions` → 201 세션 생성
-- [ ] `POST /ai/sessions/1/turns` → SSE 스트림 첫 토큰 수신
-- [ ] ChromaDB RAG 컨텍스트 검색 결과 ≥ 1건
-- [ ] 큐티 A단계 프롬프트 응답 품질 셀프 확인
-- [ ] Alembic 마이그레이션 성공
+## 9. 검증 명령
 
----
-
-### 🟨 W2 (5/26~5/29)
-
-| 일자 | 주요 작업 |
-|------|-----------|
-| 5/26 화 | 페이스 점검 (11:30). 신학 가드레일 시스템 프롬프트 추가 (이단 탐지 문구) |
-| 5/27 수 | `| 5/28 목 | `GET /ai/prompt-templates` DB 연결 완성. Bible Service 연동 (강태오·김태혁 협력) |
-| 5/29 금 | pytest 커버리지 60%+. `/ai/sessions` 목록·상세 API 완성 |
-
----
-
-### 🟧 W3 (6/1~6/5) + 🟥 W4 (6/8~6/12)
-
-| 주차 | 주요 작업 |
-|------|-----------|
-| W3 | Kafka `ai.session.completed` 이벤트 발행 (confluent-kafka). SSE P95 ≤ 2000ms 측정. 프롬프트 인젝션 방어 테스트 |
-| W4 | 큐티 D단계 완결 시나리오 시연 dry-run. pytest 커버리지 70%+ |
-
----
-
-## 4. 큐티 A~D 프롬프트 설계 원칙 (09번 요약)
-
-```python
-# 각 단계별 핵심 지침
-A (관찰): "본문에서 무엇이 보이는가?" → 관찰 사실만, 해석 금지
-B (해석): "이 말씀의 의미는?" → 역사·문화적 배경, 원어 의미 활용
-C (적용): "내 삶에 어떻게 적용하는가?" → 구체적 상황 이끌어내기
-D (결단): "오늘 무엇을 결단하는가?" → 실천 가능한 행동 1가지로 좁히기
-
-# 공통 가드레일 (모든 단계에 삽입)
-"이단적 교리, 비성경적 해석, 개인의 주관적 신학을 지지하지 마세요.
- 잘 모르겠으면 '성경 원문을 다시 살펴보겠습니다'로 돌아오세요."
+```powershell
+cd C:\workspace\QT-AI-2nd-Team-Project-master
+.\gradlew.bat -p services\ai-service build --no-daemon
+.\gradlew.bat -p services\ai-service test --no-daemon
+rg -n "DeepSeek|SseEmitter|ServerSentEvent|ai.session.completed" services\ai-service
 ```
 
----
+## 10. 금지 패턴
 
-## 5. AI 에이전트 활용 가이드
+- PostgreSQL, ZooKeeper, Tempo 설정 추가 금지
+- application.yml이나 코드에 API key, DB password, private key 평문 작성 금지
+- 트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용
+- 서비스 간 DB 직접 JOIN 또는 Repository 공유 금지
+- JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지
+- AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용
+- OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지
 
-| 단계 | Claude 활용처 | 주의사항 |
-|------|--------------|----------|
-| W1 | Alembic DDL 초안, FastAPI 라우터 패턴 | DB URL·API Key Claude에 입력 금지 |
-| W2 | Kafka producer 코드, pytest fixture | 실제 Kafka 토픽명 03번 문서와 대조 |
-| W3 | 프롬프트 튜닝 반복 실험 | 시스템 프롬프트 길이 ≤ 4000자 유지 |
-| 전체 | ANTHROPIC_API_KEY는 절대 Claude에 붙여넣기 금지 | K8s Secret 경로만 공유 |
+## 11. 산출물
+
+- DeepSeekStreamService 실제 adapter
+- AI Session/Turn API와 SSE Controller
+- ai.session.completed publisher
+- provider timeout/error 테스트
+
+## 12. PR 전에 확인
+
+- 내 담당 경로 밖 변경이 섞이지 않았는가
+- OpenAPI, event schema, DECISIONS.md와 충돌하지 않는가
+- ProblemDetail, Kafka data envelope, DeepSeek, 4서비스 기준을 지켰는가
+- 로컬 build/test 결과를 PR 본문에 적었는가
+- 막힌 점은 추측으로 넘기지 않고 Lead에게 질문으로 남겼는가

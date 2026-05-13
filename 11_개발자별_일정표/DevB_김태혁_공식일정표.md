@@ -1,117 +1,119 @@
-﻿# 📋 QT-AI — Dev B (김태혁) 상세 일정표
+# QT-AI 개인 공식 일정표 - 김태혁
 
-문서 버전: v1.0
-작성일: 2026-05-08
-담당자: 김태혁
-역할: Bible Service Owner
-담당 서비스: Bible Service — 성경 본문(KR/EN) · 주석 · Redis 24h 캐시 · 전문 검색
-개발 기간: W1(5/12) ~ W5(6/17)
-연관 문서: 00_개발_일정_총괄표 / 02_ERD_문서 v1.3 / 04_API_명세서 v1.5
+> 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
 
----
+## 1. 내 역할
 
-## 0. 역할 핵심 선언
+- 담당자: 김태혁
+- 역할: AI/RAG Service - Prompt/RAG 보조 Owner
+- 개인 작업 폴더: `workspaces/DevB_김태혁/`
+- 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
-> **"이 프로젝트의 데이터 심장은 성경 본문이다."**
-> Bible Service는 AI 코칭의 RAG 소스이자 Flutter 화면의 핵심 콘텐츠다.
-> 다중 JOIN(한/영 병기) + Redis 캐시로 P95 ≤ 300ms를 달성해야
-> AI SSE 스트리밍 전체 타임라인(P95 ≤ 2000ms)이 지켜진다.
+## 2. 반드시 지킬 최신 결정
 
----
+- 백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.
+- 인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.
+- 묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.
+- LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.
+- Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.
+- Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
+- 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
+- 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
 
-## 1. 소유권 선언
+## 3. 내가 주로 만지는 경로
 
+- services/ai-service/src/main/java/com/qtai/ai/infrastructure/rag/
+- services/ai-service/src/main/java/com/qtai/ai/prompt/
+- services/ai-service/src/test/
+- 09_AI_프롬프트_운영_가이드.md
+
+## 4. 담당 범위
+
+- QT A/B/C/D 유형과 OBSERVATION/INTERPRETATION/FEELING/APPLICATION 단계 분리 유지
+- ChromaDB RAG source metadata, seed corpus, rag_sources SSE payload 지원
+- PromptTemplate 모델과 injection/golden 평가 세트 관리
+- DeepSeek 호출부는 DevC와 인터페이스를 맞추고 공급자 교체를 시도하지 않음
+- RAG 출처 없는 신학 단정 답변을 차단하는 검증 규칙 보조
+
+## 5. API와 이벤트 계약 요약
+
+- ChromaDB collection: qtai_corpus
+- SSE rag_sources event: source title, passage/ref, snippet, score 포함
+- AI prompt는 09번 가이드의 D형 QT 4단계와 23번 도메인 용어사전을 따른다.
+- AI turn 저장 전 검증 실패 시 완료 turn으로 저장하지 않는다.
+
+## 6. W1 상세 일정 - Foundation Lock-in
+
+- 5/13: PromptTemplate, RagSource, QtStage/JournalType 매핑 초안
+- 5/14: KJV/Matthew Henry/더미 한글 주석 seed 범위 정의
+- 5/15: A/B/C/D 시스템 프롬프트 초안과 금지 응답 규칙
+- 5/19: golden-set 10건, injection-set 10건 작성
+- 5/20: ChromaDB metadata schema와 rag_sources 예시 고정
+- 5/21: DevC SSE payload와 PromptTemplate 저장 구조 맞춤
+- 5/22: eval 실행 방법과 통과 기준 리포트
+
+## 7. W2-W5 일정
+
+### W2 - 핵심 도메인 구현
+- RAG 검색 client와 prompt assembly 연동
+- 출처 기반 응답 검증기 1차 구현
+- AI 서비스 테스트 데이터 확장
+
+### W3 - Kafka/E2E 통합
+- Bible verse_exists 또는 본문 조회와 RAG 검증 연동
+- 프롬프트 인젝션 회귀 테스트 CI 후보 작성
+- 응답 품질 로그 샘플 수집
+
+### W4 - 안정화와 시연 환경
+- golden/injection/theology set 확장
+- RAG seed 재현 스크립트 정리
+- 시연용 안정 응답 샘플 준비
+
+### W5 - 발표와 리허설
+- AI 답변 품질 Q&A 대응
+- RAG 출처와 저작권 설명 준비
+- 시연 중 DeepSeek 장애 fallback 문구 지원
+
+## 8. 매일 작업 순서
+
+- 작업 시작 전 git pull 방식으로 최신 dev 동기화
+- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
+- 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
+- 작업 후 본인 서비스 build/test와 금지 패턴 검색
+- 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
+- PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
+
+## 9. 검증 명령
+
+```powershell
+cd C:\workspace\QT-AI-2nd-Team-Project-master
+.\gradlew.bat -p services\ai-service build --no-daemon
+.\gradlew.bat -p services\ai-service test --no-daemon
+rg -n "rag_sources|PromptTemplate|QtStage|JournalType" services\ai-service
 ```
-bible-service/
-  └── src/main/kotlin/com/qtai/bibleservice/
-      ├── domain/
-      │   ├── entity/Book.java
-      │   ├── entity/KrBible.java        (개역한글)
-      │   ├── entity/EnBible.java        (KJV)
-      │   ├── entity/Commentary.java
-      │   └── repository/
-      ├── usecase/
-      │   ├── GetChapterUseCase.java     ← 전담 소유
-      │   ├── GetVerseUseCase.java
-      │   ├── GetCommentaryUseCase.java
-      │   └── SearchPassageUseCase.java
-      ├── infrastructure/
-      │   └── cache/BibleCacheRepository.java  (Redis 24h TTL)
-      └── api/
-          └── BibleController.java
-  └── src/main/resources/
-      └── db/migration/
-          ├── V1__create_bible_tables.sql
-          └── V2__seed_books.sql          (66권 기본 데이터)
-```
 
-**BFF에 제공하는 공개 인터페이스**
-- `GET /bible/kr/{book}/{chapter}/{verse}` — BFF의 `/me/dashboard` 오늘의 구절에서 호출
-- `GET /bible/kr/{book}/{chapter}/1 (장 첫절)` — AI Service RAG 컨텍스트 조회에서 호출
-- 캐시 키 형식: `cache:passage:{book}:{chapter}:{verse}` (TTL 24h)
+## 10. 금지 패턴
 
----
+- PostgreSQL, ZooKeeper, Tempo 설정 추가 금지
+- application.yml이나 코드에 API key, DB password, private key 평문 작성 금지
+- 트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용
+- 서비스 간 DB 직접 JOIN 또는 Repository 공유 금지
+- JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지
+- AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용
+- OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지
 
-## 2. Bible Service 핵심 기술 요구사항
+## 11. 산출물
 
-| 요구사항 | 구현 방식 | 완료 목표 | 왜 중요한가 |
-|---------|-----------|-----------|-------------|
-| 한/영 병기 조회 | KR_BIBLE + EN_BIBLE 병렬 쿼리 → DTO 병합 | W1 목 | AI 코칭 소스 데이터 |
-| Redis 24h 캐시 | `@Cacheable("passage")` + TTL 24h | W2 화 | P95 ≤ 300ms 달성 |
-| 전문 검색 | JPQL LIKE 또는 Full-Text Index | W2 수 | 구절 검색 기능 |
-| 주석 조회 | Commentary 테이블 JOIN | W2 목 | AI RAG 연계 |
-| 시드 데이터 | Flyway V2 — 66권 메타 + 샘플 구절 (JHN 3장) | W1 화 | W1 테스트부터 실데이터 필요 |
+- PromptTemplate/QtStage 모델 PR
+- RAG seed와 source metadata 문서
+- golden/injection 평가 세트
+- 프롬프트 가드레일 체크리스트
 
----
+## 12. PR 전에 확인
 
-## 3. 일별 상세 일정
-
-### 🟩 W1 (5/12~5/22)
-
-| 일자 | 오전 | 오후 코어 | 저녁 |
-|------|------|-----------|------|
-| 5/12 화 | 킥오프 참석. git pull | Flyway V1 — BOOKS·KR_BIBLE·EN_BIBLE·COMMENTARIES 테이블 | Book 엔티티 + BOOKS 66권 V2 시드 |
-| 5/13 화 | Stand-up | KrBible·EnBible 엔티티 + 연관관계 (book-chapter-verse 복합 조회) | @DataJpaTest — 기본 조회 1개 |
-| 5/14 수 | Stand-up | `GetChapterUseCase` — 한/영 병기 병렬 쿼리 구현 | Repository 쿼리 메서드 3개 이상 |
-| 5/15 목 | Stand-up | `GetVerseUseCase` + `BibleController` 기본 엔드포인트 | X-User-Id 헤더 수신 확인 (Gateway 연동) |
-| 5/16 금 | Stand-up | 단위 테스트 — UseCase Mockito | `/bible/kr/JHN/3/16` curl 성공 확인 |
-| 5/19 월 | Stand-up | `BibleCacheRepository` Redis 24h TTL 설정 | 캐시 히트 로그 확인 |
-| 5/20 화 | Stand-up | `GetCommentaryUseCase` + Commentary 샘플 시드 | W1 체크리스트 점검 |
-| 5/21 수 | Stand-up | 통합 테스트 (@SpringBootTest + Testcontainers MySQL) | PR 정리 |
-| 5/22 목 | Stand-up | **W1 Lock-in 게이트 참석 (18:00)** | W1 회고 |
-
-**W1 완료 기준**
-- [ ] `/bible/kr/JHN/3/16` → 한/영 병기 구절 반환
-- [ ] `/bible/books` → 66권 목록 반환 (Flyway V2 시드)
-- [ ] Flyway V1+V2 마이그레이션 성공
-- [ ] Repository @DataJpaTest 통과
-
----
-
-### 🟨 W2 (5/26~5/29)
-
-| 일자 | 주요 작업 |
-|------|-----------|
-| 5/26 화 | 페이스 점검 (11:30). Redis 캐시 실제 TTL 동작 검증 (redis-cli TTL 확인) |
-| 5/27 수 | `SearchPassageUseCase` — 키워드 전문 검색 구현 |
-| 5/28 목 | Commentary 조회 완성. AI Service RAG 연동 테스트 (강상민 협력) |
-| 5/29 금 | 서비스 커버리지 60%+. `/bible/commentaries/JHN/3/16` curl 확인 |
-
----
-
-### 🟧 W3 (6/1~6/5) + 🟥 W4 (6/8~6/12)
-
-| 주차 | 주요 작업 |
-|------|-----------|
-| W3 | BFF `/me/dashboard` 오늘의 구절 실데이터 연동. Redis 캐시 부하 테스트 (k6) |
-| W4 | 회귀 테스트. 시연 JHN 3:16 데이터 완전성 확인. 커버리지 70%+ |
-
----
-
-## 4. AI 에이전트 활용 가이드
-
-| 단계 | Claude 활용처 | 주의사항 |
-|------|--------------|----------|
-| W1 | Flyway SQL DDL 초안, 병렬 쿼리 JPQL 작성 | 컬럼명·인덱스 02번 ERD와 대조 필수 |
-| W2 | Redis 캐시 설정 코드, Full-Text 쿼리 | MySQL FULLTEXT 인덱스 적용 여부 직접 확인 |
-| W3 | 테스트 케이스 생성 | 실패 케이스(존재하지 않는 book/chapter) 반드시 포함 |
+- 내 담당 경로 밖 변경이 섞이지 않았는가
+- OpenAPI, event schema, DECISIONS.md와 충돌하지 않는가
+- ProblemDetail, Kafka data envelope, DeepSeek, 4서비스 기준을 지켰는가
+- 로컬 build/test 결과를 PR 본문에 적었는가
+- 막힌 점은 추측으로 넘기지 않고 Lead에게 질문으로 남겼는가

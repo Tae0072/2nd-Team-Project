@@ -1,7 +1,7 @@
-# ADR-0005: 외부 service 식별은 BIGINT, FK 제약 없음
+# ADR-0005: 외부 Context 식별은 BIGINT/코드 값으로 저장하고 FK 제약은 만들지 않는다
 
 ## 상태
-Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
+Accepted (2026-05-13 정합성 패치)
 
 ## 날짜
 2026-05-15
@@ -10,41 +10,42 @@ Accepted (W0 5/15 — Foundation Lock-in 사전 박제)
 강태오
 
 ## Reviewer
-이지윤, 김태혁, 강상민, 이승욱, 김지민 (W1 Foundation Lock-in 회의에서 합의 — 03번 § 14.2)
+이지윤, 김태혁, 강상민, 이승욱, 김지민
 
 ## Context
-Database per Service에서 service 간 데이터 참조 (예: AI Service의 AI_SESSIONS.user_id가 Auth Service의 USERS.id를 가리킴)는 어떻게 표현해야 하는가? FK 제약을 걸면 schema 격리 위배 + 다른 service의 schema 변경에 따라 cascade 영향. 그러나 데이터 정합성은 필요.
+Database per Service에서는 다른 서비스가 소유한 테이블을 직접 JOIN하거나 cross-schema FK로 묶으면 안 된다. 2026-05-12 이후 Auth는 Gateway 내부 `auth_db`, Journal은 Bible Service 내부 `bible_db`, AI는 `ai_db`를 소유한다. 그래도 AI 세션과 Journal은 사용자 ID와 성경 passage를 참조해야 한다.
 
 ## Decision
-**외부 식별은 BIGINT 컬럼만 + FK 제약 없음** (02번 § 1.3):
+외부 Context 식별자는 FK 없이 값으로만 저장한다.
 
-\\\sql
--- ai_db.AI_SESSIONS
-CREATE TABLE AI_SESSIONS (
+```sql
+-- ai_db.ai_sessions
+CREATE TABLE ai_sessions (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
-  user_id BIGINT NOT NULL,         -- auth_db.USERS.id를 가리키지만 FK 제약 X
-  passage_book VARCHAR(3) NOT NULL, -- bible_db.BOOKS.code를 가리키지만 FK X
-  ...
-  INDEX idx_user (user_id)          -- 인덱스만 추가 (조회 성능)
+  user_id BIGINT NOT NULL,          -- auth_db.users.id 값, FK 없음
+  book_code VARCHAR(10) NOT NULL,   -- bible_db.books.code 값, FK 없음
+  chapter INT NOT NULL,
+  verse INT NOT NULL,
+  INDEX idx_ai_sessions_user_started (user_id, started_at DESC)
 );
-\\\
+```
 
-데이터 정합성은 application layer에서 검증 (\@PreAuthorize\ + service 메서드의 owner 검증).
+소유자 검증은 Gateway에서 인증된 사용자 컨텍스트(`X-User-Id` 내부 헤더 등)와 각 서비스 UseCase의 owner check로 수행한다. 데이터 정합성은 API 호출과 Kafka 이벤트 검증으로 보완한다.
 
 ## Alternatives
-- **FK 제약 유지**: schema 격리 위배. cross-schema FK는 MySQL에서 잠재적 deadlock + 인스턴스 분리 시 불가
-- **UUID로 식별**: 가독성 ↓, 인덱스 크기 ↑ (BIGINT 8B vs UUID 36B)
-- **Eventual Consistency 포기 (외부 정합 무시)**: 1차 사고 패턴 — IDOR 등 보안 위험
+- **cross-schema FK 유지**: Database per Service 위반. 향후 DB 인스턴스 분리 시 장애물이 된다.
+- **UUID만 사용**: 외부 노출에는 좋지만 v1.0 MySQL 인덱스·가독성·팀 숙련도 측면에서 부담이 크다.
+- **외부 ID 검증 생략**: IDOR와 데이터 오염 위험이 커진다.
 
 ## Consequences
 **긍정:**
-- schema 격리 유지 (ADR-0003)
-- 운영 환경에서 instance 분리 시 무중단 마이그레이션
-- 인덱스 크기 작음
+- DB schema를 서비스별로 독립 배포할 수 있다.
+- Bible/AI/Gateway Auth 간 순환 의존이 생기지 않는다.
+- Kafka 이벤트 replay와 API 검증으로 느슨한 결합을 유지한다.
 
 **부정:**
-- application layer에서 owner 검증 강제 (07번 § 3.2 IDOR 단위 테스트)
-- 외부 service 사라진 데이터 (예: 탈퇴한 user_id) 참조 가능 → application에서 처리
+- DB가 FK로 정합성을 대신 보장하지 않으므로 애플리케이션 테스트가 중요하다.
+- 잘못된 외부 ID가 저장될 수 있어 owner check와 계약 테스트가 필요하다.
 
 ## 검증 방법
-ArchUnit + 07번 § 11 — JPA \@JoinColumn\ 사용 X 검증
+Flyway DDL에서 서비스 간 FK가 없는지 확인한다. API/UseCase 테스트는 본인 리소스가 아닌 `user_id` 접근 시 403을 반환해야 한다.
