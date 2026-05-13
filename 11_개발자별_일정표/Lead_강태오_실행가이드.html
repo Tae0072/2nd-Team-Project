@@ -76,7 +76,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>5/20: Loki, Prometheus, Jaeger traceId 관측성 기준 배포</li>
 <li>5/21: Kafka topic/schema registry bootstrap 스크립트와 smoke test</li>
 <li>5/22: Foundation Lock-in 5항목 최종 검증표 작성</li>
-<li><strong>✅ W1 PR 머지 조건 (필수):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :gateway:test :bff-aggregator:test</code> 통과</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>Gateway Auth API 실제 구현 및 통합 테스트</li>
@@ -87,7 +86,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Gateway -&gt; BFF -&gt; Bible/AI trace 연결 확인</li>
 <li>Journal today DRAFT -&gt; AI 완료 요약 첨부 -&gt; 알림 E2E 1차</li>
 <li>rate limit, CORS, SSE buffering 장애 처리</li>
-<li><strong>✅ W3 PR 머지 조건 (필수):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :gateway:integrationTest :bff-aggregator:integrationTest</code> 통과, 커버리지 70%+</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
 <li>Helm values, rollback, smoke test 안정화</li>
@@ -99,7 +97,11 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>시연 직전 Gateway/BFF/CI 책임 구간 점검</li>
 <li>장애 시 백업 영상/스크립트 전환 담당</li>
 </ul>
-</div></div></section><section class="card"><h2>매일 작업 순서</h2><ul>
+</div></div></section><section class="card wide"><h2>PR 머지 조건 (필수)</h2><ul>
+<li><strong>W1 (Foundation):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :gateway:test :bff-aggregator:test</code> 로컬 통과. 단위 테스트 누락 시 REQUEST_CHANGES.</li>
+<li><strong>W3 (Kafka/E2E):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :gateway:integrationTest :bff-aggregator:integrationTest</code> 통과, 커버리지 70%+.</li>
+</ul>
+</section><section class="card"><h2>매일 작업 순서</h2><ul>
 <li>최신 dev 동기화</li>
 <li>workspaces/.../workflows에 오늘 DoD 작성</li>
 <li>계약 파일 기준으로 구현</li>

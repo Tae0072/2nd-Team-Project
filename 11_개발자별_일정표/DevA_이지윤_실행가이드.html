@@ -75,7 +75,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>5/20: ProblemDetail, X-User-Id 선택 처리, NotFound 에러 매핑</li>
 <li>5/21: DevD Journal qt_date/today DRAFT migration과 충돌 여부 점검</li>
 <li>5/22: Bible core API smoke test와 seed 데이터 검증</li>
-<li><strong>✅ W1 PR 머지 조건 (필수):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :bible-service:test</code> 통과</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>성경/주석/쉬운 설명 API 완성</li><li>오늘 QT 본문·설명 조회 흐름 완성</li>
@@ -86,7 +85,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>BFF 통합 테스트와 실제 모바일 조회 흐름 연결</li>
 <li>데이터 누락/저작권 금지 데이터 스캔</li>
 <li>성능 p95 개선</li>
-<li><strong>✅ W3 PR 머지 조건 (필수):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :bible-service:integrationTest</code> 통과, 커버리지 70%+</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
 <li>seed/migration 재현성 점검</li>
@@ -98,7 +96,11 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>장애 시 캐시/DB 점검 담당</li>
 <li>발표 Q&amp;A: 데이터 출처와 저작권 설명</li>
 </ul>
-</div></div></section><section class="card"><h2>매일 작업 순서</h2><ul>
+</div></div></section><section class="card wide"><h2>PR 머지 조건 (필수)</h2><ul>
+<li><strong>W1 (Foundation):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :bible-service:test</code> 로컬 통과. 단위 테스트 누락 시 REQUEST_CHANGES.</li>
+<li><strong>W3 (Kafka/E2E):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :bible-service:integrationTest</code> 통과, 커버리지 70%+.</li>
+</ul>
+</section><section class="card"><h2>매일 작업 순서</h2><ul>
 <li>최신 dev 동기화</li>
 <li>workspaces/.../workflows에 오늘 DoD 작성</li>
 <li>계약 파일 기준으로 구현</li>

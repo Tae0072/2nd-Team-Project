@@ -74,7 +74,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>5/20: ChromaDB metadata schema와 today QT/explanation source rag_sources 예시 고정</li>
 <li>5/21: DevC SSE payload와 PromptTemplate 저장 구조 맞춤</li>
 <li>5/22: eval 실행 방법과 통과 기준 리포트</li>
-<li><strong>✅ W1 PR 머지 조건 (필수):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :ai-service:test</code> 통과</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>RAG 검색 client와 prompt assembly 연동</li>
@@ -85,7 +84,6 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Bible verse_exists 또는 본문 조회와 RAG 검증 연동</li>
 <li>프롬프트 인젝션 회귀 테스트 CI 후보 작성</li>
 <li>응답 품질 로그 샘플 수집</li>
-<li><strong>✅ W3 PR 머지 조건 (필수):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :ai-service:integrationTest</code> 통과, 커버리지 70%+</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>
 <li>golden/injection/theology set 확장</li>
@@ -97,7 +95,11 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>RAG 출처와 저작권 설명 준비</li>
 <li>시연 중 DeepSeek 장애 fallback 문구 지원</li>
 </ul>
-</div></div></section><section class="card"><h2>매일 작업 순서</h2><ul>
+</div></div></section><section class="card wide"><h2>PR 머지 조건 (필수)</h2><ul>
+<li><strong>W1 (Foundation):</strong> 단위 테스트(Unit Test) 작성 + <code>./gradlew :ai-service:test</code> 로컬 통과. 단위 테스트 누락 시 REQUEST_CHANGES.</li>
+<li><strong>W3 (Kafka/E2E):</strong> 통합 테스트(Integration Test) 작성 + <code>./gradlew :ai-service:integrationTest</code> 통과, 커버리지 70%+.</li>
+</ul>
+</section><section class="card"><h2>매일 작업 순서</h2><ul>
 <li>최신 dev 동기화</li>
 <li>workspaces/.../workflows에 오늘 DoD 작성</li>
 <li>계약 파일 기준으로 구현</li>
