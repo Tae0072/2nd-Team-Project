@@ -16,18 +16,20 @@
     "idempotencyKey": { "type": "string", "description": "ai.session.completed:{sessionId}" },
     "data": {
       "type": "object",
-      "required": ["sessionId", "userId", "passage", "finalStep", "summary"],
+      "required": ["sessionId", "userId", "qtDate", "passage", "finalStep", "summary"],
       "properties": {
         "sessionId":  { "type": "integer", "description": "AI_SESSIONS.id" },
         "userId":     { "type": "integer", "description": "Auth users.id 참조" },
+        "qtDate":     { "type": "string", "format": "date", "description": "오늘 QT 날짜" },
         "passage": {
           "type": "object",
-          "required": ["bookId", "bookCode", "chapter", "verse"],
+          "required": ["bookId", "bookCode", "chapter", "verseStart", "verseEnd"],
           "properties": {
             "bookId":   { "type": "integer" },
             "bookCode": { "type": "string", "example": "GEN" },
             "chapter":  { "type": "integer" },
-            "verse":    { "type": "integer" }
+            "verseStart": { "type": "integer" },
+            "verseEnd":   { "type": "integer" }
           }
         },
         "finalStep":  { "type": "string", "enum": ["A", "B", "C", "D"] },

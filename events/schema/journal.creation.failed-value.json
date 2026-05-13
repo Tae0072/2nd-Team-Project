@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.creation.failed-value",
   "title": "JournalCreationFailedEvent",
-  "description": "묵상 노트 자동 생성 영구 실패 이벤트 (Saga 보상) — topic: journal.creation.failed",
+  "description": "오늘 QT 묵상 노트 생성/AI 요약 첨부 영구 실패 이벤트 (Saga 보상) — topic: journal.creation.failed",
   "type": "object",
   "required": ["eventId", "eventType", "eventVersion", "schemaSubject", "occurredAt", "traceId", "producerService", "idempotencyKey", "data"],
   "properties": {

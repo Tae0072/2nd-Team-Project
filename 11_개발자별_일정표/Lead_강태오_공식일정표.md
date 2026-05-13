@@ -1,7 +1,7 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
 
 ## 1. 내 역할
 
@@ -20,6 +20,13 @@
 - Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
 - 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
 - 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
+- 오늘 QT는 MVP에서 하루 1구절이며 `verseStart == verseEnd`로 전달한다.
+- AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
+- Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
+- Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
+- AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 `aiSessionId`를 첨부한다.
+- 찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.
+- 교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.
 
 ## 3. 내가 주로 만지는 경로
 
@@ -34,7 +41,7 @@
 
 - Gateway Auth: JWT 발급/검증, Google OAuth 진입점, Refresh Rotation, Rate Limit
 - Gateway routing: BFF, Bible, AI, admin, WebSocket/SSE 패스스루
-- BFF Aggregator: 오늘의 QT, 본문 화면, 대시보드, 관리자 API, 알림 WebSocket 집계
+- BFF Aggregator: 오늘 QT 첫 화면, 읽기 전용 본문 화면, 관리자 API, 알림 WebSocket 집계
 - CI/CD: 4서비스 matrix, gitleaks, build/test, Helm lint, 구서비스 재생성 차단
 - 공통 의사결정 충돌 조정과 PR 리뷰
 
@@ -42,30 +49,41 @@
 
 - Gateway Auth: POST /auth/register, /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, GET /auth/me
 - BFF: GET /api/v1/qt/today, GET /api/v1/passages/{bookCode}/{chapter}/{verse}, GET /api/v1/me/dashboard
+- Journal route: POST /api/v1/journals/today와 /api/v1/journals/**는 Bible Service로 라우팅
 - Admin/WS: /api/v1/admin/**, WS /ws/notifications
 - 라우팅 대상은 gateway, bff-aggregator, bible-service, ai-service 4개뿐이다.
 
 ## 6. W1 상세 일정 - Foundation Lock-in
 
-- 5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route 4서비스 기준 정리
+- 5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route 4서비스 + journals/today 기준 정리
 - 5/14: K8s Secret 4종(deepseek, mysql, jwt-keys, google-oauth)과 NetworkPolicy 초안
 - 5/15: GitHub Actions matrix를 gateway/bff-aggregator/bible-service/ai-service로 고정
-- 5/19: BFF dashboard/usecase 병렬 호출 구조와 timeout/fallback 기준 구현
+- 5/19: BFF 오늘 QT 첫 화면 응답 구조 구현 - QT 본문 우선, 최근 Journal/AI 세션은 병렬 fallback
 - 5/20: Loki, Prometheus, Jaeger traceId 관측성 기준 배포
 - 5/21: Kafka topic/schema registry bootstrap 스크립트와 smoke test
 - 5/22: Foundation Lock-in 5항목 최종 검증표 작성
+
+### W1 PR 머지 조건 (필수)
+
+- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew :gateway:test :bff-aggregator:test` 로컬 통과
+- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
 
 ## 7. W2-W5 일정
 
 ### W2 - 핵심 도메인 구현
 - Gateway Auth API 실제 구현 및 통합 테스트
-- BFF 본문 화면/대시보드 집계 API 완성
+- BFF 오늘 QT 첫 화면과 읽기 전용 본문 집계 API 완성
 - admin/notification WebSocket 인증 연결
 
 ### W3 - Kafka/E2E 통합
 - Gateway -> BFF -> Bible/AI trace 연결 확인
-- Kafka 흐름과 BFF 화면 E2E 1차
+- Journal today DRAFT -> AI 완료 요약 첨부 -> 알림 E2E 1차
 - rate limit, CORS, SSE buffering 장애 처리
+
+#### W3 PR 머지 조건 (필수)
+
+- [ ] 통합 테스트(Integration Test) 작성 완료 및 `./gradlew :gateway:integrationTest :bff-aggregator:integrationTest` 통과
+- [ ] 테스트 커버리지 70% 이상 유지
 
 ### W4 - 안정화와 시연 환경
 - Helm values, rollback, smoke test 안정화

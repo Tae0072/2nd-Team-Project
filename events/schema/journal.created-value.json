@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "journal.created-value",
   "title": "JournalCreatedEvent",
-  "description": "묵상 노트 자동 생성(DRAFT) 이벤트 — topic: journal.created",
+  "description": "오늘 QT 묵상 노트 DRAFT 생성 이벤트 — topic: journal.created",
   "type": "object",
   "required": ["eventId", "eventType", "eventVersion", "schemaSubject", "occurredAt", "traceId", "producerService", "idempotencyKey", "data"],
   "properties": {
@@ -16,17 +16,19 @@
     "idempotencyKey": { "type": "string", "description": "journal.created:{journalId}" },
     "data": {
       "type": "object",
-      "required": ["journalId", "userId", "passage", "createdAt"],
+      "required": ["journalId", "userId", "qtDate", "passage", "createdAt"],
       "properties": {
         "journalId":  { "type": "integer" },
         "userId":     { "type": "integer" },
+        "qtDate":     { "type": "string", "format": "date" },
         "passage": {
           "type": "object",
-          "required": ["bookCode", "chapter", "verse"],
+          "required": ["bookCode", "chapter", "verseStart", "verseEnd"],
           "properties": {
             "bookCode": { "type": "string" },
             "chapter":  { "type": "integer" },
-            "verse":    { "type": "integer" }
+            "verseStart": { "type": "integer" },
+            "verseEnd":   { "type": "integer" }
           }
         },
         "createdAt": { "type": "string", "format": "date-time" }

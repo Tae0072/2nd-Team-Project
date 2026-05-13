@@ -29,7 +29,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 </style>
 </head>
 <body>
-<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 강태오</h1><p class="subtitle">Lead / Gateway / BFF / DevOps / 기준일 2026-05-13 / 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/Lead_강태오/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
+<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 강태오</h1><p class="subtitle">Lead / Gateway / BFF / DevOps / 기준일 2026-05-13 / 오전 회의 + 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/Lead_강태오/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
 <main><section class="card"><h2>최신 결정</h2><ul>
 <li>백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.</li>
 <li>인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.</li>
@@ -39,11 +39,18 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.</li>
 <li>에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.</li>
 <li>성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.</li>
+<li>오늘 QT는 MVP에서 하루 1구절이며 verseStart == verseEnd로 전달한다.</li>
+<li>AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.</li>
+<li>Journal은 POST /api/v1/journals/today로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 POST /api/v1/journals는 만들지 않는다.</li>
+<li>Journal 4필드는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.</li>
+<li>AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 aiSessionId를 첨부한다.</li>
+<li>찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.</li>
+<li>교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.</li>
 </ul>
 </section><section class="card"><h2>내 담당 범위</h2><ul>
 <li>Gateway Auth: JWT 발급/검증, Google OAuth 진입점, Refresh Rotation, Rate Limit</li>
 <li>Gateway routing: BFF, Bible, AI, admin, WebSocket/SSE 패스스루</li>
-<li>BFF Aggregator: 오늘의 QT, 본문 화면, 대시보드, 관리자 API, 알림 WebSocket 집계</li>
+<li>BFF Aggregator: 오늘 QT 첫 화면, 읽기 전용 본문 화면, 관리자 API, 알림 WebSocket 집계</li>
 <li>CI/CD: 4서비스 matrix, gitleaks, build/test, Helm lint, 구서비스 재생성 차단</li>
 <li>공통 의사결정 충돌 조정과 PR 리뷰</li>
 </ul>
@@ -57,27 +64,27 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 </ul>
 </section><section class="card"><h2>API와 이벤트 계약</h2><ul>
 <li>Gateway Auth: POST /auth/register, /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, GET /auth/me</li>
-<li>BFF: GET /api/v1/qt/today, GET /api/v1/passages/{bookCode}/{chapter}/{verse}, GET /api/v1/me/dashboard</li>
+<li>BFF: GET /api/v1/qt/today, GET /api/v1/passages/{bookCode}/{chapter}/{verse}, GET /api/v1/me/dashboard</li><li>Journal route: POST /api/v1/journals/today와 /api/v1/journals/**는 Bible Service로 라우팅</li>
 <li>Admin/WS: /api/v1/admin/**, WS /ws/notifications</li>
 <li>라우팅 대상은 gateway, bff-aggregator, bible-service, ai-service 4개뿐이다.</li>
 </ul>
 </section><section class="card wide"><h2>일정</h2><div class="weeks"><div class="week"><h3>W1 - Foundation Lock-in</h3><ul>
-<li>5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route 4서비스 기준 정리</li>
+<li>5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route 4서비스 + journals/today 기준 정리</li>
 <li>5/14: K8s Secret 4종(deepseek, mysql, jwt-keys, google-oauth)과 NetworkPolicy 초안</li>
 <li>5/15: GitHub Actions matrix를 gateway/bff-aggregator/bible-service/ai-service로 고정</li>
-<li>5/19: BFF dashboard/usecase 병렬 호출 구조와 timeout/fallback 기준 구현</li>
+<li>5/19: BFF 오늘 QT 첫 화면 응답 구조 구현 - QT 본문 우선, 최근 Journal/AI 세션은 병렬 fallback</li>
 <li>5/20: Loki, Prometheus, Jaeger traceId 관측성 기준 배포</li>
 <li>5/21: Kafka topic/schema registry bootstrap 스크립트와 smoke test</li>
 <li>5/22: Foundation Lock-in 5항목 최종 검증표 작성</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
 <li>Gateway Auth API 실제 구현 및 통합 테스트</li>
-<li>BFF 본문 화면/대시보드 집계 API 완성</li>
+<li>BFF 오늘 QT 첫 화면과 읽기 전용 본문 집계 API 완성</li>
 <li>admin/notification WebSocket 인증 연결</li>
 </ul>
 </div><div class="week"><h3>W3 - Kafka/E2E 통합</h3><ul>
 <li>Gateway -&gt; BFF -&gt; Bible/AI trace 연결 확인</li>
-<li>Kafka 흐름과 BFF 화면 E2E 1차</li>
+<li>Journal today DRAFT -&gt; AI 완료 요약 첨부 -&gt; 알림 E2E 1차</li>
 <li>rate limit, CORS, SSE buffering 장애 처리</li>
 </ul>
 </div><div class="week"><h3>W4 - 안정화와 시연 환경</h3><ul>

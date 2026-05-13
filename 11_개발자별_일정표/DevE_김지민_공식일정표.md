@@ -1,7 +1,7 @@
 # QT-AI 개인 공식 일정표 - 김지민
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
 
 ## 1. 내 역할
 
@@ -20,6 +20,13 @@
 - Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
 - 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
 - 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
+- 오늘 QT는 MVP에서 하루 1구절이며 `verseStart == verseEnd`로 전달한다.
+- AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
+- Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
+- Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
+- AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 `aiSessionId`를 첨부한다.
+- 찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.
+- 교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.
 
 ## 3. 내가 주로 만지는 경로
 
@@ -31,40 +38,54 @@
 ## 4. 담당 범위
 
 - Flutter 3.24+, Riverpod, Dio, go_router, flutter_secure_storage
-- 소프트 로그인: 튜토리얼/성경 본문/오늘의 QT 미리보기는 비로그인 허용
-- 로그인 후 AI 질문, 묵상 기록, 익명 나눔, 알림, 관리자 화면 접근
+- 앱 시작 후 별도 홈 없이 `/today` 오늘 QT 화면으로 바로 진입
+- 소프트 로그인: 성경 본문/오늘 QT 미리보기는 비로그인 허용
+- 로그인 후 오늘 QT AI 질문, 묵상 기록, 익명 나눔, 알림 접근
 - AI SSE token/rag_sources/turn_completed 수신과 화면 상태 관리
 - ProblemDetail code를 사용자 메시지로 매핑
+- Journal 4필드 자동 저장 UI, 찬양 추천 저장/제거 UI, 교회 인증 optional 버튼 자리
 
 ## 5. API와 이벤트 계약 요약
 
 - Auth: /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, /auth/me
 - BFF: /api/v1/qt/today, /api/v1/passages/{bookCode}/{chapter}/{verse}, /api/v1/me/dashboard
 - AI SSE: POST /ai/sessions/{id}/turns
-- Journal: /api/v1/journals..., /api/v1/shares...
+- Journal: POST /api/v1/journals/today, /api/v1/journals/{id} PATCH/GET/DELETE, /api/v1/shares...
 - WS: /ws/notifications
 
 ## 6. W1 상세 일정 - Foundation Lock-in
 
 - 5/13: Flutter project/FVM, Riverpod providers, Dio base client
 - 5/14: AuthState, secure storage, refresh retry interceptor
-- 5/15: Sliver 기반 본문 화면 골격과 비로그인 미리보기
-- 5/19: AI session/chat 화면과 SSE parser
-- 5/20: Journal edit/publish/share 화면 골격
+- 5/15: `/today` 첫 화면, 오늘 QT 본문/설명 우선 로딩, 비로그인 미리보기
+- 5/19: 오늘 QT AI session/chat 화면과 SSE parser
+- 5/20: Journal today DRAFT 확보, 4필드 자동 저장, publish/share 화면 골격
 - 5/21: notification WebSocket, ProblemDetail error mapper
 - 5/22: Gateway/BFF/Bible/AI 연결 smoke test
+
+### W1 PR 머지 조건 (필수)
+
+- [ ] 단위 테스트(Unit Test/Widget Test) 작성 완료 및 `flutter test` 로컬 통과
+- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
 
 ## 7. W2-W5 일정
 
 ### W2 - 핵심 도메인 구현
-- 성경 본문/주석/AI 코칭 UX 완성
-- 묵상 작성/발행/공유 플로우 구현
+- 오늘 QT 본문/설명/AI 질문 UX 완성
+- 일반 성경 화면 읽기 전용 처리
+- 묵상 자동 저장/발행/공유 플로우 구현
+- 찬양 추천 저장/제거 UI 초안
 - 로그인/refresh/logout 안정화
 
 ### W3 - Kafka/E2E 통합
 - E2E 통합과 느린 네트워크/토큰 만료 처리
 - SSE 재연결/취소 UX
-- 관리자/알림 화면 연결
+- 교회 인증 optional 버튼 자리와 알림 화면 연결
+
+#### W3 PR 머지 조건 (필수)
+
+- [ ] 통합 테스트(Integration Test) 작성 완료 및 `flutter test integration_test/` 통과
+- [ ] 핵심 화면(오늘 QT/AI/Journal) 테스트 커버리지 70% 이상 유지
 
 ### W4 - 안정화와 시연 환경
 - 모바일 폴리싱, 접근성, empty/error/loading 상태

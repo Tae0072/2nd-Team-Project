@@ -29,7 +29,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 </style>
 </head>
 <body>
-<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 이승욱</h1><p class="subtitle">Bible Service - Journal/Kafka/Event Sourcing / 기준일 2026-05-13 / 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/DevD_이승욱/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
+<header><div class="wrap"><h1>QT-AI 개인 실행가이드 - 이승욱</h1><p class="subtitle">Bible Service - Journal/Kafka/Event Sourcing / 기준일 2026-05-13 / 오전 회의 + 4서비스 + DeepSeek 기준</p><div class="badges"><span class="badge">workspaces/DevD_이승욱/</span><span class="badge">Gateway Auth</span><span class="badge">Bible Journal 통합</span><span class="badge">DeepSeek</span></div></div></header>
 <main><section class="card"><h2>최신 결정</h2><ul>
 <li>백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.</li>
 <li>인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.</li>
@@ -39,12 +39,19 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.</li>
 <li>에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.</li>
 <li>성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.</li>
+<li>오늘 QT는 MVP에서 하루 1구절이며 verseStart == verseEnd로 전달한다.</li>
+<li>AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.</li>
+<li>Journal은 POST /api/v1/journals/today로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 POST /api/v1/journals는 만들지 않는다.</li>
+<li>Journal 4필드는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.</li>
+<li>AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 aiSessionId를 첨부한다.</li>
+<li>찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.</li>
+<li>교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.</li>
 </ul>
 </section><section class="card"><h2>내 담당 범위</h2><ul>
 <li>JOURNALS read model과 JOURNAL_EVENTS append-only 이벤트 로그</li>
-<li>ai.session.completed 소비 후 Journal DRAFT 자동 생성</li>
+<li>POST /api/v1/journals/today로 오늘 QT Journal DRAFT 생성/조회</li><li>ai.session.completed 소비 후 오늘 Journal에 AI 요약과 aiSessionId 첨부</li>
 <li>Journal 수정/삭제/발행/공유 공개와 이벤트 소싱</li>
-<li>idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어</li>
+<li>userId + qtDate UNIQUE, idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어</li>
 <li>notification.requested와 journal.creation.failed 발행</li>
 </ul>
 </section><section class="card"><h2>내가 만지는 경로</h2><ul>
@@ -54,7 +61,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>events/schema/</li>
 </ul>
 </section><section class="card"><h2>API와 이벤트 계약</h2><ul>
-<li>GET /api/v1/journals</li>
+<li>POST /api/v1/journals/today</li><li>GET /api/v1/journals</li>
 <li>GET/PATCH/DELETE /api/v1/journals/{id}</li>
 <li>GET /api/v1/journals/{id}/events</li>
 <li>POST/DELETE /api/v1/journals/{id}/share</li>
@@ -62,16 +69,16 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>Kafka publish: journal.created, journal.updated, journal.deleted, journal.creation.failed, notification.requested</li>
 </ul>
 </section><section class="card wide"><h2>일정</h2><div class="weeks"><div class="week"><h3>W1 - Foundation Lock-in</h3><ul>
-<li>5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격</li>
-<li>5/14: ai.session.completed consumer, manual ack, idempotencyKey skip 패턴</li>
-<li>5/15: AutoCreateFromSessionUseCase와 CREATED event 적재</li>
-<li>5/19: PATCH/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock</li>
+<li>5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격 + qt_date unique index</li>
+<li>5/14: journals/today API와 ai.session.completed summary attach consumer, manual ack, idempotencyKey skip 패턴</li>
+<li>5/15: CreateOrGetTodayJournalUseCase와 CREATED event 적재</li>
+<li>5/19: PATCH 자동 저장/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock</li>
 <li>5/20: sequence 동시성 테스트와 DuplicateKey skip 테스트</li>
 <li>5/21: DLQ, journal.creation.failed, notification.requested 발행</li>
-<li>5/22: AI 완료 -&gt; Journal DRAFT 생성 Saga E2E 검증</li>
+<li>5/22: Today DRAFT -&gt; AI 완료 -&gt; Journal 요약 첨부 E2E 검증</li>
 </ul>
 </div><div class="week"><h3>W2 - 핵심 도메인 구현</h3><ul>
-<li>Journal API와 이벤트 재구성 완성</li>
+<li>Journal API와 이벤트 재구성 완성</li><li>자동 저장 PATCH debounce와 글자 수 제한 없음 정책 반영</li>
 <li>공유/좋아요/댓글/신고 도메인 구현</li>
 <li>Bible core migration과 통합</li>
 </ul>
@@ -86,7 +93,7 @@ code { font-family:Consolas,"JetBrains Mono",monospace; }
 <li>시연용 Journal 데이터 고정</li>
 </ul>
 </div><div class="week"><h3>W5 - 발표와 리허설</h3><ul>
-<li>묵상 저장/수정/나눔 시연 책임</li>
+<li>오늘 QT 묵상 자동 저장/수정/나눔 시연 책임</li>
 <li>Kafka Saga Q&amp;A 준비</li>
 <li>장애 시 DLQ/consumer lag 점검</li>
 </ul>
@@ -112,8 +119,8 @@ rg -n &quot;JOURNAL_EVENTS|ai.session.completed|idempotencyKey|PESSIMISTIC&quot;
 </ul>
 </section><section class="card"><h2>산출물</h2><ul>
 <li>Journal/Event Flyway와 Entity</li>
-<li>ai.session.completed consumer</li>
-<li>Journal 수정/삭제/공유 UseCase</li>
+<li>journals/today API와 ai.session.completed summary attach consumer</li>
+<li>Journal 자동 저장/삭제/공유 UseCase</li>
 <li>멱등성/동시성 테스트</li>
 </ul>
 </section></main>

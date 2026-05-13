@@ -1,7 +1,7 @@
 # QT-AI 개인 공식 일정표 - 이승욱
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
 
 ## 1. 내 역할
 
@@ -20,6 +20,13 @@
 - Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
 - 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
 - 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
+- 오늘 QT는 MVP에서 하루 1구절이며 `verseStart == verseEnd`로 전달한다.
+- AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
+- Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
+- Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
+- AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 `aiSessionId`를 첨부한다.
+- 찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.
+- 교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.
 
 ## 3. 내가 주로 만지는 경로
 
@@ -31,13 +38,15 @@
 ## 4. 담당 범위
 
 - JOURNALS read model과 JOURNAL_EVENTS append-only 이벤트 로그
-- ai.session.completed 소비 후 Journal DRAFT 자동 생성
+- `POST /api/v1/journals/today`로 오늘 QT Journal DRAFT 생성/조회
+- ai.session.completed 소비 후 오늘 Journal에 AI 요약과 `aiSessionId` 첨부
 - Journal 수정/삭제/발행/공유 공개와 이벤트 소싱
-- idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어
+- `userId + qtDate` UNIQUE, idempotencyKey UNIQUE, sequence, PESSIMISTIC_WRITE 동시성 제어
 - notification.requested와 journal.creation.failed 발행
 
 ## 5. API와 이벤트 계약 요약
 
+- POST /api/v1/journals/today
 - GET /api/v1/journals
 - GET/PATCH/DELETE /api/v1/journals/{id}
 - GET /api/v1/journals/{id}/events
@@ -47,18 +56,24 @@
 
 ## 6. W1 상세 일정 - Foundation Lock-in
 
-- 5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격
+- 5/13: JOURNALS/JOURNAL_EVENTS Flyway, Entity, Repository 골격 + `qt_date` unique index
 - 5/14: ai.session.completed consumer, manual ack, idempotencyKey skip 패턴
-- 5/15: AutoCreateFromSessionUseCase와 CREATED event 적재
-- 5/19: PATCH/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock
+- 5/15: CreateOrGetTodayJournalUseCase와 CREATED event 적재
+- 5/19: PATCH 자동 저장/DELETE/SHARE UseCase와 PESSIMISTIC_WRITE lock
 - 5/20: sequence 동시성 테스트와 DuplicateKey skip 테스트
 - 5/21: DLQ, journal.creation.failed, notification.requested 발행
-- 5/22: AI 완료 -> Journal DRAFT 생성 Saga E2E 검증
+- 5/22: Today DRAFT -> AI 완료 -> Journal 요약 첨부 E2E 검증
+
+### W1 PR 머지 조건 (필수)
+
+- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew :bible-service:test` 로컬 통과
+- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
 
 ## 7. W2-W5 일정
 
 ### W2 - 핵심 도메인 구현
 - Journal API와 이벤트 재구성 완성
+- 자동 저장 PATCH debounce와 글자 수 제한 없음 정책 반영
 - 공유/좋아요/댓글/신고 도메인 구현
 - Bible core migration과 통합
 
@@ -67,13 +82,18 @@
 - BFF/Flutter 묵상 화면 연동
 - 동시 수정 충돌 처리
 
+#### W3 PR 머지 조건 (필수)
+
+- [ ] 통합 테스트(Integration Test) 작성 완료 및 `./gradlew :bible-service:integrationTest` 통과
+- [ ] 테스트 커버리지 70% 이상 유지
+
 ### W4 - 안정화와 시연 환경
 - 이벤트 로그 리플레이 리포트
 - 데이터 정합성/락 타임아웃 테스트
 - 시연용 Journal 데이터 고정
 
 ### W5 - 발표와 리허설
-- 묵상 저장/수정/나눔 시연 책임
+- 오늘 QT 묵상 자동 저장/수정/나눔 시연 책임
 - Kafka Saga Q&A 준비
 - 장애 시 DLQ/consumer lag 점검
 
@@ -108,8 +128,8 @@ rg -n "JOURNAL_EVENTS|ai.session.completed|idempotencyKey|PESSIMISTIC" services\
 ## 11. 산출물
 
 - Journal/Event Flyway와 Entity
-- ai.session.completed consumer
-- Journal 수정/삭제/공유 UseCase
+- journals/today API와 ai.session.completed summary attach consumer
+- Journal 자동 저장/삭제/공유 UseCase
 - 멱등성/동시성 테스트
 
 ## 12. PR 전에 확인

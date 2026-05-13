@@ -1,7 +1,7 @@
-# 📊 QT-AI (큐티 AI 앱) — ERD 문서 v1.5
+# 📊 QT-AI (큐티 AI 앱) — ERD 문서 v1.6
 
-> **문서 버전:** v1.5
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합) / 2026-05-12 (v1.5 — D형 QT 도메인 반영)
+> **문서 버전:** v1.6
+> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합) / 2026-05-12 (v1.5 — D형 QT 도메인 반영) / 2026-05-13 (v1.6 — 오전 회의 결정 반영)
 > **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서 / [23_도메인_용어사전](./23_도메인_용어사전.md)
 > **MSA 데이터 원칙:** **Database per Service** — 각 서비스가 자기 DB 소유, 서비스 간 직접 JOIN 금지, 비동기 동기화는 Kafka 이벤트로
 
@@ -18,6 +18,7 @@
 | v1.3 | 2026-05-09 | 강태오 | DECISIONS.md 정합 패치 — § 1.1 Kafka 토픽 다이어그램에 `journal.creation.failed` 추가 / § 3 헤더 + § 9.3 Redis 캐시 키 형식 수정(`passage:` → `cache:passage:kr:`) + EN 캐시 키 추가 / § 6.1 멱등성 키 snake_case→camelCase 통일({userId},{sessionId},{journalId},{epochMinute}) / 헤더 연관문서 v1.3→v1.4 |
 | v1.4 | 2026-05-12 | 강태오 | Auth Service 제거·Gateway Auth 정리, Journal Service → Bible Service 통합, 묵상 4분할, 익명 나눔 테이블 추가 |
 | v1.5 | 2026-05-12 | 강태오 | **D형 QT 도메인 용어사전 반영** — JOURNALS에 `observation` / `interpretation` / `qt_type` 컬럼 추가. D형 QT 4단계 완전 지원 |
+| v1.6 | 2026-05-13 | 강태오 | 오전 회의 결정 반영 — 오늘 QT 기준 묵상 자동 저장을 위해 `JOURNALS.qt_date` 추가, 자유 본문 AI/묵상 제외, 사용자 입력 글자 수 제한 없음 |
 
 ---
 
@@ -90,7 +91,7 @@
 
 ### 1.3 BFF Aggregator의 역할
 
-- **자체 DB 없음.** 6 service의 데이터를 조합해서 단일 응답 DTO 반환.
+- **자체 DB 없음.** 4개 서비스의 데이터를 조합해서 단일 응답 DTO 반환.
 - 입체적 묵상 화면 같은 다중 데이터 화면은 BFF가 Bible + Commentary를 `CompletableFuture`로 병렬 호출.
 - Notification Aggregator 기능 포함 (§ 6.4 참조).
 
@@ -363,6 +364,7 @@ erDiagram
         BIGINT id PK
         BIGINT user_id
         BIGINT book_id
+        DATE qt_date
         INT chapter
         INT verse
         VARCHAR current_step
@@ -538,6 +540,7 @@ erDiagram
 | user_id | BIGINT | N | — | | Gateway 인증 사용자 ID 참조 (FK 제약 없음) |
 | title | VARCHAR(200) | N | — | | **자동 생성: `'{name_kr} {chapter}:{verse} 묵상'` (예: '창세기 1:1 묵상').** 사용자가 수동 변경 가능. `name_kr`은 BFF가 Bible Service에서 조회 후 저장 |
 | book_id | BIGINT | N | — | | Bible Service 참조 (FK 제약 없음) |
+| qt_date | DATE | N | — | | 오늘 QT 기준 날짜. MVP에서는 사용자별·날짜별 묵상 DRAFT를 1개만 둔다 |
 | chapter | INT | N | — | | |
 | verse | INT | N | — | | |
 | **qt_type** | **VARCHAR(2)** | **Y** | **NULL** | | **A/B/C/D형 QT 유형. 23_도메인_용어사전 참조** |
@@ -558,6 +561,7 @@ erDiagram
 **인덱스**
 - `idx_journals_user_id_created` ON (user_id, created_at DESC) — 마이페이지 리스트
 - `idx_journals_user_id_status` ON (user_id, status)
+- `uk_journals_user_qt_date` UNIQUE ON (user_id, qt_date) — 오늘 QT DRAFT 멱등 생성/조회
 - `idx_journals_user_id_qt_type` ON (user_id, qt_type) — QT 유형별 필터링
 - `idx_journals_passage` ON (book_id, chapter, verse) — 인기 구절 통계용
 - `idx_journals_ai_session_id` ON (ai_session_id) — AI 대화 → Journal 연결 조회
@@ -661,6 +665,7 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
     "chapter": 1,
     "verse": 1
   },
+  "qt_date": "2026-05-13",
   "ai_session_id": 9012,
   "title": "창세기 1:1 묵상",
   "qt_type": "D",
@@ -716,7 +721,7 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 | 토픽 | Producer | Consumer | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject | DLQ 토픽 |
 | --- | --- | --- | --- | --- | --- | --- |
 | `user.activity.tracked` | BFF Aggregator | Bible Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
-| `ai.session.completed` | AI Service | Bible Service | `session_id`, `user_id`, `passage`, `guide_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
+| `ai.session.completed` | AI Service | Bible Service | `session_id`, `user_id`, `qt_date`, `passage`, `guide_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
 | `journal.created` | Bible Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
 | `journal.updated` | Bible Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
 | `journal.deleted` | Bible Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
@@ -747,12 +752,12 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 ### 6.3 Saga 패턴 적용 시나리오
 
-> **시나리오:** 사용자가 AI 대화를 완료하면 Journal 노트가 자동 생성되어야 함. 둘 중 하나가 실패하면 보상 트랜잭션 필요.
+> **시나리오:** 사용자가 AI 대화를 완료하면 이미 생성/조회된 오늘 QT Journal에 AI 요약이 첨부되어야 함. 둘 중 하나가 실패하면 보상 트랜잭션 필요.
 
 ```
 [1] AI Service: AI_SESSIONS.status = 'COMPLETED' (로컬 트랜잭션 + summary 생성)
 [2] AI Service: ai.session.completed 이벤트 발행 (v1.0: direct publish)
-[3] Bible Service: 컨슈머 수신 → JOURNALS 자동 생성 (DRAFT) + JOURNAL_EVENTS CREATED 적재 (멱등성 키 검증)
+[3] Bible Service: 컨슈머 수신 → user_id + qt_date 기준 JOURNALS 조회 → ai_session_id/summary 첨부 + JOURNAL_EVENTS UPDATED 적재 (멱등성 키 검증)
 [4] 영구 실패 시: journal.creation.failed 이벤트 발행 → AI Service가 status = COMPLETED_NO_JOURNAL 마킹
 
 실패 시:
@@ -846,7 +851,7 @@ stateDiagram-v2
 
 ```mermaid
 stateDiagram-v2
-    [*] --> DRAFT: AI 세션 완료 컨슈머가 자동 생성 (POST /journals 없음 v1.0)
+    [*] --> DRAFT: 오늘 QT 화면에서 POST /journals/today 생성/조회
     DRAFT --> PUBLISHED: 사용자 PATCH로 status='PUBLISHED' 전환
     PUBLISHED --> DELETED: 사용자 DELETE (Soft)
     DRAFT --> DELETED: 사용자 DELETE (Soft)
@@ -855,11 +860,11 @@ stateDiagram-v2
 
 | 상태 | 설명 | 다음 상태 | 전이 트리거 |
 | --- | --- | --- | --- |
-| DRAFT | 임시 저장 | PUBLISHED, DELETED | AI 세션 완료 컨슈머가 자동 생성 (`ai.session.completed:{sessionId}` 멱등성 키) |
+| DRAFT | 임시 저장 | PUBLISHED, DELETED | `POST /api/v1/journals/today`가 생성/조회 (`user_id + qt_date` UNIQUE) |
 | PUBLISHED | 정식 저장 | DELETED only | 사용자 PATCH. **PUBLISHED → DRAFT 금지 (04번 § 7.4 `INVALID_STATUS_TRANSITION` 422)** |
 | DELETED | Soft 삭제 | (30일 후 hard delete 후보) | 사용자 DELETE |
 
-> **v1.2 정정 사유:** v1.1까지는 다이어그램에 `PUBLISHED → DRAFT` 화살표 + "사용자 직접 작성"이 명시되어 있었으나 04번 § 7.1 (POST /journals 없음 v1.0) + § 7.4 (`INVALID_STATUS_TRANSITION` 422)와 모순. 04번을 정답으로 02번 정정. v1.1에 사용자가 발행 후 다시 편집하려면 새 PATCH로 `content`만 수정 가능 (status는 PUBLISHED 유지).
+> **v1.6 정정 사유:** 2026-05-13 오전 회의에서 Journal은 오늘 QT 화면 진입/기록 시작 시 `POST /api/v1/journals/today`로 확보하고, AI 완료는 같은 Journal에 요약을 첨부하기로 확정했다. 자유 본문 `POST /api/v1/journals`는 없음.
 
 ---
 
@@ -948,7 +953,7 @@ public class User extends BaseEntity {
 public void handle(SessionCompletedEvent event) {
     String idempotencyKey = "ai.session.completed:" + event.getSessionId();
     try {
-        journalService.createFromAiSession(event, idempotencyKey);
+        journalService.attachAiSummary(event, idempotencyKey);
     } catch (DataIntegrityViolationException e) {
         log.info("Duplicate event skipped: {}", idempotencyKey);  // 정상 무시
     }

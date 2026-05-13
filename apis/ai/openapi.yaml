@@ -1,10 +1,11 @@
 openapi: 3.1.0
 info:
   title: QT-AI AI Service API
-  version: "1.4"
+  version: "1.5"
   description: |
     AI/RAG 서비스 (Spring Boot 3.3 / Java 21).
-    오늘의 QT 본문이나 사용자가 선택한 구절에 대해 출처 기반 1회성 Q&A를 제공한다.
+    오늘의 QT 본문에 대해 출처 기반 1회성 Q&A를 제공한다.
+    일반 성경 보기에서 사용자가 선택한 자유 본문은 MVP에서 AI 질문 대상이 아니다.
     DeepSeek API(OpenAI 호환) SSE 스트리밍, ChromaDB RAG, QT A~D 가이드 프롬프트 템플릿 관리를 담당한다.
     이어서 대화하는 자유형 챗봇이 아니며, 사용자가 "묵상 완료"를 선택할 때 세션을 완료한다.
     SSE endpoint: POST /ai/sessions/{id}/turns (turns 정식명, messages 아님 — 04번 §6.3).
@@ -28,7 +29,10 @@ paths:
     post:
       tags: [sessions]
       summary: AI 질문 세션 시작 (04번 §6.2)
-      description: Create a new source-grounded Q&A session for the requested passage.
+      description: |
+        Create a new source-grounded Q&A session for the requested passage.
+        MVP에서는 요청 본문이 당일 `GET /api/v1/qt/today` 본문과 일치해야 한다.
+        불일치 시 422 `AI_PASSAGE_NOT_TODAY_QT`를 반환한다.
       operationId: createSession
       security:
         - BearerAuth: []
@@ -39,6 +43,7 @@ paths:
             schema:
               $ref: '#/components/schemas/StartSessionRequest'
             example:
+              qtDate: '2026-05-26'
               passage: {bookCode: GEN, chapter: 1, verse: 1}
               guideStep: A
       responses:
@@ -56,6 +61,7 @@ paths:
               example:
                 id: 9012
                 userId: 5678
+                qtDate: '2026-05-26'
                 passage: {bookId: 1, bookCode: GEN, chapter: 1, verse: 1}
                 guideStep: A
                 status: IN_PROGRESS
@@ -63,6 +69,8 @@ paths:
                 createdAt: '2026-05-26T14:30:00.123Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
     get:
       tags: [sessions]
       summary: 본인 세션 목록 조회 (04번 §6.5)
@@ -113,6 +121,7 @@ paths:
               example:
                 id: 9012
                 userId: 5678
+                qtDate: '2026-05-26'
                 passage: {bookId: 1, bookCode: GEN, chapter: 1, verse: 1}
                 guideStep: A
                 status: IN_PROGRESS
@@ -227,6 +236,7 @@ components:
     PassageRef:
       type: object
       required: [bookCode, chapter, verse]
+      description: 한 절 본문 참조. MVP AI 세션에서는 당일 오늘 QT 본문과 일치해야 한다.
       properties:
         bookId:
           type: ["integer", "null"]
@@ -238,8 +248,12 @@ components:
 
     StartSessionRequest:
       type: object
-      required: [passage]
+      required: [qtDate, passage]
       properties:
+        qtDate:
+          type: string
+          format: date
+          description: 오늘 QT 날짜. 서버는 이 날짜의 오늘 QT 본문과 passage 일치 여부를 검증한다.
         passage:
           $ref: '#/components/schemas/PassageRef'
         guideStep:
@@ -259,10 +273,13 @@ components:
 
     SessionResponse:
       type: object
-      required: [id, userId, passage, guideStep, status, createdAt]
+      required: [id, userId, qtDate, passage, guideStep, status, createdAt]
       properties:
         id: {type: integer, format: int64}
         userId: {type: integer, format: int64}
+        qtDate:
+          type: string
+          format: date
         passage:
           $ref: '#/components/schemas/PassageRef'
         guideStep:

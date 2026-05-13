@@ -1,7 +1,7 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI BFF Aggregator API
-  version: "1.5"
+  version: "1.6"
   description: |
     BFF(Backend for Frontend) 집계 서비스.
     Gateway 사용자 컨텍스트 + Bible 묵상 기록 + AI + BFF 정적 매핑 병렬 호출,
@@ -37,6 +37,9 @@ paths:
         첫 진입 강제 로그인 없이 오늘의 QT 본문 정보를 제공한다.
         BFF의 config/today-passages.yml 기반 정적 매핑을 사용하며,
         로그인 사용자는 recentJournalId 등 개인화 필드를 추가로 받을 수 있다.
+        2026-05-13 회의 결정에 따라 MVP 오늘 QT는 한 절 고정이다.
+        API는 향후 구절 범위 확장을 위해 verseStart/verseEnd를 유지하되,
+        MVP에서는 verseStart와 verseEnd가 항상 같은 값이어야 한다.
       operationId: getTodayQt
       security:
         - BearerAuth: []
@@ -52,7 +55,7 @@ paths:
                 date: '2026-05-26'
                 title: 오늘의 QT
                 theme: 창조의 시작
-                passage: {bookCode: GEN, chapter: 1, verseStart: 1, verseEnd: 5}
+                passage: {bookCode: GEN, chapter: 1, verseStart: 1, verseEnd: 1}
                 recentJournalId: null
   /api/v1/passages/{bookCode}/{chapter}/{verse}:
     get:
@@ -62,6 +65,7 @@ paths:
         KR_BIBLE + EN_BIBLE을 CompletableFuture 병렬 호출 후 단일 응답으로 묶어 반환한다.
         includeCommentary=true이고 인증 사용자인 경우 COMMENTARIES를 함께 호출한다.
         비로그인 사용자는 한/영 본문과 오늘의 QT 미리보기만 볼 수 있다.
+        일반 성경 보기는 조회 전용이다. AI 질문과 묵상 기록은 오늘의 QT 본문에서만 시작한다.
         사이드이펙트: 인증 사용자인 경우 user.activity.tracked Kafka 이벤트 발행(idempotencyKey=read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}).
         03번 1.3.1 시나리오1 / 04번 8.3 참조.
       operationId: getPassageAggregate
@@ -104,7 +108,7 @@ paths:
         1. Gateway 인증 컨텍스트 -> user
         2. Bible /api/v1/journals?size=5 -> recentJournals + stats.journalCount
         3. AI /ai/sessions?status=IN_PROGRESS&size=1 -> activeSession + completedSessions
-        4. BFF 정적 매핑 -> todayPassage (Bible /bible/today 없음 v1.0, config/hot-passages.yml)
+        4. BFF 정적 매핑 -> todayPassage (Bible /bible/today 없음 v1.0, config/today-passages.yml)
         하위 서비스 장애 시 partial 응답 (해당 필드만 null + X-Partial-Response 헤더).
         → AI 호출 시 status=IN_PROGRESS (ACTIVE 아님 — 04번 §6 기준).
       operationId: getDashboard
@@ -123,7 +127,7 @@ paths:
               example:
                 user: {id: 5678, nickname: 큐티러버}
                 stats: {journalCount: 24, completedSessions: 18, currentStreak: 3, longestStreak: 12}
-                todayPassage: {bookCode: PSA, chapter: 23, verse: 1}
+                todayPassage: {bookCode: PSA, chapter: 23, verseStart: 1, verseEnd: 1}
                 recentJournals: [{id: 12345, title: '태초의 묵상', status: PUBLISHED, createdAt: '2026-05-26T14:45:00Z'}]
                 activeSession: {id: 9012, passage: {bookCode: GEN, chapter: 1, verse: 1}, guideStep: A, updatedAt: '2026-05-26T14:42:11.789Z'}
         '401':
@@ -322,7 +326,8 @@ components:
           properties:
             bookCode: {type: string}
             chapter: {type: integer}
-            verse: {type: integer}
+            verseStart: {type: integer}
+            verseEnd: {type: integer}
         recentJournals:
           type: array
           items:
@@ -391,6 +396,7 @@ components:
         chapter: {type: integer}
         verseStart: {type: integer}
         verseEnd: {type: integer}
+      description: 오늘 QT 본문. MVP에서는 verseStart와 verseEnd가 항상 같은 한 절이다.
     AdminQtPassageUpsertRequest:
       type: object
       required: [date, title, bookCode, chapter, verseStart, verseEnd]
@@ -402,6 +408,7 @@ components:
         chapter: {type: integer}
         verseStart: {type: integer}
         verseEnd: {type: integer}
+      description: 오늘 QT 본문 등록/수정 요청. MVP에서는 verseStart와 verseEnd가 같은 값이어야 한다.
     AdminAiTurnLog:
       type: object
       properties:

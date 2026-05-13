@@ -70,6 +70,7 @@
 | 쉬운 본문 설명 | `GET /api/v1/explanations/{bookCode}/{ch}/{v}` | Bible Service | ❌ |
 | 주석 | `GET /api/v1/commentary/{bookCode}/{ch}/{v}` | Bible Service | ✅ |
 | 성경 목록 | `GET /bible/books` | Bible Service | ❌ |
+| 오늘 QT 묵상 DRAFT 생성/조회 | `POST /api/v1/journals/today` | Bible Service | ✅ |
 | 묵상 노트 목록 | `GET /api/v1/journals` | Bible Service | ✅ |
 | 묵상 노트 단건 | `GET /api/v1/journals/{id}` | Bible Service | ✅ |
 | 묵상 노트 수정 | `PATCH /api/v1/journals/{id}` | Bible Service | ✅ |
@@ -91,9 +92,27 @@
 > **AI SSE endpoint:** `/ai/sessions/{id}/turns` (turns가 정식명, messages 아님 — 04번 §6.3 기준)
 > **소프트 로그인 정책:** 첫 진입 강제 로그인 없음. 튜토리얼·성경 본문·오늘의 QT 미리보기는 비로그인 허용, 주석 열람·AI 질문·묵상 기록·찬양 저장/공유는 로그인 필수.
 > **BFF 입체 묵상 화면 인증:** 비로그인 요청은 한/영 본문과 오늘의 QT 미리보기만 반환하고, 주석·개인화 데이터는 로그인 후 제공한다.
-> **Journal 수동 생성 없음:** `POST /api/v1/journals` 없음. Journal은 `ai.session.completed` Kafka 컨슈머로 자동 DRAFT 생성. 사용자는 수정·발행·나눔 공개/취소만 수행한다.
+> **Journal 생성 범위:** 자유 본문용 `POST /api/v1/journals`는 없다. MVP에서는 오늘의 QT 기준 DRAFT만 `POST /api/v1/journals/today`로 멱등 생성/조회하고, AI 완료(`ai.session.completed`)는 같은 오늘 QT Journal에 AI 요약을 연결한다.
 > **Journal API 참조 금지:** `/api/v1/journals...` 경로는 Bible Service의 API이며, 별도 Journal Service/OpenAPI 계약으로 작업하지 않는다.
 > **계정 탈퇴 MVP 제외:** `user.deactivated` 이벤트 및 관련 API 미구현.
+
+---
+
+## 3.1 MVP 제품 범위 확정 (2026-05-13 오전 회의)
+
+| 항목 | 확정 |
+| --- | --- |
+| 오늘의 QT 본문 단위 | MVP는 **한 절 고정**. 단, DB/API는 `verseStart`, `verseEnd`를 사용하고 MVP에서는 두 값이 항상 같다. |
+| 일반 성경 보기 | 책·장·절 조회 전용. 자유 본문 기반 AI 질문·묵상 기록은 MVP 제외. |
+| AI 연결 범위 | AI 질문은 오늘의 QT 본문에서만 시작한다. 사용자가 여러 번 질문할 수 있지만 각 질문은 독립 1회성 Q&A다. |
+| 본문 설명 | Bible Service DB에 미리 저장한다. 필드는 쉬운 요약, 배경 설명, 어려운 단어, 출처. 적용 질문은 AI가 담당한다. |
+| AI 응답 저장 | 필수. 이상 응답 디버깅과 관리자 모니터링 목적이다. |
+| 묵상 기록 | 오늘 QT 기준 4필드(`felt`, `memorableVerse`, `application`, `prayer`)를 자동 저장한다. 사용자 입력 글자 수 제한은 두지 않는다. |
+| 공개/나눔 | 기본 비공개. 전체 공개/비공개만 MVP에 포함하고 세분화 공개 범위는 후속 버전. 좋아요·댓글·신고는 MVP 포함, 팔로우는 제외. |
+| 찬양 | AI가 오늘 QT 주제 기반 곡을 추천하고 사용자는 추천곡 저장/제거만 한다. 직접 YouTube URL 입력, 가사·음원 저장, 스트리밍 연동은 MVP 제외. |
+| 교회 인증 | 기본 MVP 제외. 회원가입 화면에 선택 버튼만 둘 수 있으며, API가 확인되면 구현하고 없으면 패스한다. 교회 인증이 없어도 앱 사용 가능해야 한다. |
+| 초기 화면·로딩 | 별도 홈 화면 없이 오늘 QT 화면으로 바로 진입한다. 필요해지면 홈을 추가한다. 오늘 QT 데이터 먼저 로딩 후 화면에 진입하고, 나머지 성경 데이터는 백그라운드 로딩한다. |
+| 후속 검토 | 묵상 리포트, 묵상 달력, 목표 설정, 성장 일지, TTS/오디오북은 기본 기능 완료 후 재논의한다. |
 
 ---
 

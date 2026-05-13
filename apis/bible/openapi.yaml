@@ -1,10 +1,10 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI Bible Service API
-  version: "1.5"
+  version: "1.6"
   description: |
     성경 본문 서비스. 한국어(개역한글) + 영어(KJV) 성경 본문,
-    쉬운 본문 설명, 주석(Commentary), Redis 24h 캐시, 묵상 노트(Journal) 조회·수정·삭제,
+    쉬운 본문 설명, 주석(Commentary), Redis 24h 캐시, 오늘 QT 묵상 노트(Journal) DRAFT 생성/조회·수정·삭제,
     선택적 익명 나눔 계약을 담당한다.
     별도 Journal Service/OpenAPI는 사용하지 않고 Bible Service API 안에서 묵상 기록을 제공한다.
     저작권: KJV·개역한글(출처 표기 후)·Matthew Henry(PD) 사용. 개역개정·ESV·NIV 사용 금지.
@@ -35,7 +35,7 @@ tags:
   - name: books
     description: 성경 목록
   - name: journals
-    description: 묵상 노트 조회·수정·삭제 (Bible Service 통합)
+    description: 오늘 QT 묵상 노트 DRAFT 생성/조회·수정·삭제 (Bible Service 통합)
   - name: shares
     description: 선택적 익명 나눔, 좋아요, 댓글, 신고
 
@@ -257,6 +257,39 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
+  /api/v1/journals/today:
+    post:
+      tags: [journals]
+      summary: 오늘 QT 묵상 DRAFT 생성/조회
+      description: |
+        당일 `GET /api/v1/qt/today` 본문 기준 묵상 DRAFT를 멱등 생성하거나 기존 DRAFT를 반환한다.
+        자유 본문용 `POST /api/v1/journals`는 제공하지 않는다.
+        사용자별·qtDate별 DRAFT는 하나만 허용한다.
+      operationId: createOrGetTodayJournal
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 기존 오늘 QT DRAFT 반환
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalDetailResponse'
+        '201':
+          description: 오늘 QT DRAFT 생성 완료
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: 오늘 QT 본문 없음
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
   /api/v1/journals/{id}:
     get:
       tags: [journals]
@@ -302,6 +335,7 @@ paths:
       description: |
         변경 가능 필드는 title, felt, memorableVerse, application, prayer, status(DRAFT → PUBLISHED)이다.
         묵상 본문은 4개 섹션(felt, memorableVerse, application, prayer)으로 분리한다.
+        사용자 입력 글자 수 제한은 두지 않는다. 서버 공통 요청 크기 제한과 DB 타입 한계만 적용한다.
         JOURNAL_EVENTS append-only 기록 후 Bible Service가 journal.updated 이벤트를 AFTER_COMMIT으로 발행한다.
       operationId: updateJournal
       security:
@@ -732,9 +766,13 @@ components:
 
     JournalSummaryResponse:
       type: object
-      required: [id, passage, title, status, createdAt, updatedAt]
+      required: [id, qtDate, passage, title, status, createdAt, updatedAt]
       properties:
         id: {type: integer, format: int64}
+        qtDate:
+          type: string
+          format: date
+          description: 오늘 QT 기준 날짜
         passage:
           $ref: '#/components/schemas/PassageRef'
         title: {type: string}
@@ -763,19 +801,15 @@ components:
             userId: {type: integer, format: int64}
             felt:
               type: string
-              maxLength: 5000
               description: 본문을 읽고 느낀 감정·생각
             memorableVerse:
               type: string
-              maxLength: 2000
               description: 기억할 구절
             application:
               type: string
-              maxLength: 5000
               description: 오늘 삶에 적용할 점
             prayer:
               type: string
-              maxLength: 5000
               description: 기도 내용
             lastEventSequence:
               type: integer
@@ -790,16 +824,12 @@ components:
           maxLength: 200
         felt:
           type: string
-          maxLength: 5000
         memorableVerse:
           type: string
-          maxLength: 2000
         application:
           type: string
-          maxLength: 5000
         prayer:
           type: string
-          maxLength: 5000
         status:
           type: string
           enum: [PUBLISHED]

@@ -1,7 +1,7 @@
 # QT-AI 개인 공식 일정표 - 김태혁
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-12 4서비스 재정렬
+> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
 
 ## 1. 내 역할
 
@@ -20,6 +20,13 @@
 - Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
 - 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
 - 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
+- 오늘 QT는 MVP에서 하루 1구절이며 `verseStart == verseEnd`로 전달한다.
+- AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
+- Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
+- Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
+- AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 `aiSessionId`를 첨부한다.
+- 찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.
+- 교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.
 
 ## 3. 내가 주로 만지는 경로
 
@@ -32,26 +39,33 @@
 
 - QT A/B/C/D 유형과 OBSERVATION/INTERPRETATION/FEELING/APPLICATION 단계 분리 유지
 - ChromaDB RAG source metadata, seed corpus, rag_sources SSE payload 지원
+- 오늘 QT 본문·저장 설명 source를 AI 답변의 기본 근거로 연결
 - PromptTemplate 모델과 injection/golden 평가 세트 관리
 - DeepSeek 호출부는 DevC와 인터페이스를 맞추고 공급자 교체를 시도하지 않음
 - RAG 출처 없는 신학 단정 답변을 차단하는 검증 규칙 보조
+- 참고 QT 앱 화면 흐름 캡처/공유와 찬양 추천 후보 조사 보조
 
 ## 5. API와 이벤트 계약 요약
 
 - ChromaDB collection: qtai_corpus
 - SSE rag_sources event: source title, passage/ref, snippet, score 포함
-- AI prompt는 09번 가이드의 D형 QT 4단계와 23번 도메인 용어사전을 따른다.
+- AI prompt는 09번 가이드의 오늘 QT 1회성 질문 MVP와 23번 도메인 용어사전을 따른다.
 - AI turn 저장 전 검증 실패 시 완료 turn으로 저장하지 않는다.
 
 ## 6. W1 상세 일정 - Foundation Lock-in
 
 - 5/13: PromptTemplate, RagSource, QtStage/JournalType 매핑 초안
 - 5/14: KJV/Matthew Henry/더미 한글 주석 seed 범위 정의
-- 5/15: A/B/C/D 시스템 프롬프트 초안과 금지 응답 규칙
+- 5/15: 오늘 QT 1회성 질문 시스템 프롬프트 초안과 금지 응답 규칙
 - 5/19: golden-set 10건, injection-set 10건 작성
-- 5/20: ChromaDB metadata schema와 rag_sources 예시 고정
+- 5/20: ChromaDB metadata schema와 today QT/explanation source rag_sources 예시 고정
 - 5/21: DevC SSE payload와 PromptTemplate 저장 구조 맞춤
 - 5/22: eval 실행 방법과 통과 기준 리포트
+
+### W1 PR 머지 조건 (필수)
+
+- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew :ai-service:test` 로컬 통과
+- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
 
 ## 7. W2-W5 일정
 
@@ -59,11 +73,17 @@
 - RAG 검색 client와 prompt assembly 연동
 - 출처 기반 응답 검증기 1차 구현
 - AI 서비스 테스트 데이터 확장
+- 찬양 추천 후보 데이터 구조 초안 공유
 
 ### W3 - Kafka/E2E 통합
 - Bible verse_exists 또는 본문 조회와 RAG 검증 연동
 - 프롬프트 인젝션 회귀 테스트 CI 후보 작성
 - 응답 품질 로그 샘플 수집
+
+#### W3 PR 머지 조건 (필수)
+
+- [ ] 통합 테스트(Integration Test) 작성 완료 및 `./gradlew :ai-service:integrationTest` 통과
+- [ ] 테스트 커버리지 70% 이상 유지
 
 ### W4 - 안정화와 시연 환경
 - golden/injection/theology set 확장
@@ -71,7 +91,7 @@
 - 시연용 안정 응답 샘플 준비
 
 ### W5 - 발표와 리허설
-- AI 답변 품질 Q&A 대응
+- 오늘 QT AI 답변 품질 Q&A 대응
 - RAG 출처와 저작권 설명 준비
 - 시연 중 DeepSeek 장애 fallback 문구 지원
 
