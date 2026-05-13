@@ -37,14 +37,14 @@
 
 | 담당자 | 역할 | 담당 |
 | --- | --- | --- |
-| **강태오** | Lead + DevOps 총괄 | BFF Aggregator + 공유 레이어 + Gateway + K8s/Helm/CI |
-| **이지윤** | Bible Owner | Bible Service (성경·주석·QT·묵상일지 통합) |
-| **김태혁** | AI Owner | AI Service (큐티 A~D 프롬프트, RAG 보조) |
-| **강상민** | AI/RAG Owner (팀 내 기술적 깊이 최고) | AI/RAG Service — DeepSeek·RAG·SSE·프롬프트 인젝션 방어·신학 가드레일 |
-| **이승욱** | Bible + Kafka Owner | Bible Service 묵상일지 통합 (이벤트 소싱, 컨슈머 멱등성) |
-| **김지민** | Flutter Owner | Flutter App (Sliver Sync Scroll, AI 대화, 알림) |
+| **강태오** | Lead + DevOps 총괄 + **AI 서버 팀장** | Gateway (JWT/OAuth 필터·라우팅) + BFF Aggregator + 공유 레이어 + K8s/Helm/CI + AI Service 팀 리딩 |
+| **이지윤** | Bible Core | Bible Service (성경·주석·QT 코어, Redis 캐시) |
+| **김태혁** ([@xogurrh012](https://github.com/xogurrh012)) | AI/RAG 보조 Owner | AI Service (Prompt/RAG 보조, ChromaDB 시드, LLM 응답 검증) |
+| **강상민** | AI/RAG Main Owner (팀 내 기술적 깊이 최고) + 관리자 웹 보조 | AI Service 메인 — DeepSeek·RAG·SSE·프롬프트 인젝션 방어·신학 가드레일 |
+| **이승욱** | Bible Journal + Kafka Owner | Bible Service 묵상일지·나눔 (이벤트 소싱, 컨슈머 멱등성, DLQ·재처리) |
+| **김지민** | Flutter + 관리자 웹 Owner | Flutter App (Sliver Sync Scroll, AI 대화, 알림) + 관리자 웹 |
 
-> 2026-05-12 기준: Auth Service와 Journal Service는 독립 서비스로 두지 않는다. 묵상 기록 API는 Bible Service에서 담당한다.
+> 2026-05-12 기준 (DECISIONS.md §0): Auth Service와 Journal Service는 독립 서비스로 두지 않는다. JWT 발급·검증은 Gateway 필터에서 처리하고, 묵상 기록 API는 Bible Service에서 담당한다. AI 서버는 강태오(팀장)·김태혁·강상민 3인 체제.
 
 ## 🔒 W1 Foundation Lock-in (기능보다 우선)
 

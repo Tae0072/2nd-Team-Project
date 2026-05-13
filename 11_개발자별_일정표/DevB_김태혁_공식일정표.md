@@ -6,6 +6,7 @@
 ## 1. 내 역할
 
 - 담당자: 김태혁
+- GitHub: [@xogurrh012](https://github.com/xogurrh012)
 - 역할: AI/RAG Service - Prompt/RAG 보조 Owner
 - 개인 작업 폴더: `workspaces/DevB_김태혁/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
