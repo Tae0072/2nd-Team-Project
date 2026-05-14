@@ -146,8 +146,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect Gradle wrapper
+        id: gradle
+        run: |
+          if [ -x "./gradlew" ] || [ -x "qtai-server/gradlew" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-java@v4
-        if: ${{ hashFiles('gradlew', 'qtai-server/gradlew') != '' }}
+        if: steps.gradle.outputs.exists == 'true'
         with:
           java-version: "21"
           distribution: temurin
@@ -165,20 +174,34 @@ jobs:
   frontend-test:
     name: Flutter Analyze And Test
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('flutter-app/pubspec.yaml') != '' }}
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect Flutter app
+        id: flutter
+        run: |
+          if [ -f "flutter-app/pubspec.yaml" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: subosito/flutter-action@v2
+        if: steps.flutter.outputs.exists == 'true'
         with:
           channel: stable
 
       - name: Run Flutter checks
+        if: steps.flutter.outputs.exists == 'true'
         working-directory: flutter-app
         run: |
           flutter pub get
           flutter analyze
           flutter test --coverage
+
+      - name: Skip Flutter checks
+        if: steps.flutter.outputs.exists != 'true'
+        run: echo "flutter-app/pubspec.yaml not found; skipping Flutter checks."
 
   secret-scan:
     name: Secret Scan
