@@ -1,937 +1,224 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI — Dev A 이지윤 실행가이드</title>
+<title>QT-AI - Lead 강태오 실행가이드</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box}
 :root{
-  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
-  --text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;
-  --auth:#f0883e;--blue:#539bf5;--green:#57ab5a;
-  --teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;
-  --mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --bg:#0f1720;--panel:#17212b;--panel2:#1f2c38;--line:#344554;
+  --text:#e7edf3;--muted:#9fb0bf;--lead:#e66f51;--blue:#67aaf9;
+  --green:#64b86a;--yellow:#d8aa45;--red:#e05f5f;--code:#101820;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}
-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}
-pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre}
-.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}
-.copy-btn:hover{background:var(--bg3);color:var(--text)}
-.copy-btn.ok{color:var(--green);border-color:var(--green)}
-.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}
-.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.proj{background:var(--auth);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}
-.dev-name{font-size:18px;font-weight:700}
-.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}
-.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}
-.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
-.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}
-.wnav:hover{border-color:var(--t2)}
-.wnav.cur{background:var(--auth);border-color:var(--auth);color:#fff}
-.sec{padding:28px 0;border-bottom:1px solid var(--border)}
-.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}
-.sec-title{font-size:15px;font-weight:700}
-.callout{background:rgba(240,136,62,.08);border:1px solid rgba(240,136,62,.25);border-left:3px solid var(--auth);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}
-.callout strong{color:var(--text)}
-.callout.blue{background:rgba(83,155,245,.08);border-color:rgba(83,155,245,.25);border-left-color:var(--blue)}
-.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}
-.callout.ok{background:rgba(87,171,90,.08);border-color:rgba(87,171,90,.25);border-left-color:var(--green)}
-.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
-.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}
-.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}
-.tbl td:first-child{color:var(--text);font-weight:600}
-.tbl tr:last-child td{border-bottom:none}
-.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}
-.own-item:last-child{border-bottom:none}
-.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:340px;line-height:1.7}
-.own-desc{font-size:12px;color:var(--t2);flex:1}
-.lock-tag{font-size:9px;font-weight:700;background:rgba(240,136,62,.12);color:var(--auth);border:1px solid rgba(240,136,62,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}
-.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
-.pr-step:last-child{border-bottom:none}
-.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--auth);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}
-.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--auth);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.pr-panel-body pre{margin-top:8px}
-.branch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.btype{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px}
-.btype-name{font-family:var(--mono);color:var(--teal);font-weight:700;font-size:11px;margin-bottom:4px}
-.btype-ex{color:var(--t2);font-size:11px}
-.ci-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
-.ci-tbl th{background:var(--bg3);color:var(--t2);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:8px 12px;border:1px solid var(--border);text-align:left}
-.ci-tbl td{padding:9px 12px;border:1px solid var(--border);color:var(--t2);vertical-align:top}
-.ci-tbl td:first-child{font-family:var(--mono);color:var(--text);font-weight:600}
-.badge-block{display:inline-block;background:rgba(248,81,73,.12);color:var(--lead);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;border:1px solid rgba(248,81,73,.3)}
-.badge-warn{display:inline-block;background:rgba(227,179,65,.12);color:var(--yellow);font-size:10px;font-weight:700;padding:1px 6px;border-radius:3px;border:1px solid rgba(227,179,65,.3)}
-.wblock{padding:18px 0 8px}
-.whdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.wdot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
-.wlabel{font-size:14px;font-weight:700}
-.wperiod{font-size:12px;color:var(--t2)}
-.wgoal{font-size:11px;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:3px 10px;border-radius:4px}
-.col-hdr{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;background:var(--bg3);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden}
-.col-hdr div{padding:8px 13px;font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
-.day-card{border:1px solid var(--border);border-top:none;overflow:hidden}
-.day-card:last-child{border-radius:0 0 8px 8px}
-.dtrig{display:grid;grid-template-columns:78px 1fr 1.4fr 1fr 36px;cursor:pointer;transition:background .1s}
-.dtrig:hover{background:var(--bg2)}
-.dtrig.open{background:var(--bg2);border-bottom:1px solid var(--border)}
-.dtc{padding:11px 13px;font-size:12px;color:var(--t2);line-height:1.5}
-.dt-date{font-weight:700;color:var(--text);font-size:13px;line-height:1.4}
-.dt-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-top:3px}
-.bi{background:rgba(57,197,207,.12);color:var(--teal)}
-.bc{background:rgba(83,155,245,.12);color:var(--blue)}
-.bt{background:rgba(248,81,73,.12);color:var(--lead)}
-.br{background:rgba(176,131,240,.12);color:var(--purple)}
-.bg{background:rgba(227,179,65,.12);color:var(--yellow)}
-.bo{background:rgba(87,171,90,.12);color:var(--green)}
-.bd{background:rgba(224,130,61,.12);color:var(--orange)}
-.dt-chev{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:11px;transition:transform .2s}
-.dt-chev.open{transform:rotate(180deg)}
-.day-detail{display:none;border-top:1px solid var(--border)}
-.day-detail.show{display:block}
-.four-grid{display:grid;grid-template-columns:1fr 1fr}
-.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
-.fi:nth-child(2n){border-right:none}
-.fi:nth-last-child(-n+2){border-bottom:none}
-.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
-.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}
-.path-list{list-style:none}
-.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}
-.path-list li::before{content:'📁 ';font-size:10px}
-.wt{font-size:12px;color:var(--t2);line-height:1.65}
-.wt strong{color:var(--text)}
-.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}
-.sim-btn:hover{background:rgba(87,171,90,.2)}
-.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:260px;overflow-y:auto}
-.sim-out.show{display:block}
-.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.se{color:var(--lead)}.sd{color:var(--t3)}.sy{color:var(--yellow)}.st{color:var(--teal)}
-@keyframes fi{from{opacity:0}to{opacity:1}}
-.sl{animation:fi .07s forwards}
-.jwt-in{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text);font-family:var(--mono);font-size:10px;resize:vertical;min-height:48px;line-height:1.5;margin-top:8px}
-.jwt-go{display:inline-flex;align-items:center;gap:5px;background:rgba(240,136,62,.1);border:1px solid rgba(240,136,62,.3);color:var(--auth);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:6px;font-family:var(--sans)}
-.jwt-result{margin-top:8px;display:none}
-.jwt-result.show{display:block}
-.jwt-block{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:10px;margin-bottom:6px}
-.jb-ttl{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--t2);letter-spacing:.06em;margin-bottom:5px}
-.jb-body{font-family:var(--mono);font-size:10.5px;line-height:1.7;color:#adbac7}
-.jwt-arr{text-align:center;color:var(--green);font-size:14px;margin:4px 0}
-.jwt-out{background:rgba(87,171,90,.08);border:1px solid rgba(87,171,90,.25);border-radius:5px;padding:10px;font-family:var(--mono);font-size:10.5px;line-height:1.7;color:var(--green)}
-.f-list{list-style:none;margin-top:8px}
-.f-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
-.f-item:last-child{border-bottom:none}
-.f-chk{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s;margin-top:1px}
-.f-chk.on{background:var(--green);border-color:var(--green)}
-.f-txt{font-size:12px;color:var(--t2)}
-.f-sub{font-size:10px;color:var(--t3);margin-top:2px}
-.pbar{height:5px;background:var(--bg3);border-radius:3px;margin:10px 0 5px;overflow:hidden}
-.pfill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
-.ptxt{font-size:11px;color:var(--t2)}
-.criteria{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--auth);border-radius:6px;padding:13px;margin-top:12px}
-.crit-title{font-size:11px;font-weight:700;color:var(--auth);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
-.crit-item{display:flex;gap:8px;padding:5px 0;font-size:12px;color:var(--t2);align-items:flex-start}
-.ai-stage{margin-bottom:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
-.ai-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);cursor:pointer}
-.ai-hdr:hover{background:var(--bg4)}
-.ai-w{font-size:10px;font-weight:700;background:var(--bg4);color:var(--t2);padding:2px 8px;border-radius:4px}
-.ai-body{padding:16px;border-top:1px solid var(--border);display:none}
-.ai-body.show{display:block}
-.ai-lbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
-.ai-lbl:not(:first-child){margin-top:14px}
-.ctx-list{list-style:none}
-.ctx-list li{font-size:12px;color:var(--teal);font-family:var(--mono);padding:3px 0}
-.ctx-list li::before{content:'📎 '}
-.prompt-box{background:#010409;border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:12px;color:#adbac7;line-height:1.75;white-space:pre-wrap;position:relative;font-family:var(--sans)}
-.verify-list{list-style:none}
-.verify-list li{font-size:12px;color:var(--t2);padding:4px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.55}
-.verify-list li::before{content:'⚠️';flex-shrink:0;font-size:11px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
-
-/* ===== Spec Panel (자기완결성 명세 S5) ===== */
-.spec-panel{border:1px solid var(--border);border-radius:8px;margin-top:12px;background:var(--bg2);overflow:hidden}
-.spec-panel summary.spec-sum{cursor:pointer;padding:14px 18px;list-style:none;user-select:none;display:flex;align-items:center;gap:14px;transition:background .15s}
-.spec-panel summary.spec-sum::-webkit-details-marker{display:none}
-.spec-panel summary.spec-sum::before{content:'▶';font-size:11px;color:var(--t2);transition:transform .2s;flex-shrink:0}
-.spec-panel[open] summary.spec-sum::before{transform:rotate(90deg);color:var(--blue)}
-.spec-panel summary.spec-sum:hover{background:var(--bg3)}
-.spec-panel summary .spec-num{background:var(--blue);color:#fff;font-weight:700;padding:4px 11px;border-radius:5px;font-size:13px;min-width:42px;text-align:center;font-family:var(--mono)}
-.spec-panel summary .spec-title{font-weight:600;color:var(--text);flex:1}
-.spec-panel[open]{background:var(--bg)}
-.spec-panel > *:not(summary){padding:0 18px 14px}
-.spec-panel pre{margin-top:6px}
-
-/* ===== Workflow/Report Section (S6) ===== */
-.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-.wr-card{border:1px solid var(--border);border-radius:8px;background:var(--bg2);padding:18px}
-.wr-card h3{margin:0 0 10px;color:var(--blue);font-size:15px;display:flex;align-items:center;gap:8px}
-.wr-card h3 .wr-tag{background:var(--blue);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:700}
-.wr-flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0;padding:12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:13px}
-.wr-flow .step{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:4px}
-.wr-flow .arrow{color:var(--t2);font-weight:700}
-.folder-rule{background:rgba(248,81,73,.08);border-left:3px solid var(--lead);padding:12px 14px;margin-top:12px;border-radius:0 6px 6px 0}
-.folder-rule strong{color:var(--lead)}
-@media(max-width:760px){.wr-grid{grid-template-columns:1fr}}
-
-
-/* ===== 사용 규칙 박스 (S0) ===== */
-.rules-box{margin:14px 0;padding:16px 20px;background:linear-gradient(135deg,rgba(83,155,245,.08),rgba(83,155,245,.03));border:1px solid var(--blue);border-left:4px solid var(--blue);border-radius:8px}
-.rules-box h2{margin:0 0 10px;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:8px}
-.rules-box ol{margin:0;padding-left:22px;line-height:1.8}
-.rules-box ol li{color:var(--text);font-size:13.5px}
-.rules-box ol li strong{color:var(--blue)}
-
-/* ===== 환경 셋업 명령어 박스 (S0.5) ===== */
-.setup-box{margin:14px 0;padding:16px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
-.setup-box h2{margin:0 0 10px;font-size:15px;color:var(--green);display:flex;align-items:center;gap:8px}
-.setup-box .setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
-.setup-box .setup-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px}
-.setup-box .setup-card h4{margin:0 0 8px;font-size:13px;color:var(--blue)}
-.setup-box pre{margin:0;font-size:12.5px;background:var(--bg);padding:10px;border-radius:4px;border:1px solid var(--border)}
-@media(max-width:760px){.setup-box .setup-grid{grid-template-columns:1fr}}
-
-/* ===== 원문 문서 매트릭스 (S7) ===== */
-.ref-matrix table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13.5px}
-.ref-matrix th{background:var(--bg3);color:var(--blue);font-weight:700;padding:10px 12px;text-align:left;border:1px solid var(--border)}
-.ref-matrix td{padding:10px 12px;border:1px solid var(--border);background:var(--bg2)}
-.ref-matrix td code{background:var(--bg);color:var(--orange);padding:2px 6px;border-radius:3px;font-size:12.5px}
-.ref-matrix tr:hover td{background:var(--bg3)}
-
-
-/* ===== DoD 박스 (day 카드 하단) ===== */
-.dod-box{padding:14px 18px;background:linear-gradient(135deg,rgba(87,171,90,.06),rgba(87,171,90,.02));border-top:2px solid var(--green)}
-.dod-title{font-weight:700;color:var(--green);margin-bottom:10px;font-size:14px;display:flex;align-items:center;gap:6px}
-.dod-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:13.5px;color:var(--text)}
-.dod-item input[type=checkbox]{margin-top:3px;cursor:pointer;accent-color:var(--green);flex-shrink:0}
-.dod-item label{cursor:pointer;flex:1;line-height:1.5}
-.dod-item input:checked + label{text-decoration:line-through;color:var(--t2)}
-.day-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border .12s}
-.day-row:hover{border-color:var(--auth)}
-.day-row.open{border-color:var(--auth);background:var(--bg3)}
-.day-head{padding:12px 16px;display:grid;grid-template-columns:80px 70px 1fr auto;gap:12px;align-items:center}
-.day-date{color:var(--text);font-weight:700;font-size:13px}
-.day-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
-.day-summary{font-size:12.5px;color:var(--text);line-height:1.5}
-.day-toggle{color:var(--t2);font-size:11px;font-family:var(--mono)}
-.badge-infra{background:rgba(83,155,245,.15);color:var(--blue);border:1px solid rgba(83,155,245,.3)}
-.badge-code{background:rgba(87,171,90,.15);color:var(--green);border:1px solid rgba(87,171,90,.3)}
-.badge-obs{background:rgba(57,197,207,.15);color:var(--teal);border:1px solid rgba(57,197,207,.3)}
-.badge-review{background:rgba(176,131,240,.15);color:var(--purple);border:1px solid rgba(176,131,240,.3)}
-.badge-gate{background:rgba(248,81,73,.15);color:var(--lead);border:1px solid rgba(248,81,73,.3)}
-.badge-test{background:rgba(227,179,65,.15);color:var(--yellow);border:1px solid rgba(227,179,65,.3)}
-.badge-demo{background:rgba(224,130,61,.15);color:var(--orange);border:1px solid rgba(224,130,61,.3)}
-.day-panel{display:none;border-top:1px solid var(--border);background:var(--bg)}
-.day-panel.show{display:block;animation:fi .15s forwards}
-.four-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.fi{padding:14px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
-.fi:nth-child(2n){border-right:none}
-.fi:nth-last-child(-n+2){border-bottom:none}
-.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}
-.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}
-.path-list{list-style:none;padding:0}
-.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}
-.path-list li::before{content:'📁 ';font-size:10px}
-.dod-list{list-style:none;padding:0;margin-top:6px}
-.dod-list li{font-size:11.5px;color:var(--t2);padding:3px 0 3px 18px;position:relative;line-height:1.5}
-.dod-list li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
-.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}
-.sim-btn:hover{background:rgba(87,171,90,.2)}
-.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.7;display:none;max-height:280px;overflow-y:auto;white-space:pre-wrap}
-.sim-out.show{display:block}
-.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.se{color:var(--lead)}.sd{color:var(--t3)}.sy{color:var(--yellow)}.st{color:var(--teal)}
-@keyframes fi{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}
-.copy-btn:hover{background:var(--bg3);color:var(--text)}
-.copy-btn.ok{color:var(--green);border-color:var(--green)}
-pre{position:relative}
-.path-list-static{list-style:none;padding:0;margin:8px 0}
-.path-list-static li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:3px 0}
-.path-list-static li::before{content:'📁 ';font-size:10px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.65}
+a{color:var(--blue);text-decoration:none}
+code{font-family:var(--mono);font-size:.88em;background:var(--code);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
+pre{position:relative;margin:12px 0 0;background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:#c7d3df}
+header{position:sticky;top:0;z-index:10;background:rgba(15,23,32,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+.hdr{display:flex;align-items:center;gap:14px;min-height:74px;flex-wrap:wrap}
+.mark{background:var(--lead);color:#fff;font-weight:800;font-size:11px;letter-spacing:.08em;border-radius:4px;padding:4px 9px}
+.title{font-size:19px;font-weight:800}
+.sub{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+nav a{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:5px 10px}
+nav a:hover{color:var(--text);border-color:var(--muted)}
+main{padding:24px 0 50px}
+section{padding:26px 0;border-bottom:1px solid var(--line)}
+h2{font-size:17px;margin:0 0 14px}
+.note{background:rgba(230,111,81,.09);border:1px solid rgba(230,111,81,.32);border-left:4px solid var(--lead);border-radius:7px;padding:13px 15px;color:var(--muted)}
+.note strong{color:var(--text)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 15px}
+.card h3{font-size:14px;margin:0 0 8px;color:var(--text)}
+.card p{margin:0;color:var(--muted)}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+th{background:var(--panel2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td{color:var(--muted)}
+td:first-child{color:var(--text);font-weight:700}
+tr:last-child td{border-bottom:none}
+.pill{display:inline-block;border-radius:4px;border:1px solid var(--line);padding:1px 6px;font-size:11px;color:var(--muted)}
+.ok{color:var(--green)}.warn{color:var(--yellow)}.block{color:var(--red)}
+.week{display:grid;gap:10px}
+.day{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.day-head{display:grid;grid-template-columns:120px 1fr 120px;gap:12px;align-items:center;background:var(--panel2);padding:11px 13px}
+.day-date{font-weight:800;color:var(--text)}
+.day-goal{color:var(--text);font-weight:700}
+.day-state{text-align:right}
+.day-body{padding:13px 14px;color:var(--muted)}
+.checks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.check{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px}
+.check b{display:block;color:var(--text);margin-bottom:4px}
+.sim-row{display:grid;grid-template-columns:130px 1fr 140px;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-bottom:none;padding:10px 12px}
+.sim-row:last-child{border-bottom:1px solid var(--line);border-radius:0 0 8px 8px}
+.sim-row:first-child{border-radius:8px 8px 0 0}
+.sim-btn{border:1px solid rgba(100,184,106,.45);background:rgba(100,184,106,.12);color:var(--green);border-radius:5px;padding:6px 10px;font-weight:700;cursor:pointer}
+.sim-btn[disabled]{border-color:var(--line);background:var(--panel2);color:#667582;cursor:not-allowed}
+.copy{position:absolute;right:8px;top:8px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer}
+.copy.ok{color:var(--green);border-color:var(--green)}
+@media (max-width:820px){
+  nav{margin-left:0}.grid,.checks{grid-template-columns:1fr}
+  .day-head,.sim-row{grid-template-columns:1fr}.day-state{text-align:left}
+}
 </style>
 </head>
 <body>
 <header>
-<div class="wrap">
-  <div class="hdr">
-    <span class="proj">QT-AI</span>
-    <div>
-      <div class="dev-name">강태오 <span class="role-chip">Lead · Gateway · BFF · DevOps · AI 팀장</span></div>
-      <div class="dev-sub"><a href="https://github.com/Tae0072" target="_blank" style="color:var(--auth);text-decoration:none;font-family:var(--mono);font-size:11px">@Tae0072</a> · Gateway Auth · BFF Aggregator · K8s/Helm/CI · 관측성 · Modular Monolith 단일 서비스 통합 · 기준일 2026-05-14 (v2.0) · 단일 qtai-server (Modular Monolith, ADR-0001) · DeepSeek · 2026-05-14 v2.0</div>
+  <div class="wrap">
+    <div class="hdr">
+      <span class="mark">QT-AI</span>
+      <div>
+        <div class="title">강태오 실행가이드 <span class="pill">Lead · gatewayauth · bff · DevOps</span></div>
+        <div class="sub">기준일 2026-05-15 · `00_개발_일정_총괄표.md` v0.1 · `07_요구사항_정의서.md` v2.3 · 팀원별 일정표 공통 기준</div>
+      </div>
+      <nav>
+        <a href="#role">역할</a>
+        <a href="#lock">고정 기준</a>
+        <a href="#w1">W1</a>
+        <a href="#weeks">W2-W5</a>
+        <a href="#simulator">시뮬레이터</a>
+        <a href="#verify">검증</a>
+      </nav>
     </div>
-    <nav class="wnav-wrap">
-      <button class="wnav cur" data-target="sec-0">역할</button>
-      <button class="wnav" data-target="sec-1">소유권</button>
-      <button class="wnav" data-target="sec-2">PR 가이드</button>
-      <button class="wnav" data-target="sec-3">일정</button>
-      <button class="wnav" data-target="sec-4">AI 에이전트</button>
-      <button class="wnav" data-target="sec-5">자기완결성</button>
-      <button class="wnav" data-target="sec-6">워크플로우</button>
-      <button class="wnav" data-target="sec-7">검증 명령</button>
-      <button class="wnav" data-target="sec-8">금지 패턴</button>
-      <button class="wnav" data-target="sec-9">산출물</button>
-      <button class="wnav" data-target="sec-10">매트릭스</button>
-    </nav>
   </div>
-</div>
 </header>
 
 <main class="wrap">
+  <section id="role">
+    <h2>1. 역할 선언</h2>
+    <div class="note">
+      <strong>이 파일은 강태오 Lead 실행가이드이면서 팀원별 일정표의 공통 기준이다.</strong>
+      개인별 작업은 달라질 수 있지만 W1~W5 게이트, 금지 기준, Today QT 기준은 바꾸지 않는다.
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="card"><h3>주 역할</h3><p>Lead / gatewayauth / bff / DevOps / 전체 조율. 단일 파트 전담이 아니라 도메인 경계와 PR 품질을 함께 잡는다.</p></div>
+      <div class="card"><h3>구현 구조</h3><p>백엔드는 단일 <code>qtai-server</code> Modular Monolith다. 도메인은 패키지와 내부 Interface로 분리한다.</p></div>
+      <div class="card"><h3>협업 방식</h3><p>gatewayauth와 bff는 Bible·Flutter 담당자와 API 계약을 맞춰 구현한다. 외부 API와 내부 도메인 Interface를 섞지 않는다.</p></div>
+      <div class="card"><h3>산출물</h3><p>PR, 검증 로그, Foundation 5/5 판정표, 회고 메모, 문서 정합성 수정 내역을 남긴다.</p></div>
+    </div>
+  </section>
 
-<section id="sec-0" class="sec">
-  <div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div>
-  <div class="callout"><strong>강태오(Lead) — Lead · DevOps · 전체 조율 (단일 파트 고정 X)</strong>:
-    <br>① <strong>역할 변동 (2026-05-14)</strong> — AI 서버 팀장 → 강상민으로 이관. Gateway/BFF 단독 → Bible팀과 분담. 본인은 횡단 Lead로 이동.
-    <br>② <strong>PR 자동 검증 스크립트 (ADR-0015)</strong> — Spring Modulith 메인 + ArchUnit 보조. <code>@ApplicationModule</code> 메타데이터 6개 도메인 선언 + 의도적 위반 케이스로 PR 머지 차단 시연(W1 첫 주).
-    <br>③ <strong>v2 MSA 분리 트리거 (ADR-0016)</strong> — W2 첫째 주(5/26~5/29) 강사 면담으로 학습 평가 포함 의사 확인 → 결과 박제. v2 진행 시 W4(6/8)에 AI 도메인 우선 분리 + Kafka + K8s 도입.
-    <br>④ <strong>BFF + Gateway Auth는 Bible팀과 분담</strong> — 단일 서비스 `qtai-server` 안에서 본인은 횡단 코드 리뷰·인프라·CI. Bible팀(이지윤·이승욱·김지민)이 인증·BFF 어그리게이션 실 구현에 참여.
-    <br>⑤ <strong>인프라</strong> — Docker Compose 단일 명령 기동(v1), Loki/Prometheus/Jaeger 관측성, GitHub Actions CI. K8s/Helm은 v2 분리 시 활성화.
-  </div>
-  <div class="callout red" style="margin-top:14px">⚠️ <strong>본인 우선 액션 4가지</strong>: (1) Spring Modulith + ArchUnit 도입 + 6 도메인 <code>@ApplicationModule</code> + 시연 (W1 첫 주). (2) DECISIONS·ADR·AGENTS·02_ERD·03_아키텍처 정합 PR 완료 — 진행 중. (3) W2 첫째 주 강사 면담 → ADR-0016 트리거 박제. (4) 면담 결과에 따라 W4에 AI 도메인 v2 분리 또는 발표 자료 "v2 분리 계획" 슬라이드 작성.</div>
-  <div style="margin-top:14px">
-    <div style="font-size:12px;color:var(--t2);margin-bottom:8px">담당 경로 (횡단)</div>
-    <ul class="path-list-static">
-      <li>qtai-server/src/main/java/com/qtai/gatewayauth/ — Bible팀과 분담</li>
-      <li>qtai-server/src/main/java/com/qtai/bff/ — Bible팀과 분담</li>
-      <li>qtai-server/src/test/java/com/qtai/QtaiModulesTest.java — Spring Modulith 검증</li>
-      <li>qtai-server/src/test/java/com/qtai/architecture/ — ArchUnit 보조 룰</li>
-      <li>docker-compose.yml — v1 단일 명령 기동</li>
-      <li>.github/workflows/ — GitHub Actions CI · Spectral · gitleaks</li>
-      <li>DECISIONS.md · AGENTS.md · docs/adr/ — 최상위 의사결정 권한</li>
-      <li>(v2 분리 시) helm/qtai-umbrella/ · k8s/ 디렉토리 활성화</li>
-    </ul>
-  </div>
-</section>
+  <section id="lock">
+    <h2>2. 고정 기준</h2>
+    <table>
+      <thead><tr><th>구분</th><th>기준</th></tr></thead>
+      <tbody>
+        <tr><td>일정 기준</td><td>W1은 2026-05-18 ~ 2026-05-22 Foundation Lock-in, W3는 Feature Freeze, W4는 시연 후보 빌드, W5는 리허설과 발표다.</td></tr>
+        <tr><td>Today QT</td><td>성서 유니온 공개 시각은 00:00 KST, 우리 시스템 수집 배치 시각은 04:00 KST로 통일한다.</td></tr>
+        <tr><td>Today QT 100%</td><td>본문·해설·묵상 진입점·시뮬레이터 상태값이 정상 응답하면 100%다. 모든 클립이 존재해야 한다는 뜻이 아니다.</td></tr>
+        <tr><td>AI</td><td>사용자 AI Q&amp;A, 챗봇, SSE, <code>/ai/sessions/**</code> 사용자 경로는 만들지 않는다. AI는 배치와 관리자 트리거 전용이다.</td></tr>
+        <tr><td>이벤트</td><td>v1은 Spring <code>ApplicationEventPublisher</code>를 사용한다. Kafka는 MVP 작업 목표에 넣지 않는다.</td></tr>
+        <tr><td>배포</td><td>v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다.</td></tr>
+        <tr><td>성경 데이터</td><td>Repo URL, 라이선스, 번역본명, 출처 표기, 재배포 가능 여부가 확인된 GitHub 공개 JSON만 적재한다. 개역개정, ESV, NIV는 금지한다.</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-<section id="sec-1" class="sec">
-  <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div>
-  <div class="callout warn">⚠️ 아래 경로는 강태오 전담. 같은 모노레포 다른 영역과 패키지 경계 유지 필수. CODEOWNERS도 동기화.</div>
-  <table class="tbl" style="margin-top:14px"><thead><tr><th>경로</th><th>설명</th></tr></thead><tbody><tr><td>qtai-server/src/main/java/com/qtai/gatewayauth/</td><td>JWT/OAuth AuthFilter · Rate Limit · X-User-Id/Role spoofing strip</td></tr><tr><td>qtai-server/src/main/java/com/qtai/bff/</td><td>GET /api/v1/qt/today · /me/dashboard · 병렬 fallback aggregation</td></tr><tr><td>.github/workflows/</td><td>GitHub Actions CI (단일 qtai-server) · Claude PR review · gitleaks · spectral</td></tr><tr><td>helm/qtai-umbrella/</td><td>Helm Chart · K8s Secret 4종 · NetworkPolicy</td></tr><tr><td>infra/ + DECISIONS.md</td><td>운영 환경 인프라 · 의사결정 최상위 권한</td></tr></tbody></table>
-</section>
-
-<section id="sec-2" class="sec">
-  <div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 다른 사람한테 물어볼 필요 없음</div></div>
-  <div class="callout red" style="margin-bottom:14px"><strong>🔴 W1/W3 머지 필수 조건 (단위/통합 테스트 누락 = REQUEST_CHANGES)</strong> · 14_팀_협업_규칙_Git_브랜치_전략.md v1.2 §3.5 기준</div>
-
-  <div class="pr-panel-list">
-
-    <div class="pr-panel">
-      <div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-1')">
-        <div class="pr-panel-num">1</div>
-        <div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/짧은-설명</strong><span>상세 내용 열기/닫기</span></div>
-        <div class="pr-panel-chev open" id="chev-Lead-pr-1">⌄</div>
-      </div>
-      <div class="pr-panel-body show" id="Lead-pr-1">
-        <div class="branch-grid">
-          <div class="btype"><div class="btype-name">feature/</div><div class="btype-ex">신규 기능</div></div>
-          <div class="btype"><div class="btype-name">fix/</div><div class="btype-ex">버그 수정</div></div>
-          <div class="btype"><div class="btype-name">refactor/</div><div class="btype-ex">코드 개선</div></div>
-          <div class="btype"><div class="btype-name">test/</div><div class="btype-ex">테스트 추가</div></div>
-          <div class="btype"><div class="btype-name">docs/</div><div class="btype-ex">문서 수정</div></div>
-          <div class="btype"><div class="btype-name">chore/</div><div class="btype-ex">설정 변경</div></div>
-        </div>
-      </div>
+  <section id="w1">
+    <h2>3. W1 Foundation Lock-in</h2>
+    <div class="checks">
+      <div class="check"><b>1. 저장소 운영</b><span>dev, PR, squash merge, 보호 기준</span></div>
+      <div class="check"><b>2. 백엔드 골격</b><span>단일 qtai-server와 5개 도메인 패키지</span></div>
+      <div class="check"><b>3. 도메인 경계</b><span>직접 import 차단 테스트 준비</span></div>
+      <div class="check"><b>4. DB/API 계약</b><span>외부 API와 내부 Interface 분리</span></div>
+      <div class="check"><b>5. 품질 게이트</b><span>금지 기술·API·데이터 검사</span></div>
     </div>
 
-    <div class="pr-panel">
-      <div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-2')">
-        <div class="pr-panel-num">2</div>
-        <div class="pr-panel-title"><strong>② PR 올리는 7단계 — dev 브랜치 기준</strong><span>상세 내용 열기/닫기</span></div>
-        <div class="pr-panel-chev open" id="chev-Lead-pr-2">⌄</div>
+    <div class="week" style="margin-top:14px">
+      <div class="day">
+        <div class="day-head"><div class="day-date">2026-05-18</div><div class="day-goal">구현 저장소 골격 고정</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
+        <div class="day-body">`qtai-server`, Flutter 앱, OpenAPI 위치, 브랜치/PR 흐름을 확인한다. 완료 기준은 `dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞는 것이다.</div>
       </div>
-      <div class="pr-panel-body show" id="Lead-pr-2">
-        <div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">1</div><div style="width:100%"><div class="pr-step-title">dev 최신 pull</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev &amp;&amp; git pull origin dev</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">2</div><div style="width:100%"><div class="pr-step-title">feature 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/lead-task-name</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">3</div><div style="width:100%"><div class="pr-step-title">커밋 — <code>type(scope): 설명</code> 형식</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git commit -m "feat(gateway): add new feature"</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">4</div><div style="width:100%"><div class="pr-step-title">dev rebase — 빠뜨리면 머지 거부</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git fetch origin &amp;&amp; git rebase origin/dev</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">5</div><div style="width:100%"><div class="pr-step-title">로컬 CI (단위·통합 테스트 + secret 스캔)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>./gradlew :gateway:test :bff-aggregator:test
-./gradlew :gateway:integrationTest :bff-aggregator:integrationTest
-gitleaks detect --source . --verbose</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px;border-bottom:1px solid var(--border)"><div class="pr-step-num">6</div><div style="width:100%"><div class="pr-step-title">Push + GitHub PR (base: <code>dev</code>)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git push origin feature/lead-task-name
-# GitHub → Compare &amp; pull request → base: dev</code></pre></div></div>
-          <div class="pr-step" style="padding:13px 16px"><div class="pr-step-num">7</div><div style="width:100%"><div class="pr-step-title">Reviewer 지정 — CODEOWNERS 자동</div><table class="ci-tbl" style="margin-top:8px"><thead><tr><th>변경 범위</th><th>Reviewer</th></tr></thead><tbody><tr><td>gateway/.../내부</td><td>강태오(Lead)</td></tr><tr><td>다른 도메인과 결합</td><td>강태오 + 해당 dev</td></tr><tr><td>OpenAPI · BFF 영향</td><td>강태오 + DevE(김지민)</td></tr></tbody></table></div></div>
-        </div>
+      <div class="day">
+        <div class="day-head"><div class="day-date">2026-05-19</div><div class="day-goal">도메인 패키지 경계 준비</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
+        <div class="day-body">`gatewayauth`, `bff`, `bible`, `ai`, `simulator` 패키지와 import 금지 기준을 정리한다.</div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-date">2026-05-20</div><div class="day-goal">DB/API 계약 정리</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
+        <div class="day-body">외부 공개 API `/api/v1/**`와 내부 도메인 Java Interface를 분리한다. ERD 주요 테이블과 API 초안이 충돌하지 않아야 한다.</div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-date">2026-05-21</div><div class="day-goal">품질 게이트 자동화</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
+        <div class="day-body">Kafka, Kubernetes, Helm, SSE, RAG, 금지 번역본, 사용자 AI 경로가 PR에서 검출되도록 검사 기준을 준비한다.</div>
+      </div>
+      <div class="day">
+        <div class="day-head"><div class="day-date">2026-05-22</div><div class="day-goal">Foundation 5/5 판정</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
+        <div class="day-body">5개 항목을 모두 통과해야 W2로 넘어간다. 미통과 항목은 W2 기능 범위를 줄여서 먼저 막는다.</div>
       </div>
     </div>
+  </section>
 
-    <div class="pr-panel">
-      <div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-3')">
-        <div class="pr-panel-num">3</div>
-        <div class="pr-panel-title"><strong>③ PR 템플릿 자동 로드 (.github/pull_request_template.md) — v1.2</strong><span>상세 내용 열기/닫기</span></div>
-        <div class="pr-panel-chev" id="chev-Lead-pr-3">⌄</div>
-      </div>
-      <div class="pr-panel-body" id="Lead-pr-3">
-        <pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>## 구현 내용
-&lt;!-- 이 PR에서 문제를 해결하거나 추가하는 변경 사항을 간략하게 설명하세요. --&gt;
+  <section id="weeks">
+    <h2>4. W2-W5 요약</h2>
+    <table>
+      <thead><tr><th>주차</th><th>기간</th><th>Lead 집중 범위</th><th>게이트</th></tr></thead>
+      <tbody>
+        <tr><td>W2</td><td>2026-05-25 ~ 2026-05-29</td><td>Today QT 집계, 인증·권한, BFF 응답 조립, PR 검증</td><td>핵심 API 데모</td></tr>
+        <tr><td>W3</td><td>2026-06-01 ~ 2026-06-05</td><td>관리자·통합 조정, Feature Freeze, 경계 위반 차단</td><td>MVP 기능 통과</td></tr>
+        <tr><td>W4</td><td>2026-06-08 ~ 2026-06-12</td><td>E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드</td><td>시연 후보 빌드</td></tr>
+        <tr><td>W5</td><td>2026-06-15 ~ 2026-06-17</td><td>리허설, 백업 자료, 발표 직전 장애 대응</td><td>발표 흐름 2회 이상 성공</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-## 관련 이슈 / 타스크
-&lt;!-- Closes #000 / Fixes #000 --&gt;
+  <section id="simulator">
+    <h2>5. 시뮬레이터 상태 처리</h2>
+    <div class="sim-row"><strong>READY</strong><span>재생 가능한 클립이 있다.</span><button class="sim-btn" onclick="showSim(this,'sim-ready')">시뮬레이션 보기</button></div>
+    <div class="sim-row"><strong>MISSING</strong><span>아직 클립이 없지만 Today QT 응답은 정상이다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
+    <div class="sim-row"><strong>FAILED</strong><span>생성 실패 로그를 남기고 재처리 가능 상태로 둔다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
+    <div class="sim-row"><strong>DISABLED</strong><span>MVP 범위 또는 운영 판단으로 비활성화한다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
+    <pre id="sim-ready" style="display:none">simulatorStatus=READY
+buttonEnabled=true
+todayQtComplete=true
+note=Today QT 100%는 상태값 정상 응답 기준이다.</pre>
+  </section>
 
-## 변경 유형
-- [ ] 기능 추가 (feat)
-- [ ] 버그 수정 (fix)
-- [ ] 리팩토링 (refactor)
-- [ ] 테스트 (test)
-- [ ] 문서 (docs)
-- [ ] 인프라 / CI (chore)
+  <section id="verify">
+    <h2>6. PR 전 검증</h2>
+    <div class="note"><strong>구현 저장소 기준</strong>으로 실행한다. 문서 저장소에서는 Markdown 표, 코드펜스, API JSON, 금지 기준 문구를 따로 확인한다.</div>
+    <pre><button class="copy" onclick="copyPre(this)">Copy</button><code>git checkout dev
+git pull origin dev
+./gradlew test
+rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .</code></pre>
+    <pre><button class="copy" onclick="copyPre(this)">Copy</button><code>git diff --check -- '*.md'</code></pre>
+  </section>
 
-## 코드 체크리스트
-- [ ] `DECISIONS.md` 값과 충돌이 없음
-- [ ] PostgreSQL / ZooKeeper / Tempo 코드 없음
-- [ ] `application.yml` 또는 코드에 평문 Secret 없음
-- [ ] Kafka envelope에 `payload` 키 대신 `data` 사용
-- [ ] AI SSE 경로 `/turns` 사용 (`/messages` 아님)
-- [ ] 성경 데이터: 개역개정/ESV/NIV 코드 없음
-- [ ] `@Transactional` 없는 DB 변경 메서드 없음
-- [ ] Kafka 이벤트 발행은 `@TransactionalEventListener(AFTER_COMMIT)`
-
-## 테스트 체크리스트
-- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew test` (또는 `flutter test`) 로컬 통과
-- [ ] 통합 테스트(Integration Test) 작성 완료
-      또는 미작성 사유: &lt;!-- 예: 외부 의존성(DeepSeek) Mock 처리 --&gt;
-- [ ] docs / chore 타입은 해당 없음
-
-## 테스트 방법
-&lt;!-- Unit / Integration / 수동 --&gt;</code></pre>
-        <div class="callout blue" style="margin-top:10px">📍 실제 템플릿: <code>QT-AI-2nd-Team-Project/.github/pull_request_template.md</code>.</div>
-      </div>
-    </div>
-
-    <div class="pr-panel">
-      <div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-4')">
-        <div class="pr-panel-num">4</div>
-        <div class="pr-panel-title"><strong>④ 자동 CI 게이트 + Claude PR 리뷰 (8가지)</strong><span>상세 내용 열기/닫기</span></div>
-        <div class="pr-panel-chev" id="chev-Lead-pr-4">⌄</div>
-      </div>
-      <div class="pr-panel-body" id="Lead-pr-4">
-        <table class="ci-tbl">
-          <thead><tr><th>검사</th><th>실패 시</th><th>해결</th></tr></thead>
-          <tbody>
-            <tr><td>gitleaks (secret scan)</td><td><span class="badge-block">머지 차단</span></td><td>코드에서 secret 제거 후 force push</td></tr>
-            <tr><td>Spectral lint</td><td><span class="badge-block">머지 차단</span></td><td><code>npx spectral lint apis/*/openapi.yaml</code></td></tr>
-            <tr><td>단위 테스트</td><td><span class="badge-block">머지 차단</span></td><td><code>./gradlew :gateway:test :bff-aggregator:test</code></td></tr>
-            <tr><td>통합 테스트 (W3+)</td><td><span class="badge-block">머지 차단</span></td><td><code>./gradlew :gateway:integrationTest :bff-aggregator:integrationTest</code></td></tr>
-            <tr><td>Docker build</td><td><span class="badge-block">머지 차단</span></td><td>Dockerfile 확인 후 로컬 build 성공</td></tr>
-            <tr><td>Claude PR 리뷰 (8가지)</td><td>⚠️ REQUEST_CHANGES</td><td>v1.2 §4.1 — 도메인 계약·금지 패턴·테스트 코드 등 8개 기준</td></tr>
-            <tr><td>Code Review (사람)</td><td><span class="badge-block">머지 차단</span></td><td>강태오 승인 대기</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="pr-panel">
-      <div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-5')">
-        <div class="pr-panel-num">5</div>
-        <div class="pr-panel-title"><strong>⑤ 머지 규칙 + Hotfix 절차 (Squash to dev)</strong><span>상세 내용 열기/닫기</span></div>
-        <div class="pr-panel-chev" id="chev-Lead-pr-5">⌄</div>
-      </div>
-      <div class="pr-panel-body" id="Lead-pr-5">
-        <div class="callout" style="margin-bottom:10px"><strong>Squash merge → dev 브랜치</strong>. Claude APPROVE + CI 통과 시 자동 머지. dev 빌드 깨지면 즉시 revert + Slack 알림.</div>
-        <pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># Hotfix — 강태오 DM 먼저
-git checkout dev &amp;&amp; git pull origin dev
-git checkout -b hotfix/gateway-bug
-git commit -m "fix(gateway): ..."
-git push origin hotfix/gateway-bug</code></pre>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section id="sec-3" class="sec">
-  <div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">상세 일정 — W1 일별(5/13~5/22) + W2~W5 주차 요약</div></div>
-  <div class="callout">기준일 2026-05-14 (v2.0). <strong>W1 날짜 행 클릭</strong>하면 어디서·무엇을·어떻게·DoD 4분할 패널이 열립니다. ▶ 실행 결과 시뮬레이션 버튼으로 단계별 출력 확인.</div>
-  <div style="margin-top:18px;font-size:13px;font-weight:700;color:var(--auth)">▼ W1 Foundation Lock-in (5/13~5/22) — 일별 카드</div>
-  <div style="margin-top:8px">
-
-<div class="day-row" data-day="Lead-0">
-  <div class="day-head" onclick="toggleDay('Lead-0')">
-    <div class="day-date">5/13 화</div>
-    <div class="day-badge badge-infra">infra</div>
-    <div class="day-summary">AuthFilter 골격 + X-User-Id/Role spoofing strip + Gateway route 도메인별 라우팅 + journals/today 정리</div>
-    <div class="day-toggle" id="tog-Lead-0">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-0">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/.../filter/AuthFilter.java</li><li>qtai-server/src/main/java/com/qtai/gatewayauth/src/main/resources/application.yml</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">Gateway가 들어오는 요청의 X-User-Id/Role 헤더 strip → 내부에서 JWT 검증 후 재주입. 도메인별 라우팅 (/bible /ai /api/v1) + journals/today 엔드포인트 정리.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>@Component
-public class AuthFilter implements GlobalFilter {
-    @Override
-    public Mono&lt;Void&gt; filter(ServerWebExchange ex, GatewayFilterChain chain) {
-        // 1) 외부에서 들어오는 X-User-Id/Role 헤더 strip (spoofing 방지)
-        var req = ex.getRequest().mutate()
-            .headers(h -&gt; { h.remove("X-User-Id"); h.remove("X-User-Role"); })
-            .build();
-        // 2) JWT 검증 후 X-User-Id 재주입
-        var token = req.getHeaders().getFirst("Authorization");
-        if (token != null &amp;&amp; jwtVerifier.verify(token)) {
-            var claims = jwtVerifier.parse(token);
-            req = req.mutate().header("X-User-Id", claims.getSubject()).build();
-        }
-        return chain.filter(ex.mutate().request(req).build());
-    }
-}
-
-# application.yml routes
-spring.cloud.gateway.routes:
-  - id: bible
-    uri: http://bible-service:8082
-    predicates: [Path=/bible/**, Path=/api/v1/journals/**, Path=/api/v1/explanations/**]
-  - id: ai
-    uri: http://ai-service:8085
-    predicates: [Path=/ai/sessions/**]</code></pre><button class="sim-btn" data-sim="gateway-filter" data-target="sim-Lead-0">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-0"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>AuthFilter + X-User-Id/Role spoofing strip</li><li>Gateway 도메인별 라우팅 (/bible /ai /api/v1) (bible/ai/bff)</li><li>journals/today 경로 bible 도메인 라우팅</li><li>reports/2026-05-13.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-1">
-  <div class="day-head" onclick="toggleDay('Lead-1')">
-    <div class="day-date">5/14 수</div>
-    <div class="day-badge badge-infra">infra</div>
-    <div class="day-summary">K8s Secret 4종 (deepseek · mysql · jwt-keys · google-oauth) + NetworkPolicy</div>
-    <div class="day-toggle" id="tog-Lead-1">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-1">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>infra/k8s/secrets/deepseek.yaml</li><li>infra/k8s/network-policy/qtai-services.yaml</li><li>helm/qtai-umbrella/values.yaml</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">API key/DB password를 평문 application.yml에 두지 않음. K8s Secret + NetworkPolicy로 서비스 간 통신 제한.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># secrets (sealed-secrets로 암호화)
-apiVersion: v1
-kind: Secret
-metadata: { name: deepseek-api-key, namespace: qtai }
-type: Opaque
-stringData:
-  api-key: "&lt;sealed&gt;"
-  base-url: "https://api.deepseek.com"
-
-# NetworkPolicy
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata: { name: bible-from-gateway-bff, namespace: qtai }
-spec:
-  podSelector: { matchLabels: { app: bible-service } }
-  ingress:
-    - from:
-        - podSelector: { matchLabels: { app: gateway } }
-        - podSelector: { matchLabels: { app: bff-aggregator } }</code></pre><button class="sim-btn" data-sim="k8s-secret" data-target="sim-Lead-1">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-1"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>(v2 분리 시) K8s Secret sealed-secrets로 배포 — v1은 Docker .env</li><li>NetworkPolicy: (v2 분리 시) 외부 → Gateway → 도메인별 라우팅만 허용</li><li>application.yml에 평문 secret 0건</li><li>reports/2026-05-14.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-2">
-  <div class="day-head" onclick="toggleDay('Lead-2')">
-    <div class="day-date">5/15 목</div>
-    <div class="day-badge badge-infra">infra</div>
-    <div class="day-summary">GitHub Actions matrix를 gateway/bff-aggregator/bible-service/ai-service로 고정</div>
-    <div class="day-toggle" id="tog-Lead-2">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-2">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>.github/workflows/ci.yml</li><li>.github/workflows/claude-pr-review.yml</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">CI를 단일 qtai-server 빌드로 고정. PR 시 build + test + gitleaks + spectral + Claude review 병렬 실행.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># .github/workflows/ci.yml
-strategy:
-  matrix:
-    service: [gateway, bff-aggregator, bible-service, ai-service]
-steps:
-  - run: ./gradlew :${{matrix.service}}:build :${{matrix.service}}:test --no-daemon
-  - uses: zricethezav/gitleaks-action@v2
-  - uses: stoplightio/spectral-action@v0.8.5
-    with: { file_glob: 'apis/${{matrix.service}}/openapi.yaml' }
-
-# claude-pr-review.yml
-on: { pull_request: { branches: [dev] } }
-jobs:
-  claude-review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: anthropics/claude-code-action@v1
-        with: { criteria: '14_팀_협업_규칙_Git_브랜치_전략.md §4.1' }</code></pre><button class="sim-btn" data-sim="github-actions" data-target="sim-Lead-2">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-2"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>CI 단일 qtai-server 빌드</li><li>Claude PR review 워크플로우 활성화</li><li>gitleaks + spectral lint 게이트</li><li>reports/2026-05-15.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-3">
-  <div class="day-head" onclick="toggleDay('Lead-3')">
-    <div class="day-date">5/19 월</div>
-    <div class="day-badge badge-code">code</div>
-    <div class="day-summary">BFF 오늘 QT 첫 화면 응답 구조 — QT 본문 우선 · 최근 Journal/AI 세션은 병렬 fallback</div>
-    <div class="day-toggle" id="tog-Lead-3">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-3">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/bff/.../api/QtTodayController.java</li><li>qtai-server/src/main/java/com/qtai/bff/.../application/QtTodayAggregateUseCase.java</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">GET /api/v1/qt/today: bible-service /today QT + DevD journals/today + DevC ai-sessions 최근 1건을 CompletableFuture 병렬 호출. QT 본문은 필수, Journal/AI는 실패 시 null.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>@UseCase
-public class QtTodayAggregateUseCase {
-    public QtTodayResponse execute(Long userId) {
-        var qt = bibleClient.getTodayQt();   // 필수
-        var journalF = supplyAsync(() -&gt;
-            tryOrNull(() -&gt; bibleClient.getTodayJournal(userId)));
-        var aiF = supplyAsync(() -&gt;
-            tryOrNull(() -&gt; aiClient.getRecentSession(userId)));
-        var both = allOf(journalF, aiF).join();
-        return new QtTodayResponse(qt, journalF.join(), aiF.join());
-    }
-    static &lt;T&gt; T tryOrNull(Supplier&lt;T&gt; s) { try { return s.get(); } catch (Exception e) { return null; } }
-}</code></pre><button class="sim-btn" data-sim="bff-aggregate" data-target="sim-Lead-3">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-3"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>GET /api/v1/qt/today UseCase</li><li>QT 본문 필수, Journal/AI는 fallback null</li><li>CompletableFuture 병렬 호출</li><li>reports/2026-05-19.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-4">
-  <div class="day-head" onclick="toggleDay('Lead-4')">
-    <div class="day-date">5/20 화</div>
-    <div class="day-badge badge-obs">obs</div>
-    <div class="day-summary">Loki · Prometheus · Jaeger traceId 관측성 기준 배포</div>
-    <div class="day-toggle" id="tog-Lead-4">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-4">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>helm/qtai-umbrella/values.yaml (observability section)</li><li>services/*/src/main/resources/application.yml (Micrometer · OpenTelemetry)</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">단일 qtai-server + 도메인 패키지 구간 OpenTelemetry traceId 전파. Loki(log) · Prometheus(metric) · Jaeger(trace) Helm Chart 배포.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># helm values.yaml
-loki:
-  enabled: true
-prometheus:
-  enabled: true
-  serviceMonitor: { enabled: true }
-jaeger:
-  enabled: true
-  collector: { otlp: { grpc: { port: 4317 } } }
-
-# application.yml
-management.tracing.sampling.probability: 1.0
-management.otlp.tracing.endpoint: http://jaeger-collector:4317
-logging.pattern.level: "%5p [traceId=%X{traceId} spanId=%X{spanId}]"</code></pre><button class="sim-btn" data-sim="code-init" data-target="sim-Lead-4">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-4"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>Loki · Prometheus · Jaeger Helm 배포</li><li>OpenTelemetry traceId 도메인 패키지 구간 전파</li><li>로그 패턴에 traceId/spanId 포함</li><li>reports/2026-05-20.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-5">
-  <div class="day-head" onclick="toggleDay('Lead-5')">
-    <div class="day-date">5/21 수</div>
-    <div class="day-badge badge-infra">infra</div>
-    <div class="day-summary">Kafka topic/schema registry bootstrap 스크립트와 smoke test</div>
-    <div class="day-toggle" id="tog-Lead-5">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-5">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>scripts/kafka-bootstrap.sh</li><li>events/schema/ (JSON 스키마들)</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">Kafka 토픽 4종 (ai.session.completed · journal.created · journal.creation.failed · notification.requested) 자동 생성 스크립트.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>#!/bin/bash
-# kafka-bootstrap.sh
-TOPICS=(ai.session.completed journal.created journal.updated
-        journal.creation.failed notification.requested user.activity.tracked)
-for topic in "${TOPICS[@]}"; do
-  kafka-topics.sh --bootstrap-server kafka:9092 --create --if-not-exists \
-    --topic $topic --partitions 3 --replication-factor 1
-done
-
-# DLT
-for topic in "${TOPICS[@]}"; do
-  kafka-topics.sh ... --create --topic ${topic}.DLT --partitions 1
-done</code></pre><button class="sim-btn" data-sim="k8s-secret" data-target="sim-Lead-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-5"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>6개 Kafka 토픽 + DLT bootstrap</li><li>events/schema/ JSON 스키마 동기화</li><li>smoke test: 토픽 list 확인</li><li>reports/2026-05-21.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-
-<div class="day-row" data-day="Lead-6">
-  <div class="day-head" onclick="toggleDay('Lead-6')">
-    <div class="day-date">5/22 목</div>
-    <div class="day-badge badge-gate">gate</div>
-    <div class="day-summary">Foundation Lock-in 5항목 최종 검증표 작성 — W1 종료</div>
-    <div class="day-toggle" id="tog-Lead-6">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-6">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>workspaces/Lead_강태오/reports/2026-05-22-W1-lockin.md</li><li>20_W1_Foundation_실행_가이드.md (체크리스트)</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">5항목 lockin 검증: (1) 서비스 경계 (2) OpenAPI 동결 (3) Kafka 토픽/스키마 (4) K8s 배포 (5) 관측성. 5/5 모두 ✅이어야 W2 진입. <strong>W1 머지 필수</strong>.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># W1 Foundation Lock-in 5항목
-[✅] 1. 서비스 경계 확정 — 단일 qtai-server + 도메인 패키지 6개 (gatewayauth/bff/bible/ai/journal/simulator)
-[✅] 2. OpenAPI 동결 — apis/{auth|bible|ai|bff}/openapi.yaml + Spectral 통과
-[✅] 3. Kafka 토픽/스키마 확정 — 6 topics + events/schema/ JSON
-[✅] 4. K8s 배포 — Helm Chart + Secret 4종 + NetworkPolicy
-[✅] 5. 관측성 — Loki · Prometheus · Jaeger + traceId 전파
-
-# 모두 ✅ → W2 진입 OK</code></pre><button class="sim-btn" data-sim="smoke" data-target="sim-Lead-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-6"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>Foundation Lock-in 5/5 검증</li><li>단위 테스트 + ./gradlew :gateway:test :bff-aggregator:test 통과</li><li>W2 진입 GO 결정</li><li>W1 회고 reports/2026-05-22-W1-lockin.md</li></ul></div>
-    </div>
-  </div>
-</div>
-
-  </div>
-
-  <div style="margin-top:24px;font-size:13px;font-weight:700;color:var(--auth)">▼ W2~W5 주차 카드 (클릭 펼침)</div>
-  <div style="margin-top:10px">
-
-<div class="day-row" data-day="Lead-W2">
-  <div class="day-head" onclick="toggleDay('Lead-W2')">
-    <div class="day-date">W2</div>
-    <div class="day-badge badge-code">code</div>
-    <div class="day-summary">★ 강사 면담 (ADR-0016 트리거 박제) + Gateway/BFF 횡단 지원 (5/26~5/29) · 5/25 휴무</div>
-    <div class="day-toggle" id="tog-Lead-W2">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-W2">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>docs/adr/0016-v2-migration-plan.md (면담 결과 하단 박제)</li><li>qtai-server/src/main/java/com/qtai/gatewayauth/ (횡단 리뷰)</li><li>qtai-server/src/main/java/com/qtai/bff/ (횡단 리뷰)</li><li>workspaces/Lead_강태오/notes/instructor-meeting-2026-05-26.md</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt"><strong>★ 강사 면담 (5/26~5/29 중 1회)</strong> — "MSA·Kafka·K8s 학습을 발표 평가에 포함시킬 의사" 확인. 결과를 ADR-0016 본문 하단에 박제. Yes → W4 v2 분리 작업 진행 / No → 발표 자료 "v2 분리 계획" 슬라이드 작성. Gateway Auth·BFF 횡단 리뷰 — Bible팀이 실 구현, 본인은 코드 리뷰·표준 정리. 강상민 AI 도메인 in-process 이벤트 흐름 리뷰. 이지윤 새번역 라이선스 회신 챙김.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 강사 면담 의제 (5/26~5/29 중 1회)
-1. MSA·Kafka·K8s 학습이 발표 평가에 포함되나요?
-   - Yes → W4 v2 AI 도메인 분리 작업 진행
-   - No → 발표 자료에 "v2 분리 계획" 슬라이드만 포함
-2. 면담 결과 docs/adr/0016-v2-migration-plan.md 하단 박제
-
-# 횡단 리뷰 체크리스트
-[ ] Spring Modulith verifyModuleBoundaries() 통과
-[ ] ArchUnit 5 룰 (Controller/Repository import 금지 등) 통과
-[ ] in-process 이벤트 envelope이 v2 Kafka와 동일 구조
-[ ] 도메인 간 import 0건 (qtai-server 단일 모듈 안에서)
-
-# 새번역 라이선스 회신 확인
-[ ] 이지윤 → 대한성서공회 라이선스 부서 응답 받음
-[ ] 결과를 DECISIONS.md §8에 박제</code></pre></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li><strong>★ 강사 면담 완료 + ADR-0016 트리거 조건 박제</strong> (Yes/No)</li><li>Gateway Auth·BFF 횡단 리뷰 — Bible팀 구현 PR 머지</li><li>강상민 AI in-process 이벤트 흐름 리뷰</li><li>이지윤 새번역 라이선스 회신 결과 추적</li><li>⚠️ 면담 결과가 W4 일정의 분기점</li></ul></div>
-    </div>
-  </div>
-</div>
-
-<div class="day-row" data-day="Lead-W3">
-  <div class="day-head" onclick="toggleDay('Lead-W3')">
-    <div class="day-date">W3</div>
-    <div class="day-badge badge-gate">gate</div>
-    <div class="day-summary">v1 안정화 + E2E trace 통합 + Spring Modulith 룰 정착 (6/1~6/5) · 6/3 휴무 · 통합 테스트 머지 필수</div>
-    <div class="day-toggle" id="tog-Lead-W3">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-W3">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>qtai-server/src/test/java/com/qtai/QtaiModulesTest.java</li><li>qtai-server/src/test/java/com/qtai/architecture/CodingRulesTest.java</li><li>qtai-server/src/main/java/com/qtai/gatewayauth/filter/ (RateLimit·CORS)</li><li>qtai-server/src/main/resources/application.yml (OpenTelemetry)</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">v1 Modular Monolith 안정화 (ADR-0016 트리거 조건 1번) — 오늘 QT · AI 1회성 Q&amp;A · 묵상 자동 저장 · 익명 나눔 흐름이 단일 서비스에서 모두 작동. Gateway → BFF → Bible/AI 도메인 in-process trace 연결 (Jaeger OpenTelemetry). Journal today DRAFT → AI 완료 요약 첨부 → 알림 E2E 1차. rate limit · CORS · SSE buffering 장애 처리. Spring Modulith 위반 PR 자동 차단 동작 검증.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># E2E 시나리오 (Jaeger trace 확인)
-1. Flutter → Gateway → BFF.getTodayQt()
-2. BFF → Bible.getPassage() + AI.getRecentSession() 병렬
-3. Flutter → AI.startSession() → SSE turn 스트리밍
-4. AI.complete() → in-process event → Journal.attachSummary()
-
-# Jaeger UI 확인
-http://localhost:16686 → traces by service
-# qtai-server 단일 프로세스 내 도메인 패키지 구간이 trace로 표현
-
-# Spring Modulith 의도적 위반 PR로 차단 검증
-# (예시) com.qtai.bff에서 com.qtai.bible.repository.BibleVerseRepository 직접 import
-./gradlew test --tests "QtaiModulesTest"
-# Expected: FAIL — "Module 'bff' depends on internal of module 'bible'"</code></pre></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li><strong>W3 PR 머지 필수</strong> — <code>./gradlew test</code> 통과 + Gateway/BFF 도메인 커버리지 70%+ + Spring Modulith verifyModuleBoundaries() 통과</li><li>v1 Modular Monolith 안정화 — ADR-0016 트리거 조건 1번 충족 확인</li><li>Jaeger trace로 도메인 패키지 구간 모두 표시</li><li>Journal today DRAFT → AI 완료 → 요약 첨부 → 알림 E2E 1차 통과</li><li>rate limit · CORS · SSE buffering 장애 처리 통과</li><li>Spring Modulith 위반 PR 자동 차단 시연 OK</li></ul></div>
-    </div>
-  </div>
-</div>
-
-<div class="day-row" data-day="Lead-W4">
-  <div class="day-head" onclick="toggleDay('Lead-W4')">
-    <div class="day-date">W4</div>
-    <div class="day-badge badge-obs">obs</div>
-    <div class="day-summary">(분기) v2 AI 도메인 분리 OR v1 안정화 + 발표 자료 (6/8~6/12)</div>
-    <div class="day-toggle" id="tog-Lead-W4">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-W4">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>(Yes) settings.gradle.kts (멀티 모듈) · qtai-ai-service/ 신규 모듈</li><li>(Yes) docker-compose.yml (Kafka KRaft + Schema Registry 추가)</li><li>(No) workspaces/Lead_강태오/notes/demo-slides-v2-plan.md</li><li>공통 — workspaces/Lead_강태오/notes/architecture-diagram-v1.md</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt"><strong>(ADR-0016 트리거 Yes 시 — v2 분리 진행)</strong>: 월~수 Gradle 멀티 모듈 분리, <code>qtai-ai-service</code> 빈 모듈 생성, build 통과 (강상민과 협업). 목~금 Kafka KRaft single-node + Schema Registry Docker Compose 추가, <code>ai.session.completed</code> Kafka publisher 교체 (이승욱은 Kafka consumer 코드 추가). <strong>(트리거 No 시 — v1 안정화)</strong>: Docker Compose values · rollback · smoke test 안정화. 보안/품질 게이트 정리. 시연 환경 1일 1회 배포 리허설. 발표 자료 "v2 분리 계획" 슬라이드. <strong>공통</strong>: 발표 자료 아키텍처 다이어그램 1·2 (v1 Modular Monolith + 도메인 경계 강제 방법).</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># (Yes) v2 AI 도메인 분리
-# settings.gradle.kts
-rootProject.name = "qtai"
-include(":qtai-server", ":qtai-ai-service")
-
-# qtai-server에서 com.qtai.ai 패키지 → qtai-ai-service/ 모듈로 이동
-# (기존 in-process publisher가 Kafka publisher로 교체)
-@TransactionalEventListener(phase = AFTER_COMMIT)
-public void publish(AiSessionCompletedEvent e) {
-    kafkaTemplate.send("ai.session.completed", envelope(e));
-}
-
-# Kafka KRaft Docker Compose
-services:
-  kafka:
-    image: confluentinc/cp-kafka:7.6.0
-    environment: { KAFKA_PROCESS_ROLES: 'broker,controller' }
-  schema-registry:
-    image: apicurio/apicurio-registry-mem:2.5.11.Final
-
-# (공통) 발표 슬라이드
-1. v1 Modular Monolith 다이어그램 — 단일 qtai-server + 6 도메인 패키지
-2. 도메인 경계 강제 — Spring Modulith + ArchUnit (ADR-0015)</code></pre></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li><strong>(Yes 시)</strong> Gradle 멀티 모듈 분리 + <code>qtai-ai-service</code> 빌드 통과 (강상민 협업)</li><li><strong>(Yes 시)</strong> Kafka KRaft single-node + Schema Registry Docker Compose 가동</li><li><strong>(Yes 시)</strong> <code>ai.session.completed</code> Kafka 발행/소비 E2E 검증</li><li><strong>(No 시)</strong> Docker Compose values · rollback · smoke test 안정화</li><li><strong>(No 시)</strong> 발표 자료 "v2 분리 계획" 슬라이드 3장 완성 (#3·#4·#5)</li><li><strong>공통</strong> 발표 자료 v1 다이어그램 + 도메인 경계 슬라이드 2장 완성 (#1·#2)</li></ul></div>
-    </div>
-  </div>
-</div>
-
-<div class="day-row" data-day="Lead-W5">
-  <div class="day-head" onclick="toggleDay('Lead-W5')">
-    <div class="day-date">W5</div>
-    <div class="day-badge badge-demo">demo</div>
-    <div class="day-summary">발표와 리허설 (6/15~6/17) — 발표일 6/17 수</div>
-    <div class="day-toggle" id="tog-Lead-W5">▼ 펼치기</div>
-  </div>
-  <div class="day-panel" id="panel-Lead-W5">
-    <div class="four-grid">
-      <div class="fi"><div class="fi-label lw">🗂 어디서 (WHERE)</div><ul class="path-list"><li>workspaces/Lead_강태오/notes/demo-rehearsal-schedule.md</li><li>workspaces/Lead_강태오/notes/grafana-demo-dashboard.json</li><li>(Yes 시) helm/qtai-umbrella/ 배포 산출물</li><li>발표 자료 5장 최종본</li></ul></div>
-      <div class="fi"><div class="fi-label la">📝 무엇을 (WHAT)</div><div class="wt">월~화: K8s Minikube + Helm umbrella chart 배포 (v2 분리 진행 시) / Docker Compose 시연 환경 안정화 (v1 잔류 시). 발표용 아키텍처 다이어그램 5장 최종화 (ADR-0016 §발표 자료 필수 슬라이드) — v1 Modular Monolith / 도메인 경계 강제 / v2 분리(또는 계획) / 분리 트레이드오프 / 1차 실패 vs 가드레일. Grafana 운영 대시보드 준비. 시연 직전 Gateway/BFF/CI 책임 구간 점검 + 이승욱 Flutter 빌드 책임자 지원. 장애 시 백업 영상/스크립트 전환 oncall.</div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">🛠 어떻게 (HOW)</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 발표 자료 5장 최종본 (ADR-0016)
-1. v1 Modular Monolith 다이어그램 (단일 qtai-server)
-2. 도메인 경계 강제 (Spring Modulith + ArchUnit)
-3. v2 분리 후 다이어그램 (qtai-ai-service + Kafka + K8s)
-4. 분리 과정 트레이드오프 (in-process vs Kafka · DB schema · Docker vs K8s)
-5. 1차 (HMS) 실패 vs v1+v2 가드레일
-
-# 시연 직전 점검 체크리스트
-[ ] docker compose ps → all UP
-[ ] curl localhost:8080/actuator/health → UP
-[ ] Flutter 빌드 (이승욱) → APK/IPA 정상
-[ ] DeepSeek API 키 유효 · 토큰 잔량 확인
-[ ] Grafana 대시보드 → live metric
-[ ] 백업 영상 1개 · 백업 스크립트 1개
-
-# Q&amp;A 시나리오 (Lead 답변)
-1. "왜 v1을 모놀리식으로 했나요?" → 학생 일정 + 도메인 경계 학습 (ADR-0001)
-2. "Spring Modulith vs ArchUnit?" → 메인 + 보조 (ADR-0015)
-3. "v2는 언제 분리하나요?" → 학습 평가 + W4 트리거 (ADR-0016)</code></pre></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">✅ 최종 결과물 (DoD)</div><ul class="dod-list"><li>발표용 아키텍처 다이어그램 5장 최종 완성</li><li>Grafana 운영 대시보드 라이브 metric 표시</li><li>(Yes 시) K8s Minikube + Helm 배포 완료, 시연용 데모 환경 가동</li><li>(No 시) Docker Compose 시연 환경 안정 가동</li><li>시연 직전 Gateway/BFF/CI 책임 구간 점검 완료</li><li>이승욱 Flutter 빌드 책임자 지원 (장애 시 디버깅)</li><li>백업 영상 1개 + 백업 스크립트 1개 준비</li><li>Q&amp;A 답변 3가지 준비 (Lead 영역 — v1 선택·도구·v2 트리거)</li></ul></div>
-    </div>
-  </div>
-</div>
-
-  </div>
-</section>
-
-<section id="sec-4" class="sec">
-  <div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드</div></div>
-  <div class="callout warn">⚠️ AI 에이전트(Claude Code · Cursor · Codex 등)에게 코드 생성 요청 시 <strong>반드시 DECISIONS.md · AGENTS.md · CLAUDE.md를 첨부</strong>. v1에 별도 서비스 모듈 신설(Modular Monolith, ADR-0001), Anthropic SDK 직접 호출, ChromaDB·벡터 DB·엘라스틱서치 코드(ADR-0013), Auth/Journal 독립 서비스 코드를 생성하지 못하도록 컨텍스트 가드.</div>
-  <table class="tbl" style="margin-top:14px">
-    <thead><tr><th>요청 유형</th><th>AI에게 주는 컨텍스트</th><th>출력 가드</th></tr></thead>
-    <tbody>
-      <tr><td>Entity/Repository</td><td>02_ERD_문서.md + 본인 서비스 Flyway SQL</td><td>JPA + BaseEntity 상속</td></tr>
-      <tr><td>UseCase 구현</td><td>04_API_명세서.md + apis/*/openapi.yaml</td><td><code>@UseCase</code> + <code>@Transactional</code> 필수</td></tr>
-      <tr><td>Kafka publisher</td><td>events/schema/ + AGENTS.md §Kafka</td><td><code>@TransactionalEventListener(AFTER_COMMIT)</code></td></tr>
-      <tr><td>SSE Controller</td><td>03_아키텍처_정의서.md §SSE</td><td>경로 <code>/turns</code>, 4종 이벤트 + [DONE]</td></tr>
-      <tr><td>RFC 7807 ProblemDetail</td><td>AGENTS.md §에러 응답 통일</td><td><code>application/problem+json</code> 헤더</td></tr>
-      <tr><td>단위 테스트</td><td>07_테스트_전략.md + 18_코드_품질_게이트.md</td><td>JUnit5/AssertJ/Mockito (또는 flutter_test)</td></tr>
-    </tbody>
-  </table>
-  <div class="callout red" style="margin-top:14px">
-    <ul style="margin:6px 0;padding-left:18px;line-height:1.8">
-      <li>🚫 LLM: <strong>DeepSeek API(OpenAI 호환)만</strong>. Anthropic SDK · ChromaDB · 벡터 DB · 엘라스틱서치 · 코드 생성 금지 (RAG 폐기, ADR-0013)</li>
-      <li>🚫 v1에 별도 서비스 모듈 신설 (auth-service · journal-service · notification-service 등) 금지</li>
-      <li>🚫 PostgreSQL · ZooKeeper · Tempo 설정 금지 (MySQL · Kafka KRaft · Jaeger 고정)</li>
-      <li>🚫 Kafka envelope <code>payload</code> 키 금지 → <code>data</code>만</li>
-      <li>🚫 AI SSE <code>/messages</code> 금지 → <code>/ai/sessions/{id}/turns</code>만</li>
-      <li>🚫 성경 데이터: 개역개정/ESV/NIV 시드·응답 금지 (KJV · 개역한글 · Matthew Henry만)</li>
-      <li>🚫 <code>@Transactional</code> 없는 DB 변경 메서드 금지</li>
-      <li>🚫 트랜잭션 안 <code>KafkaTemplate.send()</code> 직접 호출 금지 → AFTER_COMMIT 필수</li>
-    </ul>
-  </div>
-</section>
-
-<section id="sec-5" class="sec">
-  <div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 본인 결정 가능 여부</div></div>
-  <table class="tbl">
-    <thead><tr><th>항목</th><th>가능?</th><th>기준</th></tr></thead>
-    <tbody>
-      <tr><td>본인 도메인 Entity/Repository 추가</td><td>✅ 가능</td><td>02_ERD_문서.md 범위 내</td></tr>
-      <tr><td>본인 도메인 UseCase 분리</td><td>✅ 가능</td><td>본인 패키지 내부</td></tr>
-      <tr><td>로컬 단위 테스트 추가</td><td>✅ 가능</td><td>07_테스트_전략.md 준수</td></tr>
-      <tr><td>OpenAPI 경로 추가/변경</td><td>⚠️ Lead 협의</td><td>BFF·Flutter 영향</td></tr>
-      <tr><td>Kafka 토픽 신설</td><td>⚠️ Lead 협의</td><td>events/schema/ + 03 아키텍처</td></tr>
-      <tr><td>v1에 별도 서비스 모듈 신설</td><td>❌ 불가</td><td>DECISIONS.md §0</td></tr>
-      <tr><td>독립 Auth/Journal Service</td><td>❌ 불가</td><td>DECISIONS.md §0 (2026-05-12)</td></tr>
-      <tr><td>Anthropic SDK 사용</td><td>❌ 불가</td><td>DECISIONS.md DeepSeek 결정</td></tr>
-    </tbody>
-  </table>
-</section>
-
-<section id="sec-6" class="sec">
-  <div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div>
-  <div class="callout blue">ℹ️ 모든 작업은 <strong>워크플로우 작성 → 검토 → 작업 진행 → 리포트 작성</strong> 순서. 개인 폴더: <code>workspaces/Lead_강태오/</code></div>
-  <pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/Lead_강태오/
-├── workflows/
-│   └── {date}-{task}.md     ← 작업 전 DoD 작성
-├── reports/
-│   └── {date}-{task}.md     ← 작업 후 결과 + 막힌 점 + 다음 작업
-├── notes/                       ← 개인 메모, 스크린샷
-└── docs/                        ← 개인 ADR · 참고 자료</code></pre>
-  <div class="callout warn" style="margin-top:14px">⚠️ 본인 폴더에서만 읽기·쓰기. 다른 개발자 폴더 수정 금지.</div>
-</section>
-
-<section id="sec-7" class="sec">
-  <div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">검증 명령 — 작업 후 반드시 실행</div></div>
-  <div class="callout">PR 전·로컬 빌드 후·매일 EOD 실행. 모두 통과해야 push.</div>
-  <pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 1) 빌드 + 단위 테스트
-cd C:\workspace\QT-AI-2nd-Team-Project-master
-./gradlew :gateway:test :bff-aggregator:test
-
-# 2) 통합 테스트 (W3+)
-./gradlew :gateway:integrationTest :bff-aggregator:integrationTest
-
-# 3) 금지 패턴 검색 (0건)
-rg -n "개역개정|ESV|NIV" services
-rg -n "Anthropic|ANTHROPIC_API_KEY" services
-rg -n "auth-service|journal-service" services
-
-# 4) OpenAPI lint
-npx spectral lint apis/**/openapi.yaml
-
-# 5) Secret 스캔
-gitleaks detect --source . --verbose</code></pre>
-  <div class="callout warn" style="margin-top:12px">⚠️ 하나라도 실패하면 push 금지.</div>
-</section>
-
-<section id="sec-8" class="sec">
-  <div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정·revert</div></div>
-  <div class="callout red"><strong>14_팀_협업_규칙 v1.2 §3.5와 동기화. Claude PR 리뷰가 자동 감지해 REQUEST_CHANGES.</strong></div>
-  <table class="tbl" style="margin-top:12px">
-    <thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead>
-    <tbody>
-      <tr><td>인프라</td><td>PostgreSQL · ZooKeeper · Tempo</td><td>MySQL 8.0 · Kafka KRaft · Jaeger</td></tr>
-      <tr><td>인증</td><td>독립 Auth Service · 자체 JWT 검증</td><td>Gateway Auth 모듈 · X-User-Id 헤더</td></tr>
-      <tr><td>묵상일지</td><td>독립 Journal Service</td><td>bible-service 내부 domain/journal</td></tr>
-      <tr><td>LLM</td><td>Anthropic SDK · ANTHROPIC_API_KEY</td><td>DeepSeek API (OpenAI 호환)</td></tr>
-      <tr><td>저작권</td><td>개역개정 · ESV · NIV 시드</td><td>KJV · 개역한글 · Matthew Henry</td></tr>
-      <tr><td>Secret</td><td>application.yml 평문 key/password</td><td>K8s Secret · 환경변수</td></tr>
-      <tr><td>Kafka</td><td>트랜잭션 안 KafkaTemplate.send</td><td><code>@TransactionalEventListener(AFTER_COMMIT)</code></td></tr>
-      <tr><td>Kafka envelope</td><td><code>payload</code> 키</td><td><code>data</code> 키만</td></tr>
-      <tr><td>AI SSE</td><td>경로 <code>/messages</code></td><td><code>/ai/sessions/{id}/turns</code></td></tr>
-      <tr><td>서비스 간</td><td>DB 직접 JOIN · Repository 공유</td><td>HTTP API · Kafka 이벤트</td></tr>
-      <tr><td>이벤트</td><td>JOURNAL_EVENTS 수정/삭제</td><td>append-only event sourcing</td></tr>
-      <tr><td>OpenAPI</td><td>계약과 다른 DTO/경로 임의 생성</td><td>apis/*/openapi.yaml 먼저</td></tr>
-    </tbody>
-  </table>
-
-ion>
-
+  <section id="deliverables">
+    <h2>7. 산출물</h2>
+    <table>
+      <thead><tr><th>시점</th><th>산출물</th></tr></thead>
+      <tbody>
+        <tr><td>W1</td><td>Foundation 5/5 검증표, 도메인 경계 검증 결과, API/ERD 계약 확인 메모</td></tr>
+        <tr><td>W2</td><td>Today QT 핵심 API 데모, 인증·권한 검증 결과</td></tr>
+        <tr><td>W3</td><td>Feature Freeze 확인표, 관리자·통합 검증 결과</td></tr>
+        <tr><td>W4</td><td>E2E 결과, 성능 점검 결과, Docker Compose 시연 후보 빌드</td></tr>
+        <tr><td>W5</td><td>발표 리허설 결과, 백업 영상/스크립트, 최종 회고</td></tr>
+      </tbody>
+    </table>
+  </section>
 </main>
 
 <script>
-function toggleDay(id){var el=document.getElementById('panel-'+id);if(!el)return;el.classList.toggle('show');var t=document.getElementById('tog-'+id);if(t)t.textContent=el.classList.contains('show')?'▲ 접기':'▼ 펼치기';var r=el.parentElement;if(r&&r.classList.contains('day-row'))r.classList.toggle('open');}
-function togglePanel(id){var el=document.getElementById(id);if(!el)return;el.classList.toggle('show');var c=document.getElementById('chev-'+id);if(c)c.classList.toggle('open');}
-function copyPre(b){var p=b.closest('pre');if(!p)return;var c=p.querySelector('code')||p;if(navigator.clipboard)navigator.clipboard.writeText(c.textContent).then(function(){b.textContent='Copied';b.classList.add('ok');setTimeout(function(){b.textContent='Copy';b.classList.remove('ok');},1500);});}
-document.addEventListener('click',function(e){var s=e.target.closest('.sim-btn');if(s){var o=document.getElementById(s.getAttribute('data-target'));if(o){o.innerHTML='<div style="color:var(--t2);font-size:11px;padding:8px">(sim '+s.getAttribute('data-sim')+')</div>';o.style.display='block';}return;}var n=e.target.closest('.wnav');if(n){document.querySelectorAll('.wnav').forEach(function(b){b.classList.remove('cur');});n.classList.add('cur');var t=document.getElementById(n.getAttribute('data-target'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
+function copyPre(btn){
+  const code = btn.parentElement.querySelector('code');
+  const text = code ? code.innerText : btn.parentElement.innerText.replace('Copy','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.classList.add('ok');
+    btn.textContent = 'Copied';
+    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='Copy'},1200);
+  });
+}
+function showSim(btn,targetId){
+  const target = document.getElementById(targetId);
+  if (!target) return;
+  const isHidden = target.style.display === 'none';
+  target.style.display = isHidden ? 'block' : 'none';
+  btn.textContent = isHidden ? '닫기' : '시뮬레이션 보기';
+}
 </script>
-
 </body>
 </html>

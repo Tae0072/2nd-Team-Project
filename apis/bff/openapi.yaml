@@ -1,0 +1,817 @@
+openapi: 3.0.3
+info:
+  title: QT-AI BFF API
+  version: 0.1.0
+  description: |
+    QT-AI v2.3 기준 외부 공개 BFF API 초안이다.
+    내부 도메인 Java Interface는 이 OpenAPI 문서에 포함하지 않는다.
+servers:
+  - url: /api/v1
+tags:
+  - name: QT
+  - name: Bible
+  - name: Explanations
+  - name: Journals
+  - name: Simulator
+  - name: Songs
+  - name: Me
+  - name: Admin
+
+paths:
+  /qt/today:
+    get:
+      tags: [QT]
+      summary: 오늘 QT 조회
+      operationId: getTodayQt
+      responses:
+        "200":
+          description: 오늘 QT 본문, 해설 진입점, 묵상 진입점, 시뮬레이터 상태
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodayQtResponse"
+
+  /bible/books:
+    get:
+      tags: [Bible]
+      summary: 성경 목록 조회
+      operationId: getBibleBooks
+      responses:
+        "200":
+          description: 성경 책 목록
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BibleBook"
+
+  /bible/passages:
+    get:
+      tags: [Bible]
+      summary: 성경 본문 조회
+      operationId: getBiblePassages
+      parameters:
+        - $ref: "#/components/parameters/BookCode"
+        - name: chapter
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: verseStart
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+        - name: verseEnd
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: 절 단위 한/영 본문
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PassageResponse"
+
+  /explanations/{bookCode}/{ch}/{v}:
+    get:
+      tags: [Explanations]
+      summary: 본문 해설 조회
+      operationId: getExplanation
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/BookCodePath"
+        - $ref: "#/components/parameters/ChapterPath"
+        - $ref: "#/components/parameters/VersePath"
+      responses:
+        "200":
+          description: 사용자 노출용 C 테이블 해설
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExplanationResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /journals/today:
+    post:
+      tags: [Journals]
+      summary: 오늘 QT 묵상 DRAFT 생성 또는 조회
+      operationId: createOrGetTodayJournal
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 오늘 QT 묵상 DRAFT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /journals:
+    get:
+      tags: [Journals]
+      summary: 묵상 노트 목록 또는 날짜별 조회
+      operationId: getJournals
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+      responses:
+        "200":
+          description: 묵상 노트 목록
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalPageResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /journals/{id}:
+    get:
+      tags: [Journals]
+      summary: 묵상 노트 단건 조회
+      operationId: getJournal
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200":
+          description: 묵상 노트
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [Journals]
+      summary: 묵상 노트 수정
+      operationId: updateJournal
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JournalUpdateRequest"
+      responses:
+        "200":
+          description: 수정 결과
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalUpdateResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      tags: [Journals]
+      summary: 묵상 노트 삭제
+      operationId: deleteJournal
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "204":
+          description: 삭제 완료
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /journals/{id}/events:
+    get:
+      tags: [Journals]
+      summary: 묵상 노트 이벤트 로그 조회
+      operationId: getJournalEvents
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdPath"
+      responses:
+        "200":
+          description: 이벤트 로그
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/JournalEvent"
+
+  /journals/calendar:
+    get:
+      tags: [Journals]
+      summary: 묵상 달력 조회
+      operationId: getJournalCalendar
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2000
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+      responses:
+        "200":
+          description: 월별 묵상 기록 여부
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JournalCalendarResponse"
+
+  /simulator/{bookCode}/{ch}/{v}:
+    get:
+      tags: [Simulator]
+      summary: 시뮬레이터 상태와 클립 조회
+      operationId: getSimulator
+      parameters:
+        - $ref: "#/components/parameters/BookCodePath"
+        - $ref: "#/components/parameters/ChapterPath"
+        - $ref: "#/components/parameters/VersePath"
+      responses:
+        "200":
+          description: 시뮬레이터 상태
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulatorResponse"
+
+  /songs/curated:
+    get:
+      tags: [Songs]
+      summary: 찬양 큐레이션 목록 조회
+      operationId: getCuratedSongs
+      responses:
+        "200":
+          description: 운영자 큐레이션 찬양 목록
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Song"
+
+  /me/songs:
+    get:
+      tags: [Me]
+      summary: 내 찬양 목록 조회
+      operationId: getMySongs
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 사용자가 저장한 찬양 참조 목록
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Song"
+
+  /me/songs/{songId}:
+    post:
+      tags: [Me]
+      summary: 내 찬양 저장
+      operationId: saveMySong
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SongIdPath"
+      responses:
+        "204":
+          description: 저장 완료
+    delete:
+      tags: [Me]
+      summary: 내 찬양 제거
+      operationId: deleteMySong
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SongIdPath"
+      responses:
+        "204":
+          description: 제거 완료
+
+  /me/notifications:
+    get:
+      tags: [Me]
+      summary: 알림 목록 조회
+      operationId: getMyNotifications
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 인앱 알림 목록
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+
+  /admin/ai/regenerate:
+    post:
+      tags: [Admin]
+      summary: 관리자 AI 산출물 재생성 요청
+      operationId: regenerateAiContent
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiRegenerateRequest"
+      responses:
+        "202":
+          description: 재생성 요청 접수
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiRegenerateResponse"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    BookCode:
+      name: bookCode
+      in: query
+      required: true
+      schema:
+        type: string
+        example: GEN
+    BookCodePath:
+      name: bookCode
+      in: path
+      required: true
+      schema:
+        type: string
+        example: GEN
+    ChapterPath:
+      name: ch
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    VersePath:
+      name: v
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    SongIdPath:
+      name: songId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Size:
+      name: size
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: 인증 필요
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: 권한 부족
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    TodayQtResponse:
+      type: object
+      required: [qtId, date, range, passages, explanation, journal, simulator]
+      properties:
+        qtId:
+          type: string
+          example: "2026-05-15"
+        date:
+          type: string
+          format: date
+        range:
+          $ref: "#/components/schemas/BibleRange"
+        passages:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerseText"
+        explanation:
+          $ref: "#/components/schemas/ExplanationEntry"
+        journal:
+          $ref: "#/components/schemas/JournalEntry"
+        simulator:
+          $ref: "#/components/schemas/SimulatorSummary"
+
+    BibleRange:
+      type: object
+      required: [bookCode, chapterStart, verseStart, chapterEnd, verseEnd]
+      properties:
+        bookCode:
+          type: string
+          example: GEN
+        chapterStart:
+          type: integer
+          minimum: 1
+        verseStart:
+          type: integer
+          minimum: 1
+        chapterEnd:
+          type: integer
+          minimum: 1
+        verseEnd:
+          type: integer
+          minimum: 1
+
+    BibleBook:
+      type: object
+      required: [bookCode, koName, enName, chapterCount]
+      properties:
+        bookCode:
+          type: string
+          example: GEN
+        koName:
+          type: string
+          example: 창세기
+        enName:
+          type: string
+          example: Genesis
+        chapterCount:
+          type: integer
+          minimum: 1
+
+    PassageResponse:
+      type: object
+      required: [bookCode, chapter, verses]
+      properties:
+        bookCode:
+          type: string
+        chapter:
+          type: integer
+        verses:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerseText"
+
+    VerseText:
+      type: object
+      required: [verseKey, verse, koText, enText]
+      properties:
+        verseKey:
+          type: string
+          example: GEN.1.1
+        verse:
+          type: integer
+          minimum: 1
+        koText:
+          type: string
+          example: 한글 성경 본문
+        enText:
+          type: string
+          example: English Bible text
+
+    ExplanationEntry:
+      type: object
+      required: [available, loginRequired, path]
+      properties:
+        available:
+          type: boolean
+        loginRequired:
+          type: boolean
+        path:
+          type: string
+          example: /api/v1/explanations/GEN/1/1
+
+    JournalEntry:
+      type: object
+      required: [loginRequired, draftAvailable]
+      properties:
+        loginRequired:
+          type: boolean
+        draftAvailable:
+          type: boolean
+        todayJournalId:
+          type: integer
+          format: int64
+          nullable: true
+
+    SimulatorSummary:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/SimulatorStatus"
+        clipId:
+          type: integer
+          format: int64
+          nullable: true
+        disabledReason:
+          type: string
+          nullable: true
+
+    ExplanationResponse:
+      type: object
+      required: [bookCode, chapter, verse, title, summary, explanation, terms, sources]
+      properties:
+        bookCode:
+          type: string
+        chapter:
+          type: integer
+        verse:
+          type: integer
+        title:
+          type: string
+        summary:
+          type: string
+        explanation:
+          type: string
+        terms:
+          type: array
+          items:
+            type: string
+        sources:
+          type: array
+          items:
+            type: string
+
+    JournalResponse:
+      type: object
+      required: [journalId, qtId, status, sections, updatedAt]
+      properties:
+        journalId:
+          type: integer
+          format: int64
+        qtId:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, SAVED]
+        sections:
+          $ref: "#/components/schemas/JournalSections"
+        updatedAt:
+          type: string
+          format: date-time
+
+    JournalSections:
+      type: object
+      properties:
+        feeling:
+          type: string
+        memoryVerse:
+          type: string
+        application:
+          type: string
+        prayer:
+          type: string
+
+    JournalUpdateRequest:
+      allOf:
+        - $ref: "#/components/schemas/JournalSections"
+
+    JournalUpdateResponse:
+      type: object
+      required: [journalId, status, updatedAt]
+      properties:
+        journalId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [SAVED]
+        updatedAt:
+          type: string
+          format: date-time
+
+    JournalPageResponse:
+      type: object
+      required: [items, page, size, totalElements, totalPages, hasNext]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/JournalResponse"
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        hasNext:
+          type: boolean
+
+    JournalEvent:
+      type: object
+      required: [eventId, eventType, occurredAt]
+      properties:
+        eventId:
+          type: string
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+
+    JournalCalendarResponse:
+      type: object
+      required: [year, month, days]
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+        days:
+          type: array
+          items:
+            type: object
+            required: [date, hasJournal]
+            properties:
+              date:
+                type: string
+                format: date
+              hasJournal:
+                type: boolean
+              journalId:
+                type: integer
+                format: int64
+                nullable: true
+
+    SimulatorResponse:
+      allOf:
+        - $ref: "#/components/schemas/SimulatorSummary"
+        - type: object
+          properties:
+            bookCode:
+              type: string
+            chapter:
+              type: integer
+            verse:
+              type: integer
+            clipUrl:
+              type: string
+              nullable: true
+
+    SimulatorStatus:
+      type: string
+      enum: [READY, MISSING, FAILED, DISABLED]
+
+    Song:
+      type: object
+      required: [songId, title, artist, sourceName, attribution, isSaved]
+      properties:
+        songId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        artist:
+          type: string
+        sourceName:
+          type: string
+        attribution:
+          type: string
+        isSaved:
+          type: boolean
+
+    Notification:
+      type: object
+      required: [notificationId, title, message, read, createdAt]
+      properties:
+        notificationId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        message:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    AiRegenerateRequest:
+      type: object
+      required: [qtId, target, reason]
+      properties:
+        qtId:
+          type: string
+        target:
+          type: string
+          enum: [EXPLANATION, SIMULATOR]
+        reason:
+          type: string
+
+    AiRegenerateResponse:
+      type: object
+      required: [runId, status, message]
+      properties:
+        runId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum: [PENDING]
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, code, message, path, traceId]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        code:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+        traceId:
+          type: string

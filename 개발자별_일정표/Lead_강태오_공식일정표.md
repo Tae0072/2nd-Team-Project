@@ -1,145 +1,138 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
-> 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith + Lead 횡단 역할)**
->
-> **2026-05-14 v2.0 변경 요지:**
-> - 백엔드는 단일 `qtai-server`. AI 주도는 강상민으로 이관.
-> - **본인 새 역할: Lead · DevOps · 전체 조율 (단일 파트에 고정 X).** PR 자동 검증 스크립트, 인프라, 컨벤션, 횡단 지원.
-> - 우선 액션: (1) Spring Modulith + ArchUnit 도입 + `@ApplicationModule` 메타데이터 6개 선언 + 시연 (W1 첫 주). (2) DECISIONS·ADR·AGENTS·02_ERD·03_아키텍처 정합 PR 완료 후 W1 첫날 본 일정표 본문 갱신. (3) **W2 첫째 주(5/26~5/29) 강사 면담 — MSA·Kafka·K8s 학습 평가 포함 여부 확인 → ADR-0016 트리거 조건 박제.** (4) 면담 결과에 따라 W4(6/8) 시작 시 AI 도메인 v2 분리 작업 개시 또는 발표 자료 "v2 분리 계획" 슬라이드 작성.
-> - **PR 검증 도구 확정 (2026-05-14, ADR-0015): Spring Modulith 메인 + ArchUnit 보조.** 상세 룰은 18_코드_품질_게이트 §1.5. W1 첫 주에 `@ApplicationModule` 메타데이터 6개 도메인 선언 + `QtaiModulesTest.verifyModuleBoundaries()` 통과 + 의도적 위반 케이스 추가로 PR 머지 차단 시연.
+> **문서 버전:** v2.3-align.1
+> **작성일:** 2026-05-15
+> **기준 문서:** `00_개발_일정_총괄표.md` v0.1, `07_요구사항_정의서.md` v2.3
+> **적용 범위:** 강태오 Lead 일정표이면서, 다른 팀원 개인 일정표 작성 시 복제 가능한 공통 기준
+> **연관 문서:** `09_Git_규칙.md`, `18_코드_품질_게이트.md`, `23_도메인_용어사전.md`, `24_템플릿_문서_매핑표.md`
 
-## 1. 내 역할
+---
 
-- 담당자: 강태오
-- **새 역할 (2026-05-14): Lead · DevOps · 전체 조율 (단일 파트에 묶이지 않음)**
-- 개인 작업 폴더: `workspaces/Lead_강태오/`
-- 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
+## 1. 역할
 
-## 2. 반드시 지킬 최신 결정
+| 항목 | 내용 |
+| --- | --- |
+| 담당자 | 강태오 |
+| 주 역할 | Lead / gatewayauth / bff / DevOps / 전체 조율 |
+| 구현 기준 | 단일 `qtai-server` Modular Monolith |
+| 협업 기준 | gatewayauth와 bff는 Lead 단독 소유가 아니라 Bible·Flutter 담당자와 API 계약을 맞춰 구현한다. |
+| 산출물 기준 | 구현 PR, 검증 로그, 회고 메모, 문서 정합성 수정 내역을 남긴다. |
 
-- 백엔드는 gateway, bff-aggregator, bible-service, ai-service 4개 서비스만 사용한다.
-- 인증은 Gateway Auth 모듈에서 처리한다. 독립 Auth Service를 만들지 않는다.
-- 묵상일지 Journal은 Bible Service 내부 도메인이다. 독립 Journal Service를 만들지 않는다.
-- LLM은 DeepSeek API(OpenAI 호환) 기준이다. 구 Anthropic SDK나 Claude 고정 코드는 만들지 않는다.
-- Java 21, Spring Boot 3.3.x, Gradle Kotlin DSL, MySQL 8.0, Kafka KRaft, Jaeger를 고정한다.
-- Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
-- 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
-- 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
-- 오늘 QT는 **하루 1개 본문(범위 허용)** 이며 `chapterStart`·`verseStart`·`chapterEnd`·`verseEnd` + `startOrdinal`/`endOrdinal`로 전달한다 (DECISIONS.md §3.1, 02_ERD v2.3, ADR-0021).
-- AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
-- Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
-- Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
-- AI 완료 이벤트는 새 Journal 생성이 아니라 오늘 Journal에 AI 요약과 `aiSessionId`를 첨부한다.
-- 찬양은 AI 추천곡 저장/제거만 MVP에 포함한다. 직접 YouTube URL 입력, 가사/음원/스트리밍 제공은 제외한다.
-- 교회 인증은 MVP 기본 제외다. 인증 버튼 자리는 둘 수 있지만, 인증 여부로 앱 사용을 막지 않는다.
+---
 
-## 3. 내가 주로 만지는 경로
+## 2. 흔들리면 안 되는 기준
 
-- services/gateway/
-- services/bff-aggregator/
-- .github/workflows/
-- helm/
-- AGENTS.md
-- DECISIONS.md
+| 구분 | 고정 기준 |
+| --- | --- |
+| 백엔드 구조 | 단일 `qtai-server` 안에 `gatewayauth`, `bff`, `bible`, `ai`, `simulator` 도메인 패키지를 둔다. |
+| 배포 기준 | v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다. |
+| 이벤트 | v1은 Spring `ApplicationEventPublisher`를 사용한다. Kafka는 v2 이후 검토 대상이다. |
+| AI | 사용자 AI Q&A, 챗봇, SSE, `/ai/sessions/**` 사용자 경로는 만들지 않는다. AI는 배치와 관리자 트리거 전용이다. |
+| Today QT | 공개 시각은 00:00 KST, 수집 배치 시각은 04:00 KST로 통일한다. |
+| Today QT 100% | 본문·해설·묵상 진입점·시뮬레이터 상태값까지 정상 응답하는 것을 의미한다. 모든 시뮬레이터 클립이 반드시 존재한다는 뜻이 아니다. |
+| 시뮬레이터 | `READY`일 때만 보기 버튼을 활성화한다. `MISSING`, `FAILED`, `DISABLED`는 보기 버튼을 비활성화한다. |
+| 성경 데이터 | Repo URL, 라이선스, 번역본명, 출처 표기 방식, 재배포 가능 여부가 확인된 GitHub 공개 JSON만 적재한다. 개역개정, ESV, NIV는 금지한다. |
+| 검색/AI 저장소 | RDB 인덱스만 사용한다. RAG, ChromaDB, vector DB, Elasticsearch는 사용하지 않는다. |
+| 찬양 | AI 추천이 아니라 운영자가 선별한 큐레이션 목록을 제공한다. |
+| 교회 인증 | MVP 기본 제외다. 화면, 버튼, API를 작업 목표에 넣지 않는다. |
 
-## 4. 담당 범위
+---
 
-- Gateway Auth: JWT 발급/검증, Google OAuth 진입점, Refresh Rotation, Rate Limit
-- Gateway routing: BFF, Bible, AI, admin, WebSocket/SSE 패스스루
-- BFF Aggregator: 오늘 QT 첫 화면, 읽기 전용 본문 화면, 관리자 API, 알림 WebSocket 집계
-- CI/CD: **단일 `qtai-server` build/test** (Modular Monolith, ADR-0001) + Spring Modulith verifyModuleBoundaries + ArchUnit (ADR-0015) + gitleaks. Helm lint는 v2 분리 시 활성화(ADR-0016 보류)
-- 공통 의사결정 충돌 조정과 PR 리뷰
+## 3. W1 Foundation Lock-in 상세 일정
 
-## 5. API와 이벤트 계약 요약
+W1은 2026-05-18부터 2026-05-22까지 진행한다. 이 기간의 목표는 기능을 많이 만드는 것이 아니라, W2부터 기능 구현이 흔들리지 않도록 기준을 고정하는 것이다.
 
-- Gateway Auth: POST /auth/register, /auth/login, /auth/refresh, /auth/logout, /auth/oauth/google, GET /auth/me
-- BFF: GET /api/v1/qt/today, GET /api/v1/passages/{bookCode}/{chapter}/{verse}, GET /api/v1/me/dashboard
-- Journal route: POST /api/v1/journals/today와 /api/v1/journals/**는 Bible Service로 라우팅
-- Admin/WS: /api/v1/admin/**, WS /ws/notifications
-- 라우팅 대상은 gateway, bff-aggregator, bible-service, ai-service 4개뿐이다.
+| 날짜 | 목표 | 작업 범위 | 완료 기준 |
+| --- | --- | --- | --- |
+| 2026-05-18 | 구현 저장소 골격 고정 | `qtai-server`, Flutter 앱, OpenAPI 위치, 브랜치/PR 흐름 확인 | `dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞다. |
+| 2026-05-19 | 도메인 패키지 경계 준비 | `gatewayauth`, `bff`, `bible`, `ai`, `simulator` 패키지 구조와 import 금지 기준 정리 | 도메인 간 Entity/Service/Repository 직접 import 금지 기준을 검증할 수 있다. |
+| 2026-05-20 | DB/API 계약 정리 | 외부 공개 API `/api/v1/**`와 내부 도메인 Java Interface를 분리해 표기 | ERD 주요 테이블과 API 초안이 서로 충돌하지 않는다. |
+| 2026-05-21 | 품질 게이트 자동화 | 금지 기술, 금지 API, 금지 데이터, 문서 용어 검사 기준 준비 | Kafka/K8s/Helm/SSE/RAG/금지 번역본이 PR에서 검출 가능하다. |
+| 2026-05-22 | Foundation 5/5 판정 | 저장소 운영, 백엔드 골격, 도메인 경계, DB/API 계약, 품질 게이트 최종 확인 | `Foundation 5/5`가 모두 통과해야 W2로 넘어간다. |
 
-## 6. W1 상세 일정 - Foundation Lock-in
+### W1 완료 체크리스트
 
-- 5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route **도메인별 라우팅(`/bible` `/ai` `/api/v1`)** + journals/today 기준 정리
-- 5/14: K8s Secret 4종(deepseek, mysql, jwt-keys, google-oauth)과 NetworkPolicy 초안
-- 5/15: GitHub Actions matrix를 gateway/bff-aggregator/bible-service/ai-service로 고정
-- 5/19: BFF 오늘 QT 첫 화면 응답 구조 구현 - QT 본문 우선, 최근 Journal/AI 세션은 병렬 fallback
-- 5/20: Loki, Prometheus, Jaeger traceId 관측성 기준 배포
-- 5/21: Kafka topic/schema registry bootstrap 스크립트와 smoke test
-- 5/22: Foundation Lock-in 5항목 최종 검증표 작성
+| # | 체크 항목 | 상태 |
+| --- | --- | --- |
+| 1 | 저장소 운영 기준 정리 | TODO |
+| 2 | 단일 `qtai-server` 골격 정리 | TODO |
+| 3 | 도메인 경계 검증 준비 | TODO |
+| 4 | 외부 API와 내부 인터페이스 분리 | TODO |
+| 5 | 품질 게이트 기본 검사 준비 | TODO |
 
-### W1 PR 머지 조건 (필수)
+---
 
-- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew :gateway:test :bff-aggregator:test` 로컬 통과
-- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
+## 4. W2-W5 일정 요약
 
-## 7. W2-W5 일정
+| 주차 | 기간 | Lead 집중 범위 | 완료 기준 |
+| --- | --- | --- | --- |
+| W2 | 2026-05-25 ~ 2026-05-29 | Today QT 집계, 인증·권한, BFF 응답 조립, PR 검증 | 핵심 API 데모가 가능하다. |
+| W3 | 2026-06-01 ~ 2026-06-05 | 관리자·통합 조정, Feature Freeze, 경계 위반 차단 | 주요 MVP 기능이 통과한다. |
+| W4 | 2026-06-08 ~ 2026-06-12 | E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드 | 시연 후보 빌드를 확보한다. |
+| W5 | 2026-06-15 ~ 2026-06-17 | 리허설, 백업 자료, 발표 직전 장애 대응 | 발표 흐름 2회 이상 성공한다. |
 
-### W2 - 핵심 도메인 구현
-- Gateway Auth API 실제 구현 및 통합 테스트
-- BFF 오늘 QT 첫 화면과 읽기 전용 본문 집계 API 완성
-- admin/notification WebSocket 인증 연결
+---
 
-### W3 - Kafka/E2E 통합
-- Gateway -> BFF -> Bible/AI trace 연결 확인
-- Journal today DRAFT -> AI 완료 요약 첨부 -> 알림 E2E 1차
-- rate limit, CORS, SSE buffering 장애 처리
+## 5. 매일 작업 순서
 
-#### W3 PR 머지 조건 (필수)
+| 순서 | 작업 |
+| --- | --- |
+| 1 | `dev` 최신 상태를 확인한다. |
+| 2 | 오늘 작업이 `00_개발_일정_총괄표.md`의 주차별 게이트 안에 있는지 확인한다. |
+| 3 | 작업 전 API 계약, ERD, 화면 정의, 용어사전을 먼저 확인한다. |
+| 4 | 구현 후 단위 테스트와 금지 패턴 검사를 실행한다. |
+| 5 | PR 본문에 변경 범위, 검증 명령, 남은 리스크를 적는다. |
+| 6 | 하루 종료 시 완료/미완료/내일 작업을 짧게 기록한다. |
 
-- [ ] 통합 테스트(Integration Test) 작성 완료 및 `./gradlew :gateway:integrationTest :bff-aggregator:integrationTest` 통과
-- [ ] 테스트 커버리지 70% 이상 유지
+---
 
-### W4 - 안정화와 시연 환경
-- Helm values, rollback, smoke test 안정화
-- 보안/품질 게이트와 PR template 정리
-- 시연 환경 1일 1회 배포 리허설
+## 6. PR 전 검증 명령
 
-### W5 - 발표와 리허설
-- 발표용 아키텍처 다이어그램과 운영 대시보드 준비
-- 시연 직전 Gateway/BFF/CI 책임 구간 점검
-- 장애 시 백업 영상/스크립트 전환 담당
-
-## 8. 매일 작업 순서
-
-- 작업 시작 전 git pull 방식으로 최신 dev 동기화
-- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
-- 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
-- 작업 후 본인 서비스 build/test와 금지 패턴 검색
-- 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
-- PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
-
-## 9. 검증 명령
+아래 명령은 구현 저장소 기준으로 실행한다.
 
 ```powershell
-cd C:\workspace\QT-AI-2nd-Team-Project-master
-.\gradlew.bat -p services\gateway build --no-daemon
-.\gradlew.bat -p services\bff-aggregator build --no-daemon
-rg -n "auth-service|journal-service|ANTHROPIC|com\.anthropic" services .github AGENTS.md DECISIONS.md
+git checkout dev
+git pull origin dev
+./gradlew test
+rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .
 ```
 
-## 10. 금지 패턴
+문서 저장소에서는 Markdown 표, 코드펜스, API JSON, 금지 기준 문구를 확인한다.
 
-- PostgreSQL, ZooKeeper, Tempo 설정 추가 금지
-- application.yml이나 코드에 API key, DB password, private key 평문 작성 금지
-- 트랜잭션 안에서 KafkaTemplate.send 직접 호출 금지. AFTER_COMMIT 패턴 사용
-- 서비스 간 DB 직접 JOIN 또는 Repository 공유 금지
-- JOURNAL_EVENTS 수정/삭제 금지. append-only 이벤트 로그로 유지
-- AI SSE 경로에 /messages 사용 금지. /ai/sessions/{id}/turns만 사용
-- OpenAPI 계약과 다른 DTO, 경로, 에러 포맷 임의 생성 금지
+```powershell
+git diff --check -- '*.md'
+```
 
-## 11. 산출물
+---
 
-- Gateway AuthFilter와 route 설정 PR
-- BFF Aggregator usecase/controller 골격 PR
-- CI/CD와 Helm 4서비스 기준 PR
-- Foundation Lock-in 검증 리포트
+## 7. 산출물
 
-## 12. PR 전에 확인
+| 시점 | 산출물 |
+| --- | --- |
+| W1 | Foundation 5/5 검증표, 도메인 경계 검증 결과, API/ERD 계약 확인 메모 |
+| W2 | Today QT 핵심 API 데모, 인증·권한 검증 결과 |
+| W3 | Feature Freeze 확인표, 관리자·통합 검증 결과 |
+| W4 | E2E 결과, 성능 점검 결과, Docker Compose 시연 후보 빌드 |
+| W5 | 발표 리허설 결과, 백업 영상/스크립트, 최종 회고 |
 
-- 내 담당 경로 밖 변경이 섞이지 않았는가
-- OpenAPI, event schema, DECISIONS.md와 충돌하지 않는가
-- ProblemDetail, Kafka data envelope, DeepSeek, 4서비스 기준을 지켰는가
-- 로컬 build/test 결과를 PR 본문에 적었는가
-- 막힌 점은 추측으로 넘기지 않고 Lead에게 질문으로 남겼는가
+---
+
+## 8. 다른 팀원 일정표로 복제할 때 바꿀 부분
+
+| 항목 | 변경 방식 |
+| --- | --- |
+| 담당자 | 팀원 이름으로 변경 |
+| 주 역할 | 해당 팀원의 도메인과 화면 책임으로 변경 |
+| W1 상세 작업 | 공통 Foundation 5/5 안에서 개인 담당 영역만 바꾼다. |
+| W2-W5 집중 범위 | `00_개발_일정_총괄표.md`의 주차별 게이트를 벗어나지 않는 선에서 바꾼다. |
+| 금지 기준 | 삭제하거나 완화하지 않는다. |
+
+---
+
+## 9. 현재 상태
+
+| 항목 | 상태 |
+| --- | --- |
+| 공식 일정표 | `00_개발_일정_총괄표.md` 기준으로 v2.3 정합화 완료 |
+| 실행가이드 | `Lead_강태오_실행가이드.html`과 같은 기준으로 정합화 완료 |
+| 다음 권장 작업 | 구현 저장소 기준 실제 담당 경로와 PR 단위 확정 |
