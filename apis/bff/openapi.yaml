@@ -1,22 +1,20 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI BFF Aggregator API
-  version: "1.6"
+  version: "2.0"
   description: |
-    BFF(Backend for Frontend) 집계 서비스.
-    Gateway 사용자 컨텍스트 + Bible 묵상 기록 + AI + BFF 정적 매핑 병렬 호출,
-    입체 묵상 화면 어그리게이션, 대시보드 집계.
-    실시간 알림은 STOMP WebSocket 전용(stateless, ADR-0012).
-    v1.0에서 알림 REST API 없음 — NOTIFICATION_LOG 테이블 없음(ADR-0012).
+    BFF 도메인 API. v2.0 (2026-05-14)에서 단일 서비스 `qtai-server`의 `com.qtai.bff` 도메인 패키지로 통합되었다(ADR-0001 Modular Monolith).
+    어그리게이션 호출은 Bible Facade·AI Facade·Gateway Auth Facade를 통한 in-process 호출 + 외부 OAuth/JWK 검증.
+    입체 묵상 화면 어그리게이션, 대시보드 집계, 관리자 P0 운영 집계.
+    실시간 알림은 STOMP WebSocket 전용 (stateless, ADR-0012).
+    v1.0에서 알림 REST API 없음 — NOTIFICATION_LOG 테이블 없음.
   contact:
     name: 강태오 (Lead + BFF Owner)
 servers:
   - url: http://localhost:4015
-    description: Prism mock (04번 12.2 기준 포트)
-  - url: http://localhost:8083
-    description: Local 직접 접근
+    description: Prism mock
   - url: http://localhost:8080
-    description: Gateway 경유
+    description: qtai-server (Modular Monolith)
     
   ## WebSocket (STOMP, 04번 10번 참조)
   ## 연결: ws://localhost:8083/ws

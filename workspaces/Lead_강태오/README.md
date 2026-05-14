@@ -1,6 +1,8 @@
 ﻿# Lead_강태오 개인 작업 공간
 
-이 폴더는 **Lead_강태오 (Lead · Gateway · BFF Aggregator · DevOps · AI 서버 팀장)** 의 개인 작업 공간입니다.
+이 폴더는 **Lead_강태오 (Lead · DevOps · 전체 조율 — 단일 파트에 고정 X)** 의 개인 작업 공간입니다.
+
+> **2026-05-14 v2.0 재배치:** AI 서버 팀장 역할은 강상민으로 이관. 본인은 **횡단 Lead**로 전체 조율, PR 자동 검증 스크립트(도메인 import 금지 강제), 인프라, 컨벤션, 횡단 지원에 집중. 단일 파트(Gateway/BFF/AI 등)에 고정되지 않음. PR 검증 도구(ArchUnit / Konsist / Gradle custom) 선택은 본인 보류.
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

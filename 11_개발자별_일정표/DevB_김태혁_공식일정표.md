@@ -1,13 +1,18 @@
 # QT-AI 개인 공식 일정표 - 김태혁
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
+> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith 전환 + 시뮬레이터 단독)**
+>
+> **2026-05-14 v2.0 변경 요지:**
+> - 백엔드는 단일 `qtai-server`. RAG/ChromaDB 폐기. 기존 AI/RAG Prompt 보조 범위는 강상민 단독 주도로 이관.
+> - **본인 새 역할: 시뮬레이터 단독 담당** (스프라이트 기반 검토). 데이터 모델·저장소·생성 이미지 라이선스는 본인 일임.
+> - 시뮬레이터 명세는 22_기능_명세서·DECISIONS §10 보류 항목 참조.
 
 ## 1. 내 역할
 
 - 담당자: 김태혁
 - GitHub: [@xogurrh012](https://github.com/xogurrh012)
-- 역할: AI/RAG Service - Prompt/RAG 보조 Owner
+- **새 역할 (2026-05-14): 시뮬레이터 단독 담당 (`com.qtai.simulator` 도메인)**
 - 개인 작업 폴더: `workspaces/DevB_김태혁/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
@@ -32,76 +37,76 @@
 ## 3. 내가 주로 만지는 경로
 
 - services/ai-service/src/main/java/com/qtai/ai/infrastructure/rag/
-- services/ai-service/src/main/java/com/qtai/ai/prompt/
-- services/ai-service/src/test/
-- 09_AI_프롬프트_운영_가이드.md
+- qtai-server/src/main/java/com/qtai/simulator/
+- qtai-server/src/main/resources/db/migration/simulator/
+- 22_기능_명세서.md FS-12 (시뮬레이터 명세)
 
-## 4. 담당 범위
+## 4. 담당 범위 (2026-05-14 v2.0 — 시뮬레이터 단독)
 
-- QT A/B/C/D 유형과 OBSERVATION/INTERPRETATION/FEELING/APPLICATION 단계 분리 유지
-- ChromaDB RAG source metadata, seed corpus, rag_sources SSE payload 지원
-- 오늘 QT 본문·저장 설명 source를 AI 답변의 기본 근거로 연결
-- PromptTemplate 모델과 injection/golden 평가 세트 관리
-- DeepSeek 호출부는 DevC와 인터페이스를 맞추고 공급자 교체를 시도하지 않음
-- RAG 출처 없는 신학 단정 답변을 차단하는 검증 규칙 보조
-- 참고 QT 앱 화면 흐름 캡처/공유와 찬양 추천 후보 조사 보조
+- `com.qtai.simulator` 도메인 패키지 단독 담당 (Modular Monolith, ADR-0001)
+- 본문 좌표(book·chapter·verse) → 장면 시각화. 스프라이트 기반 검토 중 (Flame · pixi.js · Lottie · 자체 sprite sheet 후보 비교)
+- `simulator_scenes` 테이블 스키마·저장소(권장 Docker volume `qtai-simulator-assets`)·생성 이미지 라이선스 정의 = **본인 일임**
+- 생성 이미지 라이선스 3가지 확인: (1) 학습 데이터 출처 (2) 결과물 상업/재배포 권리 (3) 종교 인물(예수·하나님 등) 묘사 정책
+- 5년 단위 본문 갱신 시 폐기/재생성 (회의록 §3-3)
+- 회의록 §6 "가장 난이도 높음 — 일정 양보 허용". 시연 못 들어가면 정적 일러스트 폴백 5~10개 준비
 
-## 5. API와 이벤트 계약 요약
+## 5. API와 도메인 경계
 
-- ChromaDB collection: qtai_corpus
-- SSE rag_sources event: source title, passage/ref, snippet, score 포함
-- AI prompt는 09번 가이드의 오늘 QT 1회성 질문 MVP와 23번 도메인 용어사전을 따른다.
-- AI turn 저장 전 검증 실패 시 완료 turn으로 저장하지 않는다.
+- API: `GET /api/v1/simulator/scenes/{bookCode}/{chapter}/{verse}` (lazy 생성·캐시·재사용)
+- 도메인 Facade: `com.qtai.simulator.api.SimulatorFacade` Interface — 다른 도메인은 이 Facade만 통해 호출 (ADR-0015)
+- 입력: 본문 좌표만. **Bible 도메인 Repository 직접 import 금지** (ADR-0001)
+- 출력: `SceneResponse {bookCode, chapter, verse, assetType, assetUrl, generatedAt}`
 
-## 6. W1 상세 일정 - Foundation Lock-in
+## 6. W1 상세 일정 - Foundation Lock-in v2 (2026-05-14)
 
-- 5/13: PromptTemplate, RagSource, QtStage/JournalType 매핑 초안
-- 5/14: KJV/Matthew Henry/더미 한글 주석 seed 범위 정의
-- 5/15: 오늘 QT 1회성 질문 시스템 프롬프트 초안과 금지 응답 규칙
-- 5/19: golden-set 10건, injection-set 10건 작성
-- 5/20: ChromaDB metadata schema와 today QT/explanation source rag_sources 예시 고정
-- 5/21: DevC SSE payload와 PromptTemplate 저장 구조 맞춤
-- 5/22: eval 실행 방법과 통과 기준 리포트
+- 5/13: `com.qtai.simulator` 패키지 골격 + Spring Modulith `@ApplicationModule` 선언 + 22_기능_명세서 FS-12 본문 1차
+- 5/14: 후보 라이브러리 비교 (Flame / pixi.js / Lottie / 자체 sprite) + 본문 좌표 1개 prototype 시각화
+- 5/15: `simulator_scenes` Flyway V1 작성 + Scene 도메인 Entity
+- 5/19: **라이선스 3가지 확인 완료** → DECISIONS §10 보류 해소 + workspaces/DevB_김태혁/docs/simulator-license-report.md 박제
+- 5/20: SimulatorFacade 구현 + AssetStorage(Docker volume) + lazy 생성
+- 5/21: API endpoint + apis OpenAPI 추가 + BFF/Flutter 협업 합의
+- 5/22: 시연 본문 좌표 1~2개 E2E 검증 + 단위 테스트 + Spring Modulith 통과
 
 ### W1 PR 머지 조건 (필수)
 
-- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew :ai-service:test` 로컬 통과
-- [ ] 테스트 미작성 항목은 PR 본문에 사유 명시 (단위 테스트 누락 시 REQUEST_CHANGES)
+- [ ] 단위 테스트 작성 완료 및 `./gradlew :qtai-server:test` 로컬 통과
+- [ ] Spring Modulith `QtaiModulesTest.verifyModuleBoundaries()` 통과 (다른 도메인 import 0건)
+- [ ] ArchUnit 5 룰 통과 (Controller→Repository 등 금지 룰)
 
-## 7. W2-W5 일정
+## 7. W2-W5 일정 (2026-05-14 v2.0)
 
-### W2 - 핵심 도메인 구현
-- RAG 검색 client와 prompt assembly 연동
-- 출처 기반 응답 검증기 1차 구현
-- AI 서비스 테스트 데이터 확장
-- 찬양 추천 후보 데이터 구조 초안 공유
+### W2 - 시뮬레이터 명세 + 데이터 모델 + 라이선스 확정 (5/26~5/29)
+- 22_기능_명세서 FS-12 본문 채우기 (입출력·저장 정책·완료 기준)
+- `simulator_scenes` 테이블 + 생성 방식 결정 (AI 이미지 vs PD 일러스트 vs 자체 sprite)
+- **라이선스 3가지 확인 완료** → simulator-license-report.md 박제
+- UI 토글 "성경 인물 묘사" on/off 정책 결정
 
-### W3 - Kafka/E2E 통합
-- Bible verse_exists 또는 본문 조회와 RAG 검증 연동
-- 프롬프트 인젝션 회귀 테스트 CI 후보 작성
-- 응답 품질 로그 샘플 수집
+### W3 - 시뮬레이터 생성 파이프라인 1차 (6/1~6/5)
+- 본문 좌표 → 장면 lazy 생성 + DB 캐시
+- API endpoint + apis OpenAPI 추가
+- Docker volume `qtai-simulator-assets` 캐시·재사용 검증
 
 #### W3 PR 머지 조건 (필수)
+- [ ] simulator 패키지 단위 테스트 + Spring Modulith 통과
+- [ ] 다른 도메인 import 0건 (ADR-0001 절대 규칙)
+- [ ] 시연 본문 좌표 1~2개 시각화 성공
 
-- [ ] 통합 테스트(Integration Test) 작성 완료 및 `./gradlew :ai-service:integrationTest` 통과
-- [ ] 테스트 커버리지 70% 이상 유지
+### W4 - 시연 본문 시각화 + 정적 일러스트 폴백 (6/8~6/12)
+- 2026-06-17 발표 본문 좌표 1~3개 시각화
+- **정적 일러스트 폴백 5~10개 준비** (시뮬레이터 실패 시 즉시 대체)
+- 강태오 ADR-0016 결과 확인 — 시뮬레이터는 v2 분리 대상 아님(Modular Monolith 잔류)
 
-### W4 - 안정화와 시연 환경
-- golden/injection/theology set 확장
-- RAG seed 재현 스크립트 정리
-- 시연용 안정 응답 샘플 준비
-
-### W5 - 발표와 리허설
-- 오늘 QT AI 답변 품질 Q&A 대응
-- RAG 출처와 저작권 설명 준비
-- 시연 중 DeepSeek 장애 fallback 문구 지원
+### W5 - 발표와 리허설 (6/15~6/17)
+- 시뮬레이터 시연 또는 정적 일러스트 폴백 시연
+- 발표 자료 "시뮬레이터" 절 (생성 방식·라이선스·5년 폐기 정책)
+- Q&A: 생성 이미지 권리·종교 인물 묘사 정책 답변 준비
 
 ## 8. 매일 작업 순서
 
 - 작업 시작 전 git pull 방식으로 최신 dev 동기화
-- 개인 workspaces/.../workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
+- 개인 workspaces/DevB_김태혁/workflows/{date}-{task}.md에 오늘 작업과 DoD 작성
 - 계약 파일 이름과 경로를 먼저 확인하고 코드 생성
-- 작업 후 본인 서비스 build/test와 금지 패턴 검색
+- 작업 후 `./gradlew :qtai-server:test`와 금지 패턴 검색
 - 개인 reports/{date}-{task}.md에 결과, 막힌 점, 다음 작업 작성
 - PR에는 변경 범위, 검증 명령, 남은 리스크를 짧게 적는다
 
@@ -109,9 +114,14 @@
 
 ```powershell
 cd C:\workspace\QT-AI-2nd-Team-Project-master
-.\gradlew.bat -p services\ai-service build --no-daemon
-.\gradlew.bat -p services\ai-service test --no-daemon
-rg -n "rag_sources|PromptTemplate|QtStage|JournalType" services\ai-service
+.\gradlew.bat :qtai-server:test --no-daemon
+
+# Spring Modulith 경계 검증 (ADR-0015)
+.\gradlew.bat :qtai-server:test --tests "QtaiModulesTest" --no-daemon
+
+# 금지 패턴 검색 (0건이어야 함 — ChromaDB·RAG·v1 Kafka 코드 금지)
+rg -n "ChromaDB|rag_sources|chromadb" qtai-server\src\main\java\com\qtai\simulator
+rg -n "import com\.qtai\.(bible|ai|journal|gatewayauth|bff)\." qtai-server\src\main\java\com\qtai\simulator
 ```
 
 ## 10. 금지 패턴

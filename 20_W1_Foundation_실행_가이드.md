@@ -1,10 +1,23 @@
-# QT-AI (큐티 AI 앱) — W1 Foundation 실행 가이드 v1.1
+# QT-AI (큐티 AI 앱) — W1 Foundation 실행 가이드 v2.0
 
-> **문서 버전:** v1.1
-> **작성일:** 2026-05-08
-> **연관 문서:** [11_개발_환경_셋업_가이드 v1.1](./11_개발_환경_셋업_가이드.md) / [15_서비스별_구현_체크리스트 v1.0](./15_서비스별_구현_체크리스트.md) / [14_팀_협업_규칙_Git_브랜치_전략 v1.0](./14_팀_협업_규칙_Git_브랜치_전략.md)
+> **문서 버전:** v2.0
+> **작성일:** 2026-05-08 / **2026-05-14 (v2.0 — Modular Monolith·Bible팀 3인·Foundation Lock-in 항목 재정의)**
+> **연관 문서:** [DECISIONS](./DECISIONS.md) / [AGENTS](./AGENTS.md) / [11_개발_환경_셋업_가이드](./11_개발_환경_셋업_가이드.md) / [15_서비스별_구현_체크리스트](./15_서비스별_구현_체크리스트.md) / [14_팀_협업_규칙_Git_브랜치_전략](./14_팀_협업_규칙_Git_브랜치_전략.md)
 > **owner:** 강태오 (Lead)
-> **목적:** W1 첫날(5/12 화)부터 W1 종료(5/22 금)까지 6명이 겹치지 않고 Foundation을 쌓는 구체적 행동 순서. "오늘 뭐 해요?"를 없애기 위한 step-by-step.
+> **목적:** W1 첫날(5/12 화)부터 W1 종료(5/22 금)까지 6명이 겹치지 않고 Foundation을 쌓는 구체적 행동 순서.
+>
+> **2026-05-14 v2.0 갱신 요지 (본문은 W1 진행 중 실측으로 업데이트 예정):**
+> - 4 서비스 빌드·K8s 배포·Kafka 셋업 항목은 **모두 무효**. 단일 `qtai-server` 빌드 + Docker Compose + in-process 이벤트로 대체.
+> - Foundation Lock-in v2 5항목 (5/22 금까지):
+>   1. **모놀리식 빌드 통과** — `./gradlew :qtai-server:build` 성공, `/actuator/health` UP
+>   2. **도메인 패키지 import 검증** — 강태오 PR 검증 스크립트로 다른 도메인 import 0건 확인
+>   3. **OpenAPI 3종 동결** — `apis/{ai,bff,bible}/openapi.yaml` Spectral lint 통과 + Prism mock 가동 (`apis/auth`·`apis/journal`은 폐기)
+>   4. **단일 DB Flyway 적용** — `qtai_db`에 도메인별 prefix 테이블 모두 적용. `bible_today_qt_schedule`에 cron 19:00 1회 수집 성공
+>   5. **관측성** — Loki(로그) + Prometheus(메트릭) + Jaeger(트레이스) 단일 프로세스 기준 작동
+> - K8s 스켈레톤·Helm 차트·Kafka·Schema Registry·ChromaDB 항목 제거 (v2 분리 시 도입).
+> - 팀 배치: Bible팀 3인(이지윤·이승욱·김지민) Bible 프로토타입 합류, 강상민 AI 주도, 김태혁 시뮬레이터, 강태오 횡단 + PR 검증 스크립트.
+>
+> 본문(§2~§7)은 v2.0 기준으로 W1 첫날 작업하면서 실측 갱신할 예정. 현재 본문은 v1.1 기준이며 4 서비스/K8s 가정이 남아 있으니 **상충하는 부분은 위 v2.0 요지를 따른다.**
 
 ---
 

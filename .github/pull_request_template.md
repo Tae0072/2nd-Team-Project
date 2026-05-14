@@ -25,16 +25,25 @@
 - `path/to/file1`
 - `path/to/file2`
 
-## 문서 체크리스트
+## 문서 체크리스트 (2026-05-14 v2.0)
 
-- [ ] `DECISIONS.md` 와 충돌하는 값이 없음 (포트/TTL/스택/금지 패턴)
+- [ ] `DECISIONS.md` 와 충돌하는 값이 없음 (포트/TTL/스택/금지 패턴/팀 배치)
 - [ ] 금지 항목 미포함: PostgreSQL / ZooKeeper / Tempo / Anthropic SDK / Claude 고정 코드 / 개역개정 / ESV / NIV
+- [ ] **v1에 별도 서비스 모듈 신설 금지** (Modular Monolith, ADR-0001) — `auth-service`/`journal-service`/`ai-service`/`bible-service` 독립 모듈 신설 X. 모두 `qtai-server`의 도메인 패키지로
+- [ ] **v1 Kafka 코드 생성 금지** (ADR-0001·0004·0007) — 도메인 간 통신은 Spring `ApplicationEventPublisher` + `@TransactionalEventListener(AFTER_COMMIT)`
+- [ ] **v1 ChromaDB / 벡터 DB / 엘라스틱서치 코드 생성 금지** (ADR-0013) — 출처는 사전 적재 `bible_explanations` row 참조
+- [ ] **v1 K8s 매니페스트 / Helm chart 코드 생성 금지** (v2 분리 시 도입) — v1은 Docker Compose
+- [ ] **Spring Modulith verifyModuleBoundaries() 통과 + ArchUnit 룰 통과** (ADR-0015) — 다른 도메인 패키지 직접 import 0건
 - [ ] AI SSE 경로는 `/ai/sessions/{id}/turns` 사용 (`/messages` 아님)
-- [ ] Kafka envelope는 `data` 키 사용 (`payload` 아님)
-- [ ] 인증은 Gateway Auth, 묵상일지는 Bible Service 내부 도메인 — 독립 `auth-service` / `journal-service` 신설 문구 없음
+- [ ] SSE 응답 필드는 `sources` 사용 (구 `rag_sources`, 2026-05-14 리네이밍)
+- [ ] 해설 API 경로는 `/api/v1/explanations/commentary/*` (구 `/api/v1/commentary/*`)
+- [ ] DB 테이블 `bible_explanations` (구 `COMMENTARIES`)
+- [ ] 도메인 이벤트 envelope는 `data` 키 사용 (`payload` 아님)
 - [ ] 오늘 QT MVP는 하루 1구절 (`verseStart == verseEnd`)
 - [ ] Journal 생성은 `POST /api/v1/journals/today` (자유 본문 `POST /api/v1/journals` 미사용)
-- [ ] 평문 Secret / API Key 노출 없음
+- [ ] 평문 Secret / API Key 노출 없음 (v1은 `.env` / OS env, v2 K8s Secret)
+- [ ] 성경 데이터: KJV + 개역한글만. 새번역은 라이선스 확인 전까지 사용 금지 (pending)
+- [ ] QT 본문 소싱: 좌표 메타데이터만 최소 수집 (본문 텍스트는 자체 DB)
 
 ## 일정표 PR 추가 체크
 

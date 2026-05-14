@@ -1,6 +1,8 @@
 ﻿# DevD_이승욱 개인 작업 공간
 
-이 폴더는 **DevD_이승욱 (Bible Service Journal · Kafka · 이벤트 소싱)** 의 개인 작업 공간입니다.
+이 폴더는 **DevD_이승욱 (Bible팀 — Journal 도메인 주도 · Flutter 빌드 책임자(시연 6/17) · 인증 · 관리자 페이지)** 의 개인 작업 공간입니다.
+
+> **2026-05-14 v2.0 재배치:** Bible팀 3인 중 Journal 도메인 주도 + Flutter 빌드 책임자. Bible 프로토타입 → Flutter → 인증 → 관리자 페이지 일괄 진행. v1 Kafka는 보류, 도메인 간 통신은 Spring `ApplicationEventPublisher` + `@TransactionalEventListener(AFTER_COMMIT)` in-process 이벤트로 처리(ADR-0004·0007 v2 Kafka 전환 시 publisher만 교체).
 
 ## 🚫 다른 개발자(팀원)/에이전트 접근 금지
 

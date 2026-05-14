@@ -1,23 +1,22 @@
 openapi: 3.1.0
 info:
   title: QT-AI AI Service API
-  version: "1.5"
+  version: "2.0"
   description: |
-    AI/RAG 서비스 (Spring Boot 3.3 / Java 21).
+    AI 도메인 API. v2.0 (2026-05-14)에서 단일 서비스 `qtai-server`의 `com.qtai.ai` 도메인 패키지로 통합되었다(ADR-0001 Modular Monolith).
     오늘의 QT 본문에 대해 출처 기반 1회성 Q&A를 제공한다.
     일반 성경 보기에서 사용자가 선택한 자유 본문은 MVP에서 AI 질문 대상이 아니다.
-    DeepSeek API(OpenAI 호환) SSE 스트리밍, ChromaDB RAG, QT A~D 가이드 프롬프트 템플릿 관리를 담당한다.
-    이어서 대화하는 자유형 챗봇이 아니며, 사용자가 "묵상 완료"를 선택할 때 세션을 완료한다.
-    SSE endpoint: POST /ai/sessions/{id}/turns (turns 정식명, messages 아님 — 04번 §6.3).
+    DeepSeek API(OpenAI 호환) SSE 스트리밍, QT A~D 가이드 프롬프트 템플릿 관리를 담당한다.
+    출처 컨텍스트는 사전 적재 `bible_explanations` row 참조(ADR-0013 RAG 폐기) — ChromaDB·벡터 DB 사용 안 함.
+    SSE 응답 필드: `sources` (구 `rag_sources`, 2026-05-14 리네이밍).
+    SSE endpoint: POST /ai/sessions/{id}/turns (turns 정식명, messages 아님).
   contact:
-    name: 강태오·김태혁·강상민 (AI/RAG Owners)
+    name: 강상민 (AI 주도) · 강태오 (Lead)
 servers:
   - url: http://localhost:4013
-    description: Prism mock (04번 12.2 기준 포트)
-  - url: http://localhost:8085
-    description: Local (직접 접근)
+    description: Prism mock
   - url: http://localhost:8080
-    description: Gateway 경유 (prefix /ai 는 Gateway 라우팅 규칙에서 처리)
+    description: qtai-server (Modular Monolith, /ai/* 라우팅)
 tags:
   - name: sessions
     description: 큐티 AI 세션 관리
@@ -137,7 +136,7 @@ paths:
                     content: '이 구절은 창조의 첫 행위를 선언합니다...'
                     contentRedacted: false
                     promptTemplateId: 7
-                    ragSources: [{type: commentary, id: 11, weight: 0.82}]
+                    sources: [{type: explanation, id: 11, language: EN}]
                     createdAt: '2026-05-26T14:30:05.123Z'
         '403':
           $ref: '#/components/responses/Forbidden'
@@ -361,18 +360,18 @@ components:
     SseChunk:
       type: object
       description: |
-        SSE 이벤트 페이로드 (04번 §6.3 canonical).
-        eventType별 data 구조:
+        SSE 이벤트 페이로드. eventType별 data 구조:
           turn_started: {turnId:null, step:"A", timestamp:"..."}
           token: {text:"토큰 문자열"}
-          rag_sources: {sources:[{type,id,weight}]}
+          sources: {sources:[{type:"explanation"|"passage", id, language?}]}
           turn_completed: {turnId:33, step:"A", promptTemplateId:7, totalTokens:245, elapsedMs:4123}
           done: "[DONE]"
           error: {code:"LLM_PROVIDER_ERROR", detail:"...", traceId:"..."}
+        2026-05-14: `rag_sources` → `sources` 리네이밍 (ADR-0013 RAG 폐기, 사전 적재 bible_explanations.id 참조).
       properties:
         eventType:
           type: string
-          enum: [turn_started, token, rag_sources, turn_completed, done, error]
+          enum: [turn_started, token, sources, turn_completed, done, error]
           description: SSE event 필드값
         data:
           type: string

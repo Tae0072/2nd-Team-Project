@@ -1,12 +1,18 @@
 # QT-AI 개인 공식 일정표 - 이승욱
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
+> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith + Bible팀 + Flutter 빌드 책임)**
+>
+> **2026-05-14 v2.0 변경 요지:**
+> - 백엔드는 단일 `qtai-server`. Kafka는 v2 분리 시 도입 — v1은 Spring `ApplicationEventPublisher` + `@TransactionalEventListener(AFTER_COMMIT)` in-process 이벤트.
+> - **본인 새 역할: Bible팀 3인 중 Journal 도메인 주도 + Flutter 빌드 책임자(시연 6/17).** Bible 프로토타입 → Flutter → 인증 → 관리자 페이지 일괄 진행.
+> - 이벤트 소싱(ADR-0004), 멱등성(ADR-0007) 패턴은 v1 in-process에서도 동일 유지 — `journal_events` append-only, `journal_inbox_keys` UNIQUE.
+> - Flutter 빌드/시연 빌드 가용성 확보가 본인 D-day 책임.
 
 ## 1. 내 역할
 
 - 담당자: 이승욱
-- 역할: Bible Service - Journal/Kafka/Event Sourcing
+- **새 역할 (2026-05-14): Bible팀 - Journal 도메인 주도 + Flutter 빌드 책임자 (시연 6/17) + 인증 + 관리자 페이지**
 - 개인 작업 폴더: `workspaces/DevD_이승욱/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 

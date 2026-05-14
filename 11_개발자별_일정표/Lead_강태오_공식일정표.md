@@ -1,12 +1,18 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
+> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith + Lead 횡단 역할)**
+>
+> **2026-05-14 v2.0 변경 요지:**
+> - 백엔드는 단일 `qtai-server`. AI 주도는 강상민으로 이관.
+> - **본인 새 역할: Lead · DevOps · 전체 조율 (단일 파트에 고정 X).** PR 자동 검증 스크립트, 인프라, 컨벤션, 횡단 지원.
+> - 우선 액션: (1) Spring Modulith + ArchUnit 도입 + `@ApplicationModule` 메타데이터 6개 선언 + 시연 (W1 첫 주). (2) DECISIONS·ADR·AGENTS·02_ERD·03_아키텍처 정합 PR 완료 후 W1 첫날 본 일정표 본문 갱신. (3) **W2 첫째 주(5/26~5/29) 강사 면담 — MSA·Kafka·K8s 학습 평가 포함 여부 확인 → ADR-0016 트리거 조건 박제.** (4) 면담 결과에 따라 W4(6/8) 시작 시 AI 도메인 v2 분리 작업 개시 또는 발표 자료 "v2 분리 계획" 슬라이드 작성.
+> - **PR 검증 도구 확정 (2026-05-14, ADR-0015): Spring Modulith 메인 + ArchUnit 보조.** 상세 룰은 18_코드_품질_게이트 §1.5. W1 첫 주에 `@ApplicationModule` 메타데이터 6개 도메인 선언 + `QtaiModulesTest.verifyModuleBoundaries()` 통과 + 의도적 위반 케이스 추가로 PR 머지 차단 시연.
 
 ## 1. 내 역할
 
 - 담당자: 강태오
-- 역할: Lead / Gateway / BFF / DevOps
+- **새 역할 (2026-05-14): Lead · DevOps · 전체 조율 (단일 파트에 묶이지 않음)**
 - 개인 작업 폴더: `workspaces/Lead_강태오/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
@@ -42,7 +48,7 @@
 - Gateway Auth: JWT 발급/검증, Google OAuth 진입점, Refresh Rotation, Rate Limit
 - Gateway routing: BFF, Bible, AI, admin, WebSocket/SSE 패스스루
 - BFF Aggregator: 오늘 QT 첫 화면, 읽기 전용 본문 화면, 관리자 API, 알림 WebSocket 집계
-- CI/CD: 4서비스 matrix, gitleaks, build/test, Helm lint, 구서비스 재생성 차단
+- CI/CD: **단일 `qtai-server` build/test** (Modular Monolith, ADR-0001) + Spring Modulith verifyModuleBoundaries + ArchUnit (ADR-0015) + gitleaks. Helm lint는 v2 분리 시 활성화(ADR-0016 보류)
 - 공통 의사결정 충돌 조정과 PR 리뷰
 
 ## 5. API와 이벤트 계약 요약
@@ -55,7 +61,7 @@
 
 ## 6. W1 상세 일정 - Foundation Lock-in
 
-- 5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route 4서비스 + journals/today 기준 정리
+- 5/13: AuthFilter 골격, X-User-Id/X-User-Role spoofing strip, Gateway route **도메인별 라우팅(`/bible` `/ai` `/api/v1`)** + journals/today 기준 정리
 - 5/14: K8s Secret 4종(deepseek, mysql, jwt-keys, google-oauth)과 NetworkPolicy 초안
 - 5/15: GitHub Actions matrix를 gateway/bff-aggregator/bible-service/ai-service로 고정
 - 5/19: BFF 오늘 QT 첫 화면 응답 구조 구현 - QT 본문 우선, 최근 Journal/AI 세션은 병렬 fallback

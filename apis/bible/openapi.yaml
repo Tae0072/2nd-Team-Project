@@ -1,28 +1,33 @@
 ﻿openapi: 3.1.0
 info:
   title: QT-AI Bible Service API
-  version: "1.6"
+  version: "2.0"
   description: |
-    성경 본문 서비스. 한국어(개역한글) + 영어(KJV) 성경 본문,
-    쉬운 본문 설명, 주석(Commentary), Redis 24h 캐시, 오늘 QT 묵상 노트(Journal) DRAFT 생성/조회·수정·삭제,
-    선택적 익명 나눔 계약을 담당한다.
-    별도 Journal Service/OpenAPI는 사용하지 않고 Bible Service API 안에서 묵상 기록을 제공한다.
-    저작권: KJV·개역한글(출처 표기 후)·Matthew Henry(PD) 사용. 개역개정·ESV·NIV 사용 금지.
-    
+    Bible 도메인 API. v2.0 (2026-05-14)에서 단일 서비스 `qtai-server`의 `com.qtai.bible` + `com.qtai.journal` 도메인 패키지로 통합되었다(ADR-0001 Modular Monolith).
+    한국어(개역한글) + 영어(KJV) 성경 본문, 쉬운 본문 설명, **해설(Explanation, 구 Commentary)**, Redis 24h 캐시,
+    오늘 QT 묵상 노트(Journal) DRAFT 생성/조회·수정·삭제, 선택적 익명 나눔 계약을 담당한다.
+    별도 Journal Service/OpenAPI는 사용하지 않는다 (`apis/journal/openapi.yaml` 폐기 — 5/12 결정).
+    저작권: KJV·개역한글(출처 표기 후)·Matthew Henry(PD, AI 비교 데이터로만) 사용. 개역개정·ESV·NIV 사용 금지. 새번역은 라이선스 확인 후.
+    QT 본문 소싱: 성서 유니온 19:00 스크래핑 (ADR-0014).
+
+    ## 2026-05-14 v2.0 변경 요지
+    - 단일 서비스 `qtai-server` 안의 도메인 패키지로 통합. 분할된 OpenAPI 그대로 유지하며 서비스는 단일 8080 서빙.
+    - `COMMENTARIES` 테이블 → `bible_explanations`로 리네이밍. API 경로 `/api/v1/commentary/*` → `/api/v1/explanations/commentary/*`. 응답 필드 `commentaries` → `explanations`.
+    - DB 단일 `qtai_db`, 도메인 prefix `bible_*` / `journal_*` (ADR-0003).
+    - 도메인 간 이벤트는 v1 in-process, envelope·페이로드 구조는 v2 Kafka와 동일 (publisher만 교체).
+
     ## BFF 병렬 호출 패턴
-    BFF Aggregator는 입체 묵상 화면을 위해 다음 3개 endpoint를 CompletableFuture 병렬 호출한다:
+    BFF는 입체 묵상 화면을 위해 Bible Facade를 통해 다음 3개를 병렬 호출한다:
     1. GET /bible/kr/{bookCode}/{chapter}/{verse}
     2. GET /bible/en/{bookCode}/{chapter}/{verse}
-    3. GET /api/v1/commentary/{bookCode}/{chapter}/{verse}
-    
-    사설 통합 endpoint 없음 — 통합 책임은 BFF (04번 §5.1 v1.1 단순화).
+    3. GET /api/v1/explanations/commentary/{bookCode}/{chapter}/{verse}
   contact:
-    name: 이지윤·이승욱 (Bible Service Owners)
+    name: Bible팀 (이지윤·이승욱·김지민)
 servers:
   - url: http://localhost:4012
-    description: Prism mock (04번 12.2 기준 포트)
-  - url: http://localhost:8082
-    description: Local (직접 접근)
+    description: Prism mock
+  - url: http://localhost:8080
+    description: qtai-server (Modular Monolith, /bible/* 와 /api/v1/* 라우팅)
   - url: http://localhost:8080
     description: Gateway 경유
 tags:
@@ -31,7 +36,7 @@ tags:
   - name: explanations
     description: 쉬운 본문 설명·어려운 단어 조회
   - name: commentary
-    description: 구절 주석 조회
+    description: 구절 해설 조회 (구 "주석", 2026-05-14 리네이밍)
   - name: books
     description: 성경 목록
   - name: journals
@@ -102,14 +107,16 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /api/v1/commentary/{bookCode}/{chapter}/{verse}:
+  /api/v1/explanations/commentary/{bookCode}/{chapter}/{verse}:
     get:
       tags: [commentary]
-      summary: 구절 주석 목록 조회 (Matthew Henry PD + 더미 한글)
+      summary: 구절 해설 목록 조회 (AI 생성 + 편집자 검증 통과한 bible_explanations row)
       description: |
-        한 구절에 0~N개 주석. 빈 배열("items": []) 가능 — 404 아님.
-        캐시 키: cache:commentary:{bookCode}:{chapter}:{verse}, TTL 24h.
-      operationId: getCommentary
+        한 구절에 0~N개 해설. 빈 배열("items": []) 가능 — 404 아님.
+        2026-05-14 변경: 경로 `/api/v1/commentary/*` → `/api/v1/explanations/commentary/*`. 테이블 `COMMENTARIES` → `bible_explanations`.
+        해설은 AI 생성 + 편집자 에이전트 검증을 통과한 것만 반환 (`source='AI_GENERATED'` AND `editor_verified_at IS NOT NULL`).
+        캐시 키: cache:explanation:{bookCode}:{chapter}:{verse}, TTL 24h.
+      operationId: getExplanationCommentary
       security:
         - BearerAuth: []
       parameters:

@@ -1,12 +1,19 @@
 # QT-AI 개인 공식 일정표 - 강상민
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
+> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith + AI 주도 이관)**
+>
+> **2026-05-14 v2.0 변경 요지:**
+> - 백엔드는 단일 `qtai-server`. AI는 `com.qtai.ai` 도메인 패키지.
+> - **본인 새 역할: AI 도메인 단독 주도** (강태오 → 본인). 해설 생성, 편집자 에이전트, AI 자동 검증 메커니즘 정의.
+> - **AI 자동 검증 메커니즘 정의 = 본인 단독 작업** (입출력·평가 지표·합격선·실패 시 재시도 정책). 09_AI 가이드 §6.4에 박제.
+> - RAG/ChromaDB/벡터 DB 제외(ADR-0013). 출처 컨텍스트는 사전 적재 `bible_explanations` row 참조.
+> - SSE 응답 필드 `rag_sources` → `sources` 리네이밍.
 
 ## 1. 내 역할
 
 - 담당자: 강상민
-- 역할: AI/RAG Service - DeepSeek/SSE Main Owner
+- **새 역할 (2026-05-14): AI 도메인 (`com.qtai.ai`) 단독 주도 + 해설 생성·편집자 에이전트·검증 메커니즘 정의**
 - 개인 작업 폴더: `workspaces/DevC_강상민/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
@@ -49,7 +56,7 @@
 - POST /ai/sessions/{id}/turns - SSE
 - POST /ai/sessions/{id}/complete
 - GET /ai/sessions/{id}, GET /ai/sessions
-- SSE events: turn_started, token, rag_sources, turn_completed, [DONE]
+- SSE events: turn_started, token, **sources** (구 rag_sources, 2026-05-14 리네이밍), turn_completed, [DONE]
 - Config: DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL
 
 ## 6. W1 상세 일정 - Foundation Lock-in

@@ -1,9 +1,9 @@
-# 📊 QT-AI (큐티 AI 앱) — ERD 문서 v1.6
+# 📊 QT-AI (큐티 AI 앱) — ERD 문서 v2.0
 
-> **문서 버전:** v1.6
-> **작성일:** 2026-05-06 (v1.0) / 2026-05-06 (v1.1 — 25항목 일괄 패치) / 2026-05-12 (v1.4 — 요구사항 v1.2 정합) / 2026-05-12 (v1.5 — D형 QT 도메인 반영) / 2026-05-13 (v1.6 — 오전 회의 결정 반영)
-> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / 03 아키텍처 정의서 / 04 API 명세서 / [23_도메인_용어사전](./23_도메인_용어사전.md)
-> **MSA 데이터 원칙:** **Database per Service** — 각 서비스가 자기 DB 소유, 서비스 간 직접 JOIN 금지, 비동기 동기화는 Kafka 이벤트로
+> **문서 버전:** v2.0
+> **작성일:** 2026-05-06 (v1.0) / … / 2026-05-13 (v1.7) / **2026-05-14 (v2.0 — Modular Monolith 전환, 단일 DB·도메인 prefix, ChromaDB 제거, COMMENTARIES→EXPLANATIONS)**
+> **연관 문서:** [DECISIONS.md](./DECISIONS.md) / [AGENTS.md](./AGENTS.md) / [03_아키텍처_정의서](./03_아키텍처_정의서.md) / [04_API_명세서](./04_API_명세서.md) / [23_도메인_용어사전](./23_도메인_용어사전.md)
+> **데이터 원칙 (2026-05-14, ADR-0001·0003):** **Modular Monolith — 단일 DB `qtai_db` + 도메인별 테이블 prefix(`auth_`, `bible_`, `ai_`, `journal_`).** 도메인 간 데이터 공유는 도메인 Interface 호출 또는 in-process 이벤트로만. 다른 도메인 prefix 테이블 직접 JOIN 금지.
 
 ---
 
@@ -20,6 +20,7 @@
 | v1.5 | 2026-05-12 | 강태오 | **D형 QT 도메인 용어사전 반영** — JOURNALS에 `observation` / `interpretation` / `qt_type` 컬럼 추가. D형 QT 4단계 완전 지원 |
 | v1.6 | 2026-05-13 | 강태오 | 오전 회의 결정 반영 — 오늘 QT 기준 묵상 자동 저장을 위해 `JOURNALS.qt_date` 추가, 자유 본문 AI/묵상 제외, 사용자 입력 글자 수 제한 없음 |
 | v1.7 | 2026-05-13 | 강태오 | **§ 5.2 JOURNALS `verse` 단일 컬럼 → `verse_start` + `verse_end` 분리** (DECISIONS.md §3.1·Kafka `journal.created`/`ai.session.completed` payload schema와 정합 — MVP는 verse_start == verse_end 고정, v1.1 구절 범위 확장 대비) / `idx_journals_passage` 컬럼명 갱신 / Mermaid 다이어그램 동일 적용 |
+| **v2.0** | **2026-05-14** | 강태오 | **MSA→Modular Monolith 전환** — 4 schema(auth_db, bible_db, ai_db, journal_db) → 단일 DB `qtai_db` + 도메인 prefix(`auth_*`, `bible_*`, `ai_*`, `journal_*`). **ChromaDB·벡터 DB 완전 제거(§10 폐기)**. **COMMENTARIES → EXPLANATIONS 전면 리네이밍**(§3.5). **AI_TURNS.rag_sources → sources**(§4.4). **§6 Kafka → v1 in-process / v2 Kafka**로 재정의. INBOX_KEYS → `*_inbox_keys` 도메인별. 멱등성 키는 v1 in-process 핸들러에도 동일 적용(ADR-0007 갱신). |
 
 ---
 
@@ -29,84 +30,93 @@
 2. [Gateway Auth ERD](#2-gateway-auth-erd) — 강태오
 3. [Bible Service ERD](#3-bible-service-erd) — 이지윤·이승욱
 4. [AI/RAG Service ERD](#4-airag-service-erd) — 강태오·김태혁·강상민
-5. [Bible Service Journal ERD](#5-bible-service-journal-erd) — 이지윤·이승욱
-6. [서비스 간 연결 (Kafka 이벤트)](#6-서비스-간-연결-kafka-이벤트)
+5. [Journal 도메인 ERD](#5-bible-service-journal-erd) — Bible팀(이지윤·이승욱·김지민)
+6. [도메인 간 통신 (v1 in-process / v2 Kafka)](#6-서비스-간-연결-kafka-이벤트)
 7. [상태 코드 정의](#7-상태-코드-정의)
 8. [공통 패턴](#8-공통-패턴) — BaseEntity / Soft Delete / 멱등성 키 / Charset / Migration
 9. [인덱스 전략](#9-인덱스-전략)
-10. [ChromaDB 벡터 스토어 (별도)](#10-chromadb-벡터-스토어-별도)
+10. ~~ChromaDB 벡터 스토어~~ — **폐기 (2026-05-14 ADR-0013)**
 11. [설계 결정 사항 & 주의사항](#11-설계-결정-사항--주의사항)
 
 ---
 
 ## 1. 데이터 아키텍처 개요
 
-### 1.1 Database per Service 원칙
+### 1.1 Modular Monolith — 단일 DB `qtai_db` + 도메인 prefix
 
 ```
-┌──────────────────┐  ┌────────────────────────┐  ┌──────────────────┐
-│ Gateway Auth     │  │ Bible Service          │  │ AI/RAG Service   │
-│ (Gateway 내부)   │  │                        │  │                  │
-│ MySQL: auth_db   │  │ MySQL: bible_db        │  │ MySQL: ai_db     │
-│ + Redis-WS       │  │ + Redis-Cache          │  │ + ChromaDB       │
-│  (refresh        │  │  (passage 24h    │  │                  │  │                  │
-│   blacklist)     │  │   TTL)           │  │                  │  │                  │
-│ - USERS          │  │ - BOOKS                │  │ - PROMPT_TEMPLATE│
-│ - REFRESH_TOKENS │  │ - KR_BIBLE             │  │ - AI_SESSIONS    │
-│ - OAUTH_LINKS    │  │ - EN_BIBLE             │  │ - AI_TURNS       │
-│                  │  │ - COMMENTARIES         │  │ (벡터: ChromaDB) │
-│                  │  │ - JOURNALS/EVENTS      │  │                  │
-│                  │  │ - JOURNAL_SHARES       │  │                  │
-└──────────────────┘  └────────────────────────┘  └──────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  qtai-server (단일 서비스, Port 8080)                            │
+│                                                                  │
+│  ┌──────────────────┐ ┌─────────────────┐ ┌──────────────────┐  │
+│  │ com.qtai.        │ │ com.qtai.bible  │ │ com.qtai.ai      │  │
+│  │   gatewayauth    │ │                 │ │                  │  │
+│  │ JWT/OAuth        │ │ 본문·해설        │ │ DeepSeek·SSE     │  │
+│  └──────────────────┘ └─────────────────┘ └──────────────────┘  │
+│  ┌──────────────────┐ ┌─────────────────┐ ┌──────────────────┐  │
+│  │ com.qtai.bff     │ │ com.qtai.journal│ │ com.qtai.simulator│ │
+│  │ 어그리게이션      │ │ 이벤트 소싱      │ │ 장면 시뮬레이터    │ │
+│  └──────────────────┘ └─────────────────┘ └──────────────────┘  │
+│                                                                  │
+│   ↕ in-process 이벤트 (Spring ApplicationEventPublisher          │
+│      + @TransactionalEventListener(AFTER_COMMIT))                │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┴────────────────┐
+              ▼                                ▼
+   ┌────────────────────────────┐  ┌────────────────────────┐
+   │ MySQL: qtai_db (단일 DB)    │  │ Redis (단일 인스턴스)   │
+   │                            │  │                        │
+   │ auth_*    (USERS,          │  │ - cache:passage:* (24h)│
+   │            REFRESH_TOKENS, │  │ - auth:refresh:revoked │
+   │            OAUTH_LINKS)    │  │ - ws:session:*         │
+   │ bible_*   (BOOKS,          │  │                        │
+   │            KR_VERSES,      │  └────────────────────────┘
+   │            EN_VERSES,
+   │            EXPLANATIONS,
+   │            TODAY_QT_SCHEDULE)
+   │ ai_*      (PROMPT_TEMPLATES,
+   │            SESSIONS, TURNS,
+   │            INBOX_KEYS)
+   │ journal_* (JOURNALS, EVENTS,
+   │            SHARES, LIKES,
+   │            COMMENTS, REPORTS,
+   │            INBOX_KEYS)
+   └────────────────────────────┘
 
-┌──────────────────┐  ┌──────────────────────────┐
-│ API Gateway      │  │ BFF Aggregator           │
-│ (Auth 포함)       │  │ + Redis-WS               │     (Gateway와 같은 인스턴스 공유,
-│                  │  │  (WS 세션 레지스트리)     │      keyspace prefix로 격리)
-└──────────────────┘  └──────────────────────────┘
-
-  ※ Redis 인스턴스 분리 — 03번 § 1.1:
-     - Redis-Cache: Bible 전용 (cache:* prefix)
-     - Redis-WS:    Gateway refresh blacklist (auth:*) + BFF WS 세션 (ws:*)
-
-         ↓ 이벤트                 ↑ 컨슈머
-   ┌─────────────────────────────────────────────────┐
-   │  Kafka  (Schema Registry로 스키마 관리)           │
-   │  topics: user.activity.tracked / ai.session.completed│
-   │          journal.created / journal.updated       │
-   │          journal.updated / journal.deleted       │
-   │          journal.creation.failed                │
-   │          notification.requested                  │
-   │  + 각 토픽의 DLQ: {topic}.DLQ                    │
-   └─────────────────────────────────────────────────┘
+   ※ v1 인프라 제외 (v2 분리 시 도입): Kafka, Schema Registry, ChromaDB, K8s
+   ※ 도메인 간 통신은 v1 in-process 이벤트로, envelope 구조는 v2 Kafka와 동일
 ```
 
-### 1.2 서비스 간 데이터 참조 원칙
+### 1.2 도메인 패키지 간 데이터 참조 원칙 (ADR-0001·0003)
 
-> **절대 금지:** 서비스 A의 DB에서 서비스 B의 DB로 직접 JOIN, 직접 SELECT, FK 외래키
+> **절대 금지 (PR 자동 거절):**
+> - 다른 도메인 prefix 테이블 직접 JOIN / 직접 SELECT
+> - 다른 도메인 패키지의 Entity·Service·Repository 직접 import
+> - 도메인 간 FK 외래키 (단일 DB라도 도메인 경계 유지)
 >
 > **허용:**
-> - 비동기 데이터 동기화 → **Kafka 이벤트** (eventual consistency, Schema Registry 검증)
-> - 실시간 데이터 조회 → **API 호출** (BFF Aggregator가 병렬 호출)
-> - 외부 ID 참조 → **DB 컬럼은 단순 BIGINT, FK 제약 없음** (예: `Journal.user_id`는 Gateway Auth의 `users.id` 값을 저장하지만 FK 제약 없음)
+> - 도메인 Interface 호출 (`com.qtai.{domain}.api` 패키지의 public Facade)
+> - in-process 이벤트 발행/구독 (`@TransactionalEventListener(AFTER_COMMIT)`)
+> - 외부 ID 참조 → DB 컬럼은 단순 BIGINT, FK 제약 없음 (예: `journal_journals.user_id`는 `auth_users.id` 값을 저장하지만 FK 제약 없음)
 
-### 1.3 BFF Aggregator의 역할
+### 1.3 BFF 도메인의 역할
 
-- **자체 DB 없음.** 4개 서비스의 데이터를 조합해서 단일 응답 DTO 반환.
-- 입체적 묵상 화면 같은 다중 데이터 화면은 BFF가 Bible + Commentary를 `CompletableFuture`로 병렬 호출.
+- **자체 테이블 없음.** 여러 도메인의 데이터를 조합해서 단일 응답 DTO 반환.
+- 입체적 묵상 화면 같은 다중 데이터 화면은 BFF가 Bible Facade + AI Facade를 `CompletableFuture`로 병렬 호출.
 - Notification Aggregator 기능 포함 (§ 6.4 참조).
 
-### 1.4 Gateway의 역할
+### 1.4 Gateway Auth 도메인의 역할
 
 - JWT 발급·검증·Google OAuth·Refresh Rotation을 처리한다.
-- 인증 데이터는 Gateway Auth 모듈의 `auth_db`에 저장한다.
-- JWT 검증에 필요한 키는 K8s Secret에 적재한다.
+- 인증 데이터는 `com.qtai.gatewayauth` 도메인의 `auth_*` 테이블에 저장한다.
+- JWT 검증에 필요한 키는 v1에서는 Docker `.env` / OS env, v2 분리 시 K8s Secret에 적재한다.
 
 ---
 
 ## 2. Gateway Auth ERD
 
-> **Owner:** 강태오 / **DB schema:** `auth_db` / **외부 노출 ID:** `users.id` (다른 서비스가 참조)
+> **Owner:** Bible팀 (이지윤·이승욱·김지민) / **테이블 prefix:** `auth_*` / **외부 노출 ID:** `auth_users.id` (다른 도메인이 참조)
 >
 > Auth는 독립 서비스가 아니라 Gateway 내부 인증 모듈이다. 계정 탈퇴는 MVP 범위에서 제외한다.
 
@@ -214,9 +224,9 @@ ADR 후보 0010.
 
 ---
 
-## 3. Bible Service ERD
+## 3. Bible 도메인 ERD
 
-> **Owner:** 이지윤·이승욱 (Bible Service 통합 Owner) / **DB schema:** `bible_db` + Redis 캐시 (`cache:passage:kr:{book}:{ch}:{v}`, TTL 24h) — DECISIONS.md §7
+> **Owner:** Bible팀 (이지윤·이승욱·김지민) / **테이블 prefix:** `bible_*` + Redis 캐시 (`cache:passage:kr:{book}:{ch}:{v}`, TTL 24h)
 >
 > **데이터 출처:** § [01번 § 3.1 데이터 저작권 표](./01_프로젝트_계획서.md) — KJV (PD) + Matthew Henry (PD) + 개역한글(출처 표기) + 한글 주석 더미데이터
 
@@ -226,7 +236,7 @@ ADR 후보 0010.
 erDiagram
     BOOKS ||--o{ KR_BIBLE : "1:N 한글 절"
     BOOKS ||--o{ EN_BIBLE : "1:N 영어 절"
-    BOOKS ||--o{ COMMENTARIES : "1:N 주석"
+    BOOKS ||--o{ bible_explanations : "1:N 주석"
 
     BOOKS {
         BIGINT id PK
@@ -254,7 +264,7 @@ erDiagram
         VARCHAR version
         DATETIME created_at
     }
-    COMMENTARIES {
+    bible_explanations {
         BIGINT id PK
         BIGINT book_id FK
         INT chapter
@@ -315,34 +325,41 @@ erDiagram
 
 **ETL 시점:** **W1** (약 31,000 절).
 
-### 3.5 COMMENTARIES — 주석
+### 3.5 bible_explanations — 해설 (구 COMMENTARIES, 2026-05-14 리네이밍)
+
+> **명칭 변경:** "주석"은 한국어 상업 주석의 저작권 회피 및 UI 일관성을 위해 **"해설"** 로 통일. DB 테이블·API 응답 필드 모두 `explanations`로 변경 (ADR-0013).
+>
+> **활용:** Public Domain 영어 주석(Matthew Henry 등)을 AI **비교 데이터**로 활용해 자체 생성한 해설을 저장. 원문 그대로 노출 X.
 
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | |
-| book_id | BIGINT | N | — | FK → BOOKS.id | |
+| book_id | BIGINT | N | — | FK → bible_books.id | |
 | chapter | INT | N | — | | |
 | verse | INT | N | — | | |
-| content | TEXT | N | — | | |
-| source | VARCHAR(50) | N | — | | 'MATTHEW_HENRY' (PD) / 'DUMMY_KR' (더미) |
+| content | TEXT | N | — | | AI가 생성한 해설 본문 |
+| source | VARCHAR(50) | N | — | | 'AI_GENERATED' (편집자 검증 통과) / 'MATTHEW_HENRY_REFERENCE' (비교 데이터 기록용) |
+| reference_ids | JSON | Y | NULL | | 생성에 사용된 비교 데이터의 출처 식별자 배열 |
 | language | VARCHAR(2) | N | — | | 'EN' / 'KR' |
+| editor_verified_at | DATETIME(6) | Y | NULL | | 편집자 에이전트 검증 통과 시각 |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | |
 
 **인덱스**
-- `idx_commentaries_lookup` ON (book_id, chapter, verse, language) — 다중 JOIN 핵심
-- `idx_commentaries_source` ON (source)
+- `idx_explanations_lookup` ON (book_id, chapter, verse, language) — 다중 JOIN 핵심
+- `idx_explanations_source` ON (source)
 
-**ETL 시점:** **W1** (Matthew Henry PD + 더미 한글 주석).
+**ETL 시점:** **W1~W2** (Matthew Henry MD 변환 → 비교 데이터 적재 → AI 해설 생성 → 편집자 검증 → `bible_explanations` 적재).
 
-> **다중 JOIN 패턴:** `KR_BIBLE` + `EN_BIBLE` + `COMMENTARIES` 를 `(book_id, chapter, verse)` 동일 인덱스로 JOIN. 핫셋(자주 조회되는 100절)은 Redis 캐시.
+> **다중 JOIN 패턴:** `bible_kr_verses` + `bible_en_verses` + `bible_explanations` 를 `(book_id, chapter, verse)` 동일 인덱스로 JOIN. 핫셋(자주 조회되는 100절)은 Redis 캐시.
+> **해설 생성 파이프라인:** AGENTS.md "해설 생성 파이프라인" 절 참조. 메커니즘 상세는 강상민 정의.
 
 ---
 
-## 4. AI/RAG Service ERD
+## 4. AI 도메인 ERD
 
-> **Owner:** 강상민 / **DB schema:** `ai_db` (메타·로그) + ChromaDB (벡터 스토어, § 10)
+> **Owner:** 강상민 (주도) / **테이블 prefix:** `ai_*` / ~~ChromaDB~~ — 사용 안 함 (ADR-0013)
 >
-> **비즈니스 책임:** QT A~D 가이드 프롬프트 설계 / 출처 기반 1회성 Q&A / RAG 출처 인용 강제
+> **비즈니스 책임:** QT A~D 가이드 프롬프트 설계 / 출처 기반 1회성 Q&A / 사용한 `bible_explanations.id` 배열을 `sources`로 응답 인용
 
 ### 4.1 다이어그램
 
@@ -383,7 +400,7 @@ erDiagram
         VARCHAR step
         MEDIUMTEXT content
         INT token_count
-        JSON rag_sources
+        JSON sources
         DATETIME created_at
     }
 ```
@@ -439,7 +456,7 @@ erDiagram
 | step | VARCHAR(2) | **Y** | **NULL** | | 질문이 연결된 QT 가이드 단계 'A','B','C','D' (role=SYSTEM 시 NULL) |
 | content | **MEDIUMTEXT** | N | — | | **메시지 본문 (LLM 응답이 길어 16MB까지 허용).** SSE 스트리밍 완료 후 적재 |
 | token_count | INT | Y | NULL | | LLM 토큰 사용량 (요금·메트릭) |
-| rag_sources | JSON | Y | NULL | | ChromaDB에서 인용한 출처 배열 (§ 10.3) |
+| **sources** | JSON | Y | NULL | | **사용한 사전 적재 해설 출처 배열** — `bible_explanations.id` 목록. (구 `rag_sources`, 2026-05-14 ADR-0013 리네이밍) |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | |
 
 **인덱스**
@@ -447,7 +464,7 @@ erDiagram
 - `idx_ai_turns_role` ON (role)
 - `idx_ai_turns_template_id` ON (used_prompt_template_id) — 프롬프트 버전별 회귀 분석
 
-> **신학 가드레일:** ASSISTANT 턴에 `rag_sources` 가 비어 있으면 PR 머지 금지 (강상민 검수, [§ 10.3 환각 체크리스트](./01_프로젝트_계획서.md)).
+> **신학 가드레일:** ASSISTANT 턴에 `sources` 가 비어 있으면 PR 머지 금지 (강상민 검수). 출처 = `bible_explanations.id` 배열 (사전 적재된 해설 row 참조).
 
 ---
 
@@ -717,21 +734,24 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 
 ---
 
-## 6. 서비스 간 연결 (Kafka 이벤트)
+## 6. 도메인 간 통신 (v1 in-process / v2 Kafka)
 
-### 6.1 토픽 정의
+> **2026-05-14 갱신 (ADR-0001·0004·0007):** Modular Monolith v1에서 도메인 간 통신은 Spring `ApplicationEventPublisher` + `@TransactionalEventListener(AFTER_COMMIT)` in-process 이벤트로 처리. envelope·idempotencyKey 패턴은 v2 Kafka 전환을 대비해 동일하게 유지하므로, publisher만 교체하면 v2로 이전 가능.
 
-| 토픽 | Producer | Consumer | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject | DLQ 토픽 |
+### 6.1 이벤트 정의 (eventType별)
+
+| eventType | Producer 도메인 | Consumer 도메인 | 페이로드 핵심 필드 | 멱등성 키 | Schema Subject (v2 Kafka용) | DLQ 토픽 (v2) |
 | --- | --- | --- | --- | --- | --- | --- |
-| `user.activity.tracked` | BFF Aggregator | Bible Service | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` (READ_PASSAGE) ⭐v1.2 | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
-| `ai.session.completed` | AI Service | Bible Service | `session_id`, `user_id`, `qt_date`, `passage`, `guide_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
-| `journal.created` | Bible Service | Notification Aggregator (BFF), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
-| `journal.updated` | Bible Service | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
-| `journal.deleted` | Bible Service | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
-| `notification.requested` | (다수 서비스) | Notification Aggregator (BFF의 일부) | `user_id`, `type`, `payload` | `{type}:{userId}:{occurredAt}` | `notification.requested-value` | `notification.requested.DLQ` |
-| **`journal.creation.failed`** ⭐v1.2 | **Bible Service (@DltHandler)** | **AI Service** (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{sessionId}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
+| `user.activity.tracked` | bff | bible | `user_id`, `activity_type`, `passage`, `occurred_at`, **`idempotencyKey`** | `read.passage:{userId}:{book}:{ch}:{v}:{epochMinute}` | `user.activity.tracked-value` | `user.activity.tracked.DLQ` |
+| `ai.session.completed` | ai | journal | `session_id`, `user_id`, `qt_date`, `passage`, `guide_step`, `summary` | `ai.session.completed:{sessionId}` | `ai.session.completed-value` | `ai.session.completed.DLQ` |
+| `journal.created` | journal | bff (Notification), 통계(v1.1) | `journal_id`, `user_id`, `passage`, `created_at` | `journal.created:{journalId}` | `journal.created-value` | `journal.created.DLQ` |
+| `journal.updated` | journal | 통계(v1.1) | `journal_id`, `delta`, `updated_at` | `journal.updated:{journalId}:{seq}` | `journal.updated-value` | `journal.updated.DLQ` |
+| `journal.deleted` | journal | 통계(v1.1) | `journal_id`, `deleted_at` | `journal.deleted:{journalId}` | `journal.deleted-value` | `journal.deleted.DLQ` |
+| `notification.requested` | (다수 도메인) | bff (Notification) | `user_id`, `type`, `payload` | `{type}:{userId}:{occurredAt}` | `notification.requested-value` | `notification.requested.DLQ` |
+| `journal.creation.failed` | journal | ai (Saga 보상) | `session_id`, `original_idempotency_key`, `error`, `failed_at` | `journal.creation.failed:{sessionId}` | `journal.creation.failed-value` | `journal.creation.failed.DLQ` |
 
-> **Schema Registry:** Confluent Schema Registry 또는 Apicurio Registry를 W1 Lock-in 3번에서 셋업. 모든 토픽은 위 `Schema Subject`로 등록. **검증 실패 메시지는 producer에서 reject** (DLQ 전송 X — DLQ는 컨슈머 처리 실패용).
+> **v1 in-process:** `ApplicationEventPublisher.publishEvent(new XxxEvent(envelope))` 발행 → 다른 도메인 패키지의 `@TransactionalEventListener(AFTER_COMMIT)` 핸들러가 같은 JVM 안에서 수신. DLQ 개념은 v2 Kafka 도입 시 적용.
+> **v2 Kafka 전환 시:** Apicurio Registry에 위 Schema Subject로 등록. publisher만 KafkaTemplate으로 교체.
 
 ### 6.2 이벤트 페이로드 표준 (전 토픽 공통)
 
@@ -758,21 +778,18 @@ public void appendEvent(Long journalId, EventType type, JsonNode data, String id
 > **시나리오:** 사용자가 AI 대화를 완료하면 이미 생성/조회된 오늘 QT Journal에 AI 요약이 첨부되어야 함. 둘 중 하나가 실패하면 보상 트랜잭션 필요.
 
 ```
-[1] AI Service: AI_SESSIONS.status = 'COMPLETED' (로컬 트랜잭션 + summary 생성)
-[2] AI Service: ai.session.completed 이벤트 발행 (v1.0: direct publish)
-[3] Bible Service: 컨슈머 수신 → user_id + qt_date 기준 JOURNALS 조회 → ai_session_id/summary 첨부 + JOURNAL_EVENTS UPDATED 적재 (멱등성 키 검증)
-[4] 영구 실패 시: journal.creation.failed 이벤트 발행 → AI Service가 status = COMPLETED_NO_JOURNAL 마킹
-
-실패 시:
-- [3] 1차 실패: Bible Service 자동 재시도 (3회) → 영구 실패 시 DLQ + journal.creation.failed
-- [2] 발행 실패: v1.0 한계 — 이벤트 유실 가능 (§ 11.2 Outbox 한계)
+[1] ai 도메인: ai_sessions.status = 'COMPLETED' (로컬 트랜잭션 + summary 생성)
+[2] ai 도메인: ai.session.completed in-process 이벤트 발행 (v1 ApplicationEventPublisher)
+[3] journal 도메인: @TransactionalEventListener(AFTER_COMMIT) 핸들러 수신 →
+    user_id + qt_date 기준 journal_journals 조회 → ai_session_id/summary 첨부 +
+    journal_events UPDATED 적재 (journal_inbox_keys UNIQUE로 멱등성 검증)
+[4] 영구 실패 시: journal.creation.failed 이벤트 발행 → ai 도메인 핸들러가
+    ai_sessions.status = COMPLETED_NO_JOURNAL 마킹
 ```
 
-**v1.0 Outbox 미적용의 알려진 한계:** AI_SESSIONS 트랜잭션 커밋 후 Kafka publish 실패 시 이벤트 유실. 대응:
-1. Producer 발행 실패는 ERROR 로그 + Prometheus 메트릭(`kafka_publish_failure_total`) 알림
-2. 운영자가 AI_SESSIONS 중 status=COMPLETED인데 24h 이상 Journal 없는 행을 배치로 보상 발행
-3. **W4 부하 테스트에서 publish 실패율 검증 필수**
-4. v1.1 Outbox 패턴으로 본질 해결
+**v1 Modular Monolith의 장점:** AI 트랜잭션과 Journal 핸들러가 같은 JVM에서 동작하므로 `@TransactionalEventListener(AFTER_COMMIT)` 보장으로 메시지 유실이 사실상 없음. v1에서는 Outbox 패턴 불필요.
+
+**v2 Kafka 전환 시 한계 부활:** publish 실패 시 이벤트 유실 가능. Outbox 패턴 또는 Transactional Producer 도입을 v2 분리 트리거와 함께 재논의.
 
 ### 6.4 Notification 처리 정책 (v1.0)
 
@@ -916,7 +933,7 @@ public abstract class BaseEntity {
 | Auth | REFRESH_TOKENS | ❌ | revoked_at 컬럼으로 폐기 추적 |
 | Auth | OAUTH_LINKS | ❌ | hard delete (재연결 시 새로 생성) |
 | Bible | BOOKS | ❌ | 정적 메타 데이터 (66권 고정), 삭제 시나리오 없음 |
-| Bible | KR_BIBLE / EN_BIBLE / COMMENTARIES | ❌ | 정적 데이터, 삭제 자체가 드묾 |
+| Bible | KR_BIBLE / EN_BIBLE / bible_explanations | ❌ | 정적 데이터, 삭제 자체가 드묾 |
 | AI | AI_SESSIONS / AI_TURNS | ❌ | 로그 성격, 보존 |
 | AI | PROMPT_TEMPLATES | ❌ | status='DEPRECATED'로 대체 |
 | Journal | JOURNALS | ✅ | 사용자 삭제 후 30일 복구 가능 + 감사 |
@@ -1034,7 +1051,7 @@ CREATE TABLE users (
 | Bible | BOOKS | code | UNIQUE | 책 코드 조회·시드 idempotency |
 | Bible | KR_BIBLE | (book_id, chapter, verse) | INDEX | 다중 JOIN 핵심 |
 | Bible | EN_BIBLE | (book_id, chapter, verse) | INDEX | 다중 JOIN 핵심 |
-| Bible | COMMENTARIES | (book_id, chapter, verse, language) | INDEX | 언어별 주석 조회 |
+| Bible | bible_explanations | (book_id, chapter, verse, language) | INDEX | 언어별 주석 조회 |
 | AI | PROMPT_TEMPLATES | (code, version) | UNIQUE | 프롬프트 버전 관리 |
 | AI | PROMPT_TEMPLATES | (step, status) | INDEX | step별 ACTIVE 프롬프트 조회 |
 | AI | AI_SESSIONS | (user_id, started_at DESC) | INDEX | 사용자 최근 세션 |
@@ -1058,66 +1075,35 @@ CREATE TABLE users (
 
 ---
 
-## 10. ChromaDB 벡터 스토어 (별도)
+## 10. ~~ChromaDB 벡터 스토어~~ — 폐기 (2026-05-14 ADR-0013)
 
-> **Owner:** 강상민 / **컨테이너:** AI Service와 같은 Pod 또는 별도 StatefulSet (W1 결정)
->
-> ChromaDB는 RDBMS가 아니므로 ERD가 아닌 **Collection 스키마**로 정의.
+> **2026-05-14 결정:** RAG / 벡터 DB / 엘라스틱서치 전부 제외. 성경 본문이 장·절 단위로 정형화된 데이터라 RDB B-tree 인덱스 셀렉트로 충분. 본 절 전체를 폐기하고, 출처 인용은 `ai_turns.sources` JSON 컬럼에 사용된 `bible_explanations.id` 배열로 기록한다.
 
-### 10.1 Collection 정의
+### 10.1 폐기된 항목
 
-#### 10.1.1 `commentary_embeddings`
+- ChromaDB Collection 정의 (`commentary_embeddings`, `dummy_paper_embeddings`)
+- 임베딩 ETL 배치
+- RAG 출처 인용 (`sources` (구 rag_sources) 필드명 포함)
 
-| 필드 | 타입 | 설명 |
-| --- | --- | --- |
-| id | string | `commentary:{commentary_id}` |
-| embedding | vector(1536) | text-embedding-3-small 등 (W0 모델 결정) |
-| metadata.book_id | int | Bible Service 참조 |
-| metadata.chapter | int | |
-| metadata.verse | int | |
-| metadata.source | string | 'MATTHEW_HENRY' / 'DUMMY_KR' |
-| metadata.language | string | 'EN' / 'KR' |
-| document | string | 원문 텍스트 (인용 시 사용) |
+### 10.2 대체 메커니즘 — 사전 적재 해설 row 참조
 
-#### 10.1.2 `dummy_paper_embeddings` (v1.0 더미)
+AI 응답 시 출처 컨텍스트 주입 흐름:
 
-| 필드 | 타입 | 설명 |
-| --- | --- | --- |
-| id | string | `paper:{paper_id}` |
-| embedding | vector(1536) | |
-| metadata.title | string | |
-| metadata.author | string | |
-| metadata.related_passages | array<string> | 'GEN:1:1' 등 |
-| document | string | 더미 본문 |
+1. AI 세션 시작 시 본문 좌표(`bookCode`, `chapter`, `verse`)로 `bible_explanations` row를 미리 조회.
+2. 조회 결과(쉬운 요약·배경 설명·어려운 단어·출처)를 LLM system prompt에 텍스트로 주입.
+3. LLM 응답 후 사용한 `bible_explanations.id` 배열을 `ai_turns.sources` JSON에 기록.
 
-### 10.2 ETL 흐름 (W1)
-
-```
-[Bible Service] COMMENTARIES 적재 완료 (W1)
-    ↓
-[AI Service] 배치 잡: 신규 commentary 임베딩 생성 → ChromaDB upsert
-    ↓
-[AI Service] 묵상 대화 시 RAG 조회 시 사용
-```
-
-### 10.3 RAG 출처 인용 표준 (신학 가드레일)
-
-> 강상민 owner — 모든 ASSISTANT 턴은 인용한 ChromaDB 문서를 `AI_TURNS.rag_sources` JSON에 기록한다.
+### 10.3 sources JSON 형식 (구 rag_sources)
 
 ```json
 {
-  "rag_sources": [
-    {
-      "collection": "commentary_embeddings",
-      "id": "commentary:1234",
-      "score": 0.87,
-      "snippet": "Matthew Henry on Genesis 1:1: ..."
-    }
+  "sources": [
+    { "explanation_id": 1234, "language": "EN", "reference": "Matthew Henry on Genesis 1:1" }
   ]
 }
 ```
 
-`rag_sources` 가 비어 있는 ASSISTANT 턴은 **신학적 환각 가능성** — PR 머지 금지 ([01번 § 10.3 환각 체크리스트](./01_프로젝트_계획서.md)).
+**신학 가드레일:** ASSISTANT 턴에 `sources`가 비어 있으면 PR 머지 금지 (강상민 검수). 빈 `sources`는 LLM이 본문 외 임의 생성한 신학적 환각 가능성.
 
 ---
 
@@ -1125,16 +1111,19 @@ CREATE TABLE users (
 
 ### 11.1 핵심 설계 결정 (ADR 후보)
 
-1. **Database per Service** (ADR 0003) — 각 서비스가 자기 DB schema를 소유. 서비스 간 직접 JOIN·FK 절대 금지.
-2. **이벤트 소싱은 Bible Service의 Journal 도메인에만** (ADR 0004) — 큐티 기록은 변경 이력이 핵심 자산.
-3. **외부 ID는 단순 BIGINT 컬럼, FK 제약 없음** (ADR 0005)
-4. **소프트 딜리트는 USERS와 JOURNALS만** (ADR 0006) — 30일 복구 + 감사 가치.
-5. **Kafka 멱등성 키는 컨슈머 측 UNIQUE 제약으로 강제** (ADR 0007)
-6. **PROMPT_TEMPLATES는 DB로 관리, 코드 하드코딩 X** (ADR 0008)
-7. **BaseEntity 배포는 v1.0 소스 복사** (ADR 0009) — 강태오 sync 책임. v1.1에 maven artifact 분리.
-8. **이메일 재가입 정책 — 탈퇴 시 email 마스킹** (ADR 0010) — `u_{id}_deactivated_{epoch}@deleted.local`.
-9. **JOURNAL_EVENTS.sequence 부여 — JOURNALS.last_event_sequence 컬럼 + SELECT FOR UPDATE** (ADR 0011)
-10. **Notification은 v1.0 stateless WebSocket Push** (ADR 0012) — 별도 NOTIFICATION_LOG 없음.
+1. **Modular Monolith v1 + 도메인 패키지 경계** (ADR-0001, 2026-05-14 갈아엎음) — 단일 `qtai-server`, 도메인 간 import 금지, PR 검증 스크립트로 강제.
+2. **단일 DB `qtai_db` + 도메인 prefix** (ADR-0003, 2026-05-14 갈아엎음) — 도메인 간 직접 JOIN·FK 절대 금지. 검색은 RDB B-tree.
+3. **이벤트 소싱은 `com.qtai.journal` 도메인에만** (ADR-0004, v1 in-process / v2 Kafka) — 큐티 기록은 변경 이력이 핵심 자산.
+4. **외부 ID는 단순 BIGINT 컬럼, FK 제약 없음** (ADR-0005)
+5. **소프트 딜리트는 `auth_users`와 `journal_journals`만** (ADR-0006) — 30일 복구 + 감사 가치.
+6. **도메인 이벤트 멱등성은 `*_inbox_keys` UNIQUE 제약** (ADR-0007, v1 in-process / v2 Kafka 공통)
+7. **PROMPT_TEMPLATES는 DB로 관리, 코드 하드코딩 X** (ADR-0008)
+8. **BaseEntity 배포는 v1.0 소스 복사** (ADR-0009) — v1.1에 공통 모듈로 분리.
+9. **이메일 재가입 정책 — 탈퇴 시 email 마스킹** (ADR-0010) — `u_{id}_deactivated_{epoch}@deleted.local`.
+10. **`journal_events.sequence` 부여 — `journal_journals.last_event_sequence` 컬럼 + SELECT FOR UPDATE** (ADR-0011)
+11. **Notification은 v1.0 stateless WebSocket Push** (ADR-0012) — 별도 NOTIFICATION_LOG 없음.
+12. **RAG / 벡터 DB / 엘라스틱서치 도입 제외** (ADR-0013, 2026-05-14) — 정형 데이터에 과한 인프라.
+13. **QT 본문 일일 스크래핑 수집 (성서 유니온, 19:00)** (ADR-0014, 2026-05-14) — `bible_today_qt_schedule`에 좌표만 적재.
 
 ### 11.2 MVP 범위에서 의도적으로 제외한 설계 요소
 
@@ -1168,7 +1157,7 @@ CREATE TABLE users (
 | Spring Boot 메서드 환각 | BOM 의존성 픽스 + `@SQLRestriction` 같은 Jakarta 표준 사용 |
 | 평문 시크릿 커밋 | DB 비밀번호·DeepSeek 키 모두 K8s Secret. ERD 컬럼에 평문 토큰 저장 X (`token_hash` 만 저장) |
 | (신규) Kafka 멱등성 누락 | `JOURNAL_EVENTS.idempotency_key UNIQUE` 강제 (§ 8.3) + `(journal_id, sequence) UNIQUE` |
-| (신규) 신학적 오류 | `rag_sources` 빈 ASSISTANT 턴 머지 금지 (§ 10.3) |
+| (신규) 신학적 오류 | `sources` 빈 ASSISTANT 턴 머지 금지 (§ 10.3) |
 | (신규) 한글 깨짐 | utf8mb4 / utf8mb4_unicode_ci 강제 (§ 8.4) |
 | (신규) Outbox 미적용 이벤트 유실 | Producer 메트릭 알림 + 24h 보상 배치 + W4 부하 테스트 검증 (§ 11.2.1) |
 
@@ -1178,72 +1167,4 @@ CREATE TABLE users (
 
 ```
 {service}-service/
-└── src/main/java/com/qtai/{service}/
-    └── domain/
-        ├── {entity1}/
-        │   ├── {Entity1}.java
-        │   ├── {Entity1}Repository.java
-        │   └── {Entity1}Service.java
-        └── {entity2}/
-            ├── {Entity2}.java
-            └── ...
-```
-
-**예시 (Bible Service Journal 도메인):**
-
-```
-bible-service/src/main/java/com/qtai/bible/journal/domain/
-├── journal/
-│   ├── Journal.java
-│   ├── JournalRepository.java
-│   ├── JournalService.java
-│   └── JournalEventListener.java   # Kafka 컨슈머
-└── event/
-    ├── JournalEvent.java
-    ├── JournalEventRepository.java
-    └── JournalEventStore.java
-```
-
-#### 11.4.2 인프라 서비스 (Gateway, BFF Aggregator) — 패키지 예외
-
-> 도메인 모델이 없으므로 `domain/` 디렉토리 없음.
-
-```
-gateway/src/main/java/com/qtai/gateway/
-├── config/        # Route 정의, JWT 필터
-├── filter/        # 요청·응답 필터
-└── exception/
-
-bff-aggregator/src/main/java/com/qtai/bff/
-├── usecase/       # UseCase 패턴 (Clean Architecture)
-├── client/        # 외부 서비스 RestClient
-├── dto/           # 응답 DTO
-└── config/
-```
-
----
-
-## 📋 전체 테이블 요약
-
-| # | 서비스 | 테이블 | Owner | 주요 외부 참조 (FK 제약 없음) | 주요 컬럼 변경 |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Gateway (Auth) | USERS | 강태오 | (외부 노출) | email 재가입 정책 |
-| 2 | Gateway (Auth) | REFRESH_TOKENS | 강태오 | users.id | — |
-| 3 | Gateway (Auth) | OAUTH_LINKS | 강태오 | users.id | — |
-| 4 | Bible | BOOKS | 이지윤 | — | — |
-| 5 | Bible | KR_BIBLE | 이지윤 | books.id | — |
-| 6 | Bible | EN_BIBLE | 이지윤 | books.id | — |
-| 7 | Bible | COMMENTARIES | 이지윤 | books.id | — |
-| 8 | AI | PROMPT_TEMPLATES | 강상민 | — | status DRAFT→EDITING |
-| 9 | AI | AI_SESSIONS | 강상민 | (외부 참조) gateway.users.id, bible.books.id | **summary 컬럼 추가** |
-| 10 | AI | AI_TURNS | 강상민 | ai_sessions.id, prompt_templates.id | **used_prompt_template_id 추가, content MEDIUMTEXT, step nullable** |
-| 11 | Bible (Journal) | JOURNALS | 이승욱 | (외부 참조) gateway.users.id, bible.books.id, ai.ai_sessions.id | **last_event_sequence + qt_type/observation/interpretation 추가 (v1.5)** |
-| 12 | Bible (Journal) | JOURNAL_EVENTS | 이승욱 | journals.id (유연 결합) | (journal_id, sequence) UNIQUE 추가 |
-| — | AI | (ChromaDB) commentary_embeddings | 김태혁 | bible.commentaries.id | — |
-| — | AI | (ChromaDB) dummy_paper_embeddings | 김태혁 | — | — |
-
-**총 12개 RDBMS 테이블 + 2개 ChromaDB Collection**
-
----
-
-> **다음 작성 문서:** `03_아키텍처_정의서.md` → 서비스 경계·책임 분리·통신 패턴·Foundation Lock-in 아키텍처 청사진
+└

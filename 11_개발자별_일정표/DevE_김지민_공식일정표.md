@@ -1,12 +1,18 @@
 # QT-AI 개인 공식 일정표 - 김지민
 
 > 이 파일 하나만 읽고도 본인 작업을 시작할 수 있도록 최신 결정, 작업 범위, 일정, 검증 명령을 모두 포함한다.
-> 기준일: 2026-05-13 / 기준 결정: 2026-05-13 오전 회의 + 4서비스 재정렬
+> **기준일: 2026-05-14 / 기준 결정: 2026-05-14 오전 회의 (Modular Monolith 전환 + Bible팀 합류)**
+>
+> **2026-05-14 v2.0 변경 요지 (가장 큰 역할 변동):**
+> - 백엔드는 단일 `qtai-server`.
+> - **본인 새 역할: Bible팀 3인 합류.** Flutter 단독에서 Bible 도메인 → Flutter → 인증 → 관리자 페이지 일괄 진행으로 전환.
+> - Flutter 빌드 책임자는 **이승욱**으로 이관 (시연 6/17). 본인은 Flutter UI 작업을 Bible팀과 분담.
+> - 관리자 페이지는 W1에서는 보류, Bible 프로토타입·Flutter 완료 후 3명이 함께 진행.
 
 ## 1. 내 역할
 
 - 담당자: 김지민
-- 역할: Flutter App Owner
+- **새 역할 (2026-05-14): Bible팀 - Bible 도메인 + Flutter UI + 인증 + 관리자 페이지**
 - 개인 작업 폴더: `workspaces/DevE_김지민/`
 - 기본 브랜치 흐름: feature/{name}-{task} -> dev PR -> 리뷰 -> squash merge
 
@@ -41,7 +47,7 @@
 - 앱 시작 후 별도 홈 없이 `/today` 오늘 QT 화면으로 바로 진입
 - 소프트 로그인: 성경 본문/오늘 QT 미리보기는 비로그인 허용
 - 로그인 후 오늘 QT AI 질문, 묵상 기록, 익명 나눔, 알림 접근
-- AI SSE token/rag_sources/turn_completed 수신과 화면 상태 관리
+- AI SSE token / **sources**(구 rag_sources) / turn_completed 수신과 화면 상태 관리
 - ProblemDetail code를 사용자 메시지로 매핑
 - Journal 4필드 자동 저장 UI, 찬양 추천 저장/제거 UI, 교회 인증 optional 버튼 자리
 

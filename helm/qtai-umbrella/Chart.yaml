@@ -1,10 +1,13 @@
 ﻿apiVersion: v2
 name: qtai-umbrella
-description: QT-AI MSA 전체 서비스 Umbrella Helm Chart
+description: |
+  QT-AI Helm Chart — v2 분리 시 도입 (보류, ADR-0016).
+  v1은 Modular Monolith (ADR-0001) + Docker Compose 배포.
+  v2 트리거(ADR-0016 §트리거 조건 2개) 충족 시 AI 도메인 우선 분리 + 본 차트 활성화.
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
 
-# W0 골격 — 각 서비스 subchart는 W1 owner별 작성
-# helm/qtai-umbrella/charts/{service}/Chart.yaml
+# v1: 사용 안 함 (Docker Compose로 배포)
+# v2 분리 시: qtai-server + qtai-ai-service subchart 추가
 dependencies: []
