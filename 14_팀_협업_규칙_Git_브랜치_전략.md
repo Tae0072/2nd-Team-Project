@@ -1,30 +1,44 @@
-# QT-AI (큐티 AI 앱) — 팀 협업 규칙·Git 브랜치 전략 v1.2
+# 팀 협업 규칙·Git 브랜치 전략 — QT-AI v2.3 기준
 
-> **⚠️ 2026-05-14 v2.0 변경 우선 (본문 잔재 우선순위 낮음):** 본 문서는 5/13 이전 MSA 4 서비스 기준으로 작성된 부분이 남아 있다. 2026-05-14 회의로 다음이 결정됐고, 본문과 충돌하면 **DECISIONS.md·AGENTS.md·ADR-0001/0013/0015/0016**을 우선한다.
-> - 백엔드 단일 `qtai-server` (Modular Monolith) — `com.qtai.{gatewayauth,bff,bible,ai,journal,simulator}` 도메인 패키지 6개
-> - RAG·ChromaDB·벡터 DB·엘라스틱서치 제외 (ADR-0013)
-> - Kafka·K8s·Helm은 v2 분리 시 도입 (보류) — v1은 Spring `ApplicationEventPublisher` + Docker Compose
-> - 팀 재배치: Bible팀 3인(이지윤·이승욱·김지민) Bible→Flutter→인증→관리자 일괄 / 강상민 AI 주도 / 김태혁 시뮬레이터 / 강태오 횡단 Lead
-> - "주석" → "해설" (DB·API·UI 모두 `bible_explanations`)
-> - `rag_sources` → `sources`
-
-
-> **문서 버전:** v1.1
-> **작성일:** 2026-05-08
-> **수정일:** 2026-05-12
-> **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [11_개발_환경_셋업_가이드 v1.0](./11_개발_환경_셋업_가이드.md)
+> **문서 버전:** v2.4
+> **작성일:** 2026-05-08 / **최종 갱신:** 2026-05-15
+> **기준 문서:** [05_요구사항_정의서 v2.3](./05_요구사항_정의서.md), [00_문서_역할_분리표](./00_문서_역할_분리표.md), [03_아키텍처_정의서](./03_아키텍처_정의서.md), [04_API_명세서](./04_API_명세서.md), [18_코드_품질_게이트](./18_코드_품질_게이트.md), [23_도메인_용어사전](./23_도메인_용어사전.md)
+> **문서 역할:** 문서 기준 저장소와 구현 저장소의 협업, PR, Git 운영 기준 관리
 > **owner:** 강태오 (Lead — 규칙 정의 + 강제)
-> **목적:** 6명이 6주 동안 충돌 없이 협업. Git 충돌·빌드 깨짐·리뷰 없는 머지로 인한 시간 낭비 원천 방지.
+> **목적:** 6명이 6주 동안 충돌 없이 협업한다. Git 충돌, 빌드 깨짐, 리뷰 없는 머지, 요구사항 역주행을 PR 단계에서 차단한다.
 
 ---
 
-## 📌 변경 이력
+## 협업 기준
+
+아래 기준은 이 문서 전체에 우선한다. 기능·비기능·화면 요구사항이 충돌하면 `05_요구사항_정의서.md` v2.3을 따른다. 문서 역할과 충돌 처리 방식은 `00_문서_역할_분리표.md`를 따른다.
+
+- 백엔드는 단일 `qtai-server` Modular Monolith로 운영한다.
+- 도메인 간 Entity/Service/Repository 직접 import를 금지하고 DTO/Interface로만 통신한다.
+- `journal`과 `songs`는 `bible` 내부 하위 모듈이며 독립 서비스나 최상위 도메인으로 분리하지 않는다.
+- 외부 공개 API는 `/api/v1/**` HTTP API이고, 내부 도메인 인터페이스는 Java Interface다.
+- RAG, ChromaDB, 벡터 DB, Elasticsearch는 v1에서 사용하지 않는다.
+- Kafka, Kubernetes, Helm은 v1에서 도입하지 않는다. v1은 Spring `ApplicationEventPublisher`와 Docker Compose 기준이다.
+- 사용자용 AI 질문, 챗봇, SSE, `/ai/sessions/**` 엔드포인트는 만들지 않는다.
+- AI 호출은 04:00 KST 배치 또는 관리자 트리거에서만 실행한다.
+- QT 본문은 성서 유니온 00:00 KST 공개, 우리 시스템 04:00 KST 수집 배치 기준으로 처리한다.
+- 오늘 QT 100%는 본문, 해설 진입점, 묵상 진입점, 시뮬레이터 상태값이 정상 응답한다는 뜻이다. 모든 본문에 실제 시뮬레이터 클립이 있다는 뜻이 아니다.
+- 성경 데이터는 Repo URL, 라이선스, 번역본명, 출처 표기, 재배포 가능 여부를 확인한 GitHub 공개 JSON만 적재한다.
+- 개역개정, ESV, NIV는 저장·시드·응답에 포함하지 않는다.
+- 찬양은 운영자 큐레이션 메타데이터만 제공한다. AI 추천, 가사/음원 저장, 직접 URL 입력은 제외한다.
+- 교회 인증은 MVP에서 완전히 제외한다. 회원가입 화면에 버튼도 두지 않는다.
+
+---
+
+## 변경 이력
 
 | 버전 | 날짜 | 작성자 | 주요 변경 |
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-08 | 강태오 (Lead) | 초기 작성 — Git 전략·PR 룰·커밋 메시지·코드 리뷰·회의 규칙 |
 | v1.1 | 2026-05-12 | 강태오 (Lead) | `develop` → `dev` 브랜치 변경 / Claude 자동 리뷰·자동 머지 시스템 반영 |
-| v1.2 | 2026-05-13 | 강태오 (Lead) | PR 테스트 필수 조건 강화 (단위/통합 테스트 미작성 시 REQUEST_CHANGES) / PR 템플릿 dev 브랜치 실제본 동기화 / Claude 리뷰 기준 8가지로 확장 |
+| v1.2 | 2026-05-13 | 강태오 (Lead) | PR 테스트 필수 조건 강화 / PR 템플릿 dev 브랜치 실제본 동기화 / Claude 리뷰 기준 확장 |
+| v2.3 | 2026-05-14 | Codex + 강태오 | `05_요구사항_정의서.md` v2.3 기준으로 Modular Monolith, 배치 AI, API prefix, 금지 패턴, PR 체크리스트 정합화 |
+| v2.4 | 2026-05-15 | Codex | 문서 역할 분리 이후 `00`, `03`, `04`, `18`, `23` 기준을 협업 규칙과 PR 템플릿에 연결 |
 
 ---
 
@@ -32,11 +46,13 @@
 
 1. [Git 브랜치 전략](#1-git-브랜치-전략)
 2. [커밋 메시지 규칙](#2-커밋-메시지-규칙)
-3. [PR (Pull Request) 규칙](#3-pr-pull-request-규칙)
+3. [PR 규칙](#3-pr-규칙)
 4. [코드 리뷰 기준](#4-코드-리뷰-기준)
-5. [회의 규칙·스탠드업](#5-회의-규칙스탠드업)
-6. [Slack 채널 운영](#6-slack-채널-운영)
-7. [긴급 상황 대응](#7-긴급-상황-대응)
+5. [문서 변경 규칙](#5-문서-변경-규칙)
+6. [회의 규칙·스탠드업](#6-회의-규칙스탠드업)
+7. [Slack 채널 운영](#7-slack-채널-운영)
+8. [긴급 상황 대응](#8-긴급-상황-대응)
+9. [현재 상태](#9-현재-상태)
 
 ---
 
@@ -44,56 +60,85 @@
 
 ### 1.1 브랜치 구조
 
-```
-master        ← 최종 배포 브랜치 (Lead 강태오 수동 머지만)
-  └── dev     ← 통합 브랜치 (팀원 PR 대상 — Claude 자동 리뷰 + 자동 머지)
-        ├── feature/auth-oauth-google  ← 기능 개발
-        ├── feature/bible-today-api
-        ├── bugfix/ai-sse-timeout      ← 버그 수정
-        ├── docs/update-api-spec       ← 문서 수정
-        └── refactor/gateway-filter    ← 리팩토링
+```text
+master        ← 최종 배포 브랜치 (Lead 수동 머지)
+  └── dev     ← 통합 브랜치 (팀원 PR 대상 — 자동 리뷰 + CI)
+        ├── feature/gatewayauth-google-oauth
+        ├── feature/bff-today-qt-response
+        ├── feature/bible-qt-batch-collector
+        ├── feature/ai-explanation-batch
+        ├── feature/simulator-status-api
+        ├── docs/requirements-v23-sync
+        └── bugfix/bff-simulator-fallback
 ```
 
-> **브랜치 역할 요약**
-> - `dev`: 팀원 PR 자동 머지 대상. Claude 리뷰 통과 + CI 통과 시 squash merge 자동 진행.
-> - `master`: Lead가 dev → master PR을 직접 검토 후 수동 머지 (배포 단위).
+**브랜치 역할 요약**
+
+| 브랜치 | 역할 |
+| --- | --- |
+| `dev` | 팀원 PR 대상. 자동 리뷰와 CI 통과 후 squash merge |
+| `master` | 배포 단위. Lead가 `dev` → `master` PR을 직접 검토 후 수동 머지 |
+| `feature/*` | 기능 개발 |
+| `bugfix/*` | 버그 수정 |
+| `docs/*` | 문서 수정 |
+| `refactor/*` | 구조 개선 |
+| `chore/*` | 빌드·CI·설정 변경 |
+| `hotfix/*` | 긴급 수정 |
 
 ### 1.2 브랜치 명명 규칙
 
-```
-{type}/{서비스}-{짧은-설명}
+```text
+{type}/{scope}-{짧은-설명}
 ```
 
-**서비스 scope (담당 디렉토리) — DECISIONS.md §0 기준:**
+**scope 기준**
 
-| scope | 담당자 | 디렉토리 |
+| scope | 담당/영역 | 기준 경로·책임 |
 | --- | --- | --- |
-| `gateway` | 강태오 | `services/gateway/` (JWT 발급·검증·OAuth 필터 포함 — Auth Service 독립 없음) |
-| `bff` | 강태오 | `services/bff-aggregator/` |
-| `bible` | 이지윤·이승욱 | `services/bible-service/` (성경·QT·주석·묵상일지·나눔 — Journal Service 독립 없음) |
-| `ai` | 강태오(팀장)·김태혁·강상민(메인) | `services/ai-service/` |
-| `mobile` | 김지민 | `apps/mobile/` (+ 관리자 웹) |
+| `gatewayauth` | 강태오 | `qtai-server/src/main/java/com/qtai/gatewayauth/` — JWT, Google OAuth, Rate Limit |
+| `bff` | 강태오 | `qtai-server/src/main/java/com/qtai/bff/` — 화면 단위 응답 집계, 외부 공개 API |
+| `bible` | 이지윤·이승욱·김지민 | `qtai-server/src/main/java/com/qtai/bible/` — 성경, QT 본문, 해설 C, journal/songs 하위 모듈 |
+| `ai` | 강상민 | `qtai-server/src/main/java/com/qtai/ai/` — DeepSeek 배치, 해설 생성, 편집자 검증 |
+| `simulator` | 김태혁 | `qtai-server/src/main/java/com/qtai/simulator/` — 시뮬레이터 상태/클립 |
+| `mobile` | 김지민 중심 | Flutter 앱 |
+| `admin` | bff + Flutter Web | 관리자 화면/API |
+| `infra` | 강태오 | Docker Compose, GitHub Actions, gitleaks, 품질 게이트 |
+| `docs` | 전원 | 요구사항, 문서 역할 분리표, 아키텍처, API, 품질 게이트, 용어사전, 회의록, 일정표 |
 
-> **삭제된 scope (2026-05-12 결정):** `auth` (Gateway 내부 모듈로 통합), `journal` (Bible Service 내부 모듈로 통합). 두 scope의 브랜치 명은 사용하지 않는다.
+**삭제·금지된 scope**
 
-**예시:**
+| 금지 scope | 이유 |
+| --- | --- |
+| `auth-service` | 독립 Auth Service 없음. `gatewayauth` 도메인에서 처리 |
+| `journal-service` | 독립 Journal Service 없음. `bible/journal` 하위 모듈 |
+| `ai-chat` | 사용자용 AI Q&A·챗봇 없음 |
+| `rag` | RAG·벡터 DB 제외 |
+| `kafka` | Kafka는 v1 보류 |
+| `k8s`, `helm` | Kubernetes/Helm은 v1 보류 |
+
+**예시**
+
 ```bash
 git checkout dev
-git checkout -b feature/gateway-google-oauth      # Auth Service 아닌 Gateway 필터에 구현
-git checkout -b bugfix/ai-sse-turn-completed
-git checkout -b feature/bible-today-passage-api
-git checkout -b feature/bible-journal-event-sourcing  # Journal Service 아닌 Bible Service 안에 구현
+git checkout -b feature/gatewayauth-google-oauth
+git checkout -b feature/bff-today-qt-response
+git checkout -b feature/bible-qt-batch-collector
+git checkout -b feature/bible-journal-calendar
+git checkout -b feature/ai-explanation-batch
+git checkout -b feature/simulator-status-api
+git checkout -b docs/requirements-v23-sync
 ```
 
 ### 1.3 브랜치 운영 규칙
 
 | 규칙 | 내용 |
 | --- | --- |
-| master 직접 push 금지 | Lead 전용 — dev→master PR 수동 검토 |
-| dev 직접 push 금지 | 모든 작업은 feature/bugfix 브랜치 경유 |
-| 타 팀원 모듈 수정 금지 | CODEOWNERS 자동 감지 — Claude가 REQUEST_CHANGES |
-| 브랜치 수명 | 최대 3일 (장기 작업은 매일 dev rebase) |
-| 완료 브랜치 삭제 | PR 머지 후 원격 브랜치 즉시 삭제 |
+| `master` 직접 push 금지 | Lead 전용. `dev` → `master` PR 수동 검토 |
+| `dev` 직접 push 금지 | 모든 작업은 feature/bugfix/docs 브랜치 경유 |
+| 담당 범위 밖 변경 금지 | 필요한 경우 PR 본문에 이유와 영향 범위를 명시 |
+| unrelated 파일 stage 금지 | 빌드 산출물, `.gradle`, `build/reports` 등 의도치 않은 파일 제외 |
+| 브랜치 수명 | 최대 3일 권장. 장기 작업은 작은 PR로 분리 |
+| 완료 브랜치 삭제 | PR 머지 후 원격 브랜치 삭제 |
 
 ### 1.4 daily rebase 습관
 
@@ -111,7 +156,7 @@ git rebase --continue
 git push --force-with-lease  # 자신의 feature 브랜치에만
 ```
 
-> **⚠️ merge 대신 rebase 권장** (dev 히스토리 선형 유지). 단, PR 올린 후에는 force push 금지.
+> PR을 올린 뒤 force push가 필요하면 PR 코멘트에 이유를 남긴다.
 
 ---
 
@@ -119,92 +164,106 @@ git push --force-with-lease  # 자신의 feature 브랜치에만
 
 ### 2.1 Conventional Commits 형식
 
-```
+```text
 {type}({scope}): {subject}
 ```
 
-**type 목록:**
-```
-feat     새 기능
-fix      버그 수정
-docs     문서 수정
-refactor 리팩토링
-test     테스트 추가·수정
-chore    빌드·의존성·CI
+**type 목록**
+
+```text
+feat      새 기능
+fix       버그 수정
+docs      문서 수정
+refactor  리팩토링
+test      테스트 추가·수정
+chore     빌드·의존성·CI
 ```
 
 ### 2.2 커밋 메시지 예시
 
 ```bash
-# ✅ 좋은 예
-feat(auth): add Google OAuth login with JWK verification
-fix(ai): prevent infinite SSE retry on LLM_TIMEOUT
-feat(journal): add @TransactionalEventListener AFTER_COMMIT
-feat(mobile): implement QT home screen UI
+# 좋은 예
+feat(gatewayauth): add Google OAuth login filter
+feat(bff): add today QT response aggregator
+feat(bible): add 04 KST QT passage collector
+feat(ai): persist explanation batch run status
+feat(simulator): return simulator availability status
+docs(requirements): align v2.3 decisions
 
-# ❌ 나쁜 예 (Claude가 REQUEST_CHANGES 냄)
+# 나쁜 예
 git commit -m "수정"
 git commit -m "fix bug"
 git commit -m "작업중"
+git commit -m "feat(ai): add user chat SSE"
+git commit -m "feat(kafka): add event topics"
 ```
 
 ### 2.3 커밋 단위 원칙
 
-```
-✅ 1 커밋 = 1 논리적 변경
-✅ 테스트와 구현 같은 커밋 가능
-❌ 여러 기능을 1 커밋에 묶기
-❌ 빌드 깨지는 커밋 push (feature 브랜치라도)
+```text
+좋음: 1 커밋 = 1 논리적 변경
+좋음: 구현과 해당 테스트를 같은 커밋에 포함
+나쁨: 여러 도메인 기능을 한 커밋에 묶기
+나쁨: 빌드가 깨지는 커밋 push
+나쁨: 산출물/캐시 파일을 함께 커밋
 ```
 
 ---
 
-## 3. PR (Pull Request) 규칙
+## 3. PR 규칙
 
 ### 3.1 PR 자동화 시스템
 
-PR을 `dev`에 올리면 **자동으로** 아래가 실행됩니다:
+PR을 `dev`에 올리면 아래 검증이 실행된다.
 
-```
+```text
 PR 오픈 (base: dev)
-  ├── 🔨 QT-AI CI 실행
-  │     ├── Spring Boot Build & Test × 6개 서비스
-  │     ├── Flutter Test
-  │     └── Decisions Guard (PostgreSQL/ZooKeeper/Python/.env 금지 검사)
+  ├─ QT-AI CI
+  │  ├─ 단일 qtai-server build/test
+  │  ├─ Flutter test (앱 변경 시)
+  │  ├─ Spring Modulith / ArchUnit 도메인 경계 검증
+  │  ├─ Requirements Guard (금지 기술·금지 엔드포인트·금지 데이터 검사)
+  │  ├─ Document/Terminology Guard (문서·용어 기준 검사)
+  │  └─ gitleaks secret scan
   │
-  └── 🤖 Claude 자동 코드 리뷰 (구독 OAuth)
-        ├── APPROVE → CI 완료 대기 → 전체 통과 → squash merge → dev ✅
-        └── REQUEST_CHANGES → PR에 리뷰 코멘트 등록, 머지 안 됨 ❌
+  └─ 자동 코드 리뷰
+     ├─ APPROVE → CI 통과 확인 → squash merge
+     └─ REQUEST_CHANGES → 수정 후 재리뷰
 ```
 
-**팀원이 해야 할 것:**
-- PR 템플릿 성실하게 작성
-- REQUEST_CHANGES 받으면 → 코멘트 확인 → 수정 후 push → 자동 재리뷰
+**팀원이 해야 할 것**
 
-**팀원이 하지 않아도 되는 것:**
-- 수동 머지 버튼 클릭 ❌
-- 리뷰어 지정 ❌ (CODEOWNERS 자동 처리)
+- PR 템플릿을 성실하게 작성한다.
+- 요구사항 변경은 `05_요구사항_정의서.md` 근거를 링크하고 Lead 리뷰를 받는다.
+- REQUEST_CHANGES를 받으면 코멘트 확인 후 수정한다.
+- 담당 범위 밖 변경이 있으면 이유와 리뷰어를 명시한다.
+
+**팀원이 하지 않아도 되는 것**
+
+- `dev`에 직접 push하지 않는다.
+- 수동 머지 버튼을 누르지 않는다.
+- 금지 기술을 "나중에 지울 임시 코드"로 넣지 않는다.
 
 ### 3.2 PR 생성 기준
 
 | 항목 | 기준 |
 | --- | --- |
-| PR 대상 브랜치 | 항상 `dev` (master로 직접 PR 금지) |
+| PR 대상 브랜치 | 항상 `dev` (`master` 직접 PR 금지) |
 | PR 크기 | 변경 파일 10개 이하, 500줄 이하 권장 |
-| 자동 CI | GitHub Actions 자동 실행 (실패 시 머지 차단) |
-| 자동 리뷰 | Claude 자동 코드 리뷰 |
-| 머지 방식 | Squash Merge (자동) |
+| 자동 CI | GitHub Actions 자동 실행. 실패 시 머지 차단 |
+| 자동 리뷰 | 코드 리뷰 통과 필요 |
+| 머지 방식 | Squash Merge |
+| 요구사항 근거 | 기능 PR은 `05_요구사항_정의서.md`의 F-ID 포함 |
+| 설계/API 근거 | 아키텍처 변경은 `03`, API 변경은 `04`, 품질 게이트 변경은 `18`, 용어 변경은 `23` 링크 포함 |
 
-### 3.3 PR 템플릿 (자동 채워짐)
-
-> 실제 PR 생성 시 [QT-AI-2nd-Team-Project/.github/pull_request_template.md](https://github.com/Tae0072/QT-AI-2nd-Team-Project/blob/dev/.github/pull_request_template.md) 가 자동으로 채워집니다. 아래는 동기화된 사본입니다.
+### 3.3 PR 템플릿
 
 ```markdown
 ## 구현 내용
 <!-- 이 PR에서 해결하거나 추가하는 변경 사항을 간략하게 설명하세요. -->
 
-## 관련 이슈 / 타스크
-<!-- Closes #000 / Fixes #000 -->
+## 관련 요구사항 / 문서
+<!-- 예: F-01-11, F-02-01, 03_아키텍처_정의서.md §5, 04_API_명세서.md §4, 18_코드_품질_게이트.md §3 -->
 
 ## 변경 유형
 - [ ] 기능 추가 (feat)
@@ -214,22 +273,37 @@ PR 오픈 (base: dev)
 - [ ] 문서 (docs)
 - [ ] 인프라 / CI (chore)
 
-## 코드 체크리스트
-- [ ] `DECISIONS.md` 값과 충돌이 없음
-- [ ] PostgreSQL / ZooKeeper / Tempo 코드 없음
+## v2.4 코드·문서 체크리스트
+- [ ] `05_요구사항_정의서.md` v2.3과 충돌하지 않음
+- [ ] `00_문서_역할_분리표.md`의 문서 책임과 충돌하지 않음
+- [ ] 아키텍처 변경은 `03_아키텍처_정의서.md`, API 변경은 `04_API_명세서.md`, 품질 게이트 변경은 `18_코드_품질_게이트.md`, 용어 변경은 `23_도메인_용어사전.md`와 정합함
+- [ ] 단일 `qtai-server` Modular Monolith 기준을 지킴
+- [ ] `journal`과 `songs`는 `bible` 내부 하위 모듈로 유지함
+- [ ] 다른 도메인의 Entity/Service/Repository 직접 import 없음
+- [ ] 도메인 간 호출은 DTO/Interface로만 처리
+- [ ] 외부 공개 API는 `/api/v1/**`, 내부 도메인 인터페이스는 Java Interface로 분리됨
+- [ ] RAG, ChromaDB, 벡터 DB, Elasticsearch 코드/의존성 없음
+- [ ] Kafka, Kubernetes, Helm v1 도입 없음
+- [ ] 사용자용 AI Q&A, 챗봇, SSE, `/ai/sessions/**` 엔드포인트 없음
+- [ ] 사용자 요청 경로에서 LLM 호출 없음
+- [ ] AI 호출은 04:00 KST 배치 또는 관리자 트리거 전용
+- [ ] QT 본문은 00:00 KST 공개 / 04:00 KST 수집 배치 기준
+- [ ] 오늘 QT 응답은 본문, 해설 진입점, 묵상 진입점, 시뮬레이터 상태값을 반환
+- [ ] 성서 유니온·두란노 본문 텍스트 자체 저장 없음
+- [ ] 성경 데이터는 Repo URL·라이선스·번역본명·출처 표기·재배포 가능 여부 확인 완료
+- [ ] 개역개정, ESV, NIV 시드/응답/테스트 데이터 없음
+- [ ] 찬양 가사·음원 저장 없음, AI 찬양 추천 없음
+- [ ] 교회 인증 화면/버튼/API 없음
+- [ ] 시뮬레이터는 `READY/MISSING/FAILED/DISABLED` 상태를 반환
+- [ ] 관리자 API는 `ADMIN`, 배치/AI 내부 작업은 `SYSTEM` 권한 기준
+- [ ] 인프로세스 이벤트 실패 시 `eventId` + error log 기록 및 재처리 가능
 - [ ] `application.yml` 또는 코드에 평문 Secret 없음
-- [ ] Kafka envelope에 `payload` 키 대신 `data` 사용
-- [ ] AI SSE 경로 `/turns` 사용 (`/messages` 아님)
-- [ ] 성경 데이터: 개역개정/ESV/NIV 코드 없음
-- [ ] `@Transactional` 없는 DB 변경 메서드 없음
-- [ ] Kafka 이벤트 발행은 `@TransactionalEventListener(AFTER_COMMIT)`
 
 ## 테스트 체크리스트
-<!-- feat / fix / refactor 타입은 아래 항목 필수 — 미충족 시 Claude가 REQUEST_CHANGES -->
 - [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew test` 로컬 통과
 - [ ] 통합 테스트(Integration Test) 작성 완료
-      또는 미작성 사유: <!-- 예: 외부 의존성(Google OAuth) 특성상 Mock 처리 -->
-- [ ] docs / chore 타입은 해당 없음 (위 항목 무시)
+      또는 미작성 사유:
+- [ ] docs / chore 타입은 해당 없음
 
 ## 테스트 방법
 <!-- 어떻게 테스트했는지 설명 (Unit / Integration / 수동) -->
@@ -237,52 +311,62 @@ PR 오픈 (base: dev)
 
 ### 3.4 PR 라이프사이클
 
-```
-① dev 최신화
+```text
+1. dev 최신화
    git checkout dev && git pull origin dev
 
-② feature 브랜치 생성 (dev 기준)
-   git checkout -b feature/auth-google-oauth
+2. feature 브랜치 생성
+   git checkout -b feature/bff-today-qt-response
 
-③ 코드 작성 + 커밋
-   git commit -m "feat(auth): ..."
+3. 코드 작성 + 커밋
+   git commit -m "feat(bff): add today QT response aggregator"
 
-④ push
-   git push -u origin feature/auth-google-oauth
+4. push
+   git push -u origin feature/bff-today-qt-response
 
-⑤ GitHub에서 PR 오픈 (base: dev 확인 필수!)
+5. GitHub에서 PR 오픈 (base: dev)
 
-⑥ 🤖 Claude 자동 리뷰 + CI (gradle build·test) 병렬 실행 (1~3분)
-   - Claude APPROVE + CI (build + `./gradlew test`) 모두 통과 → 자동 squash merge → dev ✅
-   - Claude REQUEST_CHANGES → 리뷰 코멘트 확인 → 수정 후 push → 자동 재리뷰 🔄
-   - CI 실패 (단위/통합 테스트 실패 포함) → 자동 머지 차단 + PR에 ⛔ 코멘트
+6. 자동 리뷰 + CI 실행
+   - 리뷰 APPROVE + CI 통과 → squash merge
+   - REQUEST_CHANGES → 수정 후 push
+   - CI 실패 → 머지 차단
 
-⑦ 완료: dev에 자동 머지됨, feature 브랜치 삭제
+7. 완료 후 feature 브랜치 삭제
 ```
 
-### 3.5 Claude REQUEST_CHANGES 주요 원인
+### 3.5 REQUEST_CHANGES 주요 원인
 
-**즉시 반려 (Critical):**
-```
-❌ 타 팀원 모듈 디렉토리 파일 수정
-❌ 하드코딩된 API Key / 비밀번호 발견
-❌ ai-service에 Python 파일 (.py) 존재
-❌ PostgreSQL JDBC URL (MySQL만 허용)
-❌ ZooKeeper 설정 (KRaft만 허용)
+**즉시 반려 (Critical)**
+
+```text
+타 팀원 담당 범위 파일을 사전 설명 없이 수정
+하드코딩된 API Key / 비밀번호 / private key 발견
+독립 서비스 디렉토리 생성 (auth-service, bible-service, ai-service 등)
+RAG, ChromaDB, 벡터 DB, Elasticsearch 코드/의존성 추가
+Kafka, Kubernetes, Helm v1 코드/설정 추가
+사용자용 AI Q&A/SSE/API 경로 추가
+성경 데이터에 개역개정, ESV, NIV 포함
+성서 유니온·두란노 본문 텍스트 저장
+찬양 가사·음원 저장 또는 AI 찬양 추천 구현
+교회 인증 버튼/API 추가
 ```
 
-**경고 후 반려 (수정 필요):**
-```
-⚠️ DB 쓰기 메서드에 @Transactional 누락
-⚠️ 빈 catch 블록 — catch (Exception e) {} 금지
-⚠️ javax.* 사용 (Spring Boot 3.x → jakarta.*)
-⚠️ Kafka envelope에 payload 키 사용 (data 써야 함)
-⚠️ SSE 경로 /messages 사용 (/turns 써야 함)
-⚠️ 성경 데이터에 개역개정/ESV/NIV 포함
-⚠️ 새 기능(feat) PR에 단위 테스트(Unit Test) 코드 없음
-⚠️ 핵심 로직(Service, UseCase) 변경인데 테스트 없음
-⚠️ "다음 PR에서 테스트 추가 예정" 사유만 제시 → APPROVE 불가
-⚠️ 통합 테스트 미작성인데 PR 본문에 사유 없음
+**경고 후 반려 (수정 필요)**
+
+```text
+DB 쓰기 메서드에 @Transactional 누락
+빈 catch 블록 — catch (Exception e) {} 금지
+javax.* 사용 (Spring Boot 3.x → jakarta.*)
+다른 도메인 Entity/Service/Repository 직접 import
+외부 공개 API가 /api/v1 prefix를 따르지 않음
+내부 Java Interface를 HTTP API나 OpenAPI 경로처럼 설계
+시뮬레이터 미완성 상태인데 상태값 없이 null 반환
+오늘 QT 응답에서 해설 진입점·묵상 진입점·시뮬레이터 상태값 누락
+인프로세스 이벤트 핸들러 실패 로그/재처리 근거 없음
+새 기능(feat) PR에 단위 테스트 코드 없음
+핵심 로직(Service, UseCase) 변경인데 테스트 없음
+"다음 PR에서 테스트 추가 예정"만 제시
+통합 테스트 미작성인데 PR 본문에 사유 없음
 ```
 
 ### 3.6 긴급 hotfix 절차
@@ -291,7 +375,7 @@ PR 오픈 (base: dev)
 git checkout master
 git checkout -b hotfix/critical-bug
 
-git commit -m "hotfix(auth): prevent JWT verification bypass"
+git commit -m "fix(gatewayauth): prevent JWT verification bypass"
 
 # master에 PR → Lead 즉시 수동 검토
 # 이후 dev에도 cherry-pick
@@ -304,52 +388,91 @@ git push origin dev
 
 ## 4. 코드 리뷰 기준
 
-### 4.1 Claude 자동 리뷰 기준 (8가지)
+### 4.1 자동 리뷰 기준
 
 | # | 기준 | 주요 체크 |
 | --- | --- | --- |
-| 1 | 코드 품질 | 가독성, 네이밍, 중복 코드 |
-| 2 | 버그 가능성 | NPE, 인덱스 오류, 예외 처리 누락 |
-| 3 | 보안 | 하드코딩된 시크릿, SQL Injection, 권한 검증 |
-| 4 | Spring Boot 3.x 호환성 | deprecated API 사용 여부 |
-| 5 | 트랜잭션 | @Transactional 누락, 범위 오류 |
-| 6 | MSA | Kafka 이벤트 페어, API 타임아웃, 서비스 의존성 |
-| 7 | 도메인 로직 | 성경 묵상 세션 흐름, AI 코칭 턴, 묵상 노트 생성 |
-| 8 | 테스트 코드 | 단위 테스트 존재, 핵심 로직(Service/UseCase) 커버, 통합 테스트 또는 미작성 사유 명시 |
+| 1 | 코드 품질 | 가독성, 네이밍, 중복 코드, 과도한 추상화 |
+| 2 | 버그 가능성 | NPE, 인덱스 오류, 예외 처리 누락, fallback 누락 |
+| 3 | 보안 | 하드코딩된 시크릿, SQL Injection, 권한 검증, 관리자/SYSTEM 권한 |
+| 4 | Spring Boot 3.x 호환성 | deprecated API, `javax.*` 사용 여부 |
+| 5 | 트랜잭션·이벤트 | `@Transactional` 범위, 이벤트 실패 로그, 재처리 가능성 |
+| 6 | Modular Monolith | 도메인 import 금지, DTO/Interface 통신, API timeout |
+| 7 | 제품 요구사항 | 오늘 QT 00:00/04:00 기준, AI 배치 전용, 큐레이션 찬양, 시뮬레이터 상태 |
+| 8 | 테스트 코드 | 단위 테스트, 핵심 UseCase 커버, 통합 테스트 또는 미작성 사유 |
 
-### 4.2 팀원 리뷰 코멘트 레벨 (Claude 보완)
+### 4.2 팀원 리뷰 코멘트 레벨
 
-```
+```text
 [BLOCK]   머지 전 반드시 수정
 [SUGGEST] 개선 제안 (개발자 판단)
-[NIT]     사소한 스타일 (무시 가능)
+[NIT]     사소한 스타일
 [PRAISE]  잘된 코드 칭찬
 ```
 
 ---
 
-## 5. 회의 규칙·스탠드업
+## 5. 문서 변경 규칙
 
-### 5.1 주간 페이스 점검 (화 11:30 — 강제)
+이 저장소는 문서·명세 기준 틀이다. 구현 저장소는 이 기준을 따라 PR, CI, 리뷰 규칙을 구성한다.
+
+### 5.1 문서별 변경 책임
+
+| 문서 | 변경 가능 조건 | 필수 확인 |
+| --- | --- | --- |
+| `05_요구사항_정의서.md` | 기능·비기능·화면 요구사항 원본 변경 시 | Lead 리뷰, 영향 문서 동시 확인 |
+| `03_아키텍처_정의서.md` | 구조, 도메인 경계, 이벤트 기준 변경 시 | `05`, `18`, `23`과 충돌 여부 |
+| `04_API_명세서.md` | 외부 API, 내부 Java Interface 계약 변경 시 | `/api/v1`, 권한, DTO, OpenAPI 영향 |
+| `18_코드_품질_게이트.md` | PR/CI 차단 기준 변경 시 | 구현 저장소 CI 반영 가능성 |
+| `23_도메인_용어사전.md` | 용어, 상태값, 피해야 할 표현 변경 시 | 문서와 코드 상수명 영향 |
+| `14_팀_협업_규칙_Git_브랜치_전략.md` | 브랜치, PR, 리뷰, 머지 규칙 변경 시 | `18` 품질 게이트와 정합성 |
+
+### 5.2 충돌 처리 원칙
+
+| 충돌 유형 | 우선 기준 |
+| --- | --- |
+| 기능 포함 여부 | `05_요구사항_정의서.md` |
+| 비기능 목표 | `05_요구사항_정의서.md` |
+| 화면 요구 | `05_요구사항_정의서.md` |
+| 시스템 구조 | `03_아키텍처_정의서.md`, 단 `05` 위반 불가 |
+| API 계약 | `04_API_명세서.md`, 단 `05` 위반 불가 |
+| 품질 검증 방식 | `18_코드_품질_게이트.md`, 단 `05`를 검증 가능하게 유지 |
+| 용어·표현 | `23_도메인_용어사전.md`, 단 `05` 의미 변경 불가 |
+
+### 5.3 문서 PR 체크
+
+문서 PR은 아래를 확인한다.
+
+- 같은 내용을 여러 문서에 반복하지 않는다.
+- `05_요구사항_정의서.md` 슬림화는 사용자 요청 전까지 진행하지 않는다.
+- `저작권 문제 없음`, `유실률 0% 보장`, `내부 API 경로`, `AI 찬양 추천` 같은 피해야 할 표현은 허용 문맥으로 쓰지 않는다.
+- `journal`과 `songs`는 `bible` 내부 하위 모듈로 표현한다.
+- 기준 문서를 바꾸면 관련 문서의 현재 상태 표와 다음 권장 작업도 함께 확인한다.
+
+---
+
+## 6. 회의 규칙·스탠드업
+
+### 6.1 주간 페이스 점검
 
 매주 화요일 11:30, 강태오 진행, 10분 내.
-각자 30초: 지난주 완료 / 이번주 목표 / 막힌 것.
+각자 30초씩 지난주 완료 / 이번주 목표 / 막힌 것을 공유한다.
 
-**30분 이상 막힌 문제는 반드시 공유** — 혼자 씨름 금지.
+**30분 이상 막힌 문제는 반드시 공유한다.**
 
-### 5.2 일일 비동기 스탠드업 (Slack)
+### 6.2 일일 비동기 스탠드업
 
 매일 오전 9~10시 `#daily-standup` 채널:
 
-```
-✅ 어제 한 것: auth JWT 발급 구현 (PR #12 자동 머지)
-🔧 오늘 할 것: Refresh Token Blacklist Redis 구현
-🚫 막힌 것: JWK 캐싱 TTL — 강태오 의견 요청
+```text
+어제 한 것: bff 오늘 QT 응답 조립 PR 작성
+오늘 할 것: 시뮬레이터 상태 fallback 테스트
+막힌 것: 04:00 배치 실패 시 기존 캐시 유지 정책 확인 필요
 ```
 
 ---
 
-## 6. Slack 채널 운영
+## 7. Slack 채널 운영
 
 | 채널 | 용도 |
 | --- | --- |
@@ -358,21 +481,22 @@ git push origin dev
 | `#개발-리뷰` | PR 링크 공유 + 리뷰 요청 |
 | `#decisions` | 설계·기술 결정 사항 기록 |
 | `#bugs` | 버그 발견 즉시 공유 |
-| `#claude알람채널` | 운영 alert 자동 발송 |
+| `#claude알람채널` | 자동 리뷰·CI 알림 |
 
 ---
 
-## 7. 긴급 상황 대응
+## 8. 긴급 상황 대응
 
-### 7.1 긴급 연락 체계
+### 8.1 긴급 연락 체계
 
 | 상황 | 1차 연락 | 2차 연락 |
 | --- | --- | --- |
-| dev 빌드 깨짐 | 마지막 머지 작성자 | 강태오 |
+| `dev` 빌드 깨짐 | 마지막 머지 작성자 | 강태오 |
 | 보안 이슈 (시크릿 노출) | 강태오 즉시 | 전체 팀 |
+| 요구사항 충돌 발견 | 해당 PR 작성자 | 강태오 |
 | 시연 당일 장애 | 강태오 | 강상민 / 김지민 |
 
-### 7.2 dev 빌드 깨짐 대응
+### 8.2 `dev` 빌드 깨짐 대응
 
 ```bash
 # Slack #bugs 즉시 공유 후 revert
@@ -382,15 +506,31 @@ git revert <commit-hash>
 git push origin dev
 ```
 
-### 7.3 W4~W5 코드 프리즈 (6/12 금요일 이후)
+### 8.3 W4~W5 코드 프리즈 (6/12 금요일 이후)
 
-```
-- 새 기능 추가 금지
-- 버그 수정만 허용 (강태오 승인)
-- 모든 수정은 hotfix 브랜치 경유
-- 시연 빌드: git tag v1.0.0-demo
+```text
+새 기능 추가 금지
+버그 수정만 허용 (강태오 승인)
+모든 수정은 hotfix 브랜치 경유
+시연 빌드: git tag v1.0.0-demo
 ```
 
 ---
 
-> **협업 규칙의 핵심:** Claude 자동 리뷰가 있더라도 PR 템플릿을 성실하게 작성하는 것이 팀 전체 시간을 줄인다. 1차(HMS)에서 PR 없이 직접 push → 코드 충돌 → 3시간 날린 경험을 잊지 말자.
+## 9. 현재 상태
+
+| 항목 | 상태 |
+| --- | --- |
+| 기준 요구사항 | `05_요구사항_정의서.md` v2.3 유지 |
+| 협업 규칙 문서 | 이 문서에서 v2.4로 재점검 완료 |
+| 문서 역할 분리표 | `00_문서_역할_분리표.md` v0.1 반영 |
+| 아키텍처 정의서 | `03_아키텍처_정의서.md` v0.1 반영 |
+| API 명세서 | `04_API_명세서.md` v0.1 반영 |
+| 품질 게이트 | `18_코드_품질_게이트.md` v2.4 반영 |
+| 도메인 용어사전 | `23_도메인_용어사전.md` v0.1 반영 |
+| 전체 문서 정합성 최종 점검 | 진행 완료 |
+| 다음 권장 작업 | 변경분 커밋/푸시 또는 구현 저장소 반영 준비 |
+
+---
+
+> **협업 규칙의 핵심:** 자동 리뷰가 있더라도 PR 템플릿을 성실하게 작성해야 팀 전체 시간이 줄어든다. v2.3 요구사항과 충돌하는 구현은 "임시"라도 머지하지 않는다.
