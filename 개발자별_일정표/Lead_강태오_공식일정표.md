@@ -26,7 +26,7 @@
 - Kafka envelope는 data 필드만 사용한다. payload 키는 사용하지 않는다.
 - 에러 응답은 RFC 7807 ProblemDetail(application/problem+json)로 통일한다.
 - 성경 데이터는 KJV, 개역한글, Matthew Henry 주석만 허용 범위로 다룬다. 개역개정, ESV, NIV는 금지다.
-- 오늘 QT는 MVP에서 하루 1구절이며 `verseStart == verseEnd`로 전달한다.
+- 오늘 QT는 **하루 1개 본문(범위 허용)** 이며 `chapterStart`·`verseStart`·`chapterEnd`·`verseEnd` + `startOrdinal`/`endOrdinal`로 전달한다 (DECISIONS.md §3.1, 02_ERD v2.3, ADR-0021).
 - AI 질문과 묵상 기록은 오늘 QT 본문에서만 가능하다. 일반 성경 화면은 읽기 전용이다.
 - Journal은 `POST /api/v1/journals/today`로 오늘 DRAFT를 만들거나 조회한다. 자유 본문 `POST /api/v1/journals`는 만들지 않는다.
 - Journal 4필드(`felt`, `memorableVerse`, `application`, `prayer`)는 별도 저장 버튼 없이 자동 저장한다. 사용자에게 글자 수 제한을 노출하지 않는다.
