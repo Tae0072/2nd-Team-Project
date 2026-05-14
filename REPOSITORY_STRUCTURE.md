@@ -106,4 +106,4 @@ repo-root/
 | PR 템플릿 | `.github/pull_request_template.md` 작성 완료 |
 | 기본 CI | `.github/workflows/qt-ai-ci.yml` 작성 완료 |
 | 기본 구조 기준 | 이 문서에서 v0.1로 신규 작성 |
-| 다음 권장 작업 | 커밋/푸시 |
+| 다음 권장 작업 | 실제 Spring Boot/Flutter 프로젝트 골격 생성 |

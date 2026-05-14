@@ -199,4 +199,4 @@ flowchart LR
 | 번호 충돌 처리 | `18_코드_품질_게이트.md` 유지, 포트폴리오 README는 `26_포트폴리오_README.md`로 분리 |
 | 템플릿 반영 | `18_포트폴리오_README_template.md`의 README 구조를 QT-AI 기준으로 변환 |
 | 실제 성과 수치 | 구현 저장소 테스트 후 기입 |
-| 다음 권장 작업 | 커밋/푸시 |
+| 다음 권장 작업 | 실제 Spring Boot/Flutter 프로젝트 골격 생성 |

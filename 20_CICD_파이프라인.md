@@ -301,7 +301,7 @@ CI 로그에서 Secret을 출력하지 않는다. `.env`, `application-prod.yml`
 | Docker Compose 후보 빌드 기준 정의 | 완료 |
 | Branch Protection 기준 정의 | 완료 |
 | 실제 구현 저장소 워크플로우 파일 작성 | `.github/workflows/qt-ai-ci.yml` 1차 작성 완료 |
-| 실제 CI 실행 결과 기록 | TODO |
+| 실제 CI 실행 결과 기록 | 2026-05-15 KST, `0a796f4` 기준 GitHub Actions `QT-AI CI` 성공 |
 
 ---
 
@@ -312,4 +312,5 @@ CI 로그에서 Secret을 출력하지 않는다. `.env`, `application-prod.yml`
 | CI/CD 파이프라인 문서 | v0.1 신규 작성 |
 | 템플릿 반영 | `20_CICD_파이프라인_template.md` 구조를 QT-AI 기준으로 변환 |
 | 구현 저장소 반영 | `.github/workflows/qt-ai-ci.yml` 1차 작성 완료. 구현 코드 경로가 생기면 backend/API/Flutter job이 실제 실행됨 |
-| 다음 권장 작업 | 커밋/푸시 |
+| 실제 CI 실행 결과 | GitHub Actions run `25876368946` 성공 |
+| 다음 권장 작업 | 실제 Spring Boot/Flutter 프로젝트 골격 생성 |
