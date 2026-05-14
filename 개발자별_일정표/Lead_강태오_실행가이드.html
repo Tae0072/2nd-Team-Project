@@ -3,222 +3,413 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI - Lead 강태오 실행가이드</title>
+<title>QT-AI — Lead_강태오 실행가이드</title>
 <style>
-*{box-sizing:border-box}
-:root{
-  --bg:#0f1720;--panel:#17212b;--panel2:#1f2c38;--line:#344554;
-  --text:#e7edf3;--muted:#9fb0bf;--lead:#e66f51;--blue:#67aaf9;
-  --green:#64b86a;--yellow:#d8aa45;--red:#e05f5f;--code:#101820;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.65}
-a{color:var(--blue);text-decoration:none}
-code{font-family:var(--mono);font-size:.88em;background:var(--code);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
-pre{position:relative;margin:12px 0 0;background:var(--code);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;font-family:var(--mono);font-size:12px;line-height:1.7;color:#c7d3df}
-header{position:sticky;top:0;z-index:10;background:rgba(15,23,32,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
-.wrap{max-width:1160px;margin:0 auto;padding:0 22px}
-.hdr{display:flex;align-items:center;gap:14px;min-height:74px;flex-wrap:wrap}
-.mark{background:var(--lead);color:#fff;font-weight:800;font-size:11px;letter-spacing:.08em;border-radius:4px;padding:4px 9px}
-.title{font-size:19px;font-weight:800}
-.sub{font-size:12px;color:var(--muted)}
-nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
-nav a{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:5px 10px}
-nav a:hover{color:var(--text);border-color:var(--muted)}
-main{padding:24px 0 50px}
-section{padding:26px 0;border-bottom:1px solid var(--line)}
-h2{font-size:17px;margin:0 0 14px}
-.note{background:rgba(230,111,81,.09);border:1px solid rgba(230,111,81,.32);border-left:4px solid var(--lead);border-radius:7px;padding:13px 15px;color:var(--muted)}
-.note strong{color:var(--text)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 15px}
-.card h3{font-size:14px;margin:0 0 8px;color:var(--text)}
-.card p{margin:0;color:var(--muted)}
-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-th,td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
-th{background:var(--panel2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{color:var(--muted)}
-td:first-child{color:var(--text);font-weight:700}
-tr:last-child td{border-bottom:none}
-.pill{display:inline-block;border-radius:4px;border:1px solid var(--line);padding:1px 6px;font-size:11px;color:var(--muted)}
-.ok{color:var(--green)}.warn{color:var(--yellow)}.block{color:var(--red)}
-.week{display:grid;gap:10px}
-.day{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.day-head{display:grid;grid-template-columns:120px 1fr 120px;gap:12px;align-items:center;background:var(--panel2);padding:11px 13px}
-.day-date{font-weight:800;color:var(--text)}
-.day-goal{color:var(--text);font-weight:700}
-.day-state{text-align:right}
-.day-body{padding:13px 14px;color:var(--muted)}
-.checks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.check{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px}
-.check b{display:block;color:var(--text);margin-bottom:4px}
-.sim-row{display:grid;grid-template-columns:130px 1fr 140px;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-bottom:none;padding:10px 12px}
-.sim-row:last-child{border-bottom:1px solid var(--line);border-radius:0 0 8px 8px}
-.sim-row:first-child{border-radius:8px 8px 0 0}
-.sim-btn{border:1px solid rgba(100,184,106,.45);background:rgba(100,184,106,.12);color:var(--green);border-radius:5px;padding:6px 10px;font-weight:700;cursor:pointer}
-.sim-btn[disabled]{border-color:var(--line);background:var(--panel2);color:#667582;cursor:not-allowed}
-.copy{position:absolute;right:8px;top:8px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer}
-.copy.ok{color:var(--green);border-color:var(--green)}
-@media (max-width:820px){
-  nav{margin-left:0}.grid,.checks{grid-template-columns:1fr}
-  .day-head,.sim-row{grid-template-columns:1fr}.day-state{text-align:left}
-}
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;--text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;--auth:#f85149;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}.wrap{max-width:1180px;margin:0 auto;padding:0 24px}header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.proj{background:var(--auth);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}.wnav:hover{border-color:var(--t2)}.wnav.cur{background:var(--auth);border-color:var(--auth);color:#fff}.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}.sec-title{font-size:15px;font-weight:700}.callout{background:rgba(240,136,62,.08);border:1px solid rgba(240,136,62,.25);border-left:3px solid var(--auth);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}.callout strong{color:var(--text)}.callout.blue{background:rgba(83,155,245,.08);border-color:rgba(83,155,245,.25);border-left-color:var(--blue)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-top:12px}.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600}.tbl tr:last-child td{border-bottom:none}.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:340px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(240,136,62,.12);color:var(--auth);border:1px solid rgba(240,136,62,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--auth);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--auth);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.day-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border .12s}.day-row:hover{border-color:var(--auth)}.day-row.open{border-color:var(--auth);background:var(--bg3)}.day-head{padding:12px 16px;display:grid;grid-template-columns:80px 70px 1fr auto;gap:12px;align-items:center}.day-date{color:var(--text);font-weight:700;font-size:13px}.day-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}.badge-infra{background:rgba(83,155,245,.15);color:var(--blue);border:1px solid rgba(83,155,245,.3)}.badge-code{background:rgba(87,171,90,.15);color:var(--green);border:1px solid rgba(87,171,90,.3)}.day-summary{font-size:12.5px;color:var(--text);line-height:1.5}.day-toggle{color:var(--t2);font-size:11px;font-family:var(--mono)}.day-panel{display:none;border-top:1px solid var(--border)}.day-panel.show{display:block}.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}.path-list,.dod-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}.dod-list li{font-size:12px;color:var(--t2);padding:4px 0}.dod-list li::before{content:'✅ ';color:var(--green)}.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:280px;overflow-y:auto;white-space:pre-wrap}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.se{color:var(--lead)}.st{color:var(--teal)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt12{margin-top:12px}@media(max-width:860px){.wnav-wrap{margin-left:0}.day-head{grid-template-columns:1fr}.four-grid,.two{grid-template-columns:1fr}.fi{border-right:none}.own-item{display:block}.own-path{min-width:0;margin-bottom:4px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap">
-    <div class="hdr">
-      <span class="mark">QT-AI</span>
-      <div>
-        <div class="title">강태오 실행가이드 <span class="pill">Lead · gatewayauth · bff · DevOps</span></div>
-        <div class="sub">기준일 2026-05-15 · `00_개발_일정_총괄표.md` v0.1 · `07_요구사항_정의서.md` v2.3 · 팀원별 일정표 공통 기준</div>
-      </div>
-      <nav>
-        <a href="#role">역할</a>
-        <a href="#lock">고정 기준</a>
-        <a href="#w1">W1</a>
-        <a href="#weeks">W2-W5</a>
-        <a href="#simulator">시뮬레이터</a>
-        <a href="#verify">검증</a>
-      </nav>
+  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">Lead_강태오 실행가이드 <span class="role-chip">Lead / gatewayauth / bff / DevOps / 전체 조율</span></div><div class="dev-sub">기준일 2026-05-15 · Lead_강태오_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v2.3</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
+</header>
+<main class="wrap">
+<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>이 파일 하나로 Lead_강태오 담당 작업을 시작한다.</strong> 구조는 Lead 실행가이드처럼 패널형으로 통일했고, 내용은 개인 공식일정표 기준만 모았다.</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>공통 기준</div><div class="callout"><strong>작업 요약</strong><br>구현 PR, 검증 로그, 회고 메모, 문서 정합성 수정 내역을 남긴다.</div></div><table class="tbl"><thead><tr>
+<th>항목</th>
+<th>내용</th>
+</tr></thead><tbody>
+<tr>
+<td>담당자</td>
+<td>강태오</td>
+</tr>
+<tr>
+<td>주 역할</td>
+<td>Lead / gatewayauth / bff / DevOps / 전체 조율</td>
+</tr>
+<tr>
+<td>구현 기준</td>
+<td>단일 `qtai-server` Modular Monolith</td>
+</tr>
+<tr>
+<td>협업 기준</td>
+<td>gatewayauth와 bff는 Lead 단독 소유가 아니라 Bible&#183;Flutter 담당자와 API 계약을 맞춰 구현한다.</td>
+</tr>
+<tr>
+<td>산출물 기준</td>
+<td>구현 PR, 검증 로그, 회고 메모, 문서 정합성 수정 내역을 남긴다.</td>
+</tr>
+</tbody></table>
+</section>
+<section id="sec-1" class="sec"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">실제 파일 생성과 코드는 별도 구현 GitHub에서 진행한다. 이 문서 저장소에는 구현 골격을 만들지 않는다.</div><div class="own-tree">
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/gatewayauth/</div><div class="own-desc">인증&#183;권한&#183;RateLimit</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/bff/</div><div class="own-desc">화면 단위 응답 집계</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">.github/pull_request_template.md</div><div class="own-desc">PR 기준</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">workspaces/Lead_강태오/</div><div class="own-desc">리드 워크플로우와 리포트</div><span class="lock-tag">OWNER</span></div>
+</div>
+</section>
+<section id="sec-2" class="sec"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 작업 흐름 확인 가능</div></div><div class="pr-panel-list">
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>브랜치 명명 규칙</strong><span>dev 기준에서 작게 분리</span></div><div class="pr-panel-chev open" id="chev-Lead-pr-1">⌄</div></div><div class="pr-panel-body show" id="Lead-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
+git pull origin dev
+git checkout -b feature/lead-task</code></pre></div></div>
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>PR 올리는 7단계</strong><span>pull → branch → work → test → push → PR → review</span></div><div class="pr-panel-chev open" id="chev-Lead-pr-2">⌄</div></div><div class="pr-panel-body show" id="Lead-pr-2"><div class="pr-step"><div class="pr-step-num">1</div><div><div class="pr-step-title">dev 최신화</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev &amp;&amp; git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">검증 후 PR</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
+rg -n &quot;Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV&quot; qtai-server flutter-app apis data db infra</code></pre></div></div></div></div>
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>PR 본문 필수</strong><span>변경 범위, 검증 명령, 남은 리스크</span></div><div class="pr-panel-chev" id="chev-Lead-pr-3">⌄</div></div><div class="pr-panel-body" id="Lead-pr-3"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>## 변경 내용
+- Lead_강태오 담당 범위 변경
+
+## 검증
+- [ ] 금지 패턴 0건
+- [ ] 관련 테스트 통과
+
+## 리스크
+- 없음 또는 Lead 확인 필요</code></pre></div></div>
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-4')"><div class="pr-panel-num">4</div><div class="pr-panel-title"><strong>머지 전 기준</strong><span>요구사항 v2.3과 충돌 금지</span></div><div class="pr-panel-chev" id="chev-Lead-pr-4">⌄</div></div><div class="pr-panel-body" id="Lead-pr-4"><table class="tbl"><tbody><tr><td>요구사항</td><td>07_요구사항_정의서.md v2.3 우선</td></tr><tr><td>구현 저장소</td><td>실제 코드는 별도 구현 GitHub에서만 작성</td></tr><tr><td>금지 기준</td><td>사용자 AI Q&A, SSE, Kafka/K8s/Helm v1, 금지 번역본 차단</td></tr></tbody></table></div></div>
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('Lead-pr-5')"><div class="pr-panel-num">5</div><div class="pr-panel-title"><strong>Hotfix 절차</strong><span>Lead 확인 후 최소 변경</span></div><div class="pr-panel-chev" id="chev-Lead-pr-5">⌄</div></div><div class="pr-panel-body" id="Lead-pr-5"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
+git pull origin dev
+git checkout -b hotfix/lead-short-fix
+# fix + test
+git push origin hotfix/lead-short-fix</code></pre></div></div>
+</div></section>
+<section id="sec-3" class="sec"><div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">상세 일정 — W1 일별 + W2~W5 주차 요약</div></div><div class="day-row" data-day="Lead-0">
+  <div class="day-head" onclick="toggleDay('Lead-0')">
+    <div class="day-date">2026-05-18</div>
+    <div class="day-badge badge-infra">w1</div>
+    <div class="day-summary">구현 저장소 골격 고정</div>
+    <div class="day-toggle" id="tog-Lead-0">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-0">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>구현 저장소 골격 고정</strong><br>`dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+
+# 작업 내용
+담당자: Lead_강태오
+작업: 구현 저장소 골격 고정
+완료 기준: `dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="구현 저장소 골격 고정" data-owner="Lead_강태오" data-target="sim-Lead-0">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-0"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>`dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
-</header>
+</div>
+<div class="day-row" data-day="Lead-1">
+  <div class="day-head" onclick="toggleDay('Lead-1')">
+    <div class="day-date">2026-05-19</div>
+    <div class="day-badge badge-infra">w1</div>
+    <div class="day-summary">도메인 패키지 경계 준비</div>
+    <div class="day-toggle" id="tog-Lead-1">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-1">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>도메인 패키지 경계 준비</strong><br>도메인 간 Entity/Service/Repository 직접 import 금지 기준을 검증할 수 있다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
 
-<main class="wrap">
-  <section id="role">
-    <h2>1. 역할 선언</h2>
-    <div class="note">
-      <strong>이 파일은 강태오 Lead 실행가이드이면서 팀원별 일정표의 공통 기준이다.</strong>
-      개인별 작업은 달라질 수 있지만 W1~W5 게이트, 금지 기준, Today QT 기준은 바꾸지 않는다.
+# 작업 내용
+담당자: Lead_강태오
+작업: 도메인 패키지 경계 준비
+완료 기준: 도메인 간 Entity/Service/Repository 직접 import 금지 기준을 검증할 수 있다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="도메인 패키지 경계 준비" data-owner="Lead_강태오" data-target="sim-Lead-1">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-1"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>도메인 간 Entity/Service/Repository 직접 import 금지 기준을 검증할 수 있다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
-    <div class="grid" style="margin-top:14px">
-      <div class="card"><h3>주 역할</h3><p>Lead / gatewayauth / bff / DevOps / 전체 조율. 단일 파트 전담이 아니라 도메인 경계와 PR 품질을 함께 잡는다.</p></div>
-      <div class="card"><h3>구현 구조</h3><p>백엔드는 단일 <code>qtai-server</code> Modular Monolith다. 도메인은 패키지와 내부 Interface로 분리한다.</p></div>
-      <div class="card"><h3>협업 방식</h3><p>gatewayauth와 bff는 Bible·Flutter 담당자와 API 계약을 맞춰 구현한다. 외부 API와 내부 도메인 Interface를 섞지 않는다.</p></div>
-      <div class="card"><h3>산출물</h3><p>PR, 검증 로그, Foundation 5/5 판정표, 회고 메모, 문서 정합성 수정 내역을 남긴다.</p></div>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-2">
+  <div class="day-head" onclick="toggleDay('Lead-2')">
+    <div class="day-date">2026-05-20</div>
+    <div class="day-badge badge-infra">w1</div>
+    <div class="day-summary">DB/API 계약 정리</div>
+    <div class="day-toggle" id="tog-Lead-2">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-2">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>DB/API 계약 정리</strong><br>ERD 주요 테이블과 API 초안이 서로 충돌하지 않는다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+
+# 작업 내용
+담당자: Lead_강태오
+작업: DB/API 계약 정리
+완료 기준: ERD 주요 테이블과 API 초안이 서로 충돌하지 않는다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="DB/API 계약 정리" data-owner="Lead_강태오" data-target="sim-Lead-2">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-2"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>ERD 주요 테이블과 API 초안이 서로 충돌하지 않는다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
-  </section>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-3">
+  <div class="day-head" onclick="toggleDay('Lead-3')">
+    <div class="day-date">2026-05-21</div>
+    <div class="day-badge badge-infra">w1</div>
+    <div class="day-summary">품질 게이트 자동화</div>
+    <div class="day-toggle" id="tog-Lead-3">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-3">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>품질 게이트 자동화</strong><br>Kafka/K8s/Helm/SSE/RAG/금지 번역본이 PR에서 검출 가능하다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
 
-  <section id="lock">
-    <h2>2. 고정 기준</h2>
-    <table>
-      <thead><tr><th>구분</th><th>기준</th></tr></thead>
-      <tbody>
-        <tr><td>일정 기준</td><td>W1은 2026-05-18 ~ 2026-05-22 Foundation Lock-in, W3는 Feature Freeze, W4는 시연 후보 빌드, W5는 리허설과 발표다.</td></tr>
-        <tr><td>Today QT</td><td>성서 유니온 공개 시각은 00:00 KST, 우리 시스템 수집 배치 시각은 04:00 KST로 통일한다.</td></tr>
-        <tr><td>Today QT 100%</td><td>본문·해설·묵상 진입점·시뮬레이터 상태값이 정상 응답하면 100%다. 모든 클립이 존재해야 한다는 뜻이 아니다.</td></tr>
-        <tr><td>AI</td><td>사용자 AI Q&amp;A, 챗봇, SSE, <code>/ai/sessions/**</code> 사용자 경로는 만들지 않는다. AI는 배치와 관리자 트리거 전용이다.</td></tr>
-        <tr><td>이벤트</td><td>v1은 Spring <code>ApplicationEventPublisher</code>를 사용한다. Kafka는 MVP 작업 목표에 넣지 않는다.</td></tr>
-        <tr><td>배포</td><td>v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다.</td></tr>
-        <tr><td>성경 데이터</td><td>Repo URL, 라이선스, 번역본명, 출처 표기, 재배포 가능 여부가 확인된 GitHub 공개 JSON만 적재한다. 개역개정, ESV, NIV는 금지한다.</td></tr>
-      </tbody>
-    </table>
-  </section>
+# 작업 내용
+담당자: Lead_강태오
+작업: 품질 게이트 자동화
+완료 기준: Kafka/K8s/Helm/SSE/RAG/금지 번역본이 PR에서 검출 가능하다.
 
-  <section id="w1">
-    <h2>3. W1 Foundation Lock-in</h2>
-    <div class="checks">
-      <div class="check"><b>1. 저장소 운영</b><span>dev, PR, squash merge, 보호 기준</span></div>
-      <div class="check"><b>2. 백엔드 골격</b><span>단일 qtai-server와 5개 도메인 패키지</span></div>
-      <div class="check"><b>3. 도메인 경계</b><span>직접 import 차단 테스트 준비</span></div>
-      <div class="check"><b>4. DB/API 계약</b><span>외부 API와 내부 Interface 분리</span></div>
-      <div class="check"><b>5. 품질 게이트</b><span>금지 기술·API·데이터 검사</span></div>
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="품질 게이트 자동화" data-owner="Lead_강태오" data-target="sim-Lead-3">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-3"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Kafka/K8s/Helm/SSE/RAG/금지 번역본이 PR에서 검출 가능하다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-4">
+  <div class="day-head" onclick="toggleDay('Lead-4')">
+    <div class="day-date">2026-05-22</div>
+    <div class="day-badge badge-infra">w1</div>
+    <div class="day-summary">Foundation 5/5 판정</div>
+    <div class="day-toggle" id="tog-Lead-4">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-4">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>Foundation 5/5 판정</strong><br>`Foundation 5/5`가 모두 통과해야 W2로 넘어간다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
 
-    <div class="week" style="margin-top:14px">
-      <div class="day">
-        <div class="day-head"><div class="day-date">2026-05-18</div><div class="day-goal">구현 저장소 골격 고정</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
-        <div class="day-body">`qtai-server`, Flutter 앱, OpenAPI 위치, 브랜치/PR 흐름을 확인한다. 완료 기준은 `dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞는 것이다.</div>
-      </div>
-      <div class="day">
-        <div class="day-head"><div class="day-date">2026-05-19</div><div class="day-goal">도메인 패키지 경계 준비</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
-        <div class="day-body">`gatewayauth`, `bff`, `bible`, `ai`, `simulator` 패키지와 import 금지 기준을 정리한다.</div>
-      </div>
-      <div class="day">
-        <div class="day-head"><div class="day-date">2026-05-20</div><div class="day-goal">DB/API 계약 정리</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
-        <div class="day-body">외부 공개 API `/api/v1/**`와 내부 도메인 Java Interface를 분리한다. ERD 주요 테이블과 API 초안이 충돌하지 않아야 한다.</div>
-      </div>
-      <div class="day">
-        <div class="day-head"><div class="day-date">2026-05-21</div><div class="day-goal">품질 게이트 자동화</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
-        <div class="day-body">Kafka, Kubernetes, Helm, SSE, RAG, 금지 번역본, 사용자 AI 경로가 PR에서 검출되도록 검사 기준을 준비한다.</div>
-      </div>
-      <div class="day">
-        <div class="day-head"><div class="day-date">2026-05-22</div><div class="day-goal">Foundation 5/5 판정</div><div class="day-state"><span class="pill warn">TODO</span></div></div>
-        <div class="day-body">5개 항목을 모두 통과해야 W2로 넘어간다. 미통과 항목은 W2 기능 범위를 줄여서 먼저 막는다.</div>
-      </div>
+# 작업 내용
+담당자: Lead_강태오
+작업: Foundation 5/5 판정
+완료 기준: `Foundation 5/5`가 모두 통과해야 W2로 넘어간다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="Foundation 5/5 판정" data-owner="Lead_강태오" data-target="sim-Lead-4">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-4"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>`Foundation 5/5`가 모두 통과해야 W2로 넘어간다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
-  </section>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-5">
+  <div class="day-head" onclick="toggleDay('Lead-5')">
+    <div class="day-date">W2</div>
+    <div class="day-badge badge-code">plan</div>
+    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; Today QT 집계, 인증&#183;권한, BFF 응답 조립, PR 검증</div>
+    <div class="day-toggle" id="tog-Lead-5">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-5">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>Today QT 집계, 인증&#183;권한, BFF 응답 조립, PR 검증</strong><br>핵심 API 데모가 가능하다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
 
-  <section id="weeks">
-    <h2>4. W2-W5 요약</h2>
-    <table>
-      <thead><tr><th>주차</th><th>기간</th><th>Lead 집중 범위</th><th>게이트</th></tr></thead>
-      <tbody>
-        <tr><td>W2</td><td>2026-05-25 ~ 2026-05-29</td><td>Today QT 집계, 인증·권한, BFF 응답 조립, PR 검증</td><td>핵심 API 데모</td></tr>
-        <tr><td>W3</td><td>2026-06-01 ~ 2026-06-05</td><td>관리자·통합 조정, Feature Freeze, 경계 위반 차단</td><td>MVP 기능 통과</td></tr>
-        <tr><td>W4</td><td>2026-06-08 ~ 2026-06-12</td><td>E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드</td><td>시연 후보 빌드</td></tr>
-        <tr><td>W5</td><td>2026-06-15 ~ 2026-06-17</td><td>리허설, 백업 자료, 발표 직전 장애 대응</td><td>발표 흐름 2회 이상 성공</td></tr>
-      </tbody>
-    </table>
-  </section>
+# 작업 내용
+담당자: Lead_강태오
+작업: Today QT 집계, 인증·권한, BFF 응답 조립, PR 검증
+완료 기준: 핵심 API 데모가 가능하다.
 
-  <section id="simulator">
-    <h2>5. 시뮬레이터 상태 처리</h2>
-    <div class="sim-row"><strong>READY</strong><span>재생 가능한 클립이 있다.</span><button class="sim-btn" onclick="showSim(this,'sim-ready')">시뮬레이션 보기</button></div>
-    <div class="sim-row"><strong>MISSING</strong><span>아직 클립이 없지만 Today QT 응답은 정상이다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
-    <div class="sim-row"><strong>FAILED</strong><span>생성 실패 로그를 남기고 재처리 가능 상태로 둔다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
-    <div class="sim-row"><strong>DISABLED</strong><span>MVP 범위 또는 운영 판단으로 비활성화한다.</span><button class="sim-btn" disabled>시뮬레이션 보기</button></div>
-    <pre id="sim-ready" style="display:none">simulatorStatus=READY
-buttonEnabled=true
-todayQtComplete=true
-note=Today QT 100%는 상태값 정상 응답 기준이다.</pre>
-  </section>
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="Today QT 집계, 인증&#183;권한, BFF 응답 조립, PR 검증" data-owner="Lead_강태오" data-target="sim-Lead-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-5"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>핵심 API 데모가 가능하다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+    </div>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-6">
+  <div class="day-head" onclick="toggleDay('Lead-6')">
+    <div class="day-date">W3</div>
+    <div class="day-badge badge-code">plan</div>
+    <div class="day-summary">2026-06-01 ~ 2026-06-05 &#183; 관리자&#183;통합 조정, Feature Freeze, 경계 위반 차단</div>
+    <div class="day-toggle" id="tog-Lead-6">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-6">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>관리자&#183;통합 조정, Feature Freeze, 경계 위반 차단</strong><br>주요 MVP 기능이 통과한다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
 
-  <section id="verify">
-    <h2>6. PR 전 검증</h2>
-    <div class="note"><strong>구현 저장소 기준</strong>으로 실행한다. 문서 저장소에서는 Markdown 표, 코드펜스, API JSON, 금지 기준 문구를 따로 확인한다.</div>
-    <pre><button class="copy" onclick="copyPre(this)">Copy</button><code>git checkout dev
+# 작업 내용
+담당자: Lead_강태오
+작업: 관리자·통합 조정, Feature Freeze, 경계 위반 차단
+완료 기준: 주요 MVP 기능이 통과한다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="관리자&#183;통합 조정, Feature Freeze, 경계 위반 차단" data-owner="Lead_강태오" data-target="sim-Lead-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-6"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>주요 MVP 기능이 통과한다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+    </div>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-7">
+  <div class="day-head" onclick="toggleDay('Lead-7')">
+    <div class="day-date">W4</div>
+    <div class="day-badge badge-code">plan</div>
+    <div class="day-summary">2026-06-08 ~ 2026-06-12 &#183; E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드</div>
+    <div class="day-toggle" id="tog-Lead-7">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-7">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드</strong><br>시연 후보 빌드를 확보한다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+
+# 작업 내용
+담당자: Lead_강태오
+작업: E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드
+완료 기준: 시연 후보 빌드를 확보한다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="E2E, 성능, 품질 게이트, Docker Compose 시연 후보 빌드" data-owner="Lead_강태오" data-target="sim-Lead-7">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-7"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>시연 후보 빌드를 확보한다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+    </div>
+  </div>
+</div>
+<div class="day-row" data-day="Lead-8">
+  <div class="day-head" onclick="toggleDay('Lead-8')">
+    <div class="day-date">W5</div>
+    <div class="day-badge badge-code">plan</div>
+    <div class="day-summary">2026-06-15 ~ 2026-06-17 &#183; 리허설, 백업 자료, 발표 직전 장애 대응</div>
+    <div class="day-toggle" id="tog-Lead-8">▼ 펼치기</div>
+  </div>
+  <div class="day-panel" id="panel-Lead-8">
+    <div class="four-grid">
+      <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/gatewayauth/</li>
+<li>qtai-server/src/main/java/com/qtai/bff/</li>
+<li>.github/pull_request_template.md</li>
+<li>workspaces/Lead_강태오/</li></ul></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>리허설, 백업 자료, 발표 직전 장애 대응</strong><br>발표 흐름 2회 이상 성공한다.</div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
+1. 별도 구현 GitHub에서 dev 최신화
+2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
+3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+
+# 작업 내용
+담당자: Lead_강태오
+작업: 리허설, 백업 자료, 발표 직전 장애 대응
+완료 기준: 발표 흐름 2회 이상 성공한다.
+
+# 작업 후
+- 금지 기능/금지 데이터 검색
+- 관련 테스트 또는 문서 검증 실행
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="lead-flow" data-title="리허설, 백업 자료, 발표 직전 장애 대응" data-owner="Lead_강태오" data-target="sim-Lead-8">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-Lead-8"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>발표 흐름 2회 이상 성공한다.</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+    </div>
+  </div>
+</div>
+</section>
+<section id="sec-4" class="sec"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드</div></div><div class="callout warn">AI에게 코드 생성을 요청할 때는 07 요구사항, 03 아키텍처, 04 API, 18 품질 게이트, 23 용어사전을 기준으로 준다. 금지 기능을 생성하지 못하게 먼저 조건을 박는다.</div><table class="tbl"><thead><tr><th>요청 유형</th><th>필수 컨텍스트</th><th>출력 가드</th></tr></thead><tbody><tr><td>도메인 구현</td><td>03_아키텍처_정의서.md + 25_기능_명세서.md</td><td>다른 도메인 내부 타입 import 금지</td></tr><tr><td>API 연결</td><td>04_API_명세서.md + 화면 정의</td><td>외부 API와 내부 Java Interface 분리</td></tr><tr><td>테스트</td><td>11_테스트_전략서.md + 18_코드_품질_게이트.md</td><td>금지 기능/금지 데이터 검사 포함</td></tr></tbody></table></section>
+<section id="sec-5" class="sec"><div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 본인 결정 가능 여부</div></div><table class="tbl"><thead><tr><th>항목</th><th>가능?</th><th>기준</th></tr></thead><tbody><tr><td>본인 도메인 내부 구조 정리</td><td>가능</td><td>03/25 기준 안에서 가능</td></tr><tr><td>테스트 추가</td><td>가능</td><td>11/18 기준 준수</td></tr><tr><td>외부 API 변경</td><td>Lead 협의</td><td>04_API_명세서.md 영향</td></tr><tr><td>요구사항 변경</td><td>불가</td><td>07_요구사항_정의서.md Lead 확인 필요</td></tr><tr><td>금지 기능 추가</td><td>불가</td><td>사용자 AI Q&A, SSE, Kafka/K8s/Helm v1 등 금지</td></tr></tbody></table></section>
+<section id="sec-6" class="sec"><div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div><div class="callout blue">모든 작업은 워크플로우 작성 → 작업 진행 → 검증 → 리포트 작성 순서로 남긴다.</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/Lead_강태오/
+├── workflows/
+│   └── {date}-{task}.md
+├── reports/
+│   └── {date}-{task}.md
+├── notes/
+└── docs/</code></pre><div class="mt12"><table class="tbl"><thead><tr>
+<th>시점</th>
+<th>산출물</th>
+</tr></thead><tbody>
+<tr>
+<td>W1</td>
+<td>Foundation 5/5 검증표, 도메인 경계 검증 결과, API/ERD 계약 확인 메모</td>
+</tr>
+<tr>
+<td>W2</td>
+<td>Today QT 핵심 API 데모, 인증&#183;권한 검증 결과</td>
+</tr>
+<tr>
+<td>W3</td>
+<td>Feature Freeze 확인표, 관리자&#183;통합 검증 결과</td>
+</tr>
+<tr>
+<td>W4</td>
+<td>E2E 결과, 성능 점검 결과, Docker Compose 시연 후보 빌드</td>
+</tr>
+<tr>
+<td>W5</td>
+<td>발표 리허설 결과, 백업 영상/스크립트, 최종 회고</td>
+</tr>
+</tbody></table>
+</div></section>
+<section id="sec-7" class="sec"><div class="sec-hdr"><div class="sec-num">7</div><div class="sec-title">검증 명령 — 작업 후 반드시 실행</div></div><div class="callout">별도 구현 GitHub 기준으로 실행한다. 실패가 있으면 push하지 않는다.</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev
-./gradlew test
-rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .</code></pre>
-    <pre><button class="copy" onclick="copyPre(this)">Copy</button><code>git diff --check -- '*.md'</code></pre>
-  </section>
-
-  <section id="deliverables">
-    <h2>7. 산출물</h2>
-    <table>
-      <thead><tr><th>시점</th><th>산출물</th></tr></thead>
-      <tbody>
-        <tr><td>W1</td><td>Foundation 5/5 검증표, 도메인 경계 검증 결과, API/ERD 계약 확인 메모</td></tr>
-        <tr><td>W2</td><td>Today QT 핵심 API 데모, 인증·권한 검증 결과</td></tr>
-        <tr><td>W3</td><td>Feature Freeze 확인표, 관리자·통합 검증 결과</td></tr>
-        <tr><td>W4</td><td>E2E 결과, 성능 점검 결과, Docker Compose 시연 후보 빌드</td></tr>
-        <tr><td>W5</td><td>발표 리허설 결과, 백업 영상/스크립트, 최종 회고</td></tr>
-      </tbody>
-    </table>
-  </section>
+git diff --check
+rg -n &quot;Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV&quot; qtai-server flutter-app apis data db infra</code></pre></section>
+<section id="sec-8" class="sec"><div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정</div></div><div class="callout red">07_요구사항_정의서.md v2.3 기준. 아래 항목은 작업 목표에 넣지 않는다.</div><table class="tbl"><thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead><tbody><tr><td>사용자 AI</td><td>AI Q&A, 챗봇, SSE, /ai/sessions/**</td><td>04:00 배치 또는 관리자 트리거</td></tr><tr><td>인프라</td><td>Kafka, Kubernetes, Helm v1</td><td>ApplicationEventPublisher, Docker Compose</td></tr><tr><td>검색</td><td>RAG, ChromaDB, vector DB, Elasticsearch</td><td>MySQL 8.0 + RDB 인덱스</td></tr><tr><td>성경 데이터</td><td>개역개정, ESV, NIV 저장·응답·테스트</td><td>검토 완료 GitHub 공개 JSON</td></tr><tr><td>찬양</td><td>AI 찬양 추천, 가사·음원 저장, 직접 URL 입력</td><td>운영자 사전 큐레이션</td></tr><tr><td>교회 인증</td><td>화면, 버튼, API, DB 필드</td><td>MVP 제외</td></tr></tbody></table></section>
 </main>
-
 <script>
-function copyPre(btn){
-  const code = btn.parentElement.querySelector('code');
-  const text = code ? code.innerText : btn.parentElement.innerText.replace('Copy','').trim();
-  navigator.clipboard.writeText(text).then(()=>{
-    btn.classList.add('ok');
-    btn.textContent = 'Copied';
-    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='Copy'},1200);
-  });
-}
-function showSim(btn,targetId){
-  const target = document.getElementById(targetId);
-  if (!target) return;
-  const isHidden = target.style.display === 'none';
-  target.style.display = isHidden ? 'block' : 'none';
-  btn.textContent = isHidden ? '닫기' : '시뮬레이션 보기';
-}
+const simTemplates={
+  'lead-flow':['[scan] branch, PR template, CI guard 기준 확인','[ok] dev 기준 PR 흐름 정상','[ok] forbidden pattern 0건','[done] Lead review checklist 생성'],
+  'ai-flow':['[batch] 04:00 KST AI batch trigger','[log] ai_runs status=RUNNING promptVersion=v1','[verify] editor agent fact/tone check passed','[done] C explanation saved; user path LLM call=0'],
+  'ui-flow':['[render] Today QT screen mounted','[state] simulatorStatus checked; READY only button enabled','[guard] AI 질문/교회 인증/AI 찬양 추천 UI 0건','[done] Flutter flow ready for demo'],
+  'sim-flow':['[query] simulator status by qtPassageId','[cache] existing clip reused; no per-request regeneration','[state] READY/MISSING/FAILED/DISABLED mapped','[done] button enable rule verified'],
+  'journal-flow':['[api] POST /api/v1/journals/today idempotent DRAFT','[event] JournalChangedEvent published after commit','[song] curated metadata only; lyrics/audio/url input blocked','[done] journal/songs flow verified'],
+  'bible-flow':['[source] repoUrl/license/translationName checked','[range] 00:00 publish / 04:00 collection batch aligned','[guard] 개역개정/ESV/NIV data 0건','[done] Today QT bible response ready']
+};
+function toggleDay(id){var el=document.getElementById('panel-'+id);if(!el)return;el.classList.toggle('show');var t=document.getElementById('tog-'+id);if(t)t.textContent=el.classList.contains('show')?'▲ 접기':'▼ 펼치기';var r=el.parentElement;if(r&&r.classList.contains('day-row'))r.classList.toggle('open');}
+function togglePanel(id){var el=document.getElementById(id);if(!el)return;el.classList.toggle('show');var c=document.getElementById('chev-'+id);if(c)c.classList.toggle('open');}
+function copyPre(b){var p=b.closest('pre');if(!p)return;var c=p.querySelector('code')||p;if(navigator.clipboard)navigator.clipboard.writeText(c.textContent).then(function(){b.textContent='Copied';b.classList.add('ok');setTimeout(function(){b.textContent='Copy';b.classList.remove('ok');},1500);});}
+document.addEventListener('click',function(e){var s=e.target.closest('.sim-btn');if(s){var o=document.getElementById(s.getAttribute('data-target'));if(o){var key=s.getAttribute('data-sim');var title=s.getAttribute('data-title')||'task';var owner=s.getAttribute('data-owner')||'owner';var list=simTemplates[key]||['[run] simulation started','[ok] completed'];var rows=list.map(function(x){var cls=x.includes('[done]')?'sg':x.includes('[guard]')?'sw':x.includes('[ok]')?'sg':x.includes('[batch]')?'sc':'st';return '<div class="'+cls+'">'+x+'</div>';}).join('');o.innerHTML='<div class="sc">▶ '+owner+' · '+title+'</div>'+rows+'<div class="sg">result=PASS</div>';o.classList.add('show');}return;}var n=e.target.closest('.wnav');if(n){document.querySelectorAll('.wnav').forEach(function(b){b.classList.remove('cur');});n.classList.add('cur');var t=document.getElementById(n.getAttribute('data-target'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});}});
 </script>
 </body>
 </html>
