@@ -1,8 +1,8 @@
-# QT-AI (큐티 AI 앱) — 팀 협업 규칙·Git 브랜치 전략 v1.1
+# QT-AI (큐티 AI 앱) — 팀 협업 규칙·Git 브랜치 전략 v1.2
 
-> **문서 버전:** v1.1
+> **문서 버전:** v1.2
 > **작성일:** 2026-05-08
-> **수정일:** 2026-05-12
+> **수정일:** 2026-05-13
 > **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [11_개발_환경_셋업_가이드 v1.0](./11_개발_환경_셋업_가이드.md)
 > **owner:** 강태오 (Lead — 규칙 정의 + 강제)
 > **목적:** 6명이 6주 동안 충돌 없이 협업. Git 충돌·빌드 깨짐·리뷰 없는 머지로 인한 시간 낭비 원천 방지.
@@ -15,6 +15,7 @@
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-08 | 강태오 (Lead) | 초기 작성 — Git 전략·PR 룰·커밋 메시지·코드 리뷰·회의 규칙 |
 | v1.1 | 2026-05-12 | 강태오 (Lead) | `develop` → `dev` 브랜치 변경 / Claude 자동 리뷰·자동 머지 시스템 반영 |
+| v1.2 | 2026-05-13 | 강태오 (Lead) | PR 머지 조건에 테스트 코드 작성 + 단위·통합 테스트 통과 기준 추가 |
 
 ---
 
@@ -45,7 +46,7 @@ master        ← 최종 배포 브랜치 (Lead 강태오 수동 머지만)
 ```
 
 > **브랜치 역할 요약**
-> - `dev`: 팀원 PR 자동 머지 대상. Claude 리뷰 통과 + CI 통과 시 squash merge 자동 진행.
+> - `dev`: 팀원 PR 자동 머지 대상. Claude 리뷰 통과 + CI 통과 + 단위·통합 테스트 통과 시 squash merge 자동 진행.
 > - `master`: Lead가 dev → master PR을 직접 검토 후 수동 머지 (배포 단위).
 
 ### 1.2 브랜치 명명 규칙
@@ -158,6 +159,7 @@ PR을 `dev`에 올리면 **자동으로** 아래가 실행됩니다:
 PR 오픈 (base: dev)
   ├── 🔨 QT-AI CI 실행
   │     ├── Spring Boot Build & Test × 6개 서비스
+  │     ├── Unit Test + Integration Test
   │     ├── Flutter Test
   │     └── Decisions Guard (PostgreSQL/ZooKeeper/Python/.env 금지 검사)
   │
@@ -168,6 +170,8 @@ PR 오픈 (base: dev)
 
 **팀원이 해야 할 것:**
 - PR 템플릿 성실하게 작성
+- 변경 범위에 맞는 테스트 코드 작성
+- 로컬에서 단위 테스트와 통합 테스트를 실행해 통과 확인
 - REQUEST_CHANGES 받으면 → 코멘트 확인 → 수정 후 push → 자동 재리뷰
 
 **팀원이 하지 않아도 되는 것:**
@@ -182,6 +186,8 @@ PR 오픈 (base: dev)
 | PR 크기 | 변경 파일 10개 이하, 500줄 이하 권장 |
 | 자동 CI | GitHub Actions 자동 실행 (실패 시 머지 차단) |
 | 자동 리뷰 | Claude 자동 코드 리뷰 |
+| 테스트 코드 | 기능·버그·리팩토링 변경은 테스트 코드 포함 필수 (문서-only PR은 예외 사유 명시) |
+| 테스트 통과 | 단위 테스트 + 통합 테스트 + CI 전체 green 필수 |
 | 머지 방식 | Squash Merge (자동) |
 
 ### 3.3 PR 템플릿 (자동 채워짐)
@@ -210,10 +216,12 @@ PR 오픈 (base: dev)
 - [ ] 성경 데이터: 개역개정/ESV/NIV 코드 없음
 - [ ] @Transactional 없는 DB 변경 메서드 없음
 - [ ] Kafka 이벤트 발행은 @TransactionalEventListener(AFTER_COMMIT)
-- [ ] 테스트 코드 포함 또는 테스트 고려 이유 명시
+- [ ] 변경 범위 테스트 코드 작성 완료 (문서-only PR은 예외 사유 기재)
+- [ ] 단위 테스트 통과
+- [ ] 통합 테스트 통과
 
 ## 테스트
-<!-- Unit / Integration / 수동 -->
+<!-- Unit / Integration 명령과 통과 결과를 붙이세요 -->
 ```
 
 ### 3.4 PR 라이프사이클
@@ -225,19 +233,22 @@ PR 오픈 (base: dev)
 ② feature 브랜치 생성 (dev 기준)
    git checkout -b feature/auth-google-oauth
 
-③ 코드 작성 + 커밋
+③ 코드 작성 + 테스트 코드 작성 + 커밋
    git commit -m "feat(auth): ..."
 
-④ push
+④ 로컬 검증
+   단위 테스트 + 통합 테스트 통과 확인
+
+⑤ push
    git push -u origin feature/auth-google-oauth
 
-⑤ GitHub에서 PR 오픈 (base: dev 확인 필수!)
+⑥ GitHub에서 PR 오픈 (base: dev 확인 필수!)
 
-⑥ 🤖 Claude 자동 리뷰 대기 (1~2분)
+⑦ 🤖 Claude 자동 리뷰 대기 (1~2분)
    - APPROVE → CI 완료 후 자동 squash merge → dev ✅
    - REQUEST_CHANGES → 리뷰 코멘트 확인 → 수정 후 push → 자동 재리뷰 🔄
 
-⑦ 완료: dev에 자동 머지됨, feature 브랜치 삭제
+⑧ 완료: dev에 자동 머지됨, feature 브랜치 삭제
 ```
 
 ### 3.5 Claude REQUEST_CHANGES 주요 원인
@@ -259,7 +270,8 @@ PR 오픈 (base: dev)
 ⚠️ Kafka envelope에 payload 키 사용 (data 써야 함)
 ⚠️ SSE 경로 /messages 사용 (/turns 써야 함)
 ⚠️ 성경 데이터에 개역개정/ESV/NIV 포함
-⚠️ 새 기능인데 단위 테스트 없음
+⚠️ 새 기능·버그 수정인데 테스트 코드 없음
+⚠️ 단위 테스트 또는 통합 테스트 실패/미실행
 ```
 
 ### 3.6 긴급 hotfix 절차
@@ -281,7 +293,7 @@ git push origin dev
 
 ## 4. 코드 리뷰 기준
 
-### 4.1 Claude 자동 리뷰 기준 (7가지)
+### 4.1 Claude 자동 리뷰 기준 (8가지)
 
 | # | 기준 | 주요 체크 |
 | --- | --- | --- |
@@ -292,6 +304,7 @@ git push origin dev
 | 5 | 트랜잭션 | @Transactional 누락, 범위 오류 |
 | 6 | MSA | Kafka 이벤트 페어, API 타임아웃, 서비스 의존성 |
 | 7 | 도메인 로직 | 성경 묵상 세션 흐름, AI 코칭 턴, 묵상 노트 생성 |
+| 8 | 테스트 | 변경 범위 테스트 코드, 단위 테스트, 통합 테스트 통과 여부 |
 
 ### 4.2 팀원 리뷰 코멘트 레벨 (Claude 보완)
 

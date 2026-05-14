@@ -244,6 +244,7 @@ header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 
     <li><strong>30분 이상 막히면 혼자 붙잡지 않고</strong> Lead(강태오)에게 ping합니다.</li>
     <li>작업 시작 전 <code>workspaces/{본인}/workflows/</code>에 워크플로우 작성, 종료 후 <code>reports/</code>에 리포트 작성 (S6 §6.2 / §6.3).</li>
     <li>PR은 하루 종료 전 <strong>draft로 등록</strong>, 완료 기준은 각 day 카드의 <strong>📋 DoD</strong>를 따릅니다.</li>
+    <li><strong>머지 조건:</strong> 테스트 코드 작성 후 단위 테스트와 통합 테스트가 모두 통과해야 완료로 인정합니다.</li>
     <li><strong>다른 팀원의 <code>workspaces/</code> 폴더는 읽지·수정·삭제하지 않습니다</strong> (AGENTS.md §13).</li>
     <li>코드/스키마 변경이 필요하면 <strong>S7 원문 문서 매트릭스</strong>를 먼저 확인 후 해당 원본 문서를 봅니다.</li>
   </ol>
@@ -401,6 +402,8 @@ gitleaks detect --source . --verbose<button class="copy-btn" onclick="copyCode(t
 
 ## ✅ DoD 체크리스트
 - [ ] 도메인 코드 + 단위 테스트 (커버리지 70%+)
+- [ ] 통합 테스트 작성·통과
+- [ ] PR 본문에 테스트 명령과 통과 결과 첨부
 - [ ] @Transactional 누락 없음 (DB 변경 UseCase 전부)
 - [ ] JWT Private Key 코드·yml에 없음 (K8s Secret만)
 - [ ] bcrypt 해싱 확인 (평문 저장 0건)
@@ -868,7 +871,10 @@ CREATE TABLE OAUTH_LINKS (
 2. [ ] ...
 
 ## 4. 검증 기준 (Definition of Done)
+- [ ] 테스트 코드 작성 완료 (문서-only 작업은 사유 기록)
 - [ ] 단위 테스트 통과
+- [ ] 통합 테스트 통과
+- [ ] PR 본문에 테스트 명령과 통과 결과 첨부
 - [ ] `./gradlew :auth-service:build` 성공
 - [ ] OpenAPI/Spectral lint 통과 (해당 시)
 - [ ] curl 결과 확인
@@ -1071,7 +1077,7 @@ notepad 20260513-jwt-provider.md   # 결과 작성<button class="copy-btn" oncli
 var B = {infra:'인프라',code:'코드',obs:'관측성',review:'리뷰',gate:'게이트',test:'테스트',demo:'시연'};
 
 function dodFallback(badge) {
-  var common = ['단위 테스트 추가/통과', '본인 서비스 빌드 성공', 'PR draft 등록', 'workspaces/{본인}/reports/ 리포트 작성'];
+  var common = ['테스트 코드 작성 완료', '단위 테스트 통과', '통합 테스트 통과', '본인 서비스 빌드 성공', 'PR draft 등록', 'workspaces/{본인}/reports/ 리포트 작성'];
   switch(badge) {
     case 'infra': return ['인프라 정상 기동 (kubectl get pods)', '헬스체크 200 OK', '.env / Secret 적용 검증', 'reports/ 리포트 작성'];
     case 'code': return common;
