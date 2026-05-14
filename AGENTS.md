@@ -1,6 +1,6 @@
 # QT-AI — AI Agent Instructions
 
-> **Role:** Fixed context for AI coding agents working in the QT-AI implementation repository.
+> **Role:** Fixed context for AI coding agents working in the QT-AI documentation/specification repository.
 > **Source template:** `team-project-templates/templates/AGENTS.md.example`
 > **Maintain:** 150 lines or fewer. Link specs instead of copying them.
 
@@ -10,7 +10,9 @@ QT-AI is a Quiet Time app for today's Bible passage, easy Korean explanations, p
 
 - **Users:** `PUBLIC`, `USER`, `ADMIN`, `SYSTEM`
 - **Source of truth:** `07_요구사항_정의서.md` v2.3
-- **Implementation target:** one `qtai-server` Modular Monolith + Flutter app/admin surface
+- **Repository role:** documentation/specification baseline only
+- **Implementation target:** separate implementation GitHub with one `qtai-server` Modular Monolith + Flutter app/admin surface
+- **Hard boundary:** do not create Spring Boot, Flutter, OpenAPI, DB, infra, data seed, or CI implementation skeletons in this repository.
 
 ## 2. Source Documents
 
@@ -30,7 +32,7 @@ QT-AI is a Quiet Time app for today's Bible passage, easy Korean explanations, p
 
 Conflict order: `07` for requirements, `03` for architecture, `04` for API, `18` for CI/quality, `23` for terms, `09` for collaboration.
 
-## 3. Tech Stack
+## 3. Target Tech Stack
 
 - **Backend:** Java 21, Spring Boot 3.3, Gradle, Spring Modulith, ArchUnit
 - **Backend shape:** single `qtai-server`; no independent services
@@ -61,6 +63,7 @@ Flutter App / Admin Web
 - Do not import another domain's Entity, Service, Repository, or infrastructure type.
 - Controllers must not call repositories directly.
 - User-facing request paths must not call LLM clients.
+- Keep these as documentation constraints here. Actual packages, workflow files, API contracts, data review tables, and test classes are created in the separate implementation repository.
 
 ## 5. Fixed Product Decisions
 
@@ -102,9 +105,17 @@ For events, describe handler failure logs and reprocessing ability; do not promi
 - Logs must not include passwords, tokens, private keys, or sensitive personal data.
 - Prefer Korean for user-facing messages, PR explanations, and domain comments.
 
-## 8. Tests And Commands
+## 8. Checks And Commands
 
-Run relevant checks before PR:
+For this documentation repository, check wording and repository boundaries before PR:
+
+```bash
+rg -n "다음 권장 작업" -g "*.md"
+rg -n "작성 완료|완료" 00_문서_역할_분리표.md 22_구현_저장소_반영_체크리스트.md 24_템플릿_문서_매핑표.md
+git diff --check
+```
+
+When working in the separate implementation repository, run relevant code checks before PR:
 
 ```bash
 ./gradlew build

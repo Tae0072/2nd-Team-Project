@@ -1,4 +1,4 @@
-﻿# CI/CD 파이프라인 정의서 - QT-AI v0.1
+# CI/CD 파이프라인 정의서 - QT-AI v0.1
 
 > **문서 버전:** v0.1
 > **작성일:** 2026-05-15
@@ -300,8 +300,8 @@ CI 로그에서 Secret을 출력하지 않는다. `.env`, `application-prod.yml`
 | Flutter CI 기준 정의 | 완료 |
 | Docker Compose 후보 빌드 기준 정의 | 완료 |
 | Branch Protection 기준 정의 | 완료 |
-| 실제 구현 저장소 워크플로우 파일 작성 | `.github/workflows/qt-ai-ci.yml` 1차 작성 완료 |
-| 실제 CI 실행 결과 기록 | 2026-05-15 KST, `0a796f4` 기준 GitHub Actions `QT-AI CI` 성공 |
+| 실제 구현 저장소 워크플로우 파일 작성 | 별도 구현 GitHub에서 작성 예정. 이 문서 저장소에는 실제 workflow 파일을 두지 않음 |
+| 실제 CI 실행 결과 기록 | 구현 저장소 CI 구성 후 `13_테스트_보고서.md` 또는 이 문서의 이력에 기록 |
 
 ---
 
@@ -311,6 +311,6 @@ CI 로그에서 Secret을 출력하지 않는다. `.env`, `application-prod.yml`
 | --- | --- |
 | CI/CD 파이프라인 문서 | v0.1 신규 작성 |
 | 템플릿 반영 | `20_CICD_파이프라인_template.md` 구조를 QT-AI 기준으로 변환 |
-| 구현 저장소 반영 | `.github/workflows/qt-ai-ci.yml` 1차 작성 완료. 구현 코드 경로가 생기면 backend/API/Flutter job이 실제 실행됨 |
-| 실제 CI 실행 결과 | GitHub Actions run `25876368946` 성공 |
-| 다음 권장 작업 | 실제 Spring Boot/Flutter 프로젝트 골격 생성 |
+| 구현 저장소 반영 | 기준은 이 문서에 유지. 실제 workflow 파일과 실행 결과는 별도 구현 GitHub에서 관리 |
+| 실제 CI 실행 결과 | 아직 없음. 구현 저장소 첫 CI 성공 후 기록 |
+| 다음 권장 작업 | 개발자별 일정표 최종화 |
