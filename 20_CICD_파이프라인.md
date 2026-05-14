@@ -77,9 +77,9 @@ name: CI
 
 on:
   pull_request:
-    branches: [dev]
+    branches: [dev, master, main]
   push:
-    branches: [dev]
+    branches: [dev, master, main]
 
 concurrency:
   group: ci-${{ github.ref }}
