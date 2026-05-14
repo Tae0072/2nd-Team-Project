@@ -1,8 +1,17 @@
 # QT-AI (큐티 AI 앱) — 팀 협업 규칙·Git 브랜치 전략 v1.2
 
-> **문서 버전:** v1.2
+> **⚠️ 2026-05-14 v2.0 변경 우선 (본문 잔재 우선순위 낮음):** 본 문서는 5/13 이전 MSA 4 서비스 기준으로 작성된 부분이 남아 있다. 2026-05-14 회의로 다음이 결정됐고, 본문과 충돌하면 **DECISIONS.md·AGENTS.md·ADR-0001/0013/0015/0016**을 우선한다.
+> - 백엔드 단일 `qtai-server` (Modular Monolith) — `com.qtai.{gatewayauth,bff,bible,ai,journal,simulator}` 도메인 패키지 6개
+> - RAG·ChromaDB·벡터 DB·엘라스틱서치 제외 (ADR-0013)
+> - Kafka·K8s·Helm은 v2 분리 시 도입 (보류) — v1은 Spring `ApplicationEventPublisher` + Docker Compose
+> - 팀 재배치: Bible팀 3인(이지윤·이승욱·김지민) Bible→Flutter→인증→관리자 일괄 / 강상민 AI 주도 / 김태혁 시뮬레이터 / 강태오 횡단 Lead
+> - "주석" → "해설" (DB·API·UI 모두 `bible_explanations`)
+> - `rag_sources` → `sources`
+
+
+> **문서 버전:** v1.1
 > **작성일:** 2026-05-08
-> **수정일:** 2026-05-13
+> **수정일:** 2026-05-12
 > **연관 문서:** [01_프로젝트_계획서 v1.4](./01_프로젝트_계획서.md) / [11_개발_환경_셋업_가이드 v1.0](./11_개발_환경_셋업_가이드.md)
 > **owner:** 강태오 (Lead — 규칙 정의 + 강제)
 > **목적:** 6명이 6주 동안 충돌 없이 협업. Git 충돌·빌드 깨짐·리뷰 없는 머지로 인한 시간 낭비 원천 방지.
@@ -15,7 +24,7 @@
 | --- | --- | --- | --- |
 | v1.0 | 2026-05-08 | 강태오 (Lead) | 초기 작성 — Git 전략·PR 룰·커밋 메시지·코드 리뷰·회의 규칙 |
 | v1.1 | 2026-05-12 | 강태오 (Lead) | `develop` → `dev` 브랜치 변경 / Claude 자동 리뷰·자동 머지 시스템 반영 |
-| v1.2 | 2026-05-13 | 강태오 (Lead) | PR 머지 조건에 테스트 코드 작성 + 단위·통합 테스트 통과 기준 추가 |
+| v1.2 | 2026-05-13 | 강태오 (Lead) | PR 테스트 필수 조건 강화 (단위/통합 테스트 미작성 시 REQUEST_CHANGES) / PR 템플릿 dev 브랜치 실제본 동기화 / Claude 리뷰 기준 8가지로 확장 |
 
 ---
 
@@ -46,7 +55,7 @@ master        ← 최종 배포 브랜치 (Lead 강태오 수동 머지만)
 ```
 
 > **브랜치 역할 요약**
-> - `dev`: 팀원 PR 자동 머지 대상. Claude 리뷰 통과 + CI 통과 + 단위·통합 테스트 통과 시 squash merge 자동 진행.
+> - `dev`: 팀원 PR 자동 머지 대상. Claude 리뷰 통과 + CI 통과 시 squash merge 자동 진행.
 > - `master`: Lead가 dev → master PR을 직접 검토 후 수동 머지 (배포 단위).
 
 ### 1.2 브랜치 명명 규칙
@@ -55,24 +64,25 @@ master        ← 최종 배포 브랜치 (Lead 강태오 수동 머지만)
 {type}/{서비스}-{짧은-설명}
 ```
 
-**서비스 scope (담당 디렉토리):**
+**서비스 scope (담당 디렉토리) — DECISIONS.md §0 기준:**
 
 | scope | 담당자 | 디렉토리 |
 | --- | --- | --- |
-| `gateway` | 강태오 | `services/gateway/` |
+| `gateway` | 강태오 | `services/gateway/` (JWT 발급·검증·OAuth 필터 포함 — Auth Service 독립 없음) |
 | `bff` | 강태오 | `services/bff-aggregator/` |
-| `auth` | 이지윤 | `services/auth-service/` |
-| `bible` | 김태혁 | `services/bible-service/` |
-| `ai` | 강상민 | `services/ai-service/` |
-| `journal` | 이승욱 | `services/journal-service/` |
-| `mobile` | 김지민 | `apps/mobile/` |
+| `bible` | 이지윤·이승욱 | `services/bible-service/` (성경·QT·주석·묵상일지·나눔 — Journal Service 독립 없음) |
+| `ai` | 강태오(팀장)·김태혁·강상민(메인) | `services/ai-service/` |
+| `mobile` | 김지민 | `apps/mobile/` (+ 관리자 웹) |
+
+> **삭제된 scope (2026-05-12 결정):** `auth` (Gateway 내부 모듈로 통합), `journal` (Bible Service 내부 모듈로 통합). 두 scope의 브랜치 명은 사용하지 않는다.
 
 **예시:**
 ```bash
 git checkout dev
-git checkout -b feature/auth-google-oauth
+git checkout -b feature/gateway-google-oauth      # Auth Service 아닌 Gateway 필터에 구현
 git checkout -b bugfix/ai-sse-turn-completed
 git checkout -b feature/bible-today-passage-api
+git checkout -b feature/bible-journal-event-sourcing  # Journal Service 아닌 Bible Service 안에 구현
 ```
 
 ### 1.3 브랜치 운영 규칙
@@ -159,7 +169,6 @@ PR을 `dev`에 올리면 **자동으로** 아래가 실행됩니다:
 PR 오픈 (base: dev)
   ├── 🔨 QT-AI CI 실행
   │     ├── Spring Boot Build & Test × 6개 서비스
-  │     ├── Unit Test + Integration Test
   │     ├── Flutter Test
   │     └── Decisions Guard (PostgreSQL/ZooKeeper/Python/.env 금지 검사)
   │
@@ -170,8 +179,6 @@ PR 오픈 (base: dev)
 
 **팀원이 해야 할 것:**
 - PR 템플릿 성실하게 작성
-- 변경 범위에 맞는 테스트 코드 작성
-- 로컬에서 단위 테스트와 통합 테스트를 실행해 통과 확인
 - REQUEST_CHANGES 받으면 → 코멘트 확인 → 수정 후 push → 자동 재리뷰
 
 **팀원이 하지 않아도 되는 것:**
@@ -186,21 +193,21 @@ PR 오픈 (base: dev)
 | PR 크기 | 변경 파일 10개 이하, 500줄 이하 권장 |
 | 자동 CI | GitHub Actions 자동 실행 (실패 시 머지 차단) |
 | 자동 리뷰 | Claude 자동 코드 리뷰 |
-| 테스트 코드 | 기능·버그·리팩토링 변경은 테스트 코드 포함 필수 (문서-only PR은 예외 사유 명시) |
-| 테스트 통과 | 단위 테스트 + 통합 테스트 + CI 전체 green 필수 |
 | 머지 방식 | Squash Merge (자동) |
 
 ### 3.3 PR 템플릿 (자동 채워짐)
 
+> 실제 PR 생성 시 [QT-AI-2nd-Team-Project/.github/pull_request_template.md](https://github.com/Tae0072/QT-AI-2nd-Team-Project/blob/dev/.github/pull_request_template.md) 가 자동으로 채워집니다. 아래는 동기화된 사본입니다.
+
 ```markdown
 ## 구현 내용
-<!-- 변경 사항을 간략하게 설명하세요 -->
+<!-- 이 PR에서 해결하거나 추가하는 변경 사항을 간략하게 설명하세요. -->
 
 ## 관련 이슈 / 타스크
-<!-- Closes #000 -->
+<!-- Closes #000 / Fixes #000 -->
 
 ## 변경 유형
-- [ ] 특정 (feat)
+- [ ] 기능 추가 (feat)
 - [ ] 버그 수정 (fix)
 - [ ] 리팩토링 (refactor)
 - [ ] 테스트 (test)
@@ -208,20 +215,24 @@ PR 오픈 (base: dev)
 - [ ] 인프라 / CI (chore)
 
 ## 코드 체크리스트
-- [ ] DECISIONS.md 값과 충돌이 없음
+- [ ] `DECISIONS.md` 값과 충돌이 없음
 - [ ] PostgreSQL / ZooKeeper / Tempo 코드 없음
-- [ ] application.yml 또는 코드에 평문 Secret 없음
-- [ ] Kafka envelope에 payload 키 대신 data 사용
-- [ ] AI SSE 경로 /turns 사용 (/messages 아님)
+- [ ] `application.yml` 또는 코드에 평문 Secret 없음
+- [ ] Kafka envelope에 `payload` 키 대신 `data` 사용
+- [ ] AI SSE 경로 `/turns` 사용 (`/messages` 아님)
 - [ ] 성경 데이터: 개역개정/ESV/NIV 코드 없음
-- [ ] @Transactional 없는 DB 변경 메서드 없음
-- [ ] Kafka 이벤트 발행은 @TransactionalEventListener(AFTER_COMMIT)
-- [ ] 변경 범위 테스트 코드 작성 완료 (문서-only PR은 예외 사유 기재)
-- [ ] 단위 테스트 통과
-- [ ] 통합 테스트 통과
+- [ ] `@Transactional` 없는 DB 변경 메서드 없음
+- [ ] Kafka 이벤트 발행은 `@TransactionalEventListener(AFTER_COMMIT)`
 
-## 테스트
-<!-- Unit / Integration 명령과 통과 결과를 붙이세요 -->
+## 테스트 체크리스트
+<!-- feat / fix / refactor 타입은 아래 항목 필수 — 미충족 시 Claude가 REQUEST_CHANGES -->
+- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew test` 로컬 통과
+- [ ] 통합 테스트(Integration Test) 작성 완료
+      또는 미작성 사유: <!-- 예: 외부 의존성(Google OAuth) 특성상 Mock 처리 -->
+- [ ] docs / chore 타입은 해당 없음 (위 항목 무시)
+
+## 테스트 방법
+<!-- 어떻게 테스트했는지 설명 (Unit / Integration / 수동) -->
 ```
 
 ### 3.4 PR 라이프사이클
@@ -233,22 +244,20 @@ PR 오픈 (base: dev)
 ② feature 브랜치 생성 (dev 기준)
    git checkout -b feature/auth-google-oauth
 
-③ 코드 작성 + 테스트 코드 작성 + 커밋
+③ 코드 작성 + 커밋
    git commit -m "feat(auth): ..."
 
-④ 로컬 검증
-   단위 테스트 + 통합 테스트 통과 확인
-
-⑤ push
+④ push
    git push -u origin feature/auth-google-oauth
 
-⑥ GitHub에서 PR 오픈 (base: dev 확인 필수!)
+⑤ GitHub에서 PR 오픈 (base: dev 확인 필수!)
 
-⑦ 🤖 Claude 자동 리뷰 대기 (1~2분)
-   - APPROVE → CI 완료 후 자동 squash merge → dev ✅
-   - REQUEST_CHANGES → 리뷰 코멘트 확인 → 수정 후 push → 자동 재리뷰 🔄
+⑥ 🤖 Claude 자동 리뷰 + CI (gradle build·test) 병렬 실행 (1~3분)
+   - Claude APPROVE + CI (build + `./gradlew test`) 모두 통과 → 자동 squash merge → dev ✅
+   - Claude REQUEST_CHANGES → 리뷰 코멘트 확인 → 수정 후 push → 자동 재리뷰 🔄
+   - CI 실패 (단위/통합 테스트 실패 포함) → 자동 머지 차단 + PR에 ⛔ 코멘트
 
-⑧ 완료: dev에 자동 머지됨, feature 브랜치 삭제
+⑦ 완료: dev에 자동 머지됨, feature 브랜치 삭제
 ```
 
 ### 3.5 Claude REQUEST_CHANGES 주요 원인
@@ -270,8 +279,10 @@ PR 오픈 (base: dev)
 ⚠️ Kafka envelope에 payload 키 사용 (data 써야 함)
 ⚠️ SSE 경로 /messages 사용 (/turns 써야 함)
 ⚠️ 성경 데이터에 개역개정/ESV/NIV 포함
-⚠️ 새 기능·버그 수정인데 테스트 코드 없음
-⚠️ 단위 테스트 또는 통합 테스트 실패/미실행
+⚠️ 새 기능(feat) PR에 단위 테스트(Unit Test) 코드 없음
+⚠️ 핵심 로직(Service, UseCase) 변경인데 테스트 없음
+⚠️ "다음 PR에서 테스트 추가 예정" 사유만 제시 → APPROVE 불가
+⚠️ 통합 테스트 미작성인데 PR 본문에 사유 없음
 ```
 
 ### 3.6 긴급 hotfix 절차
@@ -304,7 +315,7 @@ git push origin dev
 | 5 | 트랜잭션 | @Transactional 누락, 범위 오류 |
 | 6 | MSA | Kafka 이벤트 페어, API 타임아웃, 서비스 의존성 |
 | 7 | 도메인 로직 | 성경 묵상 세션 흐름, AI 코칭 턴, 묵상 노트 생성 |
-| 8 | 테스트 | 변경 범위 테스트 코드, 단위 테스트, 통합 테스트 통과 여부 |
+| 8 | 테스트 코드 | 단위 테스트 존재, 핵심 로직(Service/UseCase) 커버, 통합 테스트 또는 미작성 사유 명시 |
 
 ### 4.2 팀원 리뷰 코멘트 레벨 (Claude 보완)
 
