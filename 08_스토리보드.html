@@ -1,0 +1,1495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QT-AI 화면설계 클릭 목업</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --surface: #fffdf8;
+      --surface-soft: #f8f5ee;
+      --ink: #25231f;
+      --muted: #6f685d;
+      --line: #ded7ca;
+      --primary: #356455;
+      --primary-soft: #e5f0ea;
+      --accent: #b87932;
+      --accent-soft: #f7ead8;
+      --danger: #a6423b;
+      --admin: #314a63;
+      --radius: 8px;
+      --shadow: 0 18px 44px rgba(50, 43, 33, .16);
+      font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: linear-gradient(180deg, #faf8f3 0%, var(--bg) 70%, #ece6da 100%);
+      letter-spacing: 0;
+    }
+    button, input, textarea, select { font: inherit; letter-spacing: 0; }
+    button { border: 0; cursor: pointer; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+      outline: 3px solid rgba(184, 121, 50, .32);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 292px minmax(430px, 1fr) 380px;
+      min-height: 100vh;
+    }
+    .sidebar, .inspector {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      background: rgba(255, 253, 248, .78);
+      backdrop-filter: blur(10px);
+    }
+    .sidebar {
+      border-right: 1px solid var(--line);
+      padding: 22px 18px;
+    }
+    .inspector {
+      border-left: 1px solid var(--line);
+      padding: 22px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--primary);
+      border-radius: 8px;
+      font-weight: 800;
+    }
+    h1, h2, h3, h4, p { margin-top: 0; }
+    .brand h1 { margin: 0; font-size: 17px; line-height: 1.25; }
+    .brand p, .subcopy { color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .section-title {
+      margin: 18px 0 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .segment {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+    .segment button, .flow button, .screen-link {
+      min-height: 36px;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 700;
+    }
+    .segment button.active, .flow button.active, .screen-link.active {
+      color: var(--ink);
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(53, 100, 85, .2);
+    }
+    .flow {
+      display: grid;
+      gap: 6px;
+    }
+    .flow button {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      text-align: left;
+    }
+    .flow small { color: var(--primary); font-weight: 800; }
+    .screen-group { display: grid; gap: 5px; }
+    .screen-link {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      align-items: center;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .screen-link span:first-child {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .screen-link span:last-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
+    .stage {
+      display: grid;
+      align-content: start;
+      justify-items: center;
+      gap: 18px;
+      padding: 24px clamp(18px, 3vw, 46px);
+      min-width: 0;
+    }
+    .stage-head {
+      width: min(100%, 780px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 14px;
+    }
+    .stage-head h2 { margin: 0; font-size: 24px; line-height: 1.25; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      border: 1px solid rgba(53, 100, 85, .18);
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .phone-shell {
+      width: 390px;
+      height: 844px;
+      padding: 10px;
+      border-radius: 32px;
+      background: #161616;
+      box-shadow: var(--shadow);
+    }
+    .phone {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 24px;
+      background: var(--surface);
+    }
+    #phoneScreen {
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      z-index: 20;
+      width: 96px;
+      height: 21px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #161616;
+    }
+    .appbar {
+      min-height: 78px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 36px 18px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 248, .97);
+    }
+    .appbar h3 { margin: 0; font-size: 17px; line-height: 1.25; }
+    .appbar small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 900;
+    }
+    .body {
+      flex: 1 1 auto;
+      min-height: 0;
+      height: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 16px 96px;
+      scrollbar-gutter: stable;
+    }
+    .body::-webkit-scrollbar { width: 8px; }
+    .body::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: rgba(111, 104, 93, .26);
+    }
+    .body.no-nav { height: 100%; padding: 102px 22px 28px; }
+    #phoneScreen > .done-state {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 62px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border-top: 1px solid var(--line);
+      background: rgba(255, 253, 248, .98);
+      z-index: 12;
+    }
+    .bottom-nav button {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 2px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .bottom-nav button.active { color: var(--primary); }
+    .bottom-nav span { font-size: 18px; line-height: 1; }
+    .panel, .note-card, .feed-card, .metric, .admin-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+    .panel { padding: 14px; margin-bottom: 12px; }
+    .panel h4 { margin: 0 0 8px; font-size: 15px; }
+    .panel p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .lead-title { margin: 0; font-size: 28px; line-height: 1.25; }
+    .lead-copy { color: var(--muted); line-height: 1.7; font-size: 14px; }
+    .primary-btn, .secondary-btn, .ghost-btn, .danger-btn {
+      min-height: 44px;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 800;
+    }
+    .primary-btn { color: #fff; background: var(--primary); }
+    .secondary-btn { color: var(--primary); background: var(--primary-soft); }
+    .ghost-btn { color: var(--muted); background: transparent; border: 1px solid var(--line); }
+    .danger-btn { color: #fff; background: var(--danger); }
+    .kakao-btn { width: 100%; color: #2d2412; background: #fee500; }
+    .button-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .button-row > * { flex: 1 1 120px; }
+    .fine-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .field-label { display: block; margin: 16px 0 8px; font-size: 13px; font-weight: 800; }
+    .field, .textarea, .select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 12px;
+    }
+    .textarea { min-height: 116px; resize: vertical; line-height: 1.6; }
+    .status-line { margin-top: 8px; color: var(--primary); font-size: 12px; font-weight: 800; }
+    .warning { color: var(--danger) !important; }
+    .chip-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+    .chip {
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .chip.active { color: #fff; background: var(--primary); border-color: var(--primary); }
+    .chip[disabled] {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+    .state-tabs {
+      margin-bottom: 12px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-soft);
+    }
+    .state-tabs p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .empty-state {
+      min-height: 360px;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      text-align: center;
+    }
+    .empty-state h4 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .empty-state p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .verse-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .verse-toolbar {
+      display: flex;
+      gap: 7px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 0 0 10px;
+      margin-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .verse-toolbar::-webkit-scrollbar { display: none; }
+    .verse-toolbar .chip {
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+    .tts-mini {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(53, 100, 85, .24);
+      border-radius: var(--radius);
+      background: var(--primary-soft);
+    }
+    .tts-mini b {
+      display: block;
+      font-size: 13px;
+    }
+    .tts-mini p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .tts-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tts-controls button {
+      min-width: 34px;
+      min-height: 34px;
+      border: 1px solid rgba(53, 100, 85, .18);
+      border-radius: 8px;
+      color: var(--primary);
+      background: #fff;
+      font-weight: 900;
+    }
+    .reference { color: var(--primary); font-size: 14px; font-weight: 900; }
+    .verse-row {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+    }
+    .verse-row:first-child { border-top: 0; }
+    .verse-row.selectable { padding-left: 8px; padding-right: 8px; border-radius: 8px; cursor: pointer; }
+    .verse-row.studyable { padding-left: 8px; padding-right: 8px; border-radius: 8px; cursor: pointer; }
+    .verse-row.studyable:hover { background: var(--surface-soft); }
+    .verse-row.selected { background: var(--primary-soft); }
+    .inline-verse-detail {
+      margin: -2px 0 8px;
+      padding: 0 12px 12px 46px;
+      border-bottom: 1px solid var(--line);
+      background: var(--primary-soft);
+      border-radius: 0 0 8px 8px;
+    }
+    .inline-verse-detail h5 {
+      margin: 12px 0 6px;
+      font-size: 13px;
+    }
+    .inline-verse-detail .detail-source {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .verse-no { color: var(--accent); font-weight: 900; }
+    .verse-ko { margin: 0 0 6px; font-size: 14px; line-height: 1.65; }
+    .verse-en { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .accordion { display: grid; gap: 8px; margin: 12px 0; }
+    .accordion button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      padding: 12px;
+      font-weight: 800;
+    }
+    .explain {
+      padding: 12px;
+      border: 1px solid rgba(53, 100, 85, .2);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .term-list { display: grid; gap: 6px; margin-top: 10px; }
+    .term-list div { display: grid; grid-template-columns: 76px 1fr; gap: 8px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .term-list b { color: var(--primary); }
+    .verse-study-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    .verse-study-head {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 0;
+      color: var(--ink);
+      background: transparent;
+      text-align: left;
+    }
+    .verse-study-head strong {
+      display: block;
+      font-size: 14px;
+    }
+    .verse-study-head small {
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .verse-study-body {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .verse-study-body h5 {
+      margin: 12px 0 6px;
+      font-size: 13px;
+    }
+    .floating-ai {
+      position: absolute;
+      right: 18px;
+      bottom: 104px;
+      z-index: 10;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      color: #fff;
+      background: var(--accent);
+      box-shadow: 0 12px 26px rgba(95, 56, 16, .24);
+      font-weight: 900;
+    }
+    .floating-write {
+      position: absolute;
+      right: 20px;
+      bottom: 78px;
+      z-index: 11;
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 12px 26px rgba(43, 94, 77, .24);
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+    }
+    .bottom-action {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 72px;
+      z-index: 10;
+      display: grid;
+      gap: 8px;
+    }
+    .sheet {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+    }
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(25, 23, 19, .28);
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    .sheet-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 86%;
+      height: 100%;
+      padding: 42px 16px 20px;
+      background: var(--surface);
+      box-shadow: -12px 0 34px rgba(40, 36, 30, .18);
+      transform: translateX(100%);
+      transition: transform .2s ease;
+      overflow: auto;
+    }
+    .sheet.open { pointer-events: auto; }
+    .sheet.open .sheet-backdrop { opacity: 1; }
+    .sheet.open .sheet-panel { transform: translateX(0); }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .toggle {
+      width: 50px;
+      height: 28px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #cfc7ba;
+      transition: background .18s ease;
+    }
+    .toggle::after {
+      content: "";
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform .18s ease;
+    }
+    .toggle.on { background: var(--primary); }
+    .toggle.on::after { transform: translateX(22px); }
+    .save-bar {
+      position: sticky;
+      bottom: -1px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: 8px;
+      padding-top: 12px;
+      background: linear-gradient(180deg, rgba(255, 253, 248, 0), var(--surface) 28%);
+    }
+    .note-stepper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .note-stepper span {
+      min-height: 38px;
+      display: grid;
+      place-items: center;
+      padding: 7px 6px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      background: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .note-stepper span.active {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .note-writing-panel {
+      min-height: 440px;
+      display: flex;
+      flex-direction: column;
+    }
+    .note-writing-panel .textarea {
+      flex: 1 1 auto;
+      min-height: 280px;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+    .note-step-help {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .done-state {
+      height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+    .done-mark {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border-radius: 18px;
+      color: #fff;
+      background: var(--primary);
+      font-size: 30px;
+      font-weight: 900;
+    }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+    .day {
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      color: var(--muted);
+      background: var(--surface-soft);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .day.marked { color: #fff; background: var(--primary); }
+    .progress { height: 10px; overflow: hidden; border-radius: 999px; background: var(--surface-soft); }
+    .progress span { display: block; width: 68%; height: 100%; background: var(--accent); }
+    .feed-card, .note-card {
+      width: 100%;
+      display: block;
+      padding: 14px;
+      margin-bottom: 10px;
+      text-align: left;
+      color: var(--ink);
+    }
+    .share-card-main {
+      width: 100%;
+      display: block;
+      margin: -2px 0 12px;
+      padding: 2px 0 0;
+      text-align: left;
+      color: var(--ink);
+      background: transparent;
+    }
+    .share-author {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-right: 6px;
+    }
+    .share-author-info {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 900;
+    }
+    .share-author strong {
+      display: block;
+      font-size: 14px;
+    }
+    .share-author small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .share-actions {
+      display: inline-flex;
+      flex: 0 0 auto;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+    .share-body h4 {
+      margin: 0 0 10px;
+      font-size: 17px;
+    }
+    .share-body p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .heart-btn {
+      min-height: 28px;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 0;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 900;
+    }
+    .heart-btn.liked {
+      color: #9b3e3a;
+      background: transparent;
+      border-color: transparent;
+    }
+    .report-icon {
+      min-height: 28px;
+      min-width: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      background: transparent;
+      font-weight: 900;
+    }
+    .report-icon svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+      stroke: currentColor;
+    }
+    .comment-item {
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .comment-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #7c4a16;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .toast {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 142px;
+      z-index: 40;
+      padding: 12px;
+      border-radius: 8px;
+      color: #fff;
+      background: rgba(37, 35, 31, .92);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: .18s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .admin-shell {
+      width: min(100%, 980px);
+      min-height: 720px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f9faf8;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .admin-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    .admin-body { display: grid; grid-template-columns: 220px 1fr; min-height: 650px; }
+    .admin-nav { padding: 14px; border-right: 1px solid var(--line); background: #f4f6f4; }
+    .admin-nav button {
+      width: 100%;
+      min-height: 38px;
+      margin-bottom: 6px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+      font-weight: 800;
+    }
+    .admin-nav button.active { color: #fff; background: var(--admin); }
+    .admin-content { padding: 18px; min-width: 0; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+    .metric { padding: 14px; }
+    .metric span { display: block; color: var(--muted); font-size: 12px; }
+    .metric b { display: block; margin-top: 6px; font-size: 24px; }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      font-size: 13px;
+    }
+    .admin-table th, .admin-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    .admin-table th { color: var(--muted); background: #f4f6f4; font-size: 12px; }
+    .admin-table tr:last-child td { border-bottom: 0; }
+
+    .inspector h2 { margin-bottom: 4px; font-size: 18px; }
+    .story-map { display: grid; gap: 8px; margin-top: 12px; }
+    .story-node {
+      display: grid;
+      gap: 2px;
+      min-height: 54px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: #fff;
+      text-align: left;
+    }
+    .story-node.active { border-color: rgba(53, 100, 85, .45); background: var(--primary-soft); }
+    .story-node strong { font-size: 13px; }
+    .story-node span { color: var(--muted); font-size: 12px; }
+    .definition-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .definition-item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .definition-item b { display: block; margin-bottom: 4px; font-size: 12px; }
+    .definition-item p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    @media (max-width: 1180px) {
+      .workspace { grid-template-columns: 260px minmax(420px, 1fr); }
+      .inspector { position: static; grid-column: 1 / -1; height: auto; border-left: 0; border-top: 1px solid var(--line); }
+    }
+    @media (max-width: 760px) {
+      .workspace { display: block; }
+      .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .stage { padding: 16px 8px 24px; }
+      .stage-head { padding: 0 10px; }
+      .stage-head h2 { font-size: 20px; }
+      .phone-shell { width: min(390px, calc(100vw - 16px)); height: min(844px, calc((100vw - 16px) * 2.164)); }
+      .admin-body { grid-template-columns: 1fr; }
+      .admin-nav { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="workspace">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">QT</div>
+        <div>
+          <h1>QT-AI 클릭 목업</h1>
+          <p>03 스토리보드 + 04 화면정의서 기반</p>
+        </div>
+      </div>
+
+      <div class="segment" aria-label="목업 모드">
+        <button class="active" data-mode="mobile" type="button">사용자 앱</button>
+        <button data-mode="admin" type="button">관리자</button>
+      </div>
+
+      <div class="section-title">시연 흐름</div>
+      <div class="flow">
+        <button class="active" data-flow="core" type="button"><span>P0 핵심 시연</span><small>9</small></button>
+        <button data-flow="support" type="button"><span>성경/노트/나눔</span><small>10</small></button>
+        <button data-flow="ai" type="button"><span>AI/TTS/확장</span><small>6</small></button>
+        <button data-flow="admin" type="button"><span>운영자 콘솔</span><small>8</small></button>
+      </div>
+
+      <div id="screenGroups"></div>
+    </aside>
+
+    <main class="stage">
+      <div class="stage-head">
+        <div>
+          <h2 id="stageTitle">오늘의 QT 기본</h2>
+          <p id="stagePurpose" class="subcopy">앱의 메인 화면. 로그인 후 홈 없이 오늘의 QT로 진입한다.</p>
+        </div>
+        <span id="flowPill" class="pill">P0 핵심 시연</span>
+      </div>
+
+      <section id="mobileMock" class="phone-shell" aria-label="모바일 앱 목업">
+        <div class="phone">
+          <div id="phoneScreen"></div>
+          <div id="toast" class="toast" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="adminMock" class="admin-shell" aria-label="관리자 웹 목업" hidden>
+        <div class="admin-topbar">
+          <div>
+            <strong>QT-AI Admin</strong>
+            <p class="subcopy" style="margin:3px 0 0">상태 파악, 검증, 신고 처리, 감사 로그 중심의 운영 도구</p>
+          </div>
+          <span class="pill">Admin Web 1440 x 1024</span>
+        </div>
+        <div class="admin-body">
+          <nav class="admin-nav" aria-label="관리자 화면">
+            <button class="active" data-admin="AD-01" type="button">AD-01 대시보드</button>
+            <button data-admin="AD-02" type="button">AD-02 QT 관리</button>
+            <button data-admin="AD-03" type="button">AD-03 AI 산출물</button>
+            <button data-admin="AD-04" type="button">AD-04 신고 처리</button>
+            <button data-admin="AD-05" type="button">AD-05 찬양 큐레이션</button>
+            <button data-admin="AD-06" type="button">AD-06 공지 관리</button>
+            <button data-admin="AD-07" type="button">AD-07 감사 로그</button>
+            <button data-admin="AD-08" type="button">AD-08 AI 모니터링</button>
+          </nav>
+          <div id="adminContent" class="admin-content"></div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="inspector">
+      <h2>화면 정의</h2>
+      <p id="inspectorCopy" class="subcopy">선택한 화면의 목적, 필수 상태, 예외 처리를 확인합니다.</p>
+      <div class="section-title">흐름 맵</div>
+      <div id="storyMap" class="story-map"></div>
+      <div class="section-title">상태 체크</div>
+      <div id="definitionList" class="definition-list"></div>
+    </aside>
+  </div>
+
+  <script>
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    const flows = {
+      core: ["A-01", "A-02", "A-03", "Q-01", "Q-02", "Q-06", "Q-07", "M-01", "M-04"],
+      support: ["B-01", "B-02", "B-03", "N-01", "N-02", "N-03", "N-04", "S-01", "S-02", "M-05"],
+      ai: ["A-04", "Q-03", "Q-04", "Q-05", "M-02", "M-03"],
+      admin: ["AD-01", "AD-02", "AD-03", "AD-04", "AD-05", "AD-06", "AD-07", "AD-08"]
+    };
+    const flowNames = {
+      core: "P0 핵심 시연",
+      support: "성경/노트/나눔",
+      ai: "AI/TTS/확장",
+      admin: "운영자 콘솔"
+    };
+    const state = {
+      mode: "mobile",
+      flow: "core",
+      screen: "Q-01",
+      admin: "AD-01",
+      selectedVerse: "2",
+      studyVerse: "1",
+      inlineStudyOpen: false,
+      noteVerses: ["1", "2"],
+      noteStep: 0,
+      shareOn: false,
+      explanationOpen: true,
+      englishOpen: true,
+      qtState: "published",
+      ttsOpen: false,
+      ttsPlaying: false,
+      ttsVerse: "1",
+      reportOpen: false,
+      freeNoteType: "PRAYER",
+      noteFilter: "전체",
+      shareFilter: "전체"
+    };
+
+    const screenMeta = {
+      "A-01": { group: "온보딩", name: "스플래시", purpose: "자동 로그인과 회원 상태에 따라 진입 화면을 분기한다.", states: ["자동 로그인", "토큰 만료", "튜토리얼 미완료", "탈퇴 계정", "네트워크 실패"] },
+      "A-02": { group: "온보딩", name: "카카오 로그인", purpose: "로그인 없이는 기능 화면을 제공하지 않는 정책을 보여준다.", states: ["기본", "로그인 실패", "네트워크 실패"] },
+      "A-03": { group: "온보딩", name: "닉네임 설정", purpose: "나눔 공간에 노출될 닉네임을 가입 시점에 확정한다.", states: ["입력 전", "사용 가능", "중복", "형식 오류", "저장 실패"] },
+      "A-04": { group: "온보딩", name: "QT 튜토리얼", purpose: "QT가 익숙하지 않은 사용자에게 읽기, 해설, 기록, 공유 순서를 안내한다.", states: ["첫 실행", "다시보기", "완료 저장 실패"] },
+      "Q-01": { group: "오늘의 QT", name: "오늘의 QT 기본", purpose: "앱의 메인 화면. 로그인 후 홈 없이 오늘의 QT로 진입한다.", states: ["게시됨", "미등록", "숨김", "캐시 본문", "조회 실패", "부분 실패"] },
+      "Q-02": { group: "오늘의 QT", name: "절별 요약/해설/용어 펼침", purpose: "각 절마다 준비된 한 줄 요약, 해설, 용어 설명을 사용자가 선택할 때만 확장한다.", states: ["절별 승인됨", "요약 없음", "해설 없음", "용어 없음", "출처 누락", "조회 실패"] },
+      "Q-03": { group: "오늘의 QT", name: "시뮬레이터 보기", purpose: "오늘 QT에 한해 검증된 장면 스크립트만 제공한다.", states: ["승인됨", "없음", "검증중", "재생 실패"] },
+      "Q-04": { group: "오늘의 QT", name: "AI 질문 슬라이드", purpose: "AI는 단발 질문만 답하고 이전 질문 맥락은 이어받지 않는다.", states: ["입력 전", "답변 성공", "정책 차단", "한도 초과", "실패", "답변 신고"] },
+      "Q-05": { group: "오늘의 QT", name: "TTS 미니 플레이어", purpose: "본문과 해설을 음성으로 들을 수 있는 보조 기능을 보여준다.", states: ["재생 전", "재생중", "일시정지", "미지원", "로딩 실패"] },
+      "Q-06": { group: "오늘의 QT", name: "QT 노트 작성", purpose: "묵상 노트 4섹션과 임시저장/저장 구분을 명확히 보여준다.", states: ["신규", "임시저장 불러오기", "저장중", "저장 실패", "중복 1건"] },
+      "Q-07": { group: "오늘의 QT", name: "QT 노트 저장 완료", purpose: "저장 결과와 다음 행동을 분명히 안내한다.", states: ["저장 완료", "공유 유도", "마이페이지 이동"] },
+      "B-01": { group: "성경", name: "일반 성경 조회", purpose: "권/장/절을 자유롭게 조회하되 QT 노트 CTA는 노출하지 않는다.", states: ["정상 조회", "권/장 변경중", "빈 장", "조회 실패", "오프라인 캐시"] },
+      "B-02": { group: "성경", name: "절 선택 상태", purpose: "설교 노트와 연결할 구절을 선택한다.", states: ["단일 선택", "다중 선택", "선택 해제", "구절 조회 실패"] },
+      "B-03": { group: "성경", name: "설교 노트 작성", purpose: "선택 구절 기반 1섹션 노트를 작성한 뒤 성경 읽기로 복귀한다.", states: ["신규", "임시저장", "저장 후 성경 복귀", "저장 실패"] },
+      "N-01": { group: "노트", name: "노트 목록", purpose: "작성 기록을 카테고리와 검색으로 탐색한다.", states: ["목록 있음", "빈 목록", "검색 결과 없음", "조회 실패"] },
+      "N-02": { group: "노트", name: "개인 노트 카테고리 선택", purpose: "본문 좌표 없는 기도/회개/감사 노트 중 작성 유형을 선택한다.", states: ["기도 선택", "회개 선택", "감사 선택"] },
+      "N-03": { group: "노트", name: "개인 노트 작성", purpose: "본문 좌표 없이 기도/회개/감사 노트를 작성한다.", states: ["신규", "임시저장", "공유 실패", "저장 실패"] },
+      "N-04": { group: "노트", name: "노트 상세/수정", purpose: "저장된 QT/자유 노트를 확인하고 작성자 수정·삭제 정책을 검증한다.", states: ["상세", "수정", "삭제 확인", "공유본 유지", "저장 충돌"] },
+      "S-01": { group: "나눔", name: "닉네임 나눔 피드", purpose: "공유를 선택한 묵상 기록만 피드에 노출한다.", states: ["목록 있음", "빈 피드", "숨김 제외", "좋아요 실패"] },
+      "S-02": { group: "나눔", name: "나눔 상세", purpose: "공유 시점의 스냅샷과 댓글/신고 상태를 보여준다.", states: ["댓글 ON", "댓글 OFF", "댓글 삭제", "좋아요 취소/실패", "신고 중복", "원본 삭제", "숨김 접근"] },
+      "M-01": { group: "마이", name: "마이페이지 대시보드", purpose: "묵상 이력, 통계, 미션, 알림, 찬양 상태를 요약한다.", states: ["정상", "기록 없음", "위젯 부분 실패"] },
+      "M-02": { group: "마이", name: "알림 목록", purpose: "좋아요, 댓글, 신고 결과, 공지를 확인한다.", states: ["읽음", "미읽음", "빈 알림", "링크 대상 없음"] },
+      "M-03": { group: "마이", name: "내 찬양 목록", purpose: "저장한 찬양과 디바이스 음원 접근 상태를 확인한다.", states: ["저장 곡 있음", "빈 목록", "링크 무효", "권한 거부", "로컬 파일 접근 실패"] },
+      "M-04": { group: "마이", name: "회원 정보/탈퇴", purpose: "회원 상태와 탈퇴의 복구 불가 영향을 명확히 안내한다.", states: ["정상", "탈퇴 확인", "처리중", "실패", "완료"] },
+      "M-05": { group: "마이", name: "내 나눔 관리", purpose: "본인이 공유 중인 글과 반응을 조회하고 공유 상태를 관리한다.", states: ["공유글 있음", "빈 목록", "공개 중단 실패", "삭제 실패"] },
+      "AD-01": { group: "관리자", name: "관리자 대시보드", purpose: "운영자가 오늘 처리해야 할 상태를 한눈에 확인한다.", states: ["정상", "권한 없음", "일부 위젯 실패"] },
+      "AD-02": { group: "관리자", name: "오늘 QT 관리", purpose: "날짜별 QT 본문 범위를 등록, 수정, 게시한다.", states: ["목록", "등록", "수정", "중복 날짜", "범위 오류"] },
+      "AD-03": { group: "관리자", name: "AI 산출물 검증", purpose: "검증 통과 콘텐츠만 사용자에게 노출되도록 처리한다.", states: ["검증중", "승인", "반려", "숨김", "버전 누락"] },
+      "AD-04": { group: "관리자", name: "신고 처리", purpose: "게시글, 댓글, AI 답변 신고를 검토하고 처리한다.", states: ["접수", "검토중", "조치 완료", "반려", "처리 실패"] },
+      "AD-05": { group: "관리자", name: "찬양 큐레이션 관리", purpose: "운영자가 곡 메타데이터와 외부 링크를 관리한다.", states: ["등록", "수정", "숨김", "링크 오류"] },
+      "AD-06": { group: "관리자", name: "시스템 공지 관리", purpose: "공지 작성, 발행, 숨김과 알림 생성을 관리한다.", states: ["초안", "게시", "숨김", "발행 실패"] },
+      "AD-07": { group: "관리자", name: "감사 로그", purpose: "주요 변경 이력을 수정 불가한 방식으로 추적한다.", states: ["목록 있음", "검색 결과 없음", "조회 실패"] },
+      "AD-08": { group: "관리자", name: "AI 운영 모니터링", purpose: "AI 검증 실패, 차단 질문, 재생성 리스크를 지표로 확인한다.", states: ["정상", "지표 집계 실패", "데이터 없음"] }
+    };
+
+    const verses = [
+      ["1", "나는 참포도나무요 내 아버지는 농부라.", "I am the true vine, and my Father is the gardener."],
+      ["2", "무릇 내게 붙어 있어 열매를 맺지 아니하는 가지는 아버지께서 그것을 제거해 버리시고.", "He cuts off every branch in me that bears no fruit."],
+      ["3", "너희는 내가 일러준 말로 이미 깨끗하여졌으니.", "You are already clean because of the word I have spoken to you."],
+      ["4", "내 안에 거하라 나도 너희 안에 거하리라.", "Remain in me, as I also remain in you."],
+      ["5", "나는 포도나무요 너희는 가지라.", "I am the vine; you are the branches."]
+    ];
+    const verseDetails = {
+      "1": {
+        summary: "예수님은 자신을 참포도나무로, 하나님을 돌보시는 농부로 설명합니다.",
+        explanation: "포도나무 비유는 제자가 스스로 생명을 만들어 내는 존재가 아니라 예수님께 연결되어 생명을 공급받는 존재임을 보여줍니다.",
+        terms: [["참포도나무", "생명의 근원이신 예수님을 가리키는 비유"], ["농부", "가지를 돌보고 열매 맺게 하시는 하나님"]]
+      },
+      "2": {
+        summary: "열매 없는 가지와 열매 맺는 가지를 다루시는 하나님의 손길을 말합니다.",
+        explanation: "제거와 깨끗하게 하심은 무관심한 방치가 아니라 열매를 위한 하나님의 다루심으로 이해할 수 있습니다.",
+        terms: [["열매", "말씀 안에 머문 삶에서 드러나는 변화"], ["제거", "본문 맥락에서는 열매 없는 가지를 치우는 농부의 행동"]]
+      },
+      "3": {
+        summary: "제자들은 예수님의 말씀으로 이미 깨끗하게 되었다고 선언됩니다.",
+        explanation: "깨끗함의 근거는 사람의 성취가 아니라 예수님이 주신 말씀입니다. 말씀은 제자의 정체성과 방향을 새롭게 합니다.",
+        terms: [["깨끗하여졌으니", "말씀으로 정결하게 된 상태"], ["말", "예수님이 제자들에게 주신 가르침과 약속"]]
+      },
+      "4": {
+        summary: "예수님 안에 머무는 것이 제자 삶의 핵심 요청으로 제시됩니다.",
+        explanation: "거한다는 것은 일시적인 감정이 아니라 말씀과 관계 안에 계속 머무는 태도입니다. 열매는 이 연결에서 나옵니다.",
+        terms: [["거하라", "지속적으로 머물고 연결되어 있으라는 요청"], ["너희 안에", "제자와 예수님의 상호적인 관계를 나타내는 표현"]]
+      },
+      "5": {
+        summary: "예수님은 포도나무, 제자는 가지라는 관계가 다시 강조됩니다.",
+        explanation: "가지는 나무와 떨어져 열매를 맺을 수 없습니다. 제자의 삶도 예수님과의 연결 안에서 열매를 맺습니다.",
+        terms: [["가지", "예수님께 연결되어 살아가는 제자"], ["포도나무", "가지에 생명과 영양을 공급하는 근원"]]
+      }
+    };
+    const qtNoteSections = [
+      {
+        title: "마음에 남은 말씀",
+        help: "오늘 본문에서 마음에 남은 문장이나 단어를 먼저 붙잡습니다.",
+        value: "말씀 안에 머무는 것이 열매의 시작이라는 점이 마음에 남습니다."
+      },
+      {
+        title: "기억할 구절",
+        help: "오늘 하루 다시 떠올리고 싶은 구절을 적습니다.",
+        value: "나는 포도나무요 너희는 가지라."
+      },
+      {
+        title: "적용할 일",
+        help: "오늘 실제로 해볼 수 있는 작은 순종이나 결정을 적습니다.",
+        value: "오늘 중요한 결정을 서두르지 않고 기도로 확인하겠습니다."
+      },
+      {
+        title: "기도",
+        help: "본문을 붙들고 하나님께 드릴 기도를 적습니다.",
+        value: "주님 안에 머무는 시간을 먼저 선택하게 해 주세요."
+      }
+    ];
+    const freeNoteTypes = {
+      PRAYER: {
+        title: "기도제목 노트",
+        category: "PRAYER",
+        bodyLabel: "기도제목",
+        titleValue: "이번 주 기도제목",
+        bodyValue: "가족의 건강과 이번 주 선택들을 위해 기도합니다.",
+        help: "본문 좌표 없이 개인, 교회, 이웃을 위한 기도제목을 기록합니다."
+      },
+      REPENTANCE: {
+        title: "회개 노트",
+        category: "REPENTANCE",
+        bodyLabel: "회개 내용",
+        titleValue: "돌아볼 마음",
+        bodyValue: "말씀보다 내 판단을 앞세웠던 태도를 돌아보고 회개합니다.",
+        help: "본문 좌표 없이 개인 회개 내용을 조용히 기록합니다."
+      },
+      GRATITUDE: {
+        title: "감사일기",
+        category: "GRATITUDE",
+        bodyLabel: "감사 내용",
+        titleValue: "오늘의 감사",
+        bodyValue: "작은 일상 속에서 지켜 주신 은혜를 기억합니다.",
+        help: "본문 좌표 없이 일상의 감사 내용을 기록합니다."
+      }
+    };
+
+    function appbar(title, subtitle, back = false) {
+      return `<header class="appbar"><div><h3>${title}</h3><small>${subtitle || ""}</small></div>${back ? '<button class="icon-btn" data-go="Q-01" type="button" aria-label="뒤로">‹</button>' : ""}</header>`;
+    }
+    function bottomNav(active) {
+      const items = [["Q", "QT", "Q-01"], ["B", "성경", "B-01"], ["N", "노트", "N-01"], ["S", "나눔", "S-01"], ["M", "마이", "M-01"]];
+      return `<nav class="bottom-nav" aria-label="하단 내비게이션">${items.map(([key, label, id]) => `<button class="${active === key ? "active" : ""}" data-go="${id}" type="button"><span>${key}</span>${label}</button>`).join("")}</nav>`;
+    }
+    function qtVerses(selectable = false, options = {}) {
+      const status = options.status || "PUBLISHED";
+      const caption = options.caption || "2026.05.17 오늘의 QT";
+      const studyable = options.studyable || false;
+      return `<section class="panel"><div class="verse-head"><div><strong class="reference">요한복음 15:1-5</strong><p class="subcopy" style="margin:2px 0 0">${caption}</p></div><span class="badge">${status}</span></div>${verses.map(([no, ko, en]) => {
+        const activeStudy = studyable && state.inlineStudyOpen && state.studyVerse === no;
+        const selectedNote = selectable && state.noteVerses.includes(no);
+        const activeTts = state.ttsOpen && state.ttsVerse === no;
+        const detail = verseDetails[no];
+        const row = `<div class="verse-row ${selectable ? "selectable" : ""} ${studyable ? "studyable" : ""} ${selectedNote || activeStudy || activeTts ? "selected" : ""}" ${selectable ? `data-select-verse="${no}"` : ""} ${studyable ? `data-open-study="${no}"` : ""}><div class="verse-no">${no}</div><div><p class="verse-ko">${ko}</p>${state.englishOpen ? `<p class="verse-en">${en}</p>` : ""}</div></div>`;
+        if (!activeStudy) return row;
+        return `${row}<div class="inline-verse-detail"><h5>한 줄 요약</h5><p class="lead-copy">${detail.summary}</p><h5>해설</h5><p class="lead-copy">${detail.explanation}</p><h5>용어 설명</h5><div class="term-list">${detail.terms.map(([term, copy]) => `<div><b>${term}</b><span>${copy}</span></div>`).join("")}</div><p class="detail-source">출처: 승인된 절별 해설 콘텐츠</p></div>`;
+      }).join("")}</section>`;
+    }
+    function qtStateTabs() {
+      const items = [["published", "정상"], ["empty", "미등록"], ["hidden", "숨김"], ["cached", "캐시"], ["error", "조회 실패"], ["partial", "부분 실패"]];
+      return `<div class="state-tabs"><p>Q-01 상태 확인</p><div class="chip-row" style="margin-bottom:0">${items.map(([key, label]) => `<button class="chip ${state.qtState === key ? "active" : ""}" data-qt-state="${key}" type="button">${label}</button>`).join("")}</div></div>`;
+    }
+    function q01Actions(disabled = false) {
+      return `<div class="verse-toolbar"><button class="chip" ${disabled ? "disabled" : 'data-action="english"'} type="button">영어 ${state.englishOpen ? "접기" : "보기"}</button><button class="chip ${state.ttsOpen ? "active" : ""}" ${disabled ? "disabled" : 'data-action="tts"'} type="button">TTS</button><button class="chip" ${disabled ? "disabled" : 'data-go="Q-03"'} type="button">시뮬레이터</button></div>`;
+    }
+    function bibleActions(disabled = false) {
+      return `<div class="verse-toolbar"><button class="chip" ${disabled ? "disabled" : 'data-action="english"'} type="button">영어 ${state.englishOpen ? "접기" : "보기"}</button><button class="chip ${state.ttsOpen ? "active" : ""}" ${disabled ? "disabled" : 'data-action="tts"'} type="button">TTS</button></div>`;
+    }
+    function ttsMiniPlayer() {
+      if (!state.ttsOpen) return "";
+      const current = verses.find(([no]) => no === state.ttsVerse) || verses[0];
+      const [no, ko, en] = current;
+      return `<div class="tts-mini"><div><b>${state.ttsPlaying ? "재생 중" : "일시정지"} · ${no}절</b><p>${ko}</p>${state.englishOpen ? `<p>${en}</p>` : ""}</div><div class="tts-controls" aria-label="TTS 제어"><button data-action="tts-prev" type="button" aria-label="이전 절">‹</button><button data-action="tts-toggle" type="button" aria-label="재생 또는 일시정지">${state.ttsPlaying ? "Ⅱ" : "▶"}</button><button data-action="tts-next" type="button" aria-label="다음 절">›</button></div></div>`;
+    }
+    function q01Content() {
+      if (state.qtState === "empty") {
+        return `${qtStateTabs()}<div class="panel empty-state"><div><h4>오늘 QT가 준비되지 않았습니다</h4><p>게시된 본문이 아직 없습니다. 잠시 후 다시 확인해 주세요.</p><button class="secondary-btn" data-qt-state="published" type="button">정상 상태 보기</button></div></div>`;
+      }
+      if (state.qtState === "hidden") {
+        return `${qtStateTabs()}<div class="panel empty-state"><div><h4>오늘 QT가 준비되지 않았습니다</h4><p>운영자가 숨김 처리한 QT는 일반 사용자에게 본문 범위와 내부 상태를 노출하지 않습니다.</p><button class="secondary-btn" data-qt-state="published" type="button">정상 상태 보기</button></div></div>`;
+      }
+      if (state.qtState === "error") {
+        return `${qtStateTabs()}<div class="panel empty-state"><div><h4>본문을 불러오지 못했습니다</h4><p>네트워크 상태를 확인한 뒤 다시 시도해 주세요. 하단 내비게이션은 유지됩니다.</p><button class="primary-btn" data-toast="본문을 다시 요청합니다." type="button">재시도</button></div></div>`;
+      }
+      if (state.qtState === "cached") {
+        return `${qtStateTabs()}<div class="panel"><h4>오프라인 캐시 본문</h4><p>저장된 본문만 표시합니다. 해설, AI, TTS, 동기화 기능은 온라인 상태에서 사용할 수 있습니다.</p></div>${q01Actions(true)}${qtVerses(false, { status: "CACHED", caption: "마지막 저장된 오늘의 QT" })}`;
+      }
+      if (state.qtState === "partial") {
+        return `${qtStateTabs()}${q01Actions()}${ttsMiniPlayer()}${qtVerses(false, { studyable: true })}<div class="panel"><h4>해설을 불러오지 못했습니다</h4><p>본문은 계속 읽을 수 있습니다. 실패한 보조 콘텐츠만 다시 시도합니다.</p><button class="secondary-btn" data-toast="해설 영역만 다시 요청합니다." type="button" style="margin-top:10px">해설 재시도</button></div>`;
+      }
+      return `${qtStateTabs()}${q01Actions()}${ttsMiniPlayer()}${qtVerses(false, { studyable: true })}`;
+    }
+    function verseStudyCards() {
+      return verses.map(([no, ko, en]) => {
+        const detail = verseDetails[no];
+        const active = state.studyVerse === no;
+        return `<section class="verse-study-card"><button class="verse-study-head" data-study-verse="${no}" type="button"><span class="verse-no">${no}</span><span><strong>${no}절 요약/해설/용어</strong><small>${detail.summary}</small></span><span class="badge">${active ? "열림" : "보기"}</span></button>${active ? `<div class="verse-study-body"><p class="verse-ko">${ko}</p>${state.englishOpen ? `<p class="verse-en">${en}</p>` : ""}<h5>한 줄 요약</h5><p class="lead-copy">${detail.summary}</p><h5>해설</h5><p class="lead-copy">${detail.explanation}</p><h5>용어 설명</h5><div class="term-list">${detail.terms.map(([term, copy]) => `<div><b>${term}</b><span>${copy}</span></div>`).join("")}</div><p class="subcopy" style="margin-top:10px">출처: 승인된 절별 해설 콘텐츠</p></div>` : ""}</section>`;
+      }).join("");
+    }
+    function qtNoteStepMarkup() {
+      const current = qtNoteSections[state.noteStep];
+      const isFirst = state.noteStep === 0;
+      const isLast = state.noteStep === qtNoteSections.length - 1;
+      return `${appbar("QT 노트 작성", `${state.noteStep + 1}/4 ${current.title}`)}<main class="body">
+        <div class="panel">
+          <div class="toggle-row"><div><h4>공유 설정</h4><p>기본은 비공개입니다. 저장 전 언제든 바꿀 수 있습니다.</p></div><button class="toggle ${state.shareOn ? "on" : ""}" data-action="share" type="button" aria-label="공유 설정"></button></div>
+          ${state.shareOn ? `<p class="status-line">공유하면 닉네임과 구절 스냅샷이 나눔 공간에 표시됩니다.</p>` : ""}
+        </div>
+        <div class="note-stepper" aria-label="QT 노트 섹션">
+          ${qtNoteSections.map((section, index) => `<span class="${state.noteStep === index ? "active" : ""}">${index + 1}. ${section.title}</span>`).join("")}
+        </div>
+        <section class="panel note-writing-panel">
+          <h4>${current.title}</h4>
+          <p class="note-step-help">${current.help}</p>
+          <textarea class="textarea">${current.value}</textarea>
+        </section>
+        <div class="save-bar">
+          <button class="ghost-btn" ${isFirst ? 'data-toast="첫 번째 섹션입니다."' : 'data-action="note-prev"'} type="button">이전</button>
+          <button class="secondary-btn" data-toast="${state.noteStep + 1}섹션이 임시저장되었습니다." type="button">임시저장</button>
+          <button class="primary-btn" ${isLast ? 'data-go="Q-07"' : 'data-action="note-next"'} type="button">${isLast ? "저장" : "다음"}</button>
+        </div>
+      </main>${bottomNav("Q")}`;
+    }
+    function aiSheet() {
+      return `<aside class="sheet ${state.screen === "Q-04" ? "open" : ""}" aria-hidden="${state.screen === "Q-04" ? "false" : "true"}"><div class="sheet-backdrop" data-close-sheet></div><div class="sheet-panel"><button class="icon-btn" data-close-sheet type="button" aria-label="닫기">×</button><h3>AI 질문</h3><p class="lead-copy">본문 이해를 돕는 단발 질문만 답변합니다. 판단, 예언, 상담 요청은 제한됩니다.</p><label class="field-label">질문</label><textarea class="textarea">“내 안에 거하라”는 말이 오늘 생활에서는 어떤 의미인가요?</textarea><button class="primary-btn" data-toast="검증된 범위 안에서 답변했습니다." type="button" style="width:100%;margin-top:10px">질문하기</button><div class="panel" style="margin-top:12px"><h4>답변 예시</h4><p>본문 안에서 “거함”은 예수님의 말씀 안에 머물며 삶의 선택을 그 말씀에 맞추는 태도로 볼 수 있습니다. 오늘은 한 가지 결정을 기도 안에서 확인해 보세요.</p><p class="status-line">ai_qa_requests.status=ANSWERED</p><button class="ghost-btn" data-action="report" type="button" style="width:100%;margin-top:10px">AI 답변 신고</button></div><div class="panel"><h4>차단/한도/실패</h4><p class="warning">blocked_reason=PASTORAL_COUNSEL 또는 DAILY_LIMIT_EXCEEDED이면 답변 대신 사유별 안내를 표시합니다. 실패 시 ai_qa_requests.status=FAILED로 남기고 재시도를 제공합니다.</p></div><div class="panel"><h4>로그 안내</h4><p>질문과 응답은 운영 검증에 필요한 최소 항목만 기록하며, 개인 상담 기록처럼 장기 맥락으로 이어받지 않습니다.</p></div></div></aside>`;
+    }
+    function reportSheet() {
+      return `<aside class="sheet ${state.reportOpen ? "open" : ""}" aria-hidden="${state.reportOpen ? "false" : "true"}"><div class="sheet-backdrop" data-action="report-close"></div><div class="sheet-panel"><button class="icon-btn" data-action="report-close" type="button" aria-label="닫기">×</button><h3>신고하기</h3><p class="lead-copy">게시글이나 댓글에 문제가 있을 때만 접수합니다. 신고 내용은 운영자 검토로 전달됩니다.</p><label class="field-label">신고 사유</label><div class="chip-row"><button class="chip active" type="button">부적절한 내용</button><button class="chip" type="button">스팸</button><button class="chip" type="button">기타</button></div><label class="field-label">상세 내용</label><textarea class="textarea" placeholder="필요한 경우 내용을 입력해 주세요."></textarea><button class="danger-btn" data-action="report-submit" type="button" style="width:100%;margin-top:10px">신고 접수</button></div></aside>`;
+    }
+
+    const renderers = {
+      "A-01": () => `<main class="body no-nav"><div><div class="brand-mark" style="width:68px;height:68px;font-size:24px;margin-bottom:22px">QT</div><h2 class="lead-title">진입 상태를 확인합니다</h2><p class="lead-copy">토큰, 회원 상태, 튜토리얼 완료 여부에 따라 다음 화면이 달라집니다.</p></div><div class="panel"><h4>분기 예시</h4><p>유효 토큰 + 튜토리얼 완료: 오늘 QT<br>유효 토큰 + 튜토리얼 미완료: 튜토리얼<br>토큰 없음/만료: 로그인<br>탈퇴 계정: 복구 불가 안내</p></div><div class="flow"><button data-go="Q-01" type="button">자동 로그인 성공</button><button data-go="A-04" type="button">튜토리얼 미완료</button><button data-go="A-02" type="button">토큰 만료</button></div><div class="panel"><h4 class="warning">탈퇴 계정</h4><p>탈퇴 완료 계정은 로그인할 수 없으며 이전 기록 복구가 불가하다는 안내 후 로그인 화면으로 이동합니다.</p></div></main>`,
+      "A-02": () => `<main class="body no-nav"><div><div class="brand-mark" style="width:68px;height:68px;font-size:24px;margin-bottom:22px">QT</div><h2 class="lead-title">오늘 말씀으로 바로 들어갑니다</h2><p class="lead-copy">로그인 전에는 기능 화면을 제공하지 않습니다. 카카오 인증 후 닉네임 설정 또는 오늘의 QT로 이동합니다.</p></div><div><button class="primary-btn kakao-btn" data-go="A-03" type="button">카카오로 시작하기</button><div class="fine-links"><span>이용약관</span><span>개인정보처리방침</span></div><p class="status-line warning">실패 상태: 인증 취소, 네트워크 실패, 서버 오류</p></div></main>`,
+      "A-03": () => `${appbar("닉네임 설정", "나눔 공간에 공개될 이름")}<main class="body"><div class="panel"><h4>닉네임 공개 안내</h4><p>공유를 선택하면 이 닉네임이 나눔 공간에 표시됩니다. 설정 완료 전까지 변경 가능합니다.</p></div><label class="field-label">닉네임</label><input class="field" value="포도나무가지"><p class="status-line">사용 가능한 닉네임입니다.</p><div class="panel" style="margin-top:14px"><h4>오류 상태</h4><p>중복, 허용 문자 오류, 저장 실패 시 입력값을 유지하고 다시 시도합니다.</p></div><button class="primary-btn" data-go="Q-01" type="button" style="width:100%">다음</button></main>`,
+      "A-04": () => `${appbar("QT 튜토리얼", "처음 사용하는 분을 위한 흐름")}<main class="body"><div class="panel"><h4>1. 오늘 본문 읽기</h4><p>한글과 영어 본문을 절 단위로 읽습니다.</p></div><div class="panel"><h4>2. 필요할 때만 펼치기</h4><p>요약, 해설, 용어는 사용자가 선택할 때만 열립니다.</p></div><div class="panel"><h4>3. 4섹션으로 기록</h4><p>묵상 노트는 자동 저장 없이 임시저장과 저장을 직접 누릅니다.</p></div><div class="panel"><h4>4. 원할 때만 공유</h4><p>기본은 비공개이며 닉네임 공개 안내 후 공유됩니다.</p></div><button class="primary-btn" data-go="Q-01" type="button" style="width:100%">시작하기</button></main>${bottomNav("Q")}`,
+      "Q-01": () => `${appbar("오늘의 QT", "요한복음 15:1-5")}${aiSheet()}${reportSheet()}<main class="body" style="padding-bottom:${state.inlineStudyOpen ? 250 : 178}px">${q01Content()}</main>${["published", "partial"].includes(state.qtState) ? `<button class="floating-ai" data-go="Q-04" type="button">AI</button><div class="bottom-action"><button class="primary-btn" data-go="Q-06" type="button">QT 노트 작성</button></div>` : ""}${bottomNav("Q")}`,
+      "Q-02": () => `${appbar("절별 요약/해설/용어", "요한복음 15:1-5", true)}<main class="body"><div class="panel"><h4>절별 콘텐츠 구조</h4><p>한 줄 요약은 <b>verse_explanations.summary</b>, 해설은 <b>verse_explanations.explanation</b>, 용어는 <b>glossary_terms</b>에서 표시합니다.</p></div><div class="chip-row"><button class="chip" data-action="english" type="button">영어 ${state.englishOpen ? "접기" : "보기"}</button><button class="chip" data-toast="선택한 절의 해설 영역만 다시 요청합니다." type="button">해설 재시도</button></div>${verseStudyCards()}<div class="panel"><h4>절별 누락 상태</h4><p>요약, 해설, 용어 중 승인된 데이터가 없거나 출처가 누락된 항목은 “준비된 해설 없음”으로 표시하고, 검증중/반려/숨김 콘텐츠는 원문을 노출하지 않습니다.</p></div></main>${bottomNav("Q")}`,
+      "Q-03": () => `${appbar("시뮬레이터", "오늘 QT 전용", true)}<main class="body"><div class="panel" style="height:330px;display:grid;place-items:center;text-align:center;background:#e5f0ea"><div><strong style="display:block;font-size:48px;color:var(--primary)">VINE</strong><p>포도나무와 가지 장면 카드</p><span class="badge">검증 통과 스크립트</span></div></div><div class="button-row"><button class="ghost-btn">이전</button><button class="secondary-btn">재생</button><button class="ghost-btn">다음</button></div><div class="panel"><h4>제한 상태</h4><p>검증중 또는 승인되지 않은 장면은 사용자에게 노출하지 않습니다.</p></div></main>${bottomNav("Q")}`,
+      "Q-04": () => renderers["Q-01"](),
+      "Q-05": () => `${appbar("TTS 미니 플레이어", "본문/해설 음성", true)}<main class="body">${qtVerses(false)}<div class="panel"><h4>음성 재생</h4><p>본문과 해설 화면에서만 제공합니다. 노트와 나눔 글에는 적용하지 않습니다.</p><div class="button-row" style="margin-top:12px"><button class="secondary-btn">재생</button><button class="ghost-btn">이전 절</button><button class="ghost-btn">다음 절</button></div></div><div class="panel"><h4>미지원 안내</h4><p class="warning">현재 기기에서는 음성 재생을 사용할 수 없습니다.</p></div></main>${bottomNav("Q")}`,
+      "Q-06": () => qtNoteStepMarkup(),
+      "Q-07": () => `${appbar("저장 완료", "묵상 노트")}<main class="done-state"><div><div class="done-mark">✓</div><h3>저장되었습니다</h3><p class="lead-copy">작성 내용과 저장 시각이 기록되었습니다. 다음 행동을 선택해 주세요.</p><div class="panel"><p>2026.05.17 15:42 저장</p></div><div class="flow"><button data-go="Q-01" type="button">오늘 QT로 돌아가기</button><button data-go="S-01" type="button">나눔에 공유하기</button><button data-go="M-01" type="button">마이페이지에서 보기</button></div></div></main>${bottomNav("Q")}`,
+      "B-01": () => `${appbar("성경", "요한복음 15장")}<main class="body"><div class="button-row"><select class="select"><option>요한복음</option></select><select class="select"><option>15장</option></select></div><div class="button-row" style="margin:10px 0 12px"><button class="primary-btn" data-go="B-02" type="button">절 선택해서 설교 노트</button></div>${bibleActions()}${ttsMiniPlayer()}${qtVerses(false, { studyable: true, caption: "오늘 QT 범위와 일치하는 구절" })}<div class="panel"><h4>정책</h4><p>사전 생성된 해설이 있는 절은 절을 눌러 한 줄 요약, 해설, 용어를 확인합니다. 설교 노트는 한 절 또는 여러 절을 선택해 작성하고, 시뮬레이터와 QT 노트 작성 CTA는 노출하지 않습니다.</p></div></main><button class="floating-ai" data-go="Q-04" type="button">AI</button>${bottomNav("B")}`,
+      "B-02": () => `${appbar("절 선택", "설교 노트 연결")}<main class="body"><p class="status-line">선택된 절: ${state.noteVerses.join(", ")}절</p>${qtVerses(true)}<div class="bottom-action"><button class="primary-btn" data-go="B-03" type="button">설교 노트 작성</button></div></main>${bottomNav("B")}`,
+      "B-03": () => `${appbar("설교 노트", `요한복음 15:${state.noteVerses.join(", ")}`)}<main class="body"><div class="panel"><h4>연결 구절</h4><p>${state.noteVerses.join(", ")}절이 노트에 연결되었습니다.</p></div><label class="field-label">제목</label><input class="field" value="포도나무 비유 설교 메모"><label class="field-label">본문</label><textarea class="textarea" style="min-height:230px">선택한 구절을 중심으로 설교 내용을 정리합니다.</textarea><div class="save-bar"><button class="ghost-btn" data-toast="임시저장되었습니다." type="button">임시저장</button><button class="primary-btn" data-go="B-01" data-toast="설교 노트를 저장하고 성경 읽기로 돌아왔습니다." type="button">저장</button></div></main>${bottomNav("B")}`,
+      "N-01": () => `${appbar("노트", "카테고리별 기록")}<main class="body" style="padding-bottom:126px"><input class="field" placeholder="노트 검색"><div class="chip-row" style="margin-top:12px">${["전체", "QT", "설교", "기도", "회개", "감사"].map((item) => `<button class="chip ${state.noteFilter === item ? "active" : ""}" data-filter="${item}" type="button">${item}</button>`).join("")}</div>${["QT 묵상 노트", "포도나무 비유 설교 메모", "이번 주 기도제목", "돌아볼 마음", "오늘의 감사"].map((title, i) => `<button class="note-card" data-go="N-04" type="button"><b>${title}</b><p class="lead-copy" style="margin:6px 0">${["QT · 요한복음 15:1-5", "설교 · 요한복음 15:1-2", "기도 · 본문 연결 없음", "회개 · 본문 연결 없음", "감사 · 본문 연결 없음"][i]}</p><span class="badge">${i === 0 ? "MEDITATION" : ["SERMON", "PRAYER", "REPENTANCE", "GRATITUDE"][i - 1]}</span></button>`).join("")}<div class="panel"><h4>조회와 작성 구분</h4><p>노트 탭에서는 5개 카테고리를 모두 조회합니다. 새 작성은 기도·회개·감사만 가능하며, QT 노트는 오늘 QT 화면에서, 설교 노트는 성경 절 선택 화면에서 작성합니다.</p></div></main><button class="floating-write" data-go="N-02" type="button" aria-label="기도 회개 감사 작성">+</button>${bottomNav("N")}`,
+      "N-02": () => `${appbar("개인 노트", "기도·회개·감사 선택")}<main class="body"><div class="panel"><h4>노트 탭에서 작성 가능한 기록</h4><p>본문 좌표가 필요 없는 개인 노트만 이곳에서 새로 작성합니다. QT 노트와 설교 노트는 원문 흐름을 먼저 거쳐야 합니다.</p></div>${Object.entries(freeNoteTypes).map(([key, item]) => `<button class="note-card" data-note-type="${key}" type="button"><b>${item.title}</b><p class="lead-copy" style="margin:6px 0">${item.help}</p><span class="badge">${item.category} · 본문 좌표 없음</span></button>`).join("")}<div class="panel"><h4>다른 작성 위치</h4><p>QT 노트: 오늘 QT 화면의 QT 노트 작성. 설교 노트: 성경 화면에서 한 절 또는 여러 절 선택 후 작성.</p></div></main>${bottomNav("N")}`,
+      "N-03": () => { const item = freeNoteTypes[state.freeNoteType]; return `${appbar(item.title, item.category)}<main class="body"><div class="panel"><h4>${item.title}</h4><p>${item.help}</p></div><label class="field-label">제목</label><input class="field" value="${item.titleValue}"><label class="field-label">${item.bodyLabel}</label><textarea class="textarea" style="min-height:280px">${item.bodyValue}</textarea><div class="panel"><div class="toggle-row"><div><h4>공유 설정</h4><p>기본은 비공개입니다.</p></div><button class="toggle ${state.shareOn ? "on" : ""}" data-action="share" type="button" aria-label="공유 설정"></button></div></div><div class="save-bar"><button class="ghost-btn" data-toast="임시저장되었습니다." type="button">임시저장</button><button class="primary-btn" data-toast="저장되었습니다." type="button">저장</button></div></main>${bottomNav("N")}`; },
+      "N-04": () => `${appbar("노트 상세", "작성자 수정/삭제")}<main class="body"><div class="panel"><h4>QT 묵상 노트</h4><p>notes.category=MEDITATION · notes.status=SAVED<br>qt_passage_id=2026-05-17 · visibility=SHARED</p></div><label class="field-label">마음에 남은 말씀</label><textarea class="textarea">말씀 안에 머무는 것이 열매의 시작이라는 점이 마음에 남습니다.</textarea><label class="field-label">적용할 일</label><textarea class="textarea">오늘 중요한 결정을 서두르지 않고 기도로 확인하겠습니다.</textarea><div class="panel"><h4>공유본 스냅샷</h4><p>sharing_posts는 공유 시점 스냅샷을 유지합니다. 원본 노트를 수정하거나 삭제해도 기존 공유글 본문은 자동 변경되지 않습니다.</p></div><div class="panel"><h4>삭제 영향</h4><p>QT 노트 삭제 시 notes.deleted_at을 기록하고 묵상 달력 완료 표시를 제거합니다. active_unique_key=NULL이면 같은 QT에 새 노트 작성이 가능합니다.</p></div><div class="save-bar"><button class="ghost-btn" data-toast="수정사항을 저장합니다." type="button">수정 저장</button><button class="danger-btn" data-toast="삭제 확인 모달을 표시합니다." type="button">노트 삭제</button></div></main>${bottomNav("N")}`,
+      "S-01": () => `${appbar("닉네임 나눔", "공유된 묵상 기록")}<main class="body"><input class="field" placeholder="나눔 검색"><div class="chip-row" style="margin-top:12px">${["전체", "QT", "설교", "기도", "회개", "감사"].map((item) => `<button class="chip ${state.shareFilter === item ? "active" : ""}" data-share-filter="${item}" type="button">${item}</button>`).join("")}</div><div class="panel"><p>비공개 노트, 숨김 글, 삭제 글은 노출하지 않습니다.</p></div>${[["포도나무가지", "QT", true, 8, 1, "요한복음 15:1-5", "말씀 안에 머무는 연습을 시작합니다."], ["작은등불", "설교", false, 9, 0, "요한복음 15:1-5", "오늘 하루 말씀을 먼저 붙듭니다."], ["말씀따라", "감사", true, 10, 2, "본문 연결 없음", "기도로 가지치기를 받아들이겠습니다."]].map(([name, category, liked, likes, comments, ref, copy]) => `<button class="feed-card" data-go="S-02" type="button"><b>${name}</b><p class="lead-copy" style="margin:8px 0">${ref} · ${copy}</p><span class="badge">${category}</span> <span class="badge">${liked ? "♥" : "♡"} ${likes} · 댓글 ${comments}</span></button>`).join("")}</main>${bottomNav("S")}`,
+      "S-02": () => `${appbar("나눔 상세", "포도나무가지")}${reportSheet()}<main class="body"><article class="panel share-body"><div class="share-author"><div class="share-author-info"><div class="avatar">포</div><div><strong>포도나무가지</strong><small>2026.05.17 · 요한복음 15:1-5</small></div></div><div class="share-actions"><button class="heart-btn liked" data-toast="좋아요를 취소했습니다. 실패 시 기존 상태를 유지하고 다시 시도 안내를 표시합니다." type="button" aria-label="좋아요 취소">♥ 8</button><button class="report-icon" data-action="report" type="button" aria-label="신고"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg></button></div></div><h4>말씀 안에 머무는 연습</h4><p><b>마음에 남은 말씀</b><br>말씀 안에 머무는 것이 열매의 시작이라는 점이 마음에 남습니다.</p><p><b>적용할 일</b><br>오늘 중요한 결정을 서두르지 않고 기도로 확인하겠습니다.</p><span class="badge" style="margin-top:12px">MEDITATION</span></article><section class="panel"><h4>상태 확인</h4><p>comments_enabled=true · source_note_deleted_at=null<br>중복 신고는 새 접수 대신 기존 신고 상태를 안내합니다.</p></section><section class="panel"><h4>댓글 <span class="badge">1</span></h4><div class="comment-item"><strong>작은등불</strong><p>저도 오늘 이 말씀을 붙들고 하루를 시작합니다.</p><button class="ghost-btn" data-toast="본인이 작성한 댓글만 삭제할 수 있습니다." type="button" style="width:100%;margin-top:8px">댓글 삭제</button></div><input class="field" placeholder="댓글 작성" style="margin-top:12px"></section><section class="panel"><h4>댓글 OFF 상태</h4><p>comments_enabled=false이면 댓글 입력창을 숨기고 댓글을 받을 수 없다는 안내만 표시합니다.</p></section></main>${bottomNav("S")}`,
+      "M-01": () => `${appbar("마이페이지", "포도나무가지")}<main class="body"><div class="panel"><div class="toggle-row"><div><h4>포도나무가지</h4><p>카카오 로그인 · ACTIVE</p></div><button class="ghost-btn" data-go="M-04" type="button">관리</button></div></div><div class="panel"><h4>묵상 달력</h4><div class="calendar">${Array.from({ length: 28 }, (_, i) => `<span class="day ${[1,2,5,7,8,13,16,21,22,23].includes(i) ? "marked" : ""}">${i + 1}</span>`).join("")}</div></div><div class="panel"><h4>주간 통계</h4><p>이번 주 4회 · 이번 달 11회</p></div><button class="note-card" data-go="M-05" type="button"><b>내 나눔</b><p class="lead-copy" style="margin:6px 0">공유 중 2개 · 좋아요 11 · 댓글 3</p><span class="badge">공유글 관리</span></button><button class="note-card" data-go="M-03" type="button"><b>내 찬양</b><p class="lead-copy" style="margin:6px 0">저장 곡 2개 · 디바이스 음원 1개</p><span class="badge">member_praise_songs</span></button><div class="panel"><h4>월간 묵상 미션</h4><div class="progress"><span></span></div></div><button class="note-card" data-go="M-02" type="button"><b>최근 알림</b><p class="lead-copy" style="margin:6px 0">좋아요 2건 · 댓글 1건 · 공지 1건</p><span class="badge">미읽음 1</span></button></main>${bottomNav("M")}`,
+      "M-02": () => `${appbar("알림", "좋아요/댓글/신고 결과/공지")}<main class="body">${[["미읽음", "작은등불님이 나눔에 댓글을 남겼습니다.", "COMMENT", "sharing_posts:88"], ["읽음", "신고하신 댓글 처리가 완료되었습니다.", "REPORT_RESULT", "reports:31"], ["읽음", "새 시스템 공지가 등록되었습니다.", "NOTICE", "notices:5"]].map(([status, item, type, target]) => `<div class="panel"><h4>${status}</h4><p>${item}</p><p class="status-line">notifications.link_type=${type} · link_id=${target}</p></div>`).join("")}<div class="panel"><h4>링크 대상 없음</h4><p>대상 글이 삭제되었거나 접근 권한이 없으면 상세 이동 대신 안내 문구를 표시하고 읽음 처리는 유지합니다.</p></div><div class="panel"><h4>빈 상태</h4><p>아직 받은 알림이 없습니다.</p></div></main>${bottomNav("M")}`,
+      "M-03": () => `${appbar("내 찬양", "저장 곡과 로컬 음원")}<main class="body"><div class="panel"><h4>저장된 큐레이션</h4><p>praise_songs.ACTIVE와 member_praise_songs를 기준으로 표시합니다.</p></div>${["내 주를 가까이", "은혜"].map((title, i) => `<div class="note-card"><b>${title}</b><p class="lead-copy" style="margin:6px 0">${i === 0 ? "찬양팀 · 외부 링크 정상" : "아티스트 · 외부 링크 무효"}</p><span class="badge">${i === 0 ? "SAVED" : "LINK_INVALID"}</span><div class="button-row" style="margin-top:10px"><button class="secondary-btn" type="button">재생</button><button class="ghost-btn" data-toast="내 찬양에서 해제합니다." type="button">저장 해제</button></div></div>`).join("")}<div class="panel"><h4>디바이스 음원</h4><p>서버 업로드 없이 로컬 파일 접근만 허용합니다. 권한 거부 시 OS 권한 안내를 표시합니다.</p><button class="ghost-btn" data-toast="디바이스 음원 권한 안내를 표시합니다." type="button" style="width:100%;margin-top:10px">로컬 음원 불러오기</button></div><div class="panel"><h4>빈 상태</h4><p>저장한 찬양이 없습니다. 찬양 큐레이션에서 저장하면 이곳에 표시됩니다.</p></div></main>${bottomNav("M")}`,
+      "M-05": () => `${appbar("내 나눔", "공유 중인 글 관리")}<main class="body"><div class="panel"><h4>공유 정책</h4><p>현재 나눔 피드에 공개 중인 글만 표시합니다. 공개 중단이나 삭제가 완료되면 이 목록에서 사라집니다.</p></div>${[
+        ["QT 묵상 노트", "MEDITATION · 요한복음 15:1-5", "공개 중 · 좋아요 8 · 댓글 1", true],
+        ["포도나무 비유 설교 메모", "SERMON · 요한복음 15:1-2", "공개 중 · 좋아요 3 · 댓글 2", true]
+      ].map(([title, meta, status]) => `<article class="note-card"><button class="share-card-main" data-go="S-02" type="button"><b>${title}</b><p class="lead-copy" style="margin:6px 0">${meta}</p><span class="badge">${status}</span></button><div class="button-row"><button class="secondary-btn" data-toast="${title} 공유를 중단합니다. 원본 노트는 유지되고 이 목록에서는 사라집니다." type="button">공개 중단</button><button class="danger-btn" data-toast="${title} 공유글 삭제 확인을 표시합니다. 원본 노트는 삭제하지 않습니다." type="button">공유글 삭제</button></div></article>`).join("")}<div class="panel"><h4>액션 의미</h4><p>카드의 본문 영역을 누르면 공유글 상세로 이동합니다. 공개 중단은 나눔 피드에서 숨기고 원본 노트는 유지합니다. 공유글 삭제는 공유 스냅샷만 삭제 대상으로 처리합니다.</p></div><div class="panel"><h4>빈 상태</h4><p>현재 공유 중인 글이 없습니다. 저장된 노트에서 공유를 켜면 이곳에 표시됩니다.</p></div></main>${bottomNav("M")}`,
+      "M-04": () => `${appbar("회원 정보/탈퇴", "복구 불가 안내", true)}<main class="body"><div class="panel"><h4>회원 정보</h4><p>닉네임: 포도나무가지<br>로그인: 카카오<br>상태: ACTIVE</p></div><button class="secondary-btn" data-go="A-04" type="button" style="width:100%;margin-bottom:12px">튜토리얼 다시보기</button><div class="panel"><h4 class="warning">탈퇴 안내</h4><p>탈퇴 후 복구할 수 없는 데이터가 있습니다. 법적 보존 대상은 제한 보관 후 삭제 또는 비식별화됩니다.</p></div><button class="danger-btn" data-toast="탈퇴 확인 모달이 열립니다." type="button" style="width:100%">탈퇴하기</button></main>${bottomNav("M")}`
+    };
+
+    function adminMarkup(id) {
+      const meta = screenMeta[id];
+      const rolePanel = `<div class="panel"><h4>권한 기준</h4><p>admin_users.admin_role=OPERATOR 예시입니다. OPERATOR는 운영 처리, REVIEWER는 AI 검증, CONTENT_CREATOR는 검증용 한국어 주석 확인, SYSTEM_BATCH는 화면 로그인 없이 배치 실행자로 구분합니다.</p><div class="chip-row"><span class="badge">OPERATOR</span><span class="badge">REVIEWER</span><span class="badge">CONTENT_CREATOR</span><span class="badge">SYSTEM_BATCH</span></div></div>`;
+      const header = `<div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:14px"><div><h3 style="margin-bottom:4px">${meta.name}</h3><p class="lead-copy" style="margin:0">${meta.purpose}</p></div><span class="badge">${id}</span></div>${rolePanel}`;
+      if (id === "AD-01") return `${header}<div class="metric-grid">${[["오늘 QT", "게시"], ["검증 대기", "12"], ["신고 대기", "3"], ["공지", "1"]].map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join("")}</div>${table(["작업", "상태", "담당"], [["오늘 QT 게시", "완료", "admin01"], ["AI 해설 검증", "대기", "검수자"], ["신고 댓글 숨김", "처리중", "운영자"]])}`;
+      if (id === "AD-02") return `${header}<div class="admin-panel panel"><div class="button-row"><input class="field" value="2026-05-17"><input class="field" value="요한복음 15:1-5"><select class="select"><option>DRAFT</option><option>PUBLISHED</option><option>HIDDEN</option></select></div><div class="button-row" style="margin-top:10px"><button class="ghost-btn">임시저장</button><button class="primary-btn">게시</button></div></div>${table(["검증", "결과", "메모"], [["날짜 중복", "정상", "-"], ["본문 범위", "정상", "시작 절 <= 끝 절"], ["감사 로그", "기록 예정", "게시 시점 저장"]])}`;
+      if (id === "AD-03") return `${header}<div class="chip-row">${["검증중", "승인", "반려", "숨김"].map((c, i) => `<button class="chip ${i === 0 ? "active" : ""}">${c}</button>`).join("")}</div>${table(["유형", "본문 좌표", "검증 체크", "처리"], [["해설", "요 15:2", "출처 · 금지 표현 · 사실 정합성", "승인 / 반려 / 보류"], ["Q&A 답변", "요 15:5", "추천 · 말투 · 단발성", "승인 / 반려 / 숨김"]])}<div class="panel"><h4>노출 정책</h4><p>검증용 체크리스트 원문과 비공개 메타데이터는 사용자 화면에 노출하지 않습니다.</p></div>`;
+      if (id === "AD-04") return `${header}${table(["상태", "대상", "사유", "처리"], [["RECEIVED", "나눔 댓글", "부적절한 내용", "숨김 / 반려 / 제재"], ["REVIEWING", "AI 답변", "정책 위반 의심", "검토중"]])}`;
+      if (id === "AD-05") return `${header}${table(["곡명", "아티스트", "링크", "상태"], [["내 주를 가까이", "찬양팀", "https://...", "ACTIVE"], ["은혜", "아티스트", "링크 오류", "HIDDEN"]])}<div class="panel"><p>사용자 기기 음원 업로드는 제공하지 않습니다. 외부 링크와 메타데이터만 관리합니다.</p></div>`;
+      if (id === "AD-06") return `${header}<div class="panel"><label class="field-label">공지 제목</label><input class="field" value="5월 QT 업데이트 안내"><label class="field-label">본문</label><textarea class="textarea">오늘의 QT 해설 콘텐츠가 보강되었습니다.</textarea><div class="button-row" style="margin-top:10px"><button class="ghost-btn">초안 저장</button><button class="primary-btn">발행</button></div></div>${table(["상태", "알림", "감사 로그"], [["DRAFT", "없음", "작성 기록"], ["PUBLISHED", "NOTICE 생성", "발행 기록"]])}`;
+      if (id === "AD-07") return `${header}${table(["시각", "작업자", "작업", "대상"], [["15:22", "admin01", "QT 게시", "2026-05-17"], ["14:50", "reviewer02", "AI 해설 승인", "asset-1024"], ["13:31", "admin01", "신고 처리", "report-88"]])}<div class="panel"><p>감사 로그에는 수정/삭제 액션을 제공하지 않습니다.</p></div>`;
+      return `${header}<div class="metric-grid">${[["검증 실패율", "4.8%"], ["차단 질문", "18"], ["재생성", "7"], ["대기", "12"]].map(([k, v]) => `<div class="metric"><span>${k}</span><b>${v}</b></div>`).join("")}</div>${table(["지표", "상태", "다음 행동"], [["반려 사유 분포", "교리 판단 요청 증가", "평가 큐 점검"], ["체크리스트 버전", "v3 통과율 하락", "버전별 비교"], ["집계", "정상", "상세 보기"]])}`;
+    }
+    function table(heads, rows) {
+      return `<table class="admin-table"><thead><tr>${heads.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    }
+
+    function renderSidebar() {
+      const groups = {};
+      Object.entries(screenMeta).forEach(([id, meta]) => {
+        if (id.startsWith("AD")) return;
+        groups[meta.group] ||= [];
+        groups[meta.group].push(id);
+      });
+      $("#screenGroups").innerHTML = Object.entries(groups).map(([group, ids]) => `<div class="section-title">${group}</div><div class="screen-group">${ids.map((id) => `<button class="screen-link ${state.screen === id ? "active" : ""}" data-go="${id}" type="button"><span>${id}</span><span>${screenMeta[id].name}</span></button>`).join("")}</div>`).join("");
+    }
+    function renderStoryMap() {
+      const ids = flows[state.flow];
+      $("#storyMap").innerHTML = ids.map((id, i) => `<button class="story-node ${state.screen === id || state.admin === id ? "active" : ""}" data-${id.startsWith("AD") ? "admin" : "go"}="${id}" type="button"><strong>${i + 1}. ${id}</strong><span>${screenMeta[id].name}</span></button>`).join("");
+    }
+    function renderDefinitions(meta, id) {
+      const qtStateLabels = {
+        published: "정상: 게시된 본문과 선택형 보조 기능을 표시",
+        empty: "미등록: 오늘 QT가 준비되지 않았다는 빈 상태 표시",
+        hidden: "숨김: 내부 상태를 노출하지 않는 준비중 안내",
+        cached: "캐시 본문: 본문만 표시하고 해설/AI/TTS/동기화 제한",
+        error: "조회 실패: 전체 실패 안내와 재시도 제공",
+        partial: "부분 실패: 본문은 유지하고 실패한 해설 영역만 재시도"
+      };
+      const rows = [
+        ["화면 목적", meta.purpose],
+        ["필수 상태", meta.states.join(" · ")],
+        ["UX 원칙", "핵심 정보는 유지하고 실패 영역에만 재시도 안내를 둡니다. 저장/공유/탈퇴처럼 영향이 큰 행동은 결과를 명확히 표시합니다."]
+      ];
+      if (id === "Q-01") rows.splice(2, 0, ["현재 목업 상태", qtStateLabels[state.qtState]]);
+      $("#definitionList").innerHTML = rows.map(([title, copy]) => `<div class="definition-item"><b>${title}</b><p>${copy}</p></div>`).join("");
+    }
+    function renderMobile() {
+      const meta = screenMeta[state.screen];
+      $("#stageTitle").textContent = meta.name;
+      $("#stagePurpose").textContent = meta.purpose;
+      $("#flowPill").textContent = flowNames[state.flow];
+      $("#phoneScreen").innerHTML = (renderers[state.screen] || renderers["Q-01"])();
+      renderDefinitions(meta, state.screen);
+    }
+    function renderAdmin() {
+      const meta = screenMeta[state.admin];
+      $("#stageTitle").textContent = meta.name;
+      $("#stagePurpose").textContent = meta.purpose;
+      $("#flowPill").textContent = flowNames.admin;
+      $("#adminContent").innerHTML = adminMarkup(state.admin);
+      $$(".admin-nav button").forEach((btn) => btn.classList.toggle("active", btn.dataset.admin === state.admin));
+      renderDefinitions(meta, state.admin);
+    }
+    function render() {
+      const isAdmin = state.mode === "admin";
+      $("#mobileMock").hidden = isAdmin;
+      $("#adminMock").hidden = !isAdmin;
+      $$(".segment button").forEach((btn) => btn.classList.toggle("active", btn.dataset.mode === state.mode));
+      $$(".flow button").forEach((btn) => btn.classList.toggle("active", btn.dataset.flow === state.flow));
+      renderSidebar();
+      renderStoryMap();
+      if (isAdmin) renderAdmin();
+      else renderMobile();
+    }
+    function go(id) {
+      if (id.startsWith("AD")) {
+        state.mode = "admin";
+        state.flow = "admin";
+        state.admin = id;
+      } else {
+        state.mode = "mobile";
+        state.screen = id;
+        state.reportOpen = false;
+        if (id === "Q-06") state.noteStep = 0;
+        if (flows.core.includes(id)) state.flow = "core";
+        else if (flows.support.includes(id)) state.flow = "support";
+        else if (flows.ai.includes(id)) state.flow = "ai";
+      }
+      render();
+    }
+    function showToast(message) {
+      const toast = $("#toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1500);
+    }
+
+    document.addEventListener("click", (event) => {
+      const goBtn = event.target.closest("[data-go]");
+      const adminBtn = event.target.closest("[data-admin]");
+      const modeBtn = event.target.closest("[data-mode]");
+      const flowBtn = event.target.closest("[data-flow]");
+      const actionBtn = event.target.closest("[data-action]");
+      const toastBtn = event.target.closest("[data-toast]");
+      const filterBtn = event.target.closest("[data-filter]");
+      const shareFilterBtn = event.target.closest("[data-share-filter]");
+      const verseRow = event.target.closest("[data-select-verse]");
+      const qtStateBtn = event.target.closest("[data-qt-state]");
+      const studyVerseBtn = event.target.closest("[data-study-verse]");
+      const openStudyBtn = event.target.closest("[data-open-study]");
+      const noteTypeBtn = event.target.closest("[data-note-type]");
+      if (goBtn) go(goBtn.dataset.go);
+      if (adminBtn) {
+        state.mode = "admin";
+        state.flow = "admin";
+        state.admin = adminBtn.dataset.admin;
+        render();
+      }
+      if (modeBtn) {
+        state.mode = modeBtn.dataset.mode;
+        if (state.mode === "admin") state.flow = "admin";
+        render();
+      }
+      if (flowBtn) {
+        state.flow = flowBtn.dataset.flow;
+        if (state.flow === "admin") {
+          state.mode = "admin";
+          state.admin = "AD-01";
+        } else {
+          state.mode = "mobile";
+          state.screen = flows[state.flow][0];
+        }
+        render();
+      }
+      if (verseRow) {
+        const verse = verseRow.dataset.selectVerse;
+        state.noteVerses = state.noteVerses.includes(verse)
+          ? state.noteVerses.filter((item) => item !== verse)
+          : [...state.noteVerses, verse].sort((a, b) => Number(a) - Number(b));
+        render();
+      }
+      if (filterBtn) {
+        state.noteFilter = filterBtn.dataset.filter;
+        render();
+      }
+      if (shareFilterBtn) {
+        state.shareFilter = shareFilterBtn.dataset.shareFilter;
+        render();
+      }
+      if (qtStateBtn) {
+        state.qtState = qtStateBtn.dataset.qtState;
+        render();
+      }
+      if (studyVerseBtn) {
+        state.studyVerse = studyVerseBtn.dataset.studyVerse;
+        render();
+      }
+      if (openStudyBtn) {
+        const verse = openStudyBtn.dataset.openStudy;
+        if (state.inlineStudyOpen && state.studyVerse === verse) {
+          state.inlineStudyOpen = false;
+        } else {
+          state.studyVerse = verse;
+          state.inlineStudyOpen = true;
+        }
+        render();
+      }
+      if (noteTypeBtn) {
+        state.freeNoteType = noteTypeBtn.dataset.noteType;
+        state.screen = "N-03";
+        state.flow = "support";
+        state.mode = "mobile";
+        render();
+      }
+      if (actionBtn) {
+        const action = actionBtn.dataset.action;
+        if (action === "share") state.shareOn = !state.shareOn;
+        if (action === "english") state.englishOpen = !state.englishOpen;
+        if (action === "tts") {
+          state.ttsOpen = !state.ttsOpen;
+          if (state.ttsOpen) state.ttsPlaying = true;
+        }
+        if (action === "tts-toggle") state.ttsPlaying = !state.ttsPlaying;
+        if (action === "tts-prev") {
+          const currentIndex = verses.findIndex(([no]) => no === state.ttsVerse);
+          state.ttsVerse = verses[Math.max(0, currentIndex - 1)]?.[0] || "1";
+          state.ttsPlaying = true;
+        }
+        if (action === "tts-next") {
+          const currentIndex = verses.findIndex(([no]) => no === state.ttsVerse);
+          state.ttsVerse = verses[Math.min(verses.length - 1, currentIndex + 1)]?.[0] || "1";
+          state.ttsPlaying = true;
+        }
+        if (action === "toggle-explain") state.explanationOpen = !state.explanationOpen;
+        if (action === "note-prev") state.noteStep = Math.max(0, state.noteStep - 1);
+        if (action === "note-next") state.noteStep = Math.min(qtNoteSections.length - 1, state.noteStep + 1);
+        if (action === "report") {
+          state.reportOpen = true;
+        }
+        if (action === "report-close") {
+          state.reportOpen = false;
+        }
+        if (action === "report-submit") {
+          state.reportOpen = false;
+          showToast("신고가 접수되었습니다.");
+        }
+        render();
+      }
+      if (event.target.closest("[data-close-sheet]")) {
+        state.screen = "Q-01";
+        render();
+      }
+      if (toastBtn) showToast(toastBtn.dataset.toast);
+    });
+
+    render();
+  </script>
+</body>
+</html>
