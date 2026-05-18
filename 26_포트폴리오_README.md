@@ -2,7 +2,7 @@
 
 > **문서 버전:** v0.1
 > **작성일:** 2026-05-15
-> **기준 문서:** `07_요구사항_정의서.md` v2.3
+> **기준 문서:** `07_요구사항_정의서.md` v3.1
 > **템플릿 원본:** `18_포트폴리오_README_template.md`
 > **번호 처리:** 기존 `18_코드_품질_게이트.md`를 유지하고, 포트폴리오 README는 `26_포트폴리오_README.md`로 분리한다.
 > **문서 역할:** 구현 저장소 README 또는 발표용 포트폴리오 README에 옮길 내용의 기준 틀을 관리한다.
@@ -32,9 +32,9 @@
 | 프로젝트명 | QT-AI |
 | 한 줄 소개 | 매일 QT 본문을 기준으로 성경 본문, 쉬운 해설, 묵상 기록, 시뮬레이터 상태를 한 화면에서 제공하는 큐티 앱 |
 | 핵심 가치 | 초심자가 오늘 본문을 바로 읽고, 필요한 해설만 열람하며, 묵상 기록까지 이어갈 수 있게 한다. |
-| 핵심 차별점 | 사용자 실시간 AI Q&A가 아니라 사전 생성·검증된 AI 해설과 시뮬레이터 상태를 제공한다. |
-| MVP 기준 | Today QT, 성경 본문, 해설 C, 묵상, 찬양 큐레이션, 관리자 운영, 시뮬레이터 상태 |
-| Out-Scope | 사용자 AI Q&A, 챗봇, SSE, Kafka, Kubernetes, Helm, RAG, vector DB, AI 찬양 추천, 교회 인증 |
+| 핵심 차별점 | 자유 챗봇이 아니라 사전 생성·검증된 AI 해설, 시뮬레이터 상태, 단발·검증형 사실 기반 Q&A를 제공한다. |
+| MVP 기준 | Today QT, 성경 본문, 승인 해설, 묵상, 찬양 큐레이션, 관리자 운영, 시뮬레이터 상태 |
+| Out-Scope | AI 자유 챗봇, 다중 턴 대화, SSE, Kafka, Kubernetes, Helm, RAG, vector DB, AI 찬양 추천, 교회 인증 |
 
 ---
 
@@ -60,11 +60,11 @@
 | --- | --- | --- |
 | Today QT | 00:00 KST 공개 본문 범위를 04:00 KST 배치로 수집하고, 본문·해설·묵상 진입점·시뮬레이터 상태를 반환 | `07_요구사항_정의서.md` F-01 |
 | 성경 본문 | 한글/영어 성경 JSON 데이터를 절 단위로 적재해 조회 | `07_요구사항_정의서.md` F-01 |
-| AI 해설 | B 테이블 원문을 AI가 재해석하고 편집자 에이전트 검증 후 C 테이블만 사용자에게 노출 | `07_요구사항_정의서.md` F-02 |
+| AI 해설 | `commentary_materials` 원문을 AI가 재해석하고 편집자 에이전트 검증 후 승인된 `verse_explanations`만 사용자에게 노출 | `07_요구사항_정의서.md` F-02 |
 | 묵상 노트 | 오늘 QT 본문 기준 DRAFT 생성, 4개 섹션 자동 저장, 묵상 달력 연계 | `07_요구사항_정의서.md` F-03, F-13 |
 | 찬양 큐레이션 | AI 추천이 아니라 운영자가 등록한 곡 메타데이터를 사용자가 내 목록에 저장 | `07_요구사항_정의서.md` F-09 |
 | 시뮬레이터 | `READY`, `MISSING`, `FAILED`, `DISABLED` 상태를 반환하고 READY일 때만 보기 버튼 활성화 | `07_요구사항_정의서.md` F-12 |
-| 관리자 운영 | Today QT, 해설 C, AI 로그, 시뮬레이터 상태, 신고, 찬양 큐레이션 관리 | `07_요구사항_정의서.md` F-06 |
+| 관리자 운영 | Today QT, 승인 해설, AI 로그, 시뮬레이터 상태, 신고, 찬양 큐레이션 관리 | `07_요구사항_정의서.md` F-06 |
 
 ---
 
@@ -89,7 +89,7 @@
 | Kafka | v1에서는 사용하지 않음. Spring `ApplicationEventPublisher` 사용 |
 | Kubernetes, Helm | v1에서는 사용하지 않음. Docker Compose 사용 |
 | RAG, ChromaDB, vector DB, Elasticsearch | 사용하지 않음. RDB 인덱스 기반 조회 |
-| 사용자 AI Q&A, SSE, `/ai/sessions/**` | 제공하지 않음. AI는 배치·관리자 트리거 전용 |
+| AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` | 제공하지 않음. F-15 사실 기반 Q&A는 단발·검증 흐름 |
 | 개역개정, ESV, NIV | 사용 금지 데이터로 명시 |
 
 ---
@@ -100,19 +100,22 @@
 flowchart LR
     User["사용자"] --> Flutter["Flutter App"]
     Admin["관리자"] --> AdminUI["Admin UI"]
-    Flutter --> BFF["qtai-server / bff"]
-    AdminUI --> BFF
-    BFF --> Auth["gatewayauth"]
-    BFF --> Bible["bible"]
-    BFF --> AI["ai"]
-    BFF --> Simulator["simulator"]
-    Bible --> MySQL["MySQL 8.0"]
+    Flutter --> API["qtai-server / api-v1"]
+    AdminUI --> API
+    API --> Member["domain.member"]
+    API --> Bible["domain.bible"]
+    API --> QT["domain.qt/study"]
+    API --> Note["domain.note/sharing/praise"]
+    API --> AI["domain.ai"]
+    Member --> MySQL["MySQL 8.0"]
+    Bible --> MySQL
+    QT --> MySQL
+    Note --> MySQL
     AI --> MySQL
-    Simulator --> MySQL
     AI --> DeepSeek["DeepSeek API"]
     Batch["04:00 KST Batch"] --> Bible
     Batch --> AI
-    Batch --> Simulator
+    Batch --> QT
 ```
 
 | 설계 핵심 | 설명 |
@@ -129,7 +132,7 @@ flowchart LR
 | 도전 | 문제 | 해결 방향 | README 증거 |
 | --- | --- | --- | --- |
 | Today QT 기준 시각 | 성서 유니온 공개 00:00과 우리 시스템 수집 04:00 사이의 데이터 정합성 | 04:00 배치 전까지 전날 캐시 유지, 배치 후 새 콘텐츠 교체 | 캐시 정책, 배치 로그, Today QT 응답 |
-| AI 저작권 리스크 | 원문 주석을 직접 노출하면 저작권 리스크가 큼 | B 원문을 AI가 재해석하고 C 테이블만 노출, 출처 메타데이터 표시 | A/B/C 구조, 편집자 검증 로그 |
+| AI 저작권 리스크 | 원문 주석을 직접 노출하면 저작권 리스크가 큼 | `commentary_materials` 기반 산출물을 검증하고 승인된 `verse_explanations`만 노출, 출처 메타데이터 표시 | ERD 해설 테이블 구조, 편집자 검증 로그 |
 | 도메인 경계 | 6명이 동시에 작업하면 도메인 import가 섞일 위험 | 패키지 격리, 내부 Interface, PR 자동 검증 | ArchUnit 또는 Spring Modulith 결과 |
 | 시뮬레이터 미완성 상태 | 모든 본문에 클립을 만들지 못해도 Today QT는 100% 응답해야 함 | 상태값을 항상 반환하고 READY 외 버튼 비활성화 | 상태별 UI 스크린샷, API 응답 |
 | 금지 기술 확산 | Kafka/K8s/RAG 등 MVP 밖 기술이 문서와 코드에 섞일 위험 | 품질 게이트에서 금지 패턴 검사 | `18_코드_품질_게이트.md`, CI 로그 |
@@ -170,10 +173,10 @@ flowchart LR
 
 | 이름 | 역할 | 포트폴리오 기여 포인트 |
 | --- | --- | --- |
-| 강태오 | Lead / gatewayauth / bff / DevOps | 문서 기준, PR 검증, 인증·BFF, 품질 게이트, 시연 안정화 |
+| 강태오 | Lead / platform / member / admin / DevOps | 문서 기준, PR 검증, 인증·외부 API 계약, 품질 게이트, 시연 안정화 |
 | 이지윤 | bible 본문·QT | 성경 JSON 출처 검토, QT 본문 범위, Today QT bible 응답 |
-| 이승욱 | bible journal/songs | 묵상 DRAFT/CRUD, 이벤트 이력, 찬양 큐레이션 저장 흐름 |
-| 김지민 | Flutter / Admin / bible 협업 | Today QT 화면, 로그인 유도, 마이페이지, 관리자 화면 |
+| 이승욱 | note / sharing / praise | 묵상 DRAFT/CRUD, 닉네임 나눔, 찬양 큐레이션 저장 흐름 |
+| 김지민 | Flutter / Admin / bible 협업 | Today QT 화면, 로그인 경계, 마이페이지, 관리자 화면 |
 | 강상민 | ai 해설·편집자 | AI 해설 생성, 편집자 검증, 실패/재처리 로그 |
 | 김태혁 | simulator | 시뮬레이터 상태 모델, 클립 저장·조회, 상태별 UI 연동 |
 
@@ -199,4 +202,4 @@ flowchart LR
 | 번호 충돌 처리 | `18_코드_품질_게이트.md` 유지, 포트폴리오 README는 `26_포트폴리오_README.md`로 분리 |
 | 템플릿 반영 | `18_포트폴리오_README_template.md`의 README 구조를 QT-AI 기준으로 변환 |
 | 실제 성과 수치 | 구현 저장소 테스트 후 기입 |
-| 다음 권장 작업 | 별도 구현 GitHub 기준 실제 담당 경로와 PR 단위 확정 |
+| 다음 권장 작업 | 구현 저장소 1~6번 PR이 끝난 뒤 저장소 URL, 실행 명령, 테스트 명령, CI 결과를 실제 값으로 채움 |

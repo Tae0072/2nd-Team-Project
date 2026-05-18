@@ -10,11 +10,11 @@
 </head>
 <body>
 <header>
-  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김지민 실행가이드 <span class="role-chip">Flutter / Admin / Today QT 화면 / bible 협업</span></div><div class="dev-sub">기준일 2026-05-15 · 김지민_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v2.3</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
+  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김지민 실행가이드 <span class="role-chip">Flutter / Admin / Today QT 화면 / bible 협업</span></div><div class="dev-sub">기준일 2026-05-15 · 김지민_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
 </header>
 <main class="wrap">
-<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>김지민 — Flutter 화면, 관리자 화면, Today QT 사용자 흐름</strong><br>1 첫 화면은 Today QT 중심이며 별도 마케팅 홈을 만들지 않는다.<br>2 비로그인 접근과 로그인 유도 액션을 명확히 구분한다.<br>3 시뮬레이터 버튼은 READY일 때만 활성화하고 MISSING/FAILED/DISABLED는 비활성화한다.<br>4 AI 질문하기, AI 찬양 추천, 교회 인증 버튼은 MVP 화면에 넣지 않는다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 Today QT 화면에서 본문·해설·묵상·시뮬레이터 상태를 모두 표시<br>2 로그인 필요 액션과 비로그인 가능 화면을 구분<br>3 관리자 메뉴 범위를 오늘 QT, 해설 C, 시뮬레이터, 신고, 찬양 큐레이션으로 제한<br>4 금지 UI 버튼이 화면에 남지 않았는지 PR 전 확인</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>mobile / admin</div><div class="callout"><strong>작업 요약</strong><br>Today QT 화면, 로그인 유도, 묵상 작성, 마이페이지, 묵상 달력, 관리자 운영 화면</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>flutter-app/lib/features/today_qt/ — Today QT 화면</li>
-<li>flutter-app/lib/features/journal/ — 묵상 작성·달력</li>
+<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>김지민 — Flutter 화면, 관리자 화면, Today QT 사용자 흐름</strong><br>1 첫 화면은 Today QT 중심이며 별도 마케팅 홈을 만들지 않는다.<br>2 미인증 기능 화면 차단과 로그인 후 접근 기준을 명확히 한다.<br>3 시뮬레이터 버튼은 READY일 때만 활성화하고 MISSING/FAILED/DISABLED는 비활성화한다.<br>4 AI 자유 챗봇, AI 찬양 추천, 교회 인증 버튼은 MVP 화면에 넣지 않는다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 Today QT 화면에서 본문·해설·묵상·시뮬레이터 상태를 모두 표시<br>2 미인증 기능 화면 차단과 로그인 후 접근 기준을 구분<br>3 관리자 메뉴 범위를 오늘 QT, 승인 해설, 시뮬레이터, 신고, 찬양 큐레이션으로 제한<br>4 금지 UI 버튼이 화면에 남지 않았는지 PR 전 확인</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>mobile / admin</div><div class="callout"><strong>작업 요약</strong><br>Today QT 화면, 로그인 경계, 묵상 작성, 마이페이지, 묵상 달력, 관리자 운영 화면</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>flutter-app/lib/features/today_qt/ — Today QT 화면</li>
+<li>flutter-app/lib/features/note/ — 묵상 작성·달력</li>
 <li>flutter-app/lib/features/admin/ — 관리자 화면</li>
 <li>flutter-app/test/ — 화면/상태 테스트</li>
 <li>workspaces/김지민/ — workflow/report 기록</li></ul></div><table class="tbl"><thead><tr>
@@ -31,7 +31,7 @@
 </tr>
 <tr>
 <td>기준 문서</td>
-<td><code>07_요구사항_정의서.md</code> v2.3, <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
+<td><code>07_요구사항_정의서.md</code> v3.1, <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
 </tr>
 <tr>
 <td>PR 기록</td>
@@ -46,17 +46,17 @@
 <div class="own-item"><div class="own-path">workspaces/김지민/</div><div class="own-desc">개인 워크플로우와 리포트</div><span class="lock-tag">OWNER</span></div>
 </div>
 </section>
-<section id="sec-2" class="sec"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 작업 흐름 확인 가능</div></div><div class="callout blue"><strong>다운로드본 Lead 실행가이드의 패널형 양식과 체크리스트 밀도를 반영했다.</strong> 단, Kafka/K8s/SSE/AI Q&amp;A 같은 구버전 내용은 v2.3 금지 기준으로 바꿨다.</div><div class="pr-panel-list mt12">
+<section id="sec-2" class="sec"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 작업 흐름 확인 가능</div></div><div class="callout blue"><strong>다운로드본 Lead 실행가이드의 패널형 양식과 체크리스트 밀도를 반영했다.</strong> 단, Kafka/K8s/SSE/세션형 AI 같은 구버전 내용은 v3.1 금지 기준으로 바꿨다.</div><div class="pr-panel-list mt12">
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/scope-task</strong><span>feature/mobile-* · feature/admin-* · bugfix/mobile-*</span></div><div class="pr-panel-chev open" id="chev-UI-pr-1">⌄</div></div><div class="pr-panel-body show" id="UI-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev
 git checkout -b feature/mobile-today-qt-screen
 # alternative
 git checkout -b feature/admin-dashboard-screen</code></pre><table class="tbl"><tbody><tr><td>기본 형식</td><td><code>{type}/{scope}-{short-task}</code></td></tr><tr><td>PR 대상</td><td>항상 <code>dev</code></td></tr><tr><td>허용 type</td><td><code>feature</code>, <code>bugfix</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>hotfix</code></td></tr><tr><td>작업 단위</td><td>3일 안에 리뷰 가능한 작은 PR 권장</td></tr></tbody></table></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 8단계 — dev 브랜치 기준</strong><span>workflow → work → test → report → PR → review</span></div><div class="pr-panel-chev open" id="chev-UI-pr-2">⌄</div></div><div class="pr-panel-body show" id="UI-pr-2"><div class="pr-step"><div class="pr-step-num">1</div><div><div class="pr-step-title">dev 최신화</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
-git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/mobile-today-qt-screen</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김지민/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v2.3 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
+git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/mobile-today-qt-screen</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김지민/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v3.1 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
 # backend 변경 시 ./gradlew test
 # flutter 변경 시 flutter analyze &amp;&amp; flutter test</code></pre></div></div><div class="pr-step"><div class="pr-step-num">6</div><div><div class="pr-step-title">작업 후 report 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김지민/reports/YYYY-MM-DD_task-name_report.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">7</div><div><div class="pr-step-title">push</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git push -u origin feature/mobile-today-qt-screen</code></pre></div></div><div class="pr-step"><div class="pr-step-num">8</div><div><div class="pr-step-title">PR 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>gh pr create --base dev --head feature/mobile-today-qt-screen --title "feat(mobile): task summary" --body-file workspaces/김지민/reports/YYYY-MM-DD_task-name_report.md</code></pre></div></div></div></div>
-  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>③ PR 템플릿 자동 로드 (.github/pull_request_template.md) — v2.3</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-UI-pr-3">⌄</div></div><div class="pr-panel-body" id="UI-pr-3"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>## 구현 내용
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>③ PR 템플릿 자동 로드 (.github/pull_request_template.md) — v3.1</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-UI-pr-3">⌄</div></div><div class="pr-panel-body" id="UI-pr-3"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>## 구현 내용
 &lt;!-- 이 PR에서 문제를 해결하거나 추가하는 변경 사항을 간략하게 설명하세요. --&gt;
 
 ## 관련 이슈 / 태스크
@@ -71,11 +71,11 @@ git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-
 - [ ] 인프라 / CI (chore)
 
 ## 코드 체크리스트
-- [ ] 07_요구사항_정의서.md v2.3과 충돌 없음
+- [ ] 07_요구사항_정의서.md v3.1과 충돌 없음
 - [ ] 02_ERD_문서.md / 04_API_명세서.md / 06_화면_기능_정의서.md와 충돌 없음
 - [ ] application.yml 또는 코드에 평문 Secret 없음
-- [ ] 사용자 AI Q&amp;A, 챗봇, SSE, /ai/sessions/** 없음
-- [ ] 사용자 요청 경로에서 LLM 호출 없음
+- [ ] AI 자유 챗봇, 다중 턴 대화, SSE, /ai/sessions/** 없음
+- [ ] 해설·시뮬레이터 사용자 요청 즉시 생성 없음
 - [ ] Kafka 도입 없음, 이벤트는 ApplicationEventPublisher 기준
 - [ ] Kubernetes/Helm 도입 없음, v1은 Docker Compose 기준
 - [ ] RAG, ChromaDB, vector DB, Elasticsearch 없음
@@ -98,7 +98,7 @@ git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-
 
 ## 남은 리스크
 &lt;!-- 남은 이슈, 후속 PR, 수동 검증 필요 사항 --&gt;</code></pre><div class="callout blue mt12"><strong>실제 템플릿:</strong> 구현 저장소 <code>.github/pull_request_template.md</code>에 반영한다. 이 문서 저장소에는 실제 workflow 파일이나 구현 골격을 만들지 않는다.</div></div></div>
-  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-4')"><div class="pr-panel-num">4</div><div class="pr-panel-title"><strong>④ 자동 CI 게이트 + Claude PR 리뷰 (8가지)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-UI-pr-4">⌄</div></div><div class="pr-panel-body" id="UI-pr-4"><table class="tbl"><thead><tr><th>검사</th><th>실패 시</th><th>해결</th></tr></thead><tbody><tr><td>gitleaks (secret scan)</td><td><span class="se">머지 차단</span></td><td>코드에서 secret 제거 후 재커밋</td></tr><tr><td>Spectral lint</td><td><span class="se">머지 차단</span></td><td><code>npx spectral lint apis/**/*.yaml</code></td></tr><tr><td>백엔드 단위 테스트</td><td><span class="se">머지 차단</span></td><td><code>./gradlew test</code></td></tr><tr><td>Flutter 분석/테스트</td><td><span class="se">머지 차단</span></td><td><code>flutter analyze && flutter test</code></td></tr><tr><td>Docker Compose 검증</td><td><span class="se">머지 차단</span></td><td><code>docker compose config</code> 확인</td></tr><tr><td>Requirements Guard</td><td><span class="sw">REQUEST_CHANGES</span></td><td>v2.3 금지 기능·금지 데이터·금지 인프라 기준 수정</td></tr><tr><td>Claude PR 리뷰 (8가지)</td><td><span class="sw">REQUEST_CHANGES</span></td><td>도메인 계약, 금지 패턴, 테스트 코드, 보안, 저작권 리스크, API/화면 정합성, 실패 처리, 운영 로그 기준 확인</td></tr><tr><td>Code Review (사람)</td><td><span class="se">머지 차단</span></td><td>Lead, bible, journal/songs, simulator 담당자와 화면/API 상태 계약 확인</td></tr></tbody></table></div></div>
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-4')"><div class="pr-panel-num">4</div><div class="pr-panel-title"><strong>④ 자동 CI 게이트 + Claude PR 리뷰 (8가지)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-UI-pr-4">⌄</div></div><div class="pr-panel-body" id="UI-pr-4"><table class="tbl"><thead><tr><th>검사</th><th>실패 시</th><th>해결</th></tr></thead><tbody><tr><td>gitleaks (secret scan)</td><td><span class="se">머지 차단</span></td><td>코드에서 secret 제거 후 재커밋</td></tr><tr><td>Spectral lint</td><td><span class="se">머지 차단</span></td><td><code>npx spectral lint apis/**/*.yaml</code></td></tr><tr><td>백엔드 단위 테스트</td><td><span class="se">머지 차단</span></td><td><code>./gradlew test</code></td></tr><tr><td>Flutter 분석/테스트</td><td><span class="se">머지 차단</span></td><td><code>flutter analyze && flutter test</code></td></tr><tr><td>Docker Compose 검증</td><td><span class="se">머지 차단</span></td><td><code>docker compose config</code> 확인</td></tr><tr><td>Requirements Guard</td><td><span class="sw">REQUEST_CHANGES</span></td><td>v3.1 금지 기능·금지 데이터·금지 인프라 기준 수정</td></tr><tr><td>Claude PR 리뷰 (8가지)</td><td><span class="sw">REQUEST_CHANGES</span></td><td>도메인 계약, 금지 패턴, 테스트 코드, 보안, 저작권 리스크, API/화면 정합성, 실패 처리, 운영 로그 기준 확인</td></tr><tr><td>Code Review (사람)</td><td><span class="se">머지 차단</span></td><td>Lead, bible, note/praise, simulator 담당자와 화면/API 상태 계약 확인</td></tr></tbody></table></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('UI-pr-5')"><div class="pr-panel-num">5</div><div class="pr-panel-title"><strong>⑤ 머지 규칙 + Hotfix 절차 (Squash to dev)</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-UI-pr-5">⌄</div></div><div class="pr-panel-body" id="UI-pr-5"><div class="callout"><strong>Squash merge → dev 브랜치.</strong> CI 통과 + Claude/자동 리뷰 이슈 해소 + 사람 리뷰 승인 후 머지한다. dev 품질이 깨지면 즉시 revert PR로 복구한다.</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># Hotfix - mobile 긴급 수정
 git checkout dev &amp;&amp; git pull origin dev
 git checkout -b hotfix/mobile-ui-bug
@@ -124,7 +124,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -156,7 +156,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -175,7 +175,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
   <div class="day-head" onclick="toggleDay('UI-2')">
     <div class="day-date">2026-05-20</div>
     <div class="day-badge badge-infra">w1</div>
-    <div class="day-summary">로그인 유도 기준 정리</div>
+    <div class="day-summary">로그인 경계 기준 정리</div>
     <div class="day-toggle" id="tog-UI-2">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-UI-2">
@@ -184,22 +184,22 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
 <li>flutter-app/lib/admin/</li>
 <li>flutter-app/test/</li>
 <li>workspaces/김지민/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>로그인 유도 기준 정리</strong><br>비로그인 가능 화면과 로그인 필요 액션 구분</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>로그인 경계 기준 정리</strong><br>미인증 기능 화면 차단과 로그인 후 접근 기준 정리</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
-작업: 로그인 유도 기준 정리
-완료 기준: 비로그인 가능 화면과 로그인 필요 액션 구분
+작업: 로그인 경계 기준 정리
+완료 기준: 미인증 기능 화면 차단과 로그인 후 접근 기준 정리
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="ui-flow" data-title="로그인 유도 기준 정리" data-owner="김지민" data-target="sim-UI-2">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-UI-2"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>비로그인 가능 화면과 로그인 필요 액션 구분</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="ui-flow" data-title="로그인 경계 기준 정리" data-owner="김지민" data-target="sim-UI-2">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-UI-2"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>미인증 기능 화면 차단과 로그인 후 접근 기준 정리</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>
@@ -220,7 +220,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -252,7 +252,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -271,7 +271,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
   <div class="day-head" onclick="toggleDay('UI-5')">
     <div class="day-date">W2</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; Today QT 화면, 로그인 유도, 묵상 작성 초안</div>
+    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; Today QT 화면, 로그인 경계, 묵상 작성 초안</div>
     <div class="day-toggle" id="tog-UI-5">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-UI-5">
@@ -280,21 +280,21 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
 <li>flutter-app/lib/admin/</li>
 <li>flutter-app/test/</li>
 <li>workspaces/김지민/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>Today QT 화면, 로그인 유도, 묵상 작성 초안</strong><br>핵심 API 데모 화면에서 Today QT 흐름 확인</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>Today QT 화면, 로그인 경계, 묵상 작성 초안</strong><br>핵심 API 데모 화면에서 Today QT 흐름 확인</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
-작업: Today QT 화면, 로그인 유도, 묵상 작성 초안
+작업: Today QT 화면, 로그인 경계, 묵상 작성 초안
 완료 기준: 핵심 API 데모 화면에서 Today QT 흐름 확인
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="ui-flow" data-title="Today QT 화면, 로그인 유도, 묵상 작성 초안" data-owner="김지민" data-target="sim-UI-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-UI-5"></div></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="ui-flow" data-title="Today QT 화면, 로그인 경계, 묵상 작성 초안" data-owner="김지민" data-target="sim-UI-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-UI-5"></div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>핵심 API 데모 화면에서 Today QT 흐름 확인</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
@@ -316,7 +316,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -348,7 +348,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -380,7 +380,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v2.3과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김지민
@@ -397,7 +397,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
 </div>
 </section>
 <section id="sec-4" class="sec"><div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">AI 에이전트 활용 가이드</div></div><div class="callout warn">AI에게 코드 생성을 요청할 때는 07 요구사항, 03 아키텍처, 04 API, 18 품질 게이트, 23 용어사전을 기준으로 준다. 금지 기능을 생성하지 못하게 먼저 조건을 박는다.</div><table class="tbl"><thead><tr><th>요청 유형</th><th>필수 컨텍스트</th><th>출력 가드</th></tr></thead><tbody><tr><td>도메인 구현</td><td>03_아키텍처_정의서.md + 25_기능_명세서.md</td><td>다른 도메인 내부 타입 import 금지</td></tr><tr><td>API 연결</td><td>04_API_명세서.md + 화면 정의</td><td>외부 API와 내부 Java Interface 분리</td></tr><tr><td>테스트</td><td>11_테스트_전략서.md + 18_코드_품질_게이트.md</td><td>금지 기능/금지 데이터 검사 포함</td></tr></tbody></table></section>
-<section id="sec-5" class="sec"><div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 본인 결정 가능 여부</div></div><table class="tbl"><thead><tr><th>항목</th><th>가능?</th><th>기준</th></tr></thead><tbody><tr><td>본인 도메인 내부 구조 정리</td><td>가능</td><td>03/25 기준 안에서 가능</td></tr><tr><td>테스트 추가</td><td>가능</td><td>11/18 기준 준수</td></tr><tr><td>외부 API 변경</td><td>Lead 협의</td><td>04_API_명세서.md 영향</td></tr><tr><td>요구사항 변경</td><td>불가</td><td>07_요구사항_정의서.md Lead 확인 필요</td></tr><tr><td>금지 기능 추가</td><td>불가</td><td>사용자 AI Q&A, SSE, Kafka/K8s/Helm v1 등 금지</td></tr></tbody></table></section>
+<section id="sec-5" class="sec"><div class="sec-hdr"><div class="sec-num">5</div><div class="sec-title">자기완결성 명세 — 본인 결정 가능 여부</div></div><table class="tbl"><thead><tr><th>항목</th><th>가능?</th><th>기준</th></tr></thead><tbody><tr><td>본인 도메인 내부 구조 정리</td><td>가능</td><td>03/25 기준 안에서 가능</td></tr><tr><td>테스트 추가</td><td>가능</td><td>11/18 기준 준수</td></tr><tr><td>외부 API 변경</td><td>Lead 협의</td><td>04_API_명세서.md 영향</td></tr><tr><td>요구사항 변경</td><td>불가</td><td>07_요구사항_정의서.md Lead 확인 필요</td></tr><tr><td>금지 기능 추가</td><td>불가</td><td>AI 자유 챗봇, SSE, Kafka/K8s/Helm v1 등 금지</td></tr></tbody></table></section>
 <section id="sec-6" class="sec"><div class="sec-hdr"><div class="sec-num">6</div><div class="sec-title">워크플로우 + 리포트 — 모든 작업 의무</div></div><div class="callout blue"><strong>작업 전 workflow, 작업 후 report가 필수다.</strong> 실제 폴더는 별도 구현 GitHub에 만들고, 이 문서 저장소에는 기준만 유지한다.</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김지민/
 ├── README.md
 ├── workflows/
@@ -411,7 +411,7 @@ gh pr create --base dev --head hotfix/mobile-ui-bug --title "fix(mobile): short 
 | 브랜치 | feature/mobile-today-qt-screen |
 | PR 대상 | dev |
 | 관련 F-ID |  |
-| 기준 문서 | 07_요구사항_정의서.md v2.3 |
+| 기준 문서 | 07_요구사항_정의서.md v3.1 |
 | 담당 경로 |  |
 
 ## 작업 목표
@@ -452,16 +452,16 @@ flutter analyze
 flutter test
 
 # PR 생성 예시
-gh pr create --base dev --head feature/mobile-today-qt-screen --title "feat(mobile): task summary" --body-file workspaces/김지민/reports/YYYY-MM-DD_task-name_report.md</code></pre><table class="tbl"><thead><tr><th>검증 축</th><th>김지민 기준</th></tr></thead><tbody><tr><td>요구사항</td><td>07_요구사항_정의서.md v2.3과 충돌 없음</td></tr><tr><td>담당 범위</td><td>mobile / admin</td></tr><tr><td>테스트</td><td>flutter analyze/test, 화면 상태, 금지 버튼 0건 검증</td></tr><tr><td>기록</td><td>workflow/report 작성 후 PR 본문 연결</td></tr></tbody></table></section>
-<section id="sec-8" class="sec"><div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정</div></div><div class="callout red">07_요구사항_정의서.md v2.3 기준. 아래 항목은 작업 목표에 넣지 않는다.</div><table class="tbl"><thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead><tbody><tr><td>사용자 AI</td><td>AI Q&A, 챗봇, SSE, /ai/sessions/**</td><td>04:00 배치 또는 관리자 트리거</td></tr><tr><td>인프라</td><td>Kafka, Kubernetes, Helm v1</td><td>ApplicationEventPublisher, Docker Compose</td></tr><tr><td>검색</td><td>RAG, ChromaDB, vector DB, Elasticsearch</td><td>MySQL 8.0 + RDB 인덱스</td></tr><tr><td>성경 데이터</td><td>개역개정, ESV, NIV 저장·응답·테스트</td><td>검토 완료 GitHub 공개 JSON</td></tr><tr><td>찬양</td><td>AI 찬양 추천, 가사·음원 저장, 직접 URL 입력</td><td>운영자 사전 큐레이션</td></tr><tr><td>교회 인증</td><td>화면, 버튼, API, DB 필드</td><td>MVP 제외</td></tr></tbody></table></section>
+gh pr create --base dev --head feature/mobile-today-qt-screen --title "feat(mobile): task summary" --body-file workspaces/김지민/reports/YYYY-MM-DD_task-name_report.md</code></pre><table class="tbl"><thead><tr><th>검증 축</th><th>김지민 기준</th></tr></thead><tbody><tr><td>요구사항</td><td>07_요구사항_정의서.md v3.1과 충돌 없음</td></tr><tr><td>담당 범위</td><td>mobile / admin</td></tr><tr><td>테스트</td><td>flutter analyze/test, 화면 상태, 금지 버튼 0건 검증</td></tr><tr><td>기록</td><td>workflow/report 작성 후 PR 본문 연결</td></tr></tbody></table></section>
+<section id="sec-8" class="sec"><div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정</div></div><div class="callout red">07_요구사항_정의서.md v3.1 기준. 아래 항목은 작업 목표에 넣지 않는다.</div><table class="tbl"><thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead><tbody><tr><td>세션형 AI</td><td>AI 자유 챗봇, 다중 턴 대화, SSE, /ai/sessions/**</td><td>F-15 단발 Q&A / 해설 배치</td></tr><tr><td>인프라</td><td>Kafka, Kubernetes, Helm v1</td><td>ApplicationEventPublisher, Docker Compose</td></tr><tr><td>검색</td><td>RAG, ChromaDB, vector DB, Elasticsearch</td><td>MySQL 8.0 + RDB 인덱스</td></tr><tr><td>성경 데이터</td><td>개역개정, ESV, NIV 저장·응답·테스트</td><td>검토 완료 GitHub 공개 JSON</td></tr><tr><td>찬양</td><td>AI 찬양 추천, 가사·음원 저장, 직접 URL 입력</td><td>운영자 사전 큐레이션</td></tr><tr><td>교회 인증</td><td>화면, 버튼, API, DB 필드</td><td>MVP 제외</td></tr></tbody></table></section>
 </main>
 <script>
 const simTemplates={
   'lead-flow':['[scan] branch, PR template, CI guard 기준 확인','[ok] dev 기준 PR 흐름 정상','[ok] forbidden pattern 0건','[done] Lead review checklist 생성'],
-  'ai-flow':['[batch] 04:00 KST AI batch trigger','[log] ai_runs status=RUNNING promptVersion=v1','[verify] editor agent fact/tone check passed','[done] C explanation saved; user path LLM call=0'],
-  'ui-flow':['[render] Today QT screen mounted','[state] simulatorStatus checked; READY only button enabled','[guard] AI 질문/교회 인증/AI 찬양 추천 UI 0건','[done] Flutter flow ready for demo'],
+  'ai-flow':['[batch] 04:00 KST AI batch trigger','[log] ai_generation_jobs status=RUNNING promptVersion=v1','[verify] editor agent fact/tone check passed','[done] C explanation saved; request-time explanation generation=0'],
+  'ui-flow':['[render] Today QT screen mounted','[state] simulatorStatus checked; READY only button enabled','[guard] AI 자유 챗봇/교회 인증/AI 찬양 추천 UI 0건','[done] Flutter flow ready for demo'],
   'sim-flow':['[query] simulator status by qtPassageId','[cache] existing clip reused; no per-request regeneration','[state] READY/MISSING/FAILED/DISABLED mapped','[done] button enable rule verified'],
-  'journal-flow':['[api] POST /api/v1/journals/today idempotent DRAFT','[event] JournalChangedEvent published after commit','[song] curated metadata only; lyrics/audio/url input blocked','[done] journal/songs flow verified'],
+  'note-flow':['[api] GET /api/v1/notes/draft idempotent DRAFT','[event] NoteChangedEvent published after commit','[praise] curated metadata only; lyrics/audio/url input blocked','[done] note/praise flow verified'],
   'bible-flow':['[source] repoUrl/license/translationName checked','[range] 00:00 publish / 04:00 collection batch aligned','[guard] 개역개정/ESV/NIV data 0건','[done] Today QT bible response ready']
 };
 function toggleDay(id){var el=document.getElementById('panel-'+id);if(!el)return;el.classList.toggle('show');var t=document.getElementById('tog-'+id);if(t)t.textContent=el.classList.contains('show')?'▲ 접기':'▼ 펼치기';var r=el.parentElement;if(r&&r.classList.contains('day-row'))r.classList.toggle('open');}
