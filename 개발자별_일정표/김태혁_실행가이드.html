@@ -10,9 +10,12 @@
 </head>
 <body>
 <header>
-  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김태혁 실행가이드 <span class="role-chip">simulator / 시뮬레이터 상태 모델 / 클립 저장&#183;조회</span></div><div class="dev-sub">기준일 2026-05-15 · 김태혁_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
+  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김태혁 실행가이드 <span class="role-chip">simulator / 시뮬레이터 상태 모델 / 클립 저장&#183;조회</span></div><div class="dev-sub">기준일 2026-05-15 · 김태혁_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
 </header>
 <main class="wrap">
+<section class="sec" style="background:rgba(248,81,73,.04);border-left:3px solid #f85149;padding:18px 0 14px 14px"><div class="sec-hdr"><div class="sec-num" style="background:#f85149;color:#fff;border-color:#f85149">!</div><div class="sec-title">2026-05-19 정책 정합화 공지 (v3.4)</div></div><div class="callout red"><strong>회의록 기반 5건 정책이 갱신됐습니다. 본 html은 헤더와 본 공지만 v3.4 정합화됐고, 본문 곳곳의 표·체크리스트는 다음 v3.5 갱신 시 일괄 반영 예정입니다. 정확한 최신 정책은 공식일정표.md v0.3 또는 doc/프로젝트 문서/ 안 07/03/04/02/06/22/25 최신본을 참조하세요.</strong><br><br>① <strong>도메인 패키지 5층 구조</strong> — api / internal / client / web + common. <code>internal/</code> 외부 접근 절대 금지, 다른 도메인 호출은 <code>api/UseCase</code>만, Mock은 <code>client/{타도메인}/...UseCaseMock</code>. (03 v1.2 §3.1)<br>② <strong>관리자 페이지 = 별도 웹</strong> — Flutter 앱이 아닌 별도 웹 프런트엔드. 사용자 Flutter 앱에 관리자 화면(AD-) 포함 금지. SSR/SPA는 v1.2 이후 결정. (03 v1.2 §4.9 / §13.6)<br>③ <strong>@멘션 본문 자동 삽입</strong> — F-03 QT 노트와 F-16 자유 노트 본문에서 <code>@로마서 8:5</code> 또는 <code>@로마서 8:5-10</code> 트리거로 본문 인용 블록 삽입. 클라이언트가 <code>GET /api/v1/bible/verses?bookCode=&amp;chapter=&amp;verseFrom=&amp;verseTo=</code> 호출 후 본문에 삽입 + verseIds로 note_verses 동기화. (07 v3.2 §6.4.1)<br>④ <strong>닉네임 7일 변경 잠금</strong> — 한 번 변경 후 7일 잠금. 가입 첫 설정·중복 재설정은 면제. 위반 시 <code>409 NICKNAME_CHANGE_LOCKED</code>. 새 컬럼 <code>members.nickname_last_changed_at</code>. (07 v3.3 §F-10, 04 v1.5 §4.1.5, 02 v2.1)<br>⑤ <strong>한글 성경 클라이언트 로컬 저장</strong> — 한글은 SQLite 로컬 + 서버 마스터 사본, 영어는 서버 마스터 + 온라인 조회만. 앱 첫 실행 시 <code>GET /api/v1/bible/bundle?language=ko</code>로 일괄 다운로드. 한글은 오프라인 표시 가능. (07 v3.4 §F-01, 04 v1.6 §4.2.2.1, 02 v2.2)<br>⑥ <strong>노트 저장 정책 (§18.2)</strong> — v1은 (c) 현행 유지(서버 마스터 단일), v1.1 이후 (b) 절충안(서버 마스터 + 로컬 캐시 + 작성 시 큐잉) 자안. v1 본문 변경 없음. (07 §18.2)</div><div class="callout warn mt12"><strong>🔥 v3.4 김태혁 본문 영향 (시뮬레이터)</strong><br>① <strong>패키지 5층 구조</strong> — 시뮬레이터는 `domain.study`(사용자 노출 조회) 또는 별도 모듈로 두며 `api/internal/web` 3분할(다른 도메인 호출 없으면 `client/` 불필요).<br>② <strong>관리자 = 웹 인지</strong> — 시뮬레이터 관리자 화면도 사용자 Flutter 앱이 아닌 별도 관리자 웹에서 구현.<br>③ <strong>다른 정책 영향 없음</strong> — @멘션·닉네임 잠금·한글 성경 로컬·노트 §18.2는 시뮬레이터 도메인 직접 영향 없음.</div>
+</section>
+
 <section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>김태혁 — 시뮬레이터 상태 모델, 클립 조회, 실패·누락 처리</strong><br>1 Today QT 100%는 시뮬레이터 상태값 정상 응답을 뜻하며 모든 클립 필수 생성이 아니다.<br>2 READY만 버튼 활성화, MISSING/FAILED/DISABLED는 비활성화한다.<br>3 본문 범위별 클립은 재사용하고 사용자 요청마다 재생성하지 않는다.<br>4 domain.bible/domain.ai 내부 클래스를 직접 import하지 않고 Interface/DTO로만 연동한다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 상태 enum과 UI 버튼 매핑 기준을 먼저 고정<br>2 Today QT 응답에 simulatorStatus가 항상 포함되는지 확인<br>3 실패 로그와 재처리 가능 기준을 report에 남김<br>4 READY와 비활성 상태를 모두 시연 샘플로 준비</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>study / simulator</div><div class="callout"><strong>작업 요약</strong><br>시뮬레이터 상태 모델, 상태 조회 API, 클립 저장·조회, 실패 상태 처리</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/study/ — 상태·클립 도메인</li>
 <li>qtai-server/src/test/java/com/qtai/domain/study/ — 상태 매핑 테스트</li>
 <li>flutter-app/lib/features/today_qt/ — 버튼 상태 연동</li>
@@ -52,7 +55,7 @@ git checkout -b feature/simulator-status-api
 # alternative
 git checkout -b test/simulator-status-flow</code></pre><table class="tbl"><tbody><tr><td>기본 형식</td><td><code>{type}/{scope}-{short-task}</code></td></tr><tr><td>PR 대상</td><td>항상 <code>dev</code></td></tr><tr><td>허용 type</td><td><code>feature</code>, <code>bugfix</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>hotfix</code></td></tr><tr><td>작업 단위</td><td>3일 안에 리뷰 가능한 작은 PR 권장</td></tr></tbody></table></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('SIM-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 8단계 — dev 브랜치 기준</strong><span>workflow → work → test → report → PR → review</span></div><div class="pr-panel-chev open" id="chev-SIM-pr-2">⌄</div></div><div class="pr-panel-body show" id="SIM-pr-2"><div class="pr-step"><div class="pr-step-num">1</div><div><div class="pr-step-title">dev 최신화</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
-git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/simulator-status-api</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김태혁/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v3.1 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
+git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/simulator-status-api</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김태혁/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조) 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
 # backend 변경 시 ./gradlew test
 # flutter 변경 시 flutter analyze &amp;&amp; flutter test</code></pre></div></div><div class="pr-step"><div class="pr-step-num">6</div><div><div class="pr-step-title">작업 후 report 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김태혁/reports/YYYY-MM-DD_task-name_report.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">7</div><div><div class="pr-step-title">push</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git push -u origin feature/simulator-status-api</code></pre></div></div><div class="pr-step"><div class="pr-step-num">8</div><div><div class="pr-step-title">PR 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>gh pr create --base dev --head feature/simulator-status-api --title "feat(simulator): task summary" --body-file workspaces/김태혁/reports/YYYY-MM-DD_task-name_report.md</code></pre></div></div></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('SIM-pr-3')"><div class="pr-panel-num">3</div><div class="pr-panel-title"><strong>③ PR 템플릿 자동 로드 (.github/pull_request_template.md) — v3.1</strong><span>상세 내용 열기/닫기</span></div><div class="pr-panel-chev" id="chev-SIM-pr-3">⌄</div></div><div class="pr-panel-body" id="SIM-pr-3"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>## 구현 내용
@@ -70,7 +73,7 @@ git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-
 - [ ] 인프라 / CI (chore)
 
 ## 코드 체크리스트
-- [ ] 07_요구사항_정의서.md v3.1과 충돌 없음
+- [ ] 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 없음
 - [ ] 02_ERD_문서.md / 04_API_명세서.md / 06_화면_기능_정의서.md와 충돌 없음
 - [ ] application.yml 또는 코드에 평문 Secret 없음
 - [ ] AI 자유 챗봇, 다중 턴 대화, SSE, /ai/sessions/** 없음
@@ -123,7 +126,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -155,7 +158,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -187,7 +190,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -219,7 +222,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -251,7 +254,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -283,7 +286,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -315,7 +318,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -347,7 +350,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -379,7 +382,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 여부 확인
 
 # 작업 내용
 담당자: 김태혁
@@ -410,7 +413,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
 | 브랜치 | feature/simulator-status-api |
 | PR 대상 | dev |
 | 관련 F-ID |  |
-| 기준 문서 | 07_요구사항_정의서.md v3.1 |
+| 기준 문서 | 07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조) |
 | 담당 경로 |  |
 
 ## 작업 목표
@@ -451,8 +454,8 @@ flutter analyze
 flutter test
 
 # PR 생성 예시
-gh pr create --base dev --head feature/simulator-status-api --title "feat(simulator): task summary" --body-file workspaces/김태혁/reports/YYYY-MM-DD_task-name_report.md</code></pre><table class="tbl"><thead><tr><th>검증 축</th><th>김태혁 기준</th></tr></thead><tbody><tr><td>요구사항</td><td>07_요구사항_정의서.md v3.1과 충돌 없음</td></tr><tr><td>담당 범위</td><td>simulator</td></tr><tr><td>테스트</td><td>READY/MISSING/FAILED/DISABLED, 재생성 금지, 버튼 활성 기준 검증</td></tr><tr><td>기록</td><td>workflow/report 작성 후 PR 본문 연결</td></tr></tbody></table></section>
-<section id="sec-8" class="sec"><div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정</div></div><div class="callout red">07_요구사항_정의서.md v3.1 기준. 아래 항목은 작업 목표에 넣지 않는다.</div><table class="tbl"><thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead><tbody><tr><td>세션형 AI</td><td>AI 자유 챗봇, 다중 턴 대화, SSE, /ai/sessions/**</td><td>F-15 단발 Q&A / 해설 배치</td></tr><tr><td>인프라</td><td>Kafka, Kubernetes, Helm v1</td><td>ApplicationEventPublisher, Docker Compose</td></tr><tr><td>검색</td><td>RAG, ChromaDB, vector DB, Elasticsearch</td><td>MySQL 8.0 + RDB 인덱스</td></tr><tr><td>성경 데이터</td><td>개역개정, ESV, NIV 저장·응답·테스트</td><td>검토 완료 GitHub 공개 JSON</td></tr><tr><td>찬양</td><td>AI 찬양 추천, 가사·음원 저장, 직접 URL 입력</td><td>운영자 사전 큐레이션</td></tr><tr><td>교회 인증</td><td>화면, 버튼, API, DB 필드</td><td>MVP 제외</td></tr></tbody></table></section>
+gh pr create --base dev --head feature/simulator-status-api --title "feat(simulator): task summary" --body-file workspaces/김태혁/reports/YYYY-MM-DD_task-name_report.md</code></pre><table class="tbl"><thead><tr><th>검증 축</th><th>김태혁 기준</th></tr></thead><tbody><tr><td>요구사항</td><td>07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조)과 충돌 없음</td></tr><tr><td>담당 범위</td><td>simulator</td></tr><tr><td>테스트</td><td>READY/MISSING/FAILED/DISABLED, 재생성 금지, 버튼 활성 기준 검증</td></tr><tr><td>기록</td><td>workflow/report 작성 후 PR 본문 연결</td></tr></tbody></table></section>
+<section id="sec-8" class="sec"><div class="sec-hdr"><div class="sec-num">8</div><div class="sec-title">금지 패턴 — 보이면 즉시 수정</div></div><div class="callout red">07_요구사항_정의서.md v3.4 (2026-05-19 정합화 - 본문은 공식일정표.md v0.3 참조) 기준. 아래 항목은 작업 목표에 넣지 않는다.</div><table class="tbl"><thead><tr><th>범주</th><th>금지</th><th>대안</th></tr></thead><tbody><tr><td>세션형 AI</td><td>AI 자유 챗봇, 다중 턴 대화, SSE, /ai/sessions/**</td><td>F-15 단발 Q&A / 해설 배치</td></tr><tr><td>인프라</td><td>Kafka, Kubernetes, Helm v1</td><td>ApplicationEventPublisher, Docker Compose</td></tr><tr><td>검색</td><td>RAG, ChromaDB, vector DB, Elasticsearch</td><td>MySQL 8.0 + RDB 인덱스</td></tr><tr><td>성경 데이터</td><td>개역개정, ESV, NIV 저장·응답·테스트</td><td>검토 완료 GitHub 공개 JSON</td></tr><tr><td>찬양</td><td>AI 찬양 추천, 가사·음원 저장, 직접 URL 입력</td><td>운영자 사전 큐레이션</td></tr><tr><td>교회 인증</td><td>화면, 버튼, API, DB 필드</td><td>MVP 제외</td></tr></tbody></table></section>
 </main>
 <script>
 const simTemplates={
