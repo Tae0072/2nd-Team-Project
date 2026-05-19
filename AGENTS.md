@@ -11,7 +11,7 @@ QT-AI is a Quiet Time app for today's Bible passage, easy Korean explanations, p
 - **Users:** `ANONYMOUS`, `USER`, `ADMIN`, `OPERATOR`, `REVIEWER`, `CONTENT_CREATOR`, `SUPER_ADMIN`, `SYSTEM_BATCH`
 - **Source of truth:** `07_요구사항_정의서.md` v3.1
 - **Repository role:** documentation/specification baseline only
-- **Implementation target:** separate implementation GitHub with one `qtai-server` Modular Monolith + Flutter app/admin surface
+- **Implementation target:** separate implementation GitHub with one `qtai-server` Modular Monolith + Flutter app (users) + separate admin web frontend (admins). Admin UI is **not** part of the Flutter app — confirmed in the 2026-05-19 instructor session.
 - **Hard boundary:** do not create Spring Boot, Flutter, OpenAPI, DB, infra, data seed, or CI implementation skeletons in this repository.
 
 ## 2. Source Documents
@@ -29,12 +29,13 @@ Conflict order: `07` for requirements, `03` for architecture, `04` for API, `18`
 - **Backend shape:** single `qtai-server`; no independent services
 - **DB/cache:** MySQL 8.0, H2 for tests, Caffeine app cache, Redis for token/rate/idempotency after review
 - **AI:** DeepSeek OpenAI-compatible client; batch/admin generation plus F-15 single-turn fact Q&A with validation
-- **Frontend:** Flutter app; admin UI by agreed Flutter Web/admin surface
+- **Frontend (users):** Flutter app (Android first, iOS later) — calls `/api/v1/**` except admin paths
+- **Frontend (admins):** separate web frontend (not Flutter app); calls `/api/v1/admin/**`. SSR/SPA framework choice deferred to v1.2+
 - **CI/deploy:** GitHub Actions, Spectral, JaCoCo, gitleaks, Docker Compose
 
 ## 4. Architecture Rules
 
-Flutter App/Admin Web calls `/api/v1/**` on single `qtai-server`.
+Flutter app (users) and separate admin web frontend both call `/api/v1/**` on the single `qtai-server`, with different paths and roles. Admin UI is not embedded in the Flutter app.
 Domains: `member`, `bible`, `qt`, `study`, `note`, `sharing`, `report`, `notification`, `praise`, `mission`, `ai`, `admin`, `audit`.
 
 - `note`, `sharing`, and `praise` are top-level domains, not `bible` submodules.
