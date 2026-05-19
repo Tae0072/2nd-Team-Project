@@ -1,4 +1,4 @@
-# QT-AI API 명세서 v1.3
+# QT-AI API 명세서 v1.4
 
 > **문서 버전:** v1.3  
 > **작성일:** 2026-05-17  
@@ -393,6 +393,16 @@
 - **Method + URL:** `GET /api/v1/bible/verses?bookCode=GENESIS&chapter=1`
 - **인증:** USER
 - **ERD:** `bible_books`, `bible_verses`
+- **쿼리 파라미터:**
+
+| 파라미터 | 필수 | 형식 | 설명 |
+|---|---|---|---|
+| `bookCode` | 필수 | string | `bible_books.code` (예: `GENESIS`, `ROMANS`) |
+| `chapter` | 필수 | int | 장 번호 |
+| `verseFrom` | 선택 | int | 시작 절. 생략하면 장 전체 조회 |
+| `verseTo` | 선택 | int | 끝 절. `verseFrom` 단독 지정 시 해당 절만 조회. `verseFrom <= verseTo` 강제 |
+
+`verseFrom`/`verseTo`는 노트 본문에서 `@`멘션 본문 자동 삽입(`07` §6.4.1, F-03/F-16)을 위해 추가된 범위 조회 지원이다. 단일 인용 범위 상한(예: 50절)은 후속 정책에서 확정한다.
 
 ```json
 {
@@ -411,6 +421,16 @@
   ]
 }
 ```
+
+- **`@`멘션 호출 예시:**
+  - `@로마서 8:5` → `GET /api/v1/bible/verses?bookCode=ROMANS&chapter=8&verseFrom=5&verseTo=5`
+  - `@로마서 8:5-10` → `GET /api/v1/bible/verses?bookCode=ROMANS&chapter=8&verseFrom=5&verseTo=10`
+  - 클라이언트는 `GET /api/v1/bible/books` 응답을 기준으로 책 이름(`koreanName`/`englishName`) → `code` 매핑을 수행한다.
+
+- **실패 코드:**
+  - `404 NOT_FOUND` — 책·장·절이 존재하지 않음
+  - `400 VALIDATION_ERROR` — `verseFrom > verseTo`, 음수, 범위 상한 초과 등 잘못된 파라미터
+  - `429 RATE_LIMIT_EXCEEDED` — 단시간 과다 호출 시
 
 ### 4.2.3 오늘 QT 조회
 
@@ -739,6 +759,7 @@
 - **주의:** 이미 생성된 `sharing_posts`의 스냅샷은 자동 변경하지 않는다.
 - **상태 전이:** `DRAFT -> SAVED`, `SAVED -> DRAFT`, `DRAFT/SAVED -> DELETED`. `DELETED` 상태 노트는 수정할 수 없다.
 - **구절 수정 정책:** `verseIds`를 전달하면 기존 `note_verses`를 요청 배열 기준으로 교체한다. `MEDITATION`은 `qtPassageId`의 구절 범위 안에서만 허용하고, `SERMON`은 자유 선택을 허용한다. `PRAYER`, `REPENTANCE`, `GRATITUDE`는 구절 연결 없이 저장할 수 있다.
+- **`@`멘션 본문 자동 삽입 (`07` §6.4.1, F-03/F-16):** 클라이언트는 본문 작성 영역에서 `@책 장:절` 또는 `@책 장:절-절` 입력을 파싱해 `GET /api/v1/bible/verses?bookCode=&chapter=&verseFrom=&verseTo=`(§4.2.2)로 절을 조회한 뒤, `body`(또는 4개 섹션 본문) 안에 인용 블록 마크업으로 직접 삽입한다. 서버는 `body` 텍스트를 자유 형식으로 보존한다. 인용된 절들의 `id` 목록은 `verseIds` 배열에 함께 담아 보내며, 서버는 이를 `note_verses`에 저장해 메타데이터 인덱스(검색·통계·내 노트 구절 보기)로 사용한다. 본문 안 인용 블록 텍스트가 사용자에 의해 직접 수정·삭제되어도 `verseIds`는 클라이언트가 다시 보내는 값으로 동기화된다(동일 절을 두 번 인용해도 `note_verses`에는 중복 없이 저장된다).
 
 요청 예시:
 
@@ -2092,3 +2113,4 @@
 | v1.1 | 2026-05-17 | Backend/API Designer | 화면별 누락 API 상세화, 노트 삭제/나눔 스냅샷/AI Q&A 비동기/관리자 AI 운영/평가 셋/체크리스트/마이페이지 달력 보강 |
 | v1.2 | 2026-05-17 | Backend/API Designer | ERD/API 필드명 및 enum 정합성 보정, 공통 envelope 예시 기준 명시, 찬양/AI 검증/평가 셋/검증 참조 작업 스키마 수정 |
 | v1.3 | 2026-05-17 | Backend/API Designer | 나눔 삭제 정책 ERD 정합성 보정, 관리자 찬양/공지 상세 API 추가, 노트 수정 요청/응답/상태 전이 보강, 연결성 표 잔여 필드 정리 |
+| v1.4 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.2 §6.4.1(F-03/F-16 `@`멘션 본문 자동 삽입) 반영 — §4.2.2 성경 절 조회에 `verseFrom`/`verseTo` 쿼리 파라미터 추가(범위 조회 지원), 쿼리 파라미터 표·`@`멘션 호출 예시·실패 코드(`400 VALIDATION_ERROR`, `404 NOT_FOUND`, `429 RATE_LIMIT_EXCEEDED`) 추가. §4.3.6 노트 수정에 `@`멘션 본문 자동 삽입 정책 추가 — 클라이언트는 입력을 파싱해 §4.2.2 호출 후 본문에 인용 블록으로 직접 삽입하고 `verseIds`로 `note_verses` 메타데이터 동기화, 서버는 `body`를 자유 형식으로 보존. 트리거 기호는 `@`만 사용(2026-05-19 확정). 코드 변경 없음. |
