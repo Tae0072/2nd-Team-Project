@@ -1,4 +1,4 @@
-# QT-AI API 명세서 v1.4
+# QT-AI API 명세서 v1.5
 
 > **문서 버전:** v1.3  
 > **작성일:** 2026-05-17  
@@ -270,6 +270,8 @@
   "tutorialCompletedAt": "2026-05-17T08:00:00+09:00",
   "withdrawnAt": null,
   "legalRetentionUntil": null,
+  "nicknameLastChangedAt": "2026-05-17T07:55:00+09:00",
+  "nicknameUnlockAt": "2026-05-24T07:55:00+09:00",
   "authProviders": [
     {
       "provider": "KAKAO",
@@ -280,6 +282,8 @@
   "createdAt": "2026-05-17T07:50:00+09:00"
 }
 ```
+
+`nicknameLastChangedAt`은 마지막 닉네임 변경 시각, `nicknameUnlockAt`은 잠금 해제 시각(`nicknameLastChangedAt + 7일`)이다. 두 값 모두 가입 후 닉네임을 한 번도 변경한 적이 없으면 `null`이다. 클라이언트는 `nicknameUnlockAt`을 화면에 안내 텍스트로 표시할 때 활용한다.
 
 - **실패 코드:** `401 TOKEN_EXPIRED`, `403 FORBIDDEN`, `404 NOT_FOUND`
 
@@ -327,7 +331,14 @@
 
 - **Method + URL:** `PATCH /api/v1/me/profile`
 - **인증:** USER
-- **ERD:** `members`
+- **ERD:** `members.nickname`, `members.nickname_last_changed_at`
+- **처리:**
+  - 현재 닉네임과 동일한 값이면 변경 없이 `200 OK` 응답.
+  - 다른 값이면 7일 잠금 정책(F-10, `07` §F-10 닉네임 정책)을 검사한다. 마지막 변경 시각(`members.nickname_last_changed_at`)이 NULL이거나 NOW()-7일 이전이면 변경을 허용하고 `nickname_last_changed_at = NOW()`로 기록한다. 그렇지 않으면 `409 NICKNAME_CHANGE_LOCKED`로 거절한다.
+  - 가입 직후 첫 설정(아직 `nickname IS NULL`인 경우)은 잠금 검사를 건너뛰고 즉시 허용하며, 이 첫 설정도 `nickname_last_changed_at`을 갱신하지 않는다(첫 설정은 "변경"이 아니라 "초기화"로 본다).
+  - 닉네임 형식 오류·중복으로 가입 직후 재설정하는 경우도 잠금 검사를 건너뛴다(닉네임이 ACTIVE 사용 이력 전이라면 잠금 대상 아님).
+
+요청:
 
 ```json
 {
@@ -335,15 +346,44 @@
 }
 ```
 
+성공 응답 (`200 OK`):
+
 ```json
 {
   "id": 10,
   "nickname": "하늘QT",
   "role": "USER",
   "status": "ACTIVE",
-  "tutorialCompletedAt": null
+  "tutorialCompletedAt": null,
+  "nicknameLastChangedAt": "2026-05-19T08:00:00+09:00",
+  "nicknameUnlockAt": "2026-05-26T08:00:00+09:00"
 }
 ```
+
+7일 잠금 실패 응답 (`409 NICKNAME_CHANGE_LOCKED`):
+
+```json
+{
+  "success": false,
+  "data": null,
+  "error": {
+    "code": "NICKNAME_CHANGE_LOCKED",
+    "message": "닉네임은 변경 후 7일 동안 다시 변경할 수 없습니다.",
+    "fields": {
+      "nicknameLastChangedAt": "2026-05-15T08:00:00+09:00",
+      "nicknameUnlockAt": "2026-05-22T08:00:00+09:00"
+    }
+  },
+  "timestamp": "2026-05-19T10:00:00+09:00",
+  "traceId": "01HX..."
+}
+```
+
+- **실패 코드:**
+  - `400 VALIDATION_ERROR` — 닉네임 형식 오류(길이, 허용 문자)
+  - `409 NICKNAME_DUPLICATED` — 닉네임 중복
+  - `409 NICKNAME_CHANGE_LOCKED` — 마지막 변경 후 7일이 지나지 않음
+  - `401 UNAUTHORIZED` / `401 TOKEN_EXPIRED`
 
 ### 4.1.6 튜토리얼 완료
 
@@ -1758,6 +1798,7 @@
 | `FORBIDDEN` | 403 | 권한 없음 |
 | `NOT_FOUND` | 404 | 리소스 없음 |
 | `NICKNAME_DUPLICATED` | 409 | 닉네임 중복 |
+| `NICKNAME_CHANGE_LOCKED` | 409 | 닉네임 변경 후 7일이 지나지 않음. 응답 `error.fields.nicknameUnlockAt`에 잠금 해제 시각 포함 (`07` §F-10) |
 | `DUPLICATE_NOTE` | 409 | 동일 사용자+QT 활성 노트 중복 |
 | `DUPLICATE_LIKE` | 409 | 좋아요 중복 |
 | `DUPLICATE_REPORT` | 409 | 동일 대상 중복 신고 |
@@ -2114,3 +2155,4 @@
 | v1.2 | 2026-05-17 | Backend/API Designer | ERD/API 필드명 및 enum 정합성 보정, 공통 envelope 예시 기준 명시, 찬양/AI 검증/평가 셋/검증 참조 작업 스키마 수정 |
 | v1.3 | 2026-05-17 | Backend/API Designer | 나눔 삭제 정책 ERD 정합성 보정, 관리자 찬양/공지 상세 API 추가, 노트 수정 요청/응답/상태 전이 보강, 연결성 표 잔여 필드 정리 |
 | v1.4 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.2 §6.4.1(F-03/F-16 `@`멘션 본문 자동 삽입) 반영 — §4.2.2 성경 절 조회에 `verseFrom`/`verseTo` 쿼리 파라미터 추가(범위 조회 지원), 쿼리 파라미터 표·`@`멘션 호출 예시·실패 코드(`400 VALIDATION_ERROR`, `404 NOT_FOUND`, `429 RATE_LIMIT_EXCEEDED`) 추가. §4.3.6 노트 수정에 `@`멘션 본문 자동 삽입 정책 추가 — 클라이언트는 입력을 파싱해 §4.2.2 호출 후 본문에 인용 블록으로 직접 삽입하고 `verseIds`로 `note_verses` 메타데이터 동기화, 서버는 `body`를 자유 형식으로 보존. 트리거 기호는 `@`만 사용(2026-05-19 확정). 코드 변경 없음. |
+| v1.5 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.3 §F-04/F-10 닉네임 7일 변경 잠금 정책 반영 — §4.1.5 `PATCH /api/v1/me/profile`에 7일 잠금 처리 규칙·잠금 면제 조건(가입 첫 설정, 형식·중복 재설정)·성공/실패 응답 예시·실패 코드 목록 추가, `nicknameLastChangedAt`/`nicknameUnlockAt` 응답 필드 도입. §4.1.2 `GET /api/v1/me` 응답에 `nicknameLastChangedAt`/`nicknameUnlockAt` 필드 추가(클라이언트가 잠금 해제 시각을 안내 텍스트로 활용). §6.2 ErrorCode 표에 `NICKNAME_CHANGE_LOCKED`(409) 추가. ERD 영향: `members.nickname_last_changed_at` 컬럼 신규(`02_ERD_문서.md`에서 정의). 출처: 2026-05-18 바이블서버 회의록 §5. 코드 변경 없음. |

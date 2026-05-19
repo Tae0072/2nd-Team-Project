@@ -1,8 +1,10 @@
-# QT-AI — ERD 문서 v2.0
+# QT-AI — ERD 문서 v2.1
 
-> **문서 버전:** v2.0  
+> **문서 버전:** v2.1  
 > **작성일:** 2026-05-17  
-> **연관 문서:** 01.요구사항명세서_현재완성v1.md
+> **최종 갱신일:** 2026-05-19  
+> **v2.1 보강 범위:** `members.nickname_last_changed_at` 컬럼 추가(닉네임 7일 변경 잠금 정책 계산 기준). `07_요구사항_정의서.md` v3.3 §F-10 / `04_API_명세서.md` v1.5 §4.1.5 정합화. 2026-05-18 바이블서버 회의록 §5 결정.  
+> **연관 문서:** 01.요구사항명세서_현재완성v1.md, 04_API_명세서.md, 07_요구사항_정의서.md
 
 ---
 
@@ -76,6 +78,7 @@ erDiagram
     members {
         BIGINT id PK
         VARCHAR nickname UK
+        DATETIME nickname_last_changed_at
         VARCHAR role
         VARCHAR status
         DATETIME withdrawn_at
@@ -338,6 +341,7 @@ erDiagram
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | 회원 ID |
 | nickname | VARCHAR(30) | N | - | UK | 나눔 공간에 노출되는 닉네임 |
+| nickname_last_changed_at | DATETIME(6) | Y | NULL | | 마지막 닉네임 변경 시각. 7일 잠금 계산 기준. 가입 시 첫 설정 또는 형식·중복 재설정은 갱신 대상 아님 (`07` §F-10, `04` §4.1.5) |
 | role | VARCHAR(20) | N | 'USER' | | USER, ADMIN, SYSTEM |
 | status | VARCHAR(20) | N | 'ACTIVE' | | ACTIVE, WITHDRAWN, SUSPENDED |
 | tutorial_completed_at | DATETIME(6) | Y | NULL | | 첫 실행 튜토리얼 완료 시각 |
@@ -350,6 +354,12 @@ erDiagram
 - `uk_members_nickname` UNIQUE ON (nickname)
 - `idx_members_status` ON (status)
 - `idx_members_legal_retention_until` ON (legal_retention_until)
+
+**닉네임 7일 잠금 처리 규칙**
+- 닉네임 변경 API(`PATCH /api/v1/me/profile`)는 다음 두 조건 중 하나를 만족할 때만 변경을 허용한다: (a) `nickname_last_changed_at IS NULL`, (b) `nickname_last_changed_at < NOW() - INTERVAL 7 DAY`.
+- 허용된 변경은 `nickname = :new_nickname`, `nickname_last_changed_at = NOW()`를 같은 트랜잭션에서 갱신한다.
+- 거절된 변경은 `409 NICKNAME_CHANGE_LOCKED`를 반환하고 `nickname_last_changed_at + 7일`을 `nicknameUnlockAt`으로 응답한다.
+- 가입 직후 첫 설정(`nickname IS NULL` → 첫 값 부여) 또는 가입 직후 형식 오류·중복 재설정은 `nickname_last_changed_at`을 갱신하지 않는다.
 
 ---
 
@@ -1391,6 +1401,12 @@ stateDiagram-v2
 | AI 평가 | ai_evaluation_sets, ai_evaluation_cases | 평가 셋과 평가 케이스 추가 | P1 |
 | 신고 | reports | AI_QA_REQUEST, AI_ASSET 신고 대상 추가 | P1 |
 | 시뮬레이터 | simulator_component_library_versions, simulator_clips | 컴포넌트 라이브러리 버전 추적 추가 | P1 |
+
+### 5.3 v2.0 → v2.1 변경 내역 (2026-05-19)
+
+| 구분 | 대상 | 변경 내용 | 우선순위 |
+| --- | --- | --- | --- |
+| 회원 | members | `nickname_last_changed_at DATETIME(6) NULL` 컬럼 추가. 닉네임 7일 변경 잠금 정책의 계산 기준. 2026-05-18 바이블서버 회의록 §5 결정, `07_요구사항_정의서.md` v3.3 §F-10 / `04_API_명세서.md` v1.5 §4.1.5 정합화 | P1 |
 
 ---
 
