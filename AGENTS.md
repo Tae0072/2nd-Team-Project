@@ -16,19 +16,10 @@ QT-AI is a Quiet Time app for today's Bible passage, easy Korean explanations, p
 
 ## 2. Source Documents
 
-| Need | Read |
-| --- | --- |
-| Requirements | `07_요구사항_정의서.md` |
-| Project scope | `01_프로젝트_계획서.md` |
-| Data model | `02_ERD_문서.md` |
-| Architecture | `03_아키텍처_정의서.md` |
-| API contracts | `04_API_명세서.md` |
-| Screen behavior | `06_화면_기능_정의서.md` |
-| Git/PR rules | `09_Git_규칙.md` |
-| Quality gates | `18_코드_품질_게이트.md` |
-| Implementation checklist | `22_구현_저장소_반영_체크리스트.md` |
-| Terms | `23_도메인_용어사전.md` |
-| Feature details | `25_기능_명세서.md` |
+- Requirements: `07_요구사항_정의서.md`
+- Architecture/API/screens/data: `03_아키텍처_정의서.md`, `04_API_명세서.md`, `06_화면_기능_정의서.md`, `02_ERD_문서.md`
+- Planning/collaboration/quality: `01_프로젝트_계획서.md`, `09_Git_규칙.md`, `18_코드_품질_게이트.md`, `22_구현_저장소_반영_체크리스트.md`
+- Terms/features: `23_도메인_용어사전.md`, `25_기능_명세서.md`
 
 Conflict order: `07` for requirements, `03` for architecture, `04` for API, `18` for CI/quality, `23` for terms, `09` for collaboration.
 
@@ -36,32 +27,20 @@ Conflict order: `07` for requirements, `03` for architecture, `04` for API, `18`
 
 - **Backend:** Java 21, Spring Boot 3.3, Gradle, Spring Modulith, ArchUnit
 - **Backend shape:** single `qtai-server`; no independent services
-- **DB/cache:** MySQL 8.0, H2 for tests, Caffeine first, Redis if reviewed
+- **DB/cache:** MySQL 8.0, H2 for tests, Caffeine app cache, Redis for token/rate/idempotency after review
 - **AI:** DeepSeek OpenAI-compatible client; batch/admin generation plus F-15 single-turn fact Q&A with validation
 - **Frontend:** Flutter app; admin UI by agreed Flutter Web/admin surface
 - **CI/deploy:** GitHub Actions, Spectral, JaCoCo, gitleaks, Docker Compose
 
 ## 4. Architecture Rules
 
-```text
-Flutter App / Admin Web
-  -> /api/v1/** external HTTP API
-  -> qtai-server
-      +-- domain.member
-      +-- domain.bible
-      +-- domain.qt
-      +-- domain.study
-      +-- domain.note
-      +-- domain.sharing
-      +-- domain.praise
-      +-- domain.ai
-      +-- domain.admin
-```
+Flutter App/Admin Web calls `/api/v1/**` on single `qtai-server`.
+Domains: `member`, `bible`, `qt`, `study`, `note`, `sharing`, `report`, `notification`, `praise`, `mission`, `ai`, `admin`, `audit`.
 
 - `note`, `sharing`, and `praise` are top-level domains, not `bible` submodules.
 - External APIs are HTTP paths under `/api/v1/**`.
 - Internal domain calls use Java Interfaces and DTOs, not HTTP paths.
-- Other domains may import only `api/` Port and DTO packages.
+- Other domains may import only `api/` UseCase/DTO packages.
 - Do not import another domain's Entity, Service, Repository, or infrastructure type.
 - Controllers must not call repositories directly.
 - Explanation and simulator request paths must not generate AI content on demand; F-15 Q&A may call LLM only through the single-turn validation flow.
@@ -121,9 +100,9 @@ git diff --check
 When working in the separate implementation repository, run relevant code checks before PR:
 
 ```bash
-./gradlew build
-./gradlew test jacocoTestReport
-./gradlew jacocoTestCoverageVerification
+./gradlew -p qtai-server build
+./gradlew -p qtai-server test jacocoTestReport
+./gradlew -p qtai-server jacocoTestCoverageVerification
 npx @stoplight/spectral-cli lint apis/*/openapi.yaml --ruleset .spectral.yaml
 gitleaks detect --source . --redact --exit-code 1
 ```

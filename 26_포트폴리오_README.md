@@ -72,7 +72,7 @@
 
 | 영역 | 스택 |
 | --- | --- |
-| Backend | Java 21, Spring Boot 3.x, Spring Security, Spring Data JPA |
+| Backend | Java 21, Spring Boot 3.3, Spring Security, Spring Data JPA |
 | Architecture | 단일 `qtai-server` Modular Monolith, 도메인 패키지 격리, 내부 Java Interface |
 | Database | MySQL 8.0 |
 | Cache | Caffeine 1차, Redis 검토 |
@@ -163,7 +163,7 @@ flowchart LR
 | 구현 저장소 URL | TBD | 실제 GitHub 저장소 생성 후 작성 |
 | 실행 명령 | TBD | Docker Compose 기준으로 작성 |
 | 환경 변수 | TBD | `.env.example` 기준으로 작성하고 실제 Secret은 쓰지 않음 |
-| 테스트 명령 | TBD | `./gradlew test`, Flutter 테스트 등 실제 스크립트 기준 |
+| 테스트 명령 | TBD | `./gradlew -p qtai-server test`, Flutter 테스트 등 실제 스크립트 기준 |
 | 데모 URL | TBD | 배포 또는 로컬 시연 URL 확정 후 작성 |
 | 시연 영상 | TBD | W5 리허설 이후 링크 작성 |
 

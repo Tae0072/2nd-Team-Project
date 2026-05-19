@@ -304,7 +304,7 @@ PR 오픈 (base: dev)
 - [ ] `application.yml` 또는 코드에 평문 Secret 없음
 
 ## 테스트 체크리스트
-- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew test` 로컬 통과
+- [ ] 단위 테스트(Unit Test) 작성 완료 및 `./gradlew -p qtai-server test` 로컬 통과
 - [ ] 통합 테스트(Integration Test) 작성 완료
       또는 미작성 사유:
 - [ ] docs / chore 타입은 해당 없음

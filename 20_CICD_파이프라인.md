@@ -129,24 +129,23 @@ done
 
 ## 7. Backend CI 기준
 
-구현 저장소 구조가 확정되면 아래 두 방식 중 하나로 고정한다.
+구현 저장소는 `qtai-server/` 하위 Gradle 프로젝트 기준으로 고정한다.
 
 | 구조 | 명령 |
 | --- | --- |
-| 루트 Gradle 프로젝트 | `./gradlew clean test` |
 | `qtai-server/` 하위 프로젝트 | `./gradlew -p qtai-server clean test` |
 
 최소 검사:
 
 ```powershell
-./gradlew clean test
-./gradlew test jacocoTestReport
+./gradlew -p qtai-server clean test
+./gradlew -p qtai-server test jacocoTestReport
 ```
 
 | 항목 | 기준 |
 | --- | --- |
 | JDK | Java 21 |
-| Spring Boot | 3.x |
+| Spring Boot | 3.3 |
 | DB 테스트 | MySQL 8.0 또는 Testcontainers/MySQL 호환 환경 |
 | AI 호출 | 테스트에서 실제 DeepSeek 호출 금지, mock 또는 fake client 사용 |
 | Secret | CI 로그에 Secret 출력 금지 |
