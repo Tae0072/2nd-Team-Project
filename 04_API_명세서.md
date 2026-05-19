@@ -1,4 +1,4 @@
-# QT-AI API 명세서 v1.5
+# QT-AI API 명세서 v1.6
 
 > **문서 버전:** v1.3  
 > **작성일:** 2026-05-17  
@@ -433,6 +433,7 @@
 - **Method + URL:** `GET /api/v1/bible/verses?bookCode=GENESIS&chapter=1`
 - **인증:** USER
 - **ERD:** `bible_books`, `bible_verses`
+- **언어 정책:** 한글 본문 조회는 클라이언트 로컬 SQLite를 우선 사용하므로(§4.2.3 한글 번들 다운로드 참조) 이 API는 주로 **영어 본문 조회** 또는 한글 로컬 캐시 미적재 상태에서의 백업 조회 용도로 사용된다(`07` v3.4 §F-01 §데이터 정책).
 - **쿼리 파라미터:**
 
 | 파라미터 | 필수 | 형식 | 설명 |
@@ -471,6 +472,58 @@
   - `404 NOT_FOUND` — 책·장·절이 존재하지 않음
   - `400 VALIDATION_ERROR` — `verseFrom > verseTo`, 음수, 범위 상한 초과 등 잘못된 파라미터
   - `429 RATE_LIMIT_EXCEEDED` — 단시간 과다 호출 시
+
+#### 4.2.2.1 한글 성경 번들 다운로드 (클라이언트 로컬 적재용)
+
+한글 성경 본문을 클라이언트 로컬 SQLite에 일괄 적재하기 위한 번들 다운로드 API다. 앱 첫 실행 시 또는 번역본 버전이 갱신될 때 호출한다. 2026-05-18 바이블서버 회의록 §1·§3·§4 결정, `07_요구사항_정의서.md` v3.4 §F-01 §데이터 정책 참조.
+
+- **Method + URL:** `GET /api/v1/bible/bundle?language=ko&version={localVersion}`
+- **인증:** USER
+- **ERD:** `bible_books`, `bible_verses`
+- **쿼리 파라미터:**
+
+| 파라미터 | 필수 | 형식 | 설명 |
+|---|---|---|---|
+| `language` | 필수 | string | 번들 언어. v1에서는 `ko`만 지원 (영어는 온라인 조회만 사용). |
+| `version` | 선택 | string | 클라이언트가 보유한 현재 번들 버전. 서버 최신과 같으면 `304 Not Modified` 반환 |
+
+- **처리:**
+  - 한글+인덱스 전체 본문은 30MB 미만이라 단일 응답으로 전송 가능하다(`Content-Encoding: gzip` 권장).
+  - 서버는 응답에 `bundleVersion`을 포함하며, 클라이언트는 이 값을 SQLite 메타 테이블에 보관해 다음 호출 시 `version` 파라미터로 전달한다.
+  - 영어 번들은 v1에서 제공하지 않는다. 영어 본문은 §4.2.2 `GET /api/v1/bible/verses`로 온라인 조회한다.
+
+- **Response (`200 OK`) 예시:**
+
+```json
+{
+  "language": "ko",
+  "bundleVersion": "2026.05.19.001",
+  "translationName": "한글 개역",
+  "attribution": "Public Domain, 1961",
+  "books": [
+    {
+      "code": "GENESIS",
+      "koreanName": "창세기",
+      "englishName": "Genesis",
+      "displayOrder": 1,
+      "chapters": [
+        {
+          "chapterNo": 1,
+          "verses": [
+            { "id": 1001, "verseNo": 1, "koreanText": "태초에 하나님이 천지를 창조하시니라" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+- **변경 없음 응답 (`304 Not Modified`):** 클라이언트가 보낸 `version`이 서버 최신 `bundleVersion`과 일치할 때 본문 없이 반환.
+
+- **실패 코드:**
+  - `400 VALIDATION_ERROR` — 지원하지 않는 `language`(예: `en`)
+  - `503 SERVICE_UNAVAILABLE` — 번들 생성 진행 중 또는 임시 비활성
 
 ### 4.2.3 오늘 QT 조회
 
@@ -2156,3 +2209,4 @@
 | v1.3 | 2026-05-17 | Backend/API Designer | 나눔 삭제 정책 ERD 정합성 보정, 관리자 찬양/공지 상세 API 추가, 노트 수정 요청/응답/상태 전이 보강, 연결성 표 잔여 필드 정리 |
 | v1.4 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.2 §6.4.1(F-03/F-16 `@`멘션 본문 자동 삽입) 반영 — §4.2.2 성경 절 조회에 `verseFrom`/`verseTo` 쿼리 파라미터 추가(범위 조회 지원), 쿼리 파라미터 표·`@`멘션 호출 예시·실패 코드(`400 VALIDATION_ERROR`, `404 NOT_FOUND`, `429 RATE_LIMIT_EXCEEDED`) 추가. §4.3.6 노트 수정에 `@`멘션 본문 자동 삽입 정책 추가 — 클라이언트는 입력을 파싱해 §4.2.2 호출 후 본문에 인용 블록으로 직접 삽입하고 `verseIds`로 `note_verses` 메타데이터 동기화, 서버는 `body`를 자유 형식으로 보존. 트리거 기호는 `@`만 사용(2026-05-19 확정). 코드 변경 없음. |
 | v1.5 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.3 §F-04/F-10 닉네임 7일 변경 잠금 정책 반영 — §4.1.5 `PATCH /api/v1/me/profile`에 7일 잠금 처리 규칙·잠금 면제 조건(가입 첫 설정, 형식·중복 재설정)·성공/실패 응답 예시·실패 코드 목록 추가, `nicknameLastChangedAt`/`nicknameUnlockAt` 응답 필드 도입. §4.1.2 `GET /api/v1/me` 응답에 `nicknameLastChangedAt`/`nicknameUnlockAt` 필드 추가(클라이언트가 잠금 해제 시각을 안내 텍스트로 활용). §6.2 ErrorCode 표에 `NICKNAME_CHANGE_LOCKED`(409) 추가. ERD 영향: `members.nickname_last_changed_at` 컬럼 신규(`02_ERD_문서.md`에서 정의). 출처: 2026-05-18 바이블서버 회의록 §5. 코드 변경 없음. |
+| v1.6 | 2026-05-19 | T (강태오) | `07_요구사항_정의서.md` v3.4 §F-01 한글 성경 클라이언트 로컬 저장 정책 반영 — §4.2.2 성경 절 조회에 "언어 정책" 명시(이 API는 영어 본문 조회 또는 한글 로컬 미적재 시 백업 조회 용도), §4.2.2.1 한글 성경 번들 다운로드 API 신설(`GET /api/v1/bible/bundle?language=ko&version=`). 쿼리 파라미터·응답 예시·`304 Not Modified` 분기·실패 코드 정의. 영어 번들은 v1에서 제공하지 않고 §4.2.2로 온라인 조회. 출처: 2026-05-18 바이블서버 회의록 §1·§3·§4. 코드 변경 없음. |
