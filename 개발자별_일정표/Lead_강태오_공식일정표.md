@@ -1,10 +1,11 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
-> **문서 버전:** v3.1-align.1
-> **작성일:** 2026-05-15
-> **기준 문서:** `00_개발_일정_총괄표.md` v0.1, `07_요구사항_정의서.md` v3.1
+> **문서 버전:** v3.4-align.1
+> **작성일:** 2026-05-15 / **최종 갱신:** 2026-05-19
+> **기준 문서:** `00_개발_일정_총괄표.md` v0.1, `07_요구사항_정의서.md` v3.4, `03_아키텍처_정의서.md` v1.2, `04_API_명세서.md` v1.6, `02_ERD_문서.md` v2.2, `06_화면_기능_정의서.md` v1.4, `25_기능_명세서.md` v0.7
 > **적용 범위:** 강태오 Lead 일정표이면서, 다른 팀원 개인 일정표 작성 시 복제 가능한 공통 기준
 > **연관 문서:** `09_Git_규칙.md`, `18_코드_품질_게이트.md`, `23_도메인_용어사전.md`, `24_템플릿_문서_매핑표.md`, `개발자별_일정표/00_공통_브랜치_PR_워크플로우_규칙.md`
+> **v3.4-align.1 보강 범위 (2026-05-19):** 회의록 기반 5건 정합성 변경 + 노트 §18.2 결정 반영 — (1) 03 v1.2 도메인 5층 패키지 구조(api/internal/client/web + common), (2) 03 v1.2 관리자 UI = 별도 웹 프런트엔드(Flutter 앱 분리), (3) 07 v3.2 §6.4.1 `@`멘션 본문 자동 삽입(F-03/F-16), (4) 07 v3.3 §F-10 닉네임 7일 변경 잠금, (5) 07 v3.4 §F-01 한글 성경 클라이언트 로컬 SQLite + 영어 온라인 조회, (6) 07 §18.2 노트 로컬 v1=(c) 현행 유지·v1.1 이후=(b) 절충안.
 
 ---
 
@@ -25,6 +26,12 @@
 | 구분 | 고정 기준 |
 | --- | --- |
 | 백엔드 구조 | 단일 `qtai-server` 안에 `domain.member`, `domain.bible`, `domain.qt`, `domain.study`, `domain.note`, `domain.sharing`, `domain.report`, `domain.notification`, `domain.praise`, `domain.mission`, `domain.ai`, `domain.admin`, `domain.audit` 패키지를 둔다. |
+| 도메인 패키지 구조 | 각 도메인은 `api/internal/client/web` 5층 구조(공통 + 4층)를 따른다. `internal/`은 외부 접근 절대 금지, 다른 도메인은 `api/UseCase`만 호출, Mock은 호출자의 `client/{타도메인}/...UseCaseMock.java`(03 v1.2 §3.1). |
+| 관리자 UI 플랫폼 | 관리자 UI는 사용자 Flutter 앱과 분리된 **별도 웹 프런트엔드**다(2026-05-19 강사님 직강). 사용자 앱(`/api/v1/**` 관리자 제외)과 관리자 웹(`/api/v1/admin/**`)이 같은 `qtai-server`를 호출(03 v1.2 §4.9 / §13.6). |
+| 노트 본문 `@`멘션 | F-03/F-16 노트 본문에서 `@책 장:절(-끝절)`로 다른 성경 구절 인용 블록 즉시 삽입. 트리거는 `@`만(07 v3.2 §6.4.1, 04 v1.4 §4.2.2). |
+| 닉네임 변경 | 한 번 변경 후 7일 잠금. 가입 첫 설정·중복 재설정은 면제. 위반 시 `409 NICKNAME_CHANGE_LOCKED`(07 v3.3 §F-10, 04 v1.5 §4.1.5, 02 v2.1 `members.nickname_last_changed_at`). |
+| 한글 성경 저장 위치 | 한글 본문은 **클라이언트 로컬 SQLite + 서버 마스터 사본**, 영어 본문은 **서버 마스터 + 온라인 조회만**. 한글 번들은 `GET /api/v1/bible/bundle?language=ko`로 첫 적재(07 v3.4 §F-01, 04 v1.6 §4.2.2.1, 02 v2.2). |
+| 노트 저장 정책 (v1) | v1은 (c) 현행 유지 — 서버 마스터 단일. v1.1 이후 (b) 절충안(서버 마스터 + 로컬 캐시 + 작성 시 큐잉) 채택 자안. v1 본문 변경 없음(07 §18.2). |
 | 배포 기준 | v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다. |
 | 이벤트 | v1은 Spring `ApplicationEventPublisher`를 사용한다. Kafka는 v2 이후 검토 대상이다. |
 | AI | AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` 사용자 경로는 만들지 않는다. F-15 사실 기반 Q&A는 단발·검증 흐름으로 둔다. |
@@ -108,6 +115,9 @@ git checkout dev
 git pull origin dev
 ./gradlew -p qtai-server test
 rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .
+# 추가 정책 위반 검사 (v3.4 정합)
+rg -n "domain\.[a-z]+\.(application|dao|domain|dto|exception)\." qtai-server/src   # 옛 6분할 패키지 잔존
+rg -n "관리자.*Flutter 앱|Flutter.*admin" qtai-server flutter-app                  # 관리자 = Flutter 앱 잔존
 ```
 
 문서 저장소에서는 Markdown 표, 코드펜스, API JSON, 금지 기준 문구를 확인한다.
@@ -147,7 +157,7 @@ git diff --check -- '*.md'
 
 | 항목 | 상태 |
 | --- | --- |
-| 공식 일정표 | `00_개발_일정_총괄표.md` 기준으로 v3.1 정합화 완료 |
-| 실행가이드 | `Lead_강태오_실행가이드.html`과 같은 기준으로 정합화 완료 |
+| 공식 일정표 | `00_개발_일정_총괄표.md` 기준으로 v3.4 정합화 완료 (회의록 기반 5건 + 노트 §18.2 결정 반영) |
+| 실행가이드 | `Lead_강태오_실행가이드.html`은 별도 동기화 필요 (v3.4 기준) |
 | 브랜치·PR·작업 기록 | 공통 규칙 문서와 Lead 개인 `workspaces` 기준 반영 |
-| 다음 권장 작업 | 1번 PR `chore(repo): initialize branch, pr rules and workspaces` 진행 후 2번 CI, 3번 서버 골격 PR로 이어감 |
+| 다음 권장 작업 | (1) 5건 문서 갱신 PR 묶음 머지(03 v1.2 / 07 v3.4 / 04 v1.6 / 02 v2.2 / 06 v1.4 / 25 v0.7), (2) 팀원 6명에게 정책 변경 사항 공지 + 개별 일정표 v3.4-align 갱신본 공유, (3) `qtai-server` 패키지 5층 구조 ArchUnit 테스트 추가, (4) `GET /api/v1/bible/bundle` Controller 골격, (5) `members.nickname_last_changed_at` 마이그레이션, (6) 관리자 웹 디렉토리(`admin-web/`) 초기 골격 결정 |
