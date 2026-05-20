@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI — 김태혁 실행가이드</title>
+<title>QT-AI — 김태혁 실행가이드 (simulator / domain.study 공동)</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;--text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;--auth:#57ab5a;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}.wrap{max-width:1180px;margin:0 auto;padding:0 24px}header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.proj{background:var(--auth);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}.wnav:hover{border-color:var(--t2)}.wnav.cur{background:var(--auth);border-color:var(--auth);color:#fff}.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}.sec-title{font-size:15px;font-weight:700}.callout{background:rgba(240,136,62,.08);border:1px solid rgba(240,136,62,.25);border-left:3px solid var(--auth);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}.callout strong{color:var(--text)}.callout.blue{background:rgba(83,155,245,.08);border-color:rgba(83,155,245,.25);border-left-color:var(--blue)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-top:12px}.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600}.tbl tr:last-child td{border-bottom:none}.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:340px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(240,136,62,.12);color:var(--auth);border:1px solid rgba(240,136,62,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--auth);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--auth);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.day-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border .12s}.day-row:hover{border-color:var(--auth)}.day-row.open{border-color:var(--auth);background:var(--bg3)}.day-head{padding:12px 16px;display:grid;grid-template-columns:80px 70px 1fr auto;gap:12px;align-items:center}.day-date{color:var(--text);font-weight:700;font-size:13px}.day-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}.badge-infra{background:rgba(83,155,245,.15);color:var(--blue);border:1px solid rgba(83,155,245,.3)}.badge-code{background:rgba(87,171,90,.15);color:var(--green);border:1px solid rgba(87,171,90,.3)}.day-summary{font-size:12.5px;color:var(--text);line-height:1.5}.day-toggle{color:var(--t2);font-size:11px;font-family:var(--mono)}.day-panel{display:none;border-top:1px solid var(--border)}.day-panel.show{display:block}.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}.path-list,.dod-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}.dod-list li{font-size:12px;color:var(--t2);padding:4px 0}.dod-list li::before{content:'✅ ';color:var(--green)}.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:280px;overflow-y:auto;white-space:pre-wrap}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.se{color:var(--lead)}.st{color:var(--teal)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt12{margin-top:12px}@media(max-width:860px){.wnav-wrap{margin-left:0}.day-head{grid-template-columns:1fr}.four-grid,.two{grid-template-columns:1fr}.fi{border-right:none}.own-item{display:block}.own-path{min-width:0;margin-bottom:4px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김태혁 실행가이드 <span class="role-chip">simulator / 시뮬레이터 상태 모델 / 클립 저장&#183;조회</span></div><div class="dev-sub">기준일 2026-05-15 · 김태혁_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
+  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">김태혁 실행가이드 <span class="role-chip">simulator / domain.study 공동</span></div><div class="dev-sub">기준일 2026-05-20 (v0.3) · 김태혁_공식일정표.md v0.3 · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1 · 03_아키텍처_정의서.md v1.2</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
 </header>
 <main class="wrap">
-<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>김태혁 — 시뮬레이터 상태 모델, 클립 조회, 실패·누락 처리</strong><br>1 Today QT 100%는 시뮬레이터 상태값 정상 응답을 뜻하며 모든 클립 필수 생성이 아니다.<br>2 READY만 버튼 활성화, MISSING/FAILED/DISABLED는 비활성화한다.<br>3 본문 범위별 클립은 재사용하고 사용자 요청마다 재생성하지 않는다.<br>4 domain.bible/domain.ai 내부 클래스를 직접 import하지 않고 Interface/DTO로만 연동한다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 상태 enum과 UI 버튼 매핑 기준을 먼저 고정<br>2 Today QT 응답에 simulatorStatus가 항상 포함되는지 확인<br>3 실패 로그와 재처리 가능 기준을 report에 남김<br>4 READY와 비활성 상태를 모두 시연 샘플로 준비</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>study / simulator</div><div class="callout"><strong>작업 요약</strong><br>시뮬레이터 상태 모델, 상태 조회 API, 클립 저장·조회, 실패 상태 처리</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/study/ — 상태·클립 도메인</li>
-<li>qtai-server/src/test/java/com/qtai/domain/study/ — 상태 매핑 테스트</li>
-<li>flutter-app/lib/features/today_qt/ — 버튼 상태 연동</li>
+<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언 (v0.3)</div></div><div class="callout"><strong>김태혁 — simulator 도메인 + domain.study의 simulator_clips 사용자 노출 (강상민과 공동)</strong><br>1 v0.3 기준 김태혁은 simulator 상태 모델·클립 저장·조회와 함께 <code>domain.study</code>의 simulator_clips 사용자 노출을 담당한다.<br>2 강상민과 study 도메인을 공동 담당하며, 강상민은 verse_explanations/glossary_terms/commentary_* 노출, 김태혁은 simulator_clips 노출을 책임진다 (03_아키텍처_정의서.md v1.2 §3.2 매핑).<br>3 Today QT 100%는 시뮬레이터 상태값 정상 응답을 뜻하며 모든 클립 필수 생성이 아니다.<br>4 READY만 버튼 활성화, MISSING/FAILED/DISABLED는 비활성화한다.<br>5 본문 범위별 클립은 재사용하고 사용자 요청마다 재생성하지 않는다.<br>6 domain.bible/domain.ai 내부 클래스를 직접 import하지 않고 Interface/DTO로만 연동한다.</div><div class="callout warn mt12"><strong>강상민과 공동 책임 분담 (study 도메인)</strong><br>· <strong>김태혁</strong> — simulator_clips 사용자 노출 API·DTO, 시뮬레이터 상태/버튼 활성화 로직<br>· <strong>강상민</strong> — verse_explanations, glossary_terms, commentary_* 사용자 노출 + AI 산출물 생성·검증<br>· 같은 <code>domain.study</code> 패키지를 공유하므로 PR 충돌을 피하려면 prefix(<code>feature/simulator-*</code> vs <code>feature/study-*</code>)와 파일 단위 소유권을 사전에 합의한다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 상태 enum과 UI 버튼 매핑 기준을 먼저 고정<br>2 Today QT 응답에 simulatorStatus가 항상 포함되는지 확인<br>3 실패 로그와 재처리 가능 기준을 report에 남김<br>4 READY와 비활성 상태를 모두 시연 샘플로 준비</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>simulator (= domain.study의 simulator_clips, §3.2 매핑)</div><div class="callout"><strong>작업 요약</strong><br>시뮬레이터 상태 모델, 상태 조회 API, 클립 저장·조회, 실패 상태 처리, simulator_clips 사용자 노출 (study 모듈)</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준 · 강상민과 공동)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/study/ — domain.study 공동 (simulator_clips 영역)</li>
+<li>qtai-server/src/main/java/com/qtai/domain/study/api/ — study Port/DTO (simulator_clips DTO)</li>
+<li>qtai-server/src/main/java/com/qtai/domain/study/internal/ — SimulatorClip Entity·Service·Repository</li>
+<li>qtai-server/src/test/java/com/qtai/domain/study/ — simulator_clips 노출·상태 매핑 테스트</li>
 <li>workspaces/김태혁/ — workflow/report 기록</li></ul></div><table class="tbl"><thead><tr>
 <th>항목</th>
 <th>내용</th>
@@ -26,11 +27,11 @@
 </tr>
 <tr>
 <td>주 역할</td>
-<td>simulator / 시뮬레이터 상태 모델 / 클립 저장·조회</td>
+<td>simulator / domain.study의 simulator_clips 사용자 노출 (강상민과 공동)</td>
 </tr>
 <tr>
 <td>기준 문서</td>
-<td><code>07_요구사항_정의서.md</code> v3.1, <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
+<td><code>07_요구사항_정의서.md</code> v3.1, <code>03_아키텍처_정의서.md</code> v1.2 (§4.9·§13.6), <code>김태혁_공식일정표.md</code> v0.3, <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
 </tr>
 <tr>
 <td>PR 기록</td>
@@ -39,17 +40,24 @@
 </tbody></table>
 </section>
 <section id="sec-1" class="sec"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">실제 파일 생성과 코드는 별도 구현 GitHub에서 진행한다. 이 문서 저장소에는 구현 골격을 만들지 않는다.</div><div class="own-tree">
-<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/</div><div class="own-desc">시뮬레이터 상태&#183;클립</div><span class="lock-tag">OWNER</span></div>
-<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/api/</div><div class="own-desc">study Port/DTO</div><span class="lock-tag">OWNER</span></div>
-<div class="own-item"><div class="own-path">qtai-server/src/test/java/com/qtai/domain/study/</div><div class="own-desc">상태 전이 테스트</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/ (강상민 공동)</div><div class="own-desc">domain.study 공동 — 김태혁은 simulator_clips 영역</div><span class="lock-tag">SHARED</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/api/SimulatorClip*UseCase.java</div><div class="own-desc">simulator_clips Port (DTO·UseCase 인터페이스)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/internal/SimulatorClip.java</div><div class="own-desc">SimulatorClip Entity (상태 enum 포함)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/internal/SimulatorClipService.java</div><div class="own-desc">SimulatorClip Service (조회·상태 매핑)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/internal/SimulatorClipRepository.java</div><div class="own-desc">SimulatorClip Repository</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/study/web/SimulatorClipController.java</div><div class="own-desc">사용자 노출 Controller (`/api/v1/qt/{id}/simulator-clips/*`)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/test/java/com/qtai/domain/study/SimulatorClip*Test.java</div><div class="own-desc">상태 전이·노출 필터링 테스트</div><span class="lock-tag">OWNER</span></div>
 <div class="own-item"><div class="own-path">workspaces/김태혁/</div><div class="own-desc">개인 워크플로우와 리포트</div><span class="lock-tag">OWNER</span></div>
 </div>
 </section>
 <section id="sec-2" class="sec"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 작업 흐름 확인 가능</div></div><div class="callout blue"><strong>다운로드본 Lead 실행가이드의 패널형 양식과 체크리스트 밀도를 반영했다.</strong> 단, Kafka/K8s/SSE/세션형 AI 같은 구버전 내용은 v3.1 금지 기준으로 바꿨다.</div><div class="pr-panel-list mt12">
-  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('SIM-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/scope-task</strong><span>feature/simulator-* · bugfix/simulator-* · test/simulator-*</span></div><div class="pr-panel-chev open" id="chev-SIM-pr-1">⌄</div></div><div class="pr-panel-body show" id="SIM-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('SIM-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/scope-task</strong><span>feature/simulator-* · feature/study-* · bugfix/simulator-* · bugfix/study-* · test/simulator-*</span></div><div class="pr-panel-chev open" id="chev-SIM-pr-1">⌄</div></div><div class="pr-panel-body show" id="SIM-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev
 git checkout -b feature/simulator-status-api
+# study 공동 작업 (강상민과 패키지 공유 시)
+git checkout -b feature/study-simulator-clip-exposure
 # alternative
+git checkout -b bugfix/study-clip-list-empty
 git checkout -b test/simulator-status-flow</code></pre><table class="tbl"><tbody><tr><td>기본 형식</td><td><code>{type}/{scope}-{short-task}</code></td></tr><tr><td>PR 대상</td><td>항상 <code>dev</code></td></tr><tr><td>허용 type</td><td><code>feature</code>, <code>bugfix</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>hotfix</code></td></tr><tr><td>작업 단위</td><td>3일 안에 리뷰 가능한 작은 PR 권장</td></tr></tbody></table></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('SIM-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 8단계 — dev 브랜치 기준</strong><span>workflow → work → test → report → PR → review</span></div><div class="pr-panel-chev open" id="chev-SIM-pr-2">⌄</div></div><div class="pr-panel-body show" id="SIM-pr-2"><div class="pr-step"><div class="pr-step-num">1</div><div><div class="pr-step-title">dev 최신화</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/simulator-status-api</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/김태혁/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v3.1 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
@@ -270,7 +278,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
   <div class="day-head" onclick="toggleDay('SIM-5')">
     <div class="day-date">W2</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; 상태 조회 API, 샘플 상태, Today QT 응답 연결</div>
+    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; simulator_clips 사용자 조회 API (study 모듈) + Today QT 응답 연결</div>
     <div class="day-toggle" id="tog-SIM-5">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-SIM-5">
@@ -279,22 +287,24 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
 <li>qtai-server/src/main/java/com/qtai/domain/study/api/</li>
 <li>qtai-server/src/test/java/com/qtai/domain/study/</li>
 <li>workspaces/김태혁/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>상태 조회 API, 샘플 상태, Today QT 응답 연결</strong><br>READY 외 상태에서도 Today QT 화면이 정상 응답</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>simulator_clips 사용자 조회 API (study 모듈) + Today QT 응답 연결</strong><br>domain.study의 simulator_clips를 사용자에게 노출하는 API를 만들고, READY 외 상태에서도 Today QT 화면이 정상 응답하도록 연결한다. (강상민의 verse_explanations 노출과 study 패키지 공유)</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1 + 03_아키텍처_정의서.md v1.2 §3.2/§4.9와 충돌 여부 확인
+4. 강상민과 domain.study 파일 단위 소유권 사전 합의
 
 # 작업 내용
-담당자: 김태혁
-작업: 상태 조회 API, 샘플 상태, Today QT 응답 연결
-완료 기준: READY 외 상태에서도 Today QT 화면이 정상 응답
+담당자: 김태혁 (강상민과 공동)
+작업: simulator_clips 사용자 조회 API + Today QT 응답 연결
+완료 기준: READY 외 상태에서도 Today QT 화면이 정상 응답하고, simulator-clips 응답이 노출 필터(APPROVED 등)를 통과
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
+- domain.study 내 강상민 담당 영역(verse_explanations) 변경 충돌 여부 확인
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="sim-flow" data-title="상태 조회 API, 샘플 상태, Today QT 응답 연결" data-owner="김태혁" data-target="sim-SIM-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-SIM-5"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>READY 외 상태에서도 Today QT 화면이 정상 응답</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="sim-flow" data-title="simulator_clips 사용자 조회 API + Today QT 응답 연결" data-owner="김태혁" data-target="sim-SIM-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-SIM-5"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>READY 외 상태에서도 Today QT 화면이 정상 응답</li><li>simulator-clips 사용자 노출 API가 APPROVED 필터를 통과</li><li>강상민의 verse_explanations 노출과 study 패키지 충돌 0건</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>
@@ -302,7 +312,7 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
   <div class="day-head" onclick="toggleDay('SIM-6')">
     <div class="day-date">W3</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-06-01 ~ 2026-06-05 &#183; 클립 저장&#183;조회, 실패 상태, 팝업 연결</div>
+    <div class="day-summary">2026-06-01 ~ 2026-06-05 &#183; 시뮬레이터 클립 노출 안정화 (저장&#183;조회·실패 상태·팝업 연결)</div>
     <div class="day-toggle" id="tog-SIM-6">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-SIM-6">
@@ -311,22 +321,24 @@ gh pr create --base dev --head hotfix/simulator-status-bug --title "fix(simulato
 <li>qtai-server/src/main/java/com/qtai/domain/study/api/</li>
 <li>qtai-server/src/test/java/com/qtai/domain/study/</li>
 <li>workspaces/김태혁/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>클립 저장&#183;조회, 실패 상태, 팝업 연결</strong><br>Feature Freeze 전 버튼 활성/비활성 흐름 통과</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>시뮬레이터 클립 노출 안정화 (저장·조회·실패 상태·팝업 연결)</strong><br>simulator_clips 저장·조회 흐름을 안정화하고 실패 상태와 팝업 연동까지 마무리. Feature Freeze 전 버튼 활성/비활성 흐름 통과. (study 패키지 강상민과 공동)</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
-3. 07_요구사항_정의서.md v3.1과 충돌 여부 확인
+3. 07_요구사항_정의서.md v3.1 + 03_아키텍처_정의서.md v1.2와 충돌 여부 확인
+4. 강상민의 verse_explanations/glossary_terms PR과 study 패키지 충돌 여부 확인
 
 # 작업 내용
-담당자: 김태혁
-작업: 클립 저장&#183;조회, 실패 상태, 팝업 연결
-완료 기준: Feature Freeze 전 버튼 활성/비활성 흐름 통과
+담당자: 김태혁 (강상민과 공동)
+작업: 시뮬레이터 클립 노출 안정화 — 저장·조회, 실패 상태(FAILED/MISSING/DISABLED), 팝업 연결
+완료 기준: Feature Freeze 전 simulator_clips 노출과 버튼 활성/비활성 흐름이 모두 통과
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
+- 실패 로그(eventId, handler, error message)와 재처리 가능 상태 확인
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="sim-flow" data-title="클립 저장&#183;조회, 실패 상태, 팝업 연결" data-owner="김태혁" data-target="sim-SIM-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-SIM-6"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Feature Freeze 전 버튼 활성/비활성 흐름 통과</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="sim-flow" data-title="시뮬레이터 클립 노출 안정화" data-owner="김태혁" data-target="sim-SIM-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-SIM-6"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Feature Freeze 전 simulator_clips 노출과 버튼 활성/비활성 흐름 통과</li><li>실패 로그·재처리 가능 상태 기준 충족</li><li>강상민 영역과 study 패키지 충돌 0건</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>

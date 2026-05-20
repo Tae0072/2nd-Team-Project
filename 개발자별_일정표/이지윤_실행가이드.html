@@ -3,19 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QT-AI — 이지윤 실행가이드</title>
+<title>QT-AI — 이지윤 실행가이드 (v0.3)</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;--text:#cdd9e5;--t2:#768390;--t3:#444c56;--border:#373e47;--auth:#f0883e;--blue:#539bf5;--green:#57ab5a;--teal:#39c5cf;--orange:#e0823d;--purple:#b083f0;--yellow:#e3b341;--lead:#f85149;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6}code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:#adbac7}pre{background:#010409;border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;position:relative;font-family:var(--mono);font-size:11.5px;line-height:1.75;color:#adbac7;white-space:pre}.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:3px 9px;border-radius:4px;cursor:pointer;font-family:var(--sans)}.copy-btn:hover{background:var(--bg3);color:var(--text)}.copy-btn.ok{color:var(--green);border-color:var(--green)}.wrap{max-width:1180px;margin:0 auto;padding:0 24px}header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 0;position:sticky;top:0;z-index:200}.hdr{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.proj{background:var(--auth);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;letter-spacing:.08em}.dev-name{font-size:18px;font-weight:700}.role-chip{background:var(--bg4);border:1px solid var(--border);color:var(--t2);font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle}.dev-sub{font-size:11px;color:var(--t2);margin-top:2px}.wnav-wrap{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}.wnav{font-size:11px;font-weight:700;padding:4px 11px;border-radius:12px;border:1px solid var(--border);color:var(--t2);cursor:pointer;background:none}.wnav:hover{border-color:var(--t2)}.wnav.cur{background:var(--auth);border-color:var(--auth);color:#fff}.sec{padding:28px 0;border-bottom:1px solid var(--border)}.sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:16px}.sec-num{width:26px;height:26px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}.sec-title{font-size:15px;font-weight:700}.callout{background:rgba(240,136,62,.08);border:1px solid rgba(240,136,62,.25);border-left:3px solid var(--auth);border-radius:6px;padding:12px 16px;font-size:12.5px;color:var(--t2);line-height:1.65}.callout strong{color:var(--text)}.callout.blue{background:rgba(83,155,245,.08);border-color:rgba(83,155,245,.25);border-left-color:var(--blue)}.callout.warn{background:rgba(224,130,61,.08);border-color:rgba(224,130,61,.25);border-left-color:var(--orange)}.callout.red{background:rgba(248,81,73,.08);border-color:rgba(248,81,73,.25);border-left-color:var(--lead)}.tbl{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-top:12px}.tbl th{background:var(--bg3);color:var(--t2);font-weight:600;font-size:10px;letter-spacing:.06em;padding:10px 14px;border-bottom:1px solid var(--border);text-align:left;text-transform:uppercase}.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--t2);font-size:12px;line-height:1.6}.tbl td:first-child{color:var(--text);font-weight:600}.tbl tr:last-child td{border-bottom:none}.own-tree{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.own-item{display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}.own-item:last-child{border-bottom:none}.own-path{font-family:var(--mono);font-size:11px;color:var(--teal);min-width:340px;line-height:1.7}.own-desc{font-size:12px;color:var(--t2);flex:1}.lock-tag{font-size:9px;font-weight:700;background:rgba(240,136,62,.12);color:var(--auth);border:1px solid rgba(240,136,62,.3);padding:1px 6px;border-radius:3px;white-space:nowrap;margin-left:auto}.pr-panel-list{display:grid;gap:10px}.pr-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}.pr-panel-hdr{display:grid;grid-template-columns:28px 1fr 26px;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);cursor:pointer}.pr-panel-hdr:hover{background:var(--bg4)}.pr-panel-num{width:24px;height:24px;border-radius:50%;background:var(--auth);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}.pr-panel-title{display:grid;gap:2px}.pr-panel-title strong{font-size:13px;color:var(--text);font-weight:700}.pr-panel-title span{font-size:11px;color:var(--t2)}.pr-panel-chev{color:var(--t3);font-size:12px;transition:transform .2s;text-align:center}.pr-panel-chev.open{transform:rotate(180deg)}.pr-panel-body{display:none;padding:14px 16px;border-top:1px solid var(--border)}.pr-panel-body.show{display:block}.pr-step{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}.pr-step:last-child{border-bottom:none}.pr-step-num{width:26px;height:26px;border-radius:50%;background:var(--auth);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}.pr-step-title{font-size:13px;font-weight:600;margin-bottom:6px}.day-row{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border .12s}.day-row:hover{border-color:var(--auth)}.day-row.open{border-color:var(--auth);background:var(--bg3)}.day-head{padding:12px 16px;display:grid;grid-template-columns:80px 70px 1fr auto;gap:12px;align-items:center}.day-date{color:var(--text);font-weight:700;font-size:13px}.day-badge{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:11px;text-transform:uppercase;letter-spacing:.06em;text-align:center}.badge-infra{background:rgba(83,155,245,.15);color:var(--blue);border:1px solid rgba(83,155,245,.3)}.badge-code{background:rgba(87,171,90,.15);color:var(--green);border:1px solid rgba(87,171,90,.3)}.day-summary{font-size:12.5px;color:var(--text);line-height:1.5}.day-toggle{color:var(--t2);font-size:11px;font-family:var(--mono)}.day-panel{display:none;border-top:1px solid var(--border)}.day-panel.show{display:block}.four-grid{display:grid;grid-template-columns:1fr 1fr}.fi{padding:15px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}.fi:nth-child(2n){border-right:none}.fi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:9px}.lw{color:var(--blue)}.la{color:var(--purple)}.lh{color:var(--yellow)}.lo{color:var(--green)}.path-list,.dod-list{list-style:none}.path-list li{font-family:var(--mono);font-size:11px;color:var(--teal);padding:2px 0;line-height:1.5}.path-list li::before{content:'📁 ';font-size:10px}.dod-list li{font-size:12px;color:var(--t2);padding:4px 0}.dod-list li::before{content:'✅ ';color:var(--green)}.wt{font-size:12px;color:var(--t2);line-height:1.65}.wt strong{color:var(--text)}.sim-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(87,171,90,.1);border:1px solid rgba(87,171,90,.3);color:var(--green);font-size:11px;font-weight:600;padding:5px 12px;border-radius:5px;cursor:pointer;margin-top:8px;font-family:var(--sans)}.sim-btn:hover{background:rgba(87,171,90,.2)}.sim-out{margin-top:8px;background:#010409;border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--mono);font-size:11px;line-height:1.8;display:none;max-height:280px;overflow-y:auto;white-space:pre-wrap}.sim-out.show{display:block}.sc{color:var(--blue)}.sg{color:var(--green)}.sw{color:var(--orange)}.se{color:var(--lead)}.st{color:var(--teal)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.mt12{margin-top:12px}@media(max-width:860px){.wnav-wrap{margin-left:0}.day-head{grid-template-columns:1fr}.four-grid,.two{grid-template-columns:1fr}.fi{border-right:none}.own-item{display:block}.own-path{min-width:0;margin-bottom:4px}}
 </style>
 </head>
 <body>
 <header>
-  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">이지윤 실행가이드 <span class="role-chip">bible 본문&#183;QT / 성경 JSON 소스 검토 / 묵상&#183;찬양 도메인 협업</span></div><div class="dev-sub">기준일 2026-05-15 · 이지윤_공식일정표.md · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
+  <div class="wrap"><div class="hdr"><span class="proj">QT-AI</span><div><div class="dev-name">이지윤 실행가이드 <span class="role-chip">bible 본문&#183;QT / 성경 JSON / Flutter 앱 + 관리자 웹 공동 (바이블서버 3명)</span></div><div class="dev-sub">기준일 2026-05-20 (v0.3) · 이지윤_공식일정표.md v0.3 · 00_개발_일정_총괄표.md v0.1 · 07_요구사항_정의서.md v3.1 · 03_아키텍처_정의서.md v1.2</div></div><nav class="wnav-wrap"><button class="wnav cur" data-target="sec-0">역할</button><button class="wnav" data-target="sec-1">소유권</button><button class="wnav" data-target="sec-2">PR 가이드</button><button class="wnav" data-target="sec-3">일정</button><button class="wnav" data-target="sec-4">AI 에이전트</button><button class="wnav" data-target="sec-5">자기완결성</button><button class="wnav" data-target="sec-6">워크플로우</button><button class="wnav" data-target="sec-7">검증 명령</button><button class="wnav" data-target="sec-8">금지 패턴</button></nav></div></div>
 </header>
 <main class="wrap">
-<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>이지윤 — 성경 본문, QT 범위, Today QT bible 응답과 출처 검증</strong><br>1 성서 유니온 공개 시각은 00:00 KST, 우리 시스템 수집 배치는 04:00 KST로 유지한다.<br>2 QT 본문 텍스트 자체는 저장하지 않고 본문 범위 정보만 수집한다.<br>3 성경 JSON은 Repo URL, 라이선스, 번역본명, 출처 표기 방식, 재배포 가능 여부 확인 후 사용한다.<br>4 개역개정, ESV, NIV 저장·응답·테스트 데이터는 금지한다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 성경 JSON 출처 검토표를 먼저 채운 뒤 데이터 사용<br>2 chapter/verse 범위와 ordinal 기준을 ERD/API와 맞춤<br>3 Today QT 응답에서 cacheStatus와 simulatorStatus 연결을 확인<br>4 금지 번역본 문자열과 테스트 데이터가 없는지 PR 전 검색</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>bible</div><div class="callout"><strong>작업 요약</strong><br>성경 본문, QT 본문 범위, Today QT 응답 구성에 필요한 bible 데이터</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/bible/ — 본문·QT 범위</li>
+<section id="sec-0" class="sec"><div class="sec-hdr"><div class="sec-num">0</div><div class="sec-title">역할 핵심 선언</div></div><div class="callout"><strong>이지윤 (v0.3) — bible 백엔드 주 담당 + Flutter 성경/QT 화면 + 관리자 웹 공동 (바이블서버 3명)</strong><br>1 성서 유니온 공개 시각은 00:00 KST, 우리 시스템 수집 배치는 04:00 KST로 유지한다.<br>2 QT 본문 텍스트 자체는 저장하지 않고 본문 범위 정보만 수집한다.<br>3 성경 JSON은 Repo URL, 라이선스, 번역본명, 출처 표기 방식, 재배포 가능 여부 확인 후 사용한다.<br>4 개역개정, ESV, NIV 저장·응답·테스트 데이터는 금지한다.<br>5 (03 v1.2 §4.9.2) Flutter 앱 + 관리자 웹은 김지민 단독이 아닌 바이블서버 팀(이지윤·이승욱·김지민) 3명 공동 작업. 본인은 Flutter 성경/QT 본문 조회 화면과 관리자 웹의 QT/해설 메뉴를 주 담당한다.</div><div class="callout red mt12"><strong>본인 우선 액션 4가지</strong><br>1 성경 JSON 출처 검토표를 먼저 채운 뒤 데이터 사용<br>2 chapter/verse 범위와 ordinal 기준을 ERD/API와 맞춤<br>3 Today QT 응답에서 cacheStatus와 simulatorStatus 연결을 확인<br>4 금지 번역본 문자열과 테스트 데이터가 없는지 PR 전 검색</div><div class="two mt12"><div class="callout blue"><strong>중심 영역</strong><br>bible (백엔드 주 담당) + Flutter 성경/QT 화면 + 관리자 웹 (바이블서버 3명 공동)</div><div class="callout"><strong>작업 요약</strong><br>성경 본문, QT 본문 범위, Today QT 응답 구성에 필요한 bible 데이터, Flutter 성경/QT 화면, 관리자 웹의 QT/해설 메뉴 공동</div></div><div class="mt12"><div class="wt">담당 경로 (구현 저장소 기준)</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/bible/ — 본문·QT 범위 (백엔드 주 담당)</li>
 <li>data/bible-sources/README.md — 구현 저장소의 출처 검토 기준</li>
 <li>qtai-server/src/test/java/com/qtai/domain/bible/ — 본문 범위 테스트</li>
+<li>flutter-app/lib/screens/bible/ — Flutter 성경 본문 화면 (주 담당)</li>
+<li>flutter-app/lib/screens/qt/ — Flutter QT 본문 조회 화면 (주 담당, 김지민과 컴포넌트 정합)</li>
+<li>admin-web/src/pages/qt/ — 관리자 웹 QT 등록·범위 메뉴 (바이블서버 3명 공동)</li>
+<li>admin-web/src/pages/explanation/ — 관리자 웹 해설 조회 메뉴 (바이블서버 3명 공동)</li>
 <li>workspaces/이지윤/ — workflow/report 기록</li></ul></div><table class="tbl"><thead><tr>
 <th>항목</th>
 <th>내용</th>
@@ -26,11 +30,11 @@
 </tr>
 <tr>
 <td>주 역할</td>
-<td>bible 본문·QT / 성경 JSON 소스 검토 / 묵상·찬양 도메인 협업</td>
+<td>bible 본문·QT (백엔드 주 담당) / 성경 JSON 소스 검토 / Flutter 성경·QT 화면 주 담당 / 관리자 웹 QT·해설 메뉴 공동 (바이블서버 3명)</td>
 </tr>
 <tr>
 <td>기준 문서</td>
-<td><code>07_요구사항_정의서.md</code> v3.1, <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
+<td><code>07_요구사항_정의서.md</code> v3.1, <code>03_아키텍처_정의서.md</code> v1.2 (§4.9.1 관리자 웹 분리·§4.9.2 바이블서버 3명 공동·§13.6 Lead 정정), <code>00_공통_브랜치_PR_워크플로우_규칙.md</code></td>
 </tr>
 <tr>
 <td>PR 기록</td>
@@ -39,18 +43,27 @@
 </tbody></table>
 </section>
 <section id="sec-1" class="sec"><div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">소유권 선언 (Code Ownership)</div></div><div class="callout warn">실제 파일 생성과 코드는 별도 구현 GitHub에서 진행한다. 이 문서 저장소에는 구현 골격을 만들지 않는다.</div><div class="own-tree">
-<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/bible/</div><div class="own-desc">성경 본문&#183;QT 범위</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">qtai-server/src/main/java/com/qtai/domain/bible/</div><div class="own-desc">성경 본문&#183;QT 범위 (백엔드 주 담당)</div><span class="lock-tag">OWNER</span></div>
 <div class="own-item"><div class="own-path">data/bible-sources/</div><div class="own-desc">성경 JSON 출처 검토</div><span class="lock-tag">OWNER</span></div>
 <div class="own-item"><div class="own-path">qtai-server/src/test/java/com/qtai/domain/bible/</div><div class="own-desc">본문 범위&#183;캐시 테스트</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">flutter-app/lib/screens/bible/</div><div class="own-desc">Flutter 성경 본문 화면 (주 담당, 03 v1.2 §4.9.2)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">flutter-app/lib/screens/qt/</div><div class="own-desc">Flutter QT 본문 조회 화면 (주 담당, 김지민과 컴포넌트 정합)</div><span class="lock-tag">OWNER</span></div>
+<div class="own-item"><div class="own-path">admin-web/src/pages/qt/</div><div class="own-desc">관리자 웹 QT 등록&#183;범위 메뉴 (바이블서버 3명 공동)</div><span class="lock-tag">SHARED</span></div>
+<div class="own-item"><div class="own-path">admin-web/src/pages/explanation/</div><div class="own-desc">관리자 웹 해설 조회 메뉴 (바이블서버 3명 공동)</div><span class="lock-tag">SHARED</span></div>
 <div class="own-item"><div class="own-path">workspaces/이지윤/</div><div class="own-desc">개인 워크플로우와 리포트</div><span class="lock-tag">OWNER</span></div>
 </div>
 </section>
 <section id="sec-2" class="sec"><div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">PR 가이드 — 이 섹션만 읽으면 작업 흐름 확인 가능</div></div><div class="callout blue"><strong>다운로드본 Lead 실행가이드의 패널형 양식과 체크리스트 밀도를 반영했다.</strong> 단, Kafka/K8s/SSE/세션형 AI 같은 구버전 내용은 v3.1 금지 기준으로 바꿨다.</div><div class="pr-panel-list mt12">
-  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('BIBLE-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/scope-task</strong><span>feature/bible-* · bugfix/bible-* · test/bible-*</span></div><div class="pr-panel-chev open" id="chev-BIBLE-pr-1">⌄</div></div><div class="pr-panel-body show" id="BIBLE-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
+  <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('BIBLE-pr-1')"><div class="pr-panel-num">1</div><div class="pr-panel-title"><strong>① 브랜치 명명 규칙 — type/scope-task</strong><span>feature/bible-* · feature/mobile-bible-* · feature/admin-bible-* · bugfix/bible-* · test/bible-*</span></div><div class="pr-panel-chev open" id="chev-BIBLE-pr-1">⌄</div></div><div class="pr-panel-body show" id="BIBLE-pr-1"><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev
+# 백엔드 (bible 도메인)
 git checkout -b feature/bible-qt-range-model
-# alternative
-git checkout -b test/bible-source-guard</code></pre><table class="tbl"><tbody><tr><td>기본 형식</td><td><code>{type}/{scope}-{short-task}</code></td></tr><tr><td>PR 대상</td><td>항상 <code>dev</code></td></tr><tr><td>허용 type</td><td><code>feature</code>, <code>bugfix</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>hotfix</code></td></tr><tr><td>작업 단위</td><td>3일 안에 리뷰 가능한 작은 PR 권장</td></tr></tbody></table></div></div>
+# Flutter 화면 (mobile- prefix)
+git checkout -b feature/mobile-bible-passage-screen
+# 관리자 웹 (admin- prefix)
+git checkout -b feature/admin-bible-qt-menu
+# 테스트
+git checkout -b test/bible-source-guard</code></pre><table class="tbl"><tbody><tr><td>기본 형식</td><td><code>{type}/{scope}-{short-task}</code></td></tr><tr><td>PR 대상</td><td>항상 <code>dev</code></td></tr><tr><td>허용 type</td><td><code>feature</code>, <code>bugfix</code>, <code>refactor</code>, <code>test</code>, <code>docs</code>, <code>chore</code>, <code>hotfix</code></td></tr><tr><td>scope prefix</td><td>백엔드: <code>bible-*</code> · Flutter: <code>mobile-bible-*</code> · 관리자 웹: <code>admin-bible-*</code> (03 v1.2 §4.9.2)</td></tr><tr><td>작업 단위</td><td>3일 안에 리뷰 가능한 작은 PR 권장</td></tr></tbody></table></div></div>
   <div class="pr-panel"><div class="pr-panel-hdr" onclick="togglePanel('BIBLE-pr-2')"><div class="pr-panel-num">2</div><div class="pr-panel-title"><strong>② PR 올리는 8단계 — dev 브랜치 기준</strong><span>workflow → work → test → report → PR → review</span></div><div class="pr-panel-chev open" id="chev-BIBLE-pr-2">⌄</div></div><div class="pr-panel-body show" id="BIBLE-pr-2"><div class="pr-step"><div class="pr-step-num">1</div><div><div class="pr-step-title">dev 최신화</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout dev
 git pull origin dev</code></pre></div></div><div class="pr-step"><div class="pr-step-num">2</div><div><div class="pr-step-title">작업 브랜치 생성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git checkout -b feature/bible-qt-range-model</code></pre></div></div><div class="pr-step"><div class="pr-step-num">3</div><div><div class="pr-step-title">작업 전 workflow 작성</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>workspaces/이지윤/workflows/YYYY-MM-DD_task-name.md</code></pre></div></div><div class="pr-step"><div class="pr-step-num">4</div><div><div class="pr-step-title">구현 또는 문서 수정</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>07_요구사항_정의서.md v3.1 기준과 충돌하지 않게 수정</code></pre></div></div><div class="pr-step"><div class="pr-step-num">5</div><div><div class="pr-step-title">로컬 검증</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code>git diff --check
 # backend 변경 시 ./gradlew test
@@ -270,7 +283,7 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
   <div class="day-head" onclick="toggleDay('BIBLE-5')">
     <div class="day-date">W2</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; 성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화</div>
+    <div class="day-summary">2026-05-25 ~ 2026-05-29 &#183; 성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화 + Flutter 성경/QT 화면 컴포넌트 초안</div>
     <div class="day-toggle" id="tog-BIBLE-5">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-BIBLE-5">
@@ -278,8 +291,10 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
       <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/bible/</li>
 <li>data/bible-sources/</li>
 <li>qtai-server/src/test/java/com/qtai/domain/bible/</li>
+<li>flutter-app/lib/screens/bible/</li>
+<li>flutter-app/lib/screens/qt/</li>
 <li>workspaces/이지윤/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화</strong><br>핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화 + Flutter 성경/QT 화면 컴포넌트 초안</strong><br>핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회, Flutter 화면에서 한/영 토글 동작</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
@@ -287,14 +302,14 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
 
 # 작업 내용
 담당자: 이지윤
-작업: 성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화
-완료 기준: 핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회
+작업: 성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화 + Flutter 성경/QT 화면 컴포넌트 초안
+완료 기준: 핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회, Flutter 화면에서 한/영 토글 동작
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="성경 본문 조회, QT 범위 조회, Today QT bible 응답 안정화" data-owner="이지윤" data-target="sim-BIBLE-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-5"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="성경 본문 조회·Today QT bible 응답 안정화 + Flutter 화면 초안" data-owner="이지윤" data-target="sim-BIBLE-5">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-5"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>핵심 API 데모에서 본문 범위와 한/영 본문이 정상 조회</li><li>Flutter 성경/QT 화면에서 한/영 토글 동작 (mobile-bible-* 브랜치)</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>
@@ -302,7 +317,7 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
   <div class="day-head" onclick="toggleDay('BIBLE-6')">
     <div class="day-date">W3</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-06-01 ~ 2026-06-05 &#183; 승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강</div>
+    <div class="day-summary">2026-06-01 ~ 2026-06-05 &#183; 승인 해설 조회 연결, 묵상&#183;달력 bible 데이터 연결 보강 + 관리자 웹 QT/해설 메뉴 공동</div>
     <div class="day-toggle" id="tog-BIBLE-6">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-BIBLE-6">
@@ -310,8 +325,10 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
       <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/bible/</li>
 <li>data/bible-sources/</li>
 <li>qtai-server/src/test/java/com/qtai/domain/bible/</li>
+<li>admin-web/src/pages/qt/</li>
+<li>admin-web/src/pages/explanation/</li>
 <li>workspaces/이지윤/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강</strong><br>Feature Freeze 전 주요 조회 흐름 통과</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강 + 관리자 웹 QT/해설 메뉴 공동 작업</strong><br>Feature Freeze 전 주요 조회 흐름 통과, 관리자 웹에서 QT 등록·해설 조회</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
@@ -319,14 +336,14 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
 
 # 작업 내용
 담당자: 이지윤
-작업: 승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강
-완료 기준: Feature Freeze 전 주요 조회 흐름 통과
+작업: 승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강 + 관리자 웹 QT/해설 메뉴 공동 작업 (바이블서버 3명)
+완료 기준: Feature Freeze 전 주요 조회 흐름 통과, 관리자 웹에서 QT 등록·해설 조회
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="승인 해설 조회 연결, 묵상&#183;달력 기능과 bible 데이터 연결 보강" data-owner="이지윤" data-target="sim-BIBLE-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-6"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Feature Freeze 전 주요 조회 흐름 통과</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="해설 조회 연결 + 관리자 웹 QT/해설 메뉴 공동" data-owner="이지윤" data-target="sim-BIBLE-6">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-6"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Feature Freeze 전 주요 조회 흐름 통과</li><li>관리자 웹 QT 등록·해설 조회 메뉴 동작 (admin-bible-* 브랜치, 바이블서버 3명 공동 분담)</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>
@@ -334,7 +351,7 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
   <div class="day-head" onclick="toggleDay('BIBLE-7')">
     <div class="day-date">W4</div>
     <div class="day-badge badge-code">plan</div>
-    <div class="day-summary">2026-06-08 ~ 2026-06-12 &#183; 데이터 누락&#183;성능&#183;금지 번역본 검증</div>
+    <div class="day-summary">2026-06-08 ~ 2026-06-12 &#183; 데이터 누락&#183;성능&#183;금지 번역본 검증 + Flutter 화면 + 관리자 웹 E2E 보강</div>
     <div class="day-toggle" id="tog-BIBLE-7">▼ 펼치기</div>
   </div>
   <div class="day-panel" id="panel-BIBLE-7">
@@ -342,8 +359,12 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
       <div class="fi"><div class="fi-label lw">WHERE</div><ul class="path-list"><li>qtai-server/src/main/java/com/qtai/domain/bible/</li>
 <li>data/bible-sources/</li>
 <li>qtai-server/src/test/java/com/qtai/domain/bible/</li>
+<li>flutter-app/lib/screens/bible/</li>
+<li>flutter-app/lib/screens/qt/</li>
+<li>admin-web/src/pages/qt/</li>
+<li>admin-web/src/pages/explanation/</li>
 <li>workspaces/이지윤/</li></ul></div>
-      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>데이터 누락&#183;성능&#183;금지 번역본 검증</strong><br>Today QT 캐시 히트율과 금지 데이터 검사 통과</div></div>
+      <div class="fi"><div class="fi-label la">WHAT</div><div class="wt"><strong>데이터 누락&#183;성능&#183;금지 번역본 검증 + Flutter 화면 + 관리자 웹 E2E 보강</strong><br>Today QT 캐시 히트율과 금지 데이터 검사 통과, 시연 후보 빌드에서 성경 화면 깨짐 없음</div></div>
       <div class="fi" style="grid-column:1/-1"><div class="fi-label lh">HOW</div><pre><button class="copy-btn" onclick="copyPre(this)">Copy</button><code># 작업 전
 1. 별도 구현 GitHub에서 dev 최신화
 2. 오늘 작업이 00_개발_일정_총괄표.md W1~W5 게이트 안인지 확인
@@ -351,14 +372,14 @@ gh pr create --base dev --head hotfix/bible-source-bug --title "fix(bible): shor
 
 # 작업 내용
 담당자: 이지윤
-작업: 데이터 누락&#183;성능&#183;금지 번역본 검증
-완료 기준: Today QT 캐시 히트율과 금지 데이터 검사 통과
+작업: 데이터 누락&#183;성능&#183;금지 번역본 검증 + Flutter 화면 + 관리자 웹 E2E 보강
+완료 기준: Today QT 캐시 히트율과 금지 데이터 검사 통과, 시연 후보 빌드에서 성경 화면 깨짐 없음
 
 # 작업 후
 - 금지 기능/금지 데이터 검색
 - 관련 테스트 또는 문서 검증 실행
-- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="데이터 누락&#183;성능&#183;금지 번역본 검증" data-owner="이지윤" data-target="sim-BIBLE-7">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-7"></div></div>
-      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Today QT 캐시 히트율과 금지 데이터 검사 통과</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
+- PR 본문에 검증 결과와 남은 리스크 기록</code></pre><button class="sim-btn" data-sim="bible-flow" data-title="금지 번역본 검증 + Flutter/관리자 웹 E2E" data-owner="이지윤" data-target="sim-BIBLE-7">▶ 실행 결과 시뮬레이션</button><div class="sim-out" id="sim-BIBLE-7"></div></div>
+      <div class="fi" style="grid-column:1/-1"><div class="fi-label lo">DoD</div><ul class="dod-list"><li>Today QT 캐시 히트율과 금지 데이터 검사 통과</li><li>시연 후보 빌드에서 Flutter 성경 화면 + 관리자 웹 QT/해설 메뉴 깨짐 없음</li><li>금지 기준 위반 0건</li><li>PR 본문에 검증 명령과 결과 기록</li></ul></div>
     </div>
   </div>
 </div>
