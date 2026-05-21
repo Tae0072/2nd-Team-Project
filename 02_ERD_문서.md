@@ -50,6 +50,7 @@ erDiagram
 
     notes ||--o{ note_verses : "선택 구절"
     bible_verses ||--o{ note_verses : "노트 연결"
+    notes ||--o{ journal_events : "이벤트 이력"
     notes ||--o| sharing_posts : "나눔 게시"
     sharing_posts ||--o{ comments : "댓글"
     sharing_posts ||--o{ likes : "좋아요"
@@ -170,6 +171,12 @@ erDiagram
         BIGINT note_id FK
         BIGINT bible_verse_id FK
         SMALLINT display_order
+    }
+    journal_events {
+        BIGINT id PK
+        BIGINT note_id FK
+        VARCHAR event_type
+        DATETIME occurred_at
     }
     sharing_posts {
         BIGINT id PK
@@ -635,6 +642,22 @@ erDiagram
 - `uk_notes_active_qt_meditation` UNIQUE ON (member_id, qt_passage_id, category, active_unique_key)
 
 > 묵상 노트는 `category = MEDITATION`, `qt_passage_id IS NOT NULL`, `status != DELETED`, `active_unique_key = 'ACTIVE'` 상태에서만 사용자별 QT 1건을 허용한다. 기본값은 `NULL`이며, Service는 저장 확정된 활성 묵상 노트에만 `active_unique_key = 'ACTIVE'`를 세팅한다. 소프트 삭제 시 `deleted_at`을 세팅하고 `active_unique_key = NULL`로 변경하여 같은 QT 본문에 새 묵상 노트를 다시 작성할 수 있게 한다. 설교 노트와 개인 노트는 `active_unique_key = NULL`을 유지해 이 유니크 정책의 대상이 되지 않는다.
+
+---
+
+### 2.13-1 journal_events — 묵상 이벤트 이력
+
+| 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
+| --- | --- | --- | --- | --- | --- |
+| id | BIGINT | N | AUTO_INCREMENT | PK | 이벤트 ID |
+| note_id | BIGINT | N | - | FK | notes.id |
+| event_type | VARCHAR(50) | N | - | | NOTE_SAVED, NOTE_DELETED 등 |
+| occurred_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | 발생 시각 |
+
+**인덱스**
+- `idx_journal_events_note` ON (note_id)
+
+> 노트 상태 변화(저장 확정, 삭제 등)를 이력으로 남겨 감사 추적에 활용한다. `note_id`는 `notes.id`를 FK로 참조하며 노트 삭제 시 CASCADE DELETE한다.
 
 ---
 
@@ -1517,6 +1540,7 @@ stateDiagram-v2
 | 35 | ai_evaluation_cases | AI 평가 케이스 | evaluation_set_id, reviewed_by_admin_id |
 | 36 | service_accounts | 시스템 계정 | - |
 | 37 | simulator_component_library_versions | 시뮬레이터 컴포넌트 라이브러리 버전 | - |
+| 38 | journal_events | 묵상 이벤트 이력 | note_id |
 ---
 
 ## 8. BaseEntity 및 삭제 전략
