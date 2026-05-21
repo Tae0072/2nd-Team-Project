@@ -1,8 +1,9 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
-> **문서 버전:** v3.1-align.2
+> **문서 버전:** v3.1-align.3
 > **작성일:** 2026-05-20
-> **기준 문서:** `00_개발_일정_총괄표.md` v0.1, `07_요구사항_정의서.md` v3.1
+> **최종 갱신:** 2026-05-21
+> **기준 문서:** `00_개발_일정_총괄표.md` v0.3, `07_요구사항_정의서.md` v3.5, `04_API_명세서.md` v1.7, `25_기능_명세서.md` v0.8
 > **적용 범위:** 강태오 Lead 일정표이면서, 다른 팀원 개인 일정표 작성 시 복제 가능한 공통 기준
 > **연관 문서:** `09_Git_규칙.md`, `18_코드_품질_게이트.md`, `23_도메인_용어사전.md`, `24_템플릿_문서_매핑표.md`, `개발자별_일정표/00_공통_브랜치_PR_워크플로우_규칙.md`
 
@@ -27,6 +28,7 @@
 | 백엔드 구조 | 단일 `qtai-server` 안에 `domain.member`, `domain.bible`, `domain.qt`, `domain.study`, `domain.note`, `domain.sharing`, `domain.report`, `domain.notification`, `domain.praise`, `domain.mission`, `domain.ai`, `domain.admin`, `domain.audit` 패키지를 둔다. |
 | 배포 기준 | v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다. |
 | 인증 경로 | Flutter SDK가 카카오 토큰을 직접 받아 `POST /api/v1/auth/kakao`로 서버에 전달한다. 서버사이드 `/oauth2/**` 경로는 사용하지 않는다. |
+| 사용자 설정 API | `GET /api/v1/me/settings`(설정 조회), `PATCH /api/v1/me/settings`(설정 변경) — 절 선택 방식(단일 선택 v1, 범위 선택 v2에서 활성화), 글쓰기 방식 포함. 화면 M-06(마이페이지 설정, 신규). |
 | 이벤트 | v1은 Spring `ApplicationEventPublisher`를 사용한다. Kafka는 v2 이후 검토 대상이다. |
 | AI | AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` 사용자 경로는 만들지 않는다. F-15 사실 기반 Q&A는 단발·검증 흐름으로 둔다. |
 | Today QT | 공개 시각은 00:00 KST, 수집 배치 시각은 04:00 KST로 통일한다. |
@@ -148,7 +150,8 @@ git diff --check -- '*.md'
 
 | 항목 | 상태 |
 | --- | --- |
-| 공식 일정표 | `00_개발_일정_총괄표.md` 기준으로 v3.1 정합화 완료 |
+| 공식 일정표 | `00_개발_일정_총괄표.md` v0.3 기준으로 v3.5 정합화 완료 |
 | 실행가이드 | `Lead_강태오_실행가이드.html`과 같은 기준으로 정합화 완료 |
 | 브랜치·PR·작업 기록 | 공통 규칙 문서와 Lead 개인 `workspaces` 기준 반영 |
+| 정합성 갱신 | `07_요구사항_정의서.md` v3.5(§19 v1/v2 범위), `04_API_명세서.md` v1.7(me/settings 추가), `25_기능_명세서.md` v0.8(v1/v2 규칙 반영) |
 | 다음 권장 작업 | 1번 PR `chore(repo): initialize branch, pr rules and workspaces` 진행 후 2번 CI, 3번 서버 골격 PR로 이어감 |

@@ -802,7 +802,7 @@ gh pr create --base dev --head feature/note-draft --title "feat(note): add medit
         <div class="body">
           <div class="callout warn">
             현재 dev의 <code>NoteController</code>, <code>SharingController</code>, <code>PraiseController</code> 주석 경로는 일부 문서 명세와 다를 수 있다.
-            목표 계약은 <code>doc/프로젝트 문서/04_API_명세서.md</code>와 <code>07_요구사항_정의서.md</code> 기준으로 맞춘다.
+            목표 계약은 <code>doc/프로젝트 문서/04_API_명세서.md</code>(v1.7) 와 <code>07_요구사항_정의서.md</code>(v3.5) 기준으로 맞춘다.
           </div>
           <div class="task-grid">
             <div class="box">
@@ -972,6 +972,7 @@ gh pr create --base dev --head feature/note-draft --title "feat(note): add medit
                 <li>닉네임 노출 안내가 가능해야 한다.</li>
                 <li>공유 시점 본문/닉네임/구절 스냅샷을 유지한다.</li>
                 <li>실명, 이메일, 전화번호를 응답하지 않는다.</li>
+                <li><strong>v1 인지:</strong> N-04 외부 공유 버튼/바텀시트(<code>share_plus</code> 연동)는 v1 포함. 공유용 링크/카드 이미지 생성 API가 필요하면 강태오와 API 계약 확인.</li>
               </ul>
             </div>
           </div>
@@ -1192,42 +1193,4 @@ rg -n "javax\.|password|token|private key|secret" .</code></pre>
 
 <script>
 function panels() {
-  return Array.from(document.querySelectorAll("details.panel"));
-}
-function openAll() {
-  panels().forEach((panel) => panel.open = true);
-}
-function closeAll() {
-  panels().forEach((panel, index) => panel.open = index < 2);
-}
-function copyBlock(btn) {
-  const text = btn.parentElement.innerText.replace(/^Copy\s*/, "");
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = "Copied";
-    btn.classList.add("ok");
-    setTimeout(() => {
-      btn.textContent = "Copy";
-      btn.classList.remove("ok");
-    }, 1200);
-  });
-}
-function saveCheck(input) {
-  const key = "lee-dev-guide-" + input.dataset.check;
-  localStorage.setItem(key, input.checked ? "1" : "0");
-  input.closest(".check")?.classList.toggle("done", input.checked);
-}
-function resetChecks() {
-  document.querySelectorAll("[data-check]").forEach((input) => {
-    input.checked = false;
-    saveCheck(input);
-  });
-}
-document.querySelectorAll("[data-check]").forEach((input) => {
-  const key = "lee-dev-guide-" + input.dataset.check;
-  input.checked = localStorage.getItem(key) === "1";
-  input.closest(".check")?.classList.toggle("done", input.checked);
-  input.addEventListener("change", () => saveCheck(input));
-});
-</script>
-</body>
-</html>
+  return Array.from(document.que
