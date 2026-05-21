@@ -538,7 +538,60 @@ git push origin dev
 | 품질 게이트 | `18_코드_품질_게이트.md` v2.4 반영 |
 | 도메인 용어사전 | `23_도메인_용어사전.md` v0.1 반영 |
 | 전체 문서 정합성 최종 점검 | 진행 완료 |
-| 다음 권장 작업 | 별도 구현 GitHub 1번 PR에서 PR 템플릿, CODEOWNERS, `workspaces/*/{workflows,reports}` 생성 |
+| CI 자동화 강화 (2026-05-21) | pr-validation, labeler, dependabot, ci-all 추가 완료 |
+| 브랜치 보호 규칙 강화 (2026-05-21) | master 승인 2명 / dev 승인 1명 / ci-all required check 설정 완료 |
+
+---
+
+## 10. GitHub Actions 자동화 세트 (2026-05-21 추가)
+
+구현 레포(QT-AI-2nd-Team-Project)에 다음 자동화가 추가되었다.
+
+### 10-1. PR Validation (`.github/workflows/pr-validation.yml`)
+
+PR이 열리거나 수정될 때 자동 실행된다.
+
+| 검사 항목 | 규칙 |
+| --- | --- |
+| PR 제목 형식 | `{type}({scope}): {대문자/한글로 시작}` — Conventional Commits 형식 위반 시 차단 |
+| 브랜치명 | `^(feature\|bugfix\|hotfix\|chore\|release\|docs)/[a-z0-9-]+$` — 위반 시 차단 |
+| PR 크기 | XS(~50) / S(~200) / M(~500) / L(~1000) / XL(1000+) 라벨 자동 부착. XL은 경고만 (차단 아님) |
+
+### 10-2. 자동 라벨링 (`.github/labeler.yml` + `.github/workflows/labeler.yml`)
+
+변경된 파일 경로 기준으로 PR에 라벨이 자동으로 붙는다.
+
+| 라벨 | 대상 경로 |
+| --- | --- |
+| `backend` | `qtai-server/**` |
+| `flutter` | `flutter-app/**` |
+| `infra` | `Dockerfile`, `docker-compose*.yml`, `.github/**`, `infra/**` |
+| `api-spec` | `apis/**` |
+| `docs` | `**/*.md`, `docs/**`, `workspaces/**/*.md` |
+| `data` | `data/**` |
+
+### 10-3. Dependabot (`.github/dependabot.yml`)
+
+매주 월요일 09:00 KST에 자동으로 의존성 업데이트 PR을 생성한다.
+
+| 생태계 | 대상 디렉터리 | 라벨 |
+| --- | --- | --- |
+| Gradle | `/qtai-server` | `dependencies`, `backend` |
+| Flutter (pub) | `/flutter-app` | `dependencies`, `flutter` |
+| GitHub Actions | `/` | `dependencies`, `infra` |
+
+### 10-4. ci-all 집계 잡 (`qt-ai-ci.yml` 마지막 잡)
+
+기존 6개 CI 잡(`spring-build`, `flutter-test`, `requirements-guard`, `gitleaks`, `spectral-lint`, `docker-compose-config`)의 결과를 하나로 집계한다. 브랜치 보호의 Required status check로 `ci-all` 하나만 등록하면 모든 잡 통과를 강제할 수 있다.
+
+### 10-5. 브랜치 보호 규칙 (GitHub Settings에서 직접 설정)
+
+| 브랜치 | 승인 수 | Code Owner | ci-all | Linear history | Force push |
+| --- | --- | --- | --- | --- | --- |
+| `master` | 2명 | ✅ | ✅ | ✅ | ❌ 차단 |
+| `dev` | 1명 | ✅ | ✅ | ✅ | ❌ 차단 |
+
+머지 전략: **Squash merge만 허용** (Default commit message = Pull request title)
 
 ---
 
