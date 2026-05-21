@@ -1,6 +1,6 @@
 # QT-AI 개인 공식 일정표 - 강태오
 
-> **문서 버전:** v3.1-align.3
+> **문서 버전:** v3.5-align.1
 > **작성일:** 2026-05-20
 > **최종 갱신:** 2026-05-21
 > **기준 문서:** `00_개발_일정_총괄표.md` v0.3, `07_요구사항_정의서.md` v3.5, `04_API_명세서.md` v1.7, `25_기능_명세서.md` v0.8
@@ -26,6 +26,8 @@
 | 구분 | 고정 기준 |
 | --- | --- |
 | 백엔드 구조 | 단일 `qtai-server` 안에 `domain.member`, `domain.bible`, `domain.qt`, `domain.study`, `domain.note`, `domain.sharing`, `domain.report`, `domain.notification`, `domain.praise`, `domain.mission`, `domain.ai`, `domain.admin`, `domain.audit` 패키지를 둔다. |
+| 도메인 패키지 구조 | 각 도메인은 `api/internal/client/web` 5층 구조를 따른다. `internal/`은 외부 접근 절대 금지, 다른 도메인은 `api/UseCase`만 호출, Mock은 호출자의 `client/{타도메인}/...UseCaseMock.java`(03 v1.2 §3.1). |
+| 관리자 UI 플랫폼 | 관리자 UI는 사용자 Flutter 앱과 분리된 별도 웹 프런트엔드다(2026-05-19 강사님 직강). 사용자 앱(`/api/v1/**` 관리자 제외)과 관리자 웹(`/api/v1/admin/**`)이 같은 `qtai-server`를 호출(03 v1.2 §4.9 / §13.6). |
 | 배포 기준 | v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다. |
 | 인증 경로 | Flutter SDK가 카카오 토큰을 직접 받아 `POST /api/v1/auth/kakao`로 서버에 전달한다. 서버사이드 `/oauth2/**` 경로는 사용하지 않는다. |
 | 사용자 설정 API | `GET /api/v1/me/settings`(설정 조회), `PATCH /api/v1/me/settings`(설정 변경) — 절 선택 방식(단일 선택 v1, 범위 선택 v2에서 활성화), 글쓰기 방식 포함. 화면 M-06(마이페이지 설정, 신규). |
@@ -38,6 +40,10 @@
 | 검색/AI 저장소 | RDB 인덱스만 사용한다. RAG, ChromaDB, vector DB, Elasticsearch는 사용하지 않는다. |
 | 찬양 | AI 추천이 아니라 운영자가 선별한 큐레이션 목록을 제공한다. |
 | 교회 인증 | MVP 기본 제외다. 화면, 버튼, API를 작업 목표에 넣지 않는다. |
+| 노트 본문 `@`멘션 | 클라이언트가 `@` 트리거로 성경 절을 인용해 본문에 삽입하면 서버는 `body`를 자유 형식으로 보존하고 `verseIds`를 `note_verses`에 중복 없이 저장한다. 동일 절 두 번 인용 시 한 번만 기록(F-03/F-16, 07 v3.2 §6.4.1). |
+| 닉네임 변경 7일 잠금 | 최초 가입 닉네임 설정 후 변경에는 7일 잠금이 적용된다. 잠금 중 변경 시 `409 NICKNAME_CHANGE_LOCKED` 반환. 가입 첫 설정·형식 오류·중복 재설정은 잠금 면제(07 v3.3 §F-10). |
+| 한글 성경 저장 위치 | 한글 성경은 클라이언트 로컬 SQLite에 저장하고 서버는 메타데이터만 보관한다. 영어 성경은 서버 마스터 + 온라인 조회. 초기 적재는 `GET /api/v1/bible/bundle?language=ko`(07 v3.4 §F-01). |
+| 노트 저장 정책 (v1) | 현행 서버 마스터 단일 — 로컬 캐시·큐잉 도입은 v1.1 이후 (b) 절충안으로 사전 인지만 하되 v1에서 구현하지 않는다(07 §18.2). |
 
 ---
 
@@ -150,7 +156,7 @@ git diff --check -- '*.md'
 
 | 항목 | 상태 |
 | --- | --- |
-| 공식 일정표 | `00_개발_일정_총괄표.md` v0.3 기준으로 v3.5 정합화 완료 |
+| 공식 일정표 | v3.5-align.1 정합화 완료 — v3.4-align.1 전체 정책 보존 + v3.5/v1.7/v0.8 신규 내용 추가 |
 | 실행가이드 | `Lead_강태오_실행가이드.html`과 같은 기준으로 정합화 완료 |
 | 브랜치·PR·작업 기록 | 공통 규칙 문서와 Lead 개인 `workspaces` 기준 반영 |
 | 정합성 갱신 | `07_요구사항_정의서.md` v3.5(§19 v1/v2 범위), `04_API_명세서.md` v1.7(me/settings 추가), `25_기능_명세서.md` v0.8(v1/v2 규칙 반영) |
