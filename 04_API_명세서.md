@@ -1,10 +1,10 @@
 # QT-AI API 명세서 v1.7
 
-> **문서 버전:** v1.3  
+> **문서 버전:** v1.7
 > **작성일:** 2026-05-17  
-> **기준 문서:** `01.요구사항명세서_현재완성v1.md`, `02_ERD_문서_v2.md`, `04_화면정의서.md`, `03_화면설계_스토리보드.md`  
+> **기준 문서:** `07_요구사항_정의서.md` v3.5, `02_ERD_문서.md` v2.2, `03_아키텍처_정의서.md` v1.3, `06_화면_기능_정의서.md` v1.5, `08_스토리보드.md` v2.1
 > **작성 관점:** 백엔드 API 설계, 화면-API-ERD 연결성, 인증/권한, 예외 처리
-> **v1.3 보강 범위:** 관리자 찬양/공지 API 상세화, 노트 수정 계약 보강, 나눔 삭제 ERD 정합성 보정, 하단 연결성 표 잔여 필드명 정리
+> **v1.7 현재 반영 범위:** 사용자 설정 API, Today QT `simulatorStatus`, 관리자 AI 산출물 권한, 검증 체크리스트 version/hash registry, 전체 API 요약 정합화
 
 ---
 
@@ -440,7 +440,7 @@
 - **ERD:** `members.tutorial_completed_at`
 - **Response:** `204 No Content`
 
-### 4.1.7 회원 탈퇴
+### 4.1.9 회원 탈퇴
 
 - **Method + URL:** `POST /api/v1/me/withdraw`
 - **인증:** USER
@@ -1866,6 +1866,7 @@
 | `GET /notifications` | `read`, `type` | `createdAt,desc` |
 | `GET /admin/qt-passages` | `status`, `from`, `to`, `q` | `qtDate,desc` |
 | `GET /admin/ai/assets` | `assetType`, `targetType`, `status`, `promptVersionId`, `checklistVersionId` | `createdAt,desc` |
+| `GET /admin/ai/validation-checklists` | `checklistType`, `status`, `version` | `createdAt,desc` |
 | `GET /admin/reports` | `targetType`, `status`, `reason`, `from`, `to` | `createdAt,desc` |
 | `GET /admin/audit-logs` | `actorType`, `actorId`, `actionType`, `targetType`, `from`, `to` | `createdAt,desc` |
 
