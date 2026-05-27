@@ -154,7 +154,7 @@
 
 ```json
 {
-  "kakaoAccessToken": "kakao_access_token_value"
+  "kakaoAccessToken": "<redacted>"
 }
 ```
 
