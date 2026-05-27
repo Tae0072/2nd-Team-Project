@@ -72,7 +72,7 @@ erDiagram
 
     admin_users ||--o{ notices : "공지 발행"
     admin_users ||--o{ reports : "신고 처리"
-    admin_users ||--o{ ai_validation_checklist_versions : "체크리스트 작성"
+    admin_users ||--o{ ai_validation_checklist_versions : "체크리스트 등록"
     admin_users ||--o{ ai_evaluation_cases : "평가 케이스 검토"
     admin_users ||--o{ audit_logs : "관리자 감사"
     service_accounts ||--o{ audit_logs : "시스템 감사"
@@ -311,6 +311,10 @@ erDiagram
         VARCHAR version
         VARCHAR content_hash
         VARCHAR status
+        BIGINT created_by_admin_id FK
+        DATETIME created_at
+        DATETIME activated_at
+        DATETIME retired_at
     }
     ai_evaluation_sets {
         BIGINT id PK
@@ -1102,14 +1106,16 @@ erDiagram
 
 ### 2.33 ai_validation_checklist_versions — AI 검증 체크리스트 버전
 
+이 테이블은 체크리스트 원문 저장 테이블이 아니라 외부 문서/파일 SSoT의 `checklist_type`, `version`, `content_hash`, `status`, 상태 시각과 등록자 참조를 추적하는 version/hash/status registry다. 체크리스트 원문 항목은 서버 DB에 저장하지 않는다.
+
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | 체크리스트 버전 ID |
 | checklist_type | VARCHAR(30) | N | - | | EXPLANATION, SIMULATOR, QA |
 | version | VARCHAR(30) | N | - | | 예: 2026.05.17-1 |
-| content_hash | VARCHAR(100) | N | - | | 체크리스트 원문 해시 |
+| content_hash | VARCHAR(100) | N | - | | 외부 SSoT 체크리스트 원문/파일 해시 |
 | status | VARCHAR(20) | N | 'DRAFT' | | DRAFT, ACTIVE, RETIRED |
-| created_by_admin_id | BIGINT | Y | NULL | FK | 생성 관리자 |
+| created_by_admin_id | BIGINT | Y | NULL | FK | 생성 관리자 ID(`admin_users.id`). 시스템 이관·초기 적재 등 관리자 주체가 없으면 NULL 가능 |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | 생성 시각 |
 | activated_at | DATETIME(6) | Y | NULL | | 활성화 시각 |
 | retired_at | DATETIME(6) | Y | NULL | | 폐기 시각 |
@@ -1253,7 +1259,7 @@ erDiagram
 | simulator_component_library_versions | simulator_clips | 1:N | 클립 생성 기준 라이브러리 버전 |
 | admin_users | notices | 1:N | 공지 발행 |
 | admin_users | reports | 1:N | 신고 처리 |
-| admin_users | ai_validation_checklist_versions | 1:N | 체크리스트 작성 |
+| admin_users | ai_validation_checklist_versions | 1:N | 체크리스트 등록. 관리자 주체가 없으면 `created_by_admin_id`는 NULL |
 | admin_users | ai_evaluation_cases | 1:N | 평가 케이스 검토 |
 | admin_users | audit_logs | 1:N | 관리자 감사 로그 |
 | service_accounts | audit_logs | 1:N | 시스템 주체 감사 로그 |
