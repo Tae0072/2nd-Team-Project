@@ -1938,13 +1938,13 @@
 | AI 산출물 | `AI_ASSET_APPROVE`, `AI_ASSET_REJECT`, `AI_ASSET_HIDE`, `AI_REGENERATE_REQUEST` | REVIEWER/SUPER_ADMIN |
 | 신고 | `REPORT_RESOLVE`, `REPORT_REJECT`, `TARGET_HIDE` | OPERATOR |
 | 공지 | `NOTICE_CREATE`, `NOTICE_PUBLISH`, `NOTICE_HIDE` | OPERATOR |
-| 체크리스트 | `CHECKLIST_ACTIVATE`, `CHECKLIST_RETIRE` | REVIEWER/SUPER_ADMIN |
+| 체크리스트 | `CHECKLIST_CREATE`, `CHECKLIST_ACTIVATE`, `CHECKLIST_RETIRE` | REVIEWER/SUPER_ADMIN |
 | 평가 셋 | `EVAL_CASE_APPROVE`, `EVAL_CASE_REJECT` | REVIEWER |
 | 배치 | `AI_JOB_CREATE`, `AI_VALIDATION_FAIL`, `AI_VALIDATION_PASS` | SYSTEM_BATCH |
 
 ### 7.2 검증 체크리스트 버전 API
 
-- **Method + URL:** `GET /api/v1/admin/ai/validation-checklists?checklistType=EXPLANATION&status=ACTIVE`
+- **Method + URL:** `GET /api/v1/admin/ai/validation-checklists?checklistType=EXPLANATION&status=ACTIVE&page=0&size=20`
 - **Method + URL:** `POST /api/v1/admin/ai/validation-checklists`
 - **Method + URL:** `POST /api/v1/admin/ai/validation-checklists/{id}/activate`
 - **Method + URL:** `POST /api/v1/admin/ai/validation-checklists/{id}/retire`
@@ -1962,7 +1962,7 @@
       "version": "2026.05.1",
       "contentHash": "sha256:...",
       "status": "ACTIVE",
-      "createdByAdminId": 2,
+      "createdByAdminId": null,
       "createdAt": "2026-05-17T10:00:00+09:00",
       "activatedAt": "2026-05-17T10:05:00+09:00",
       "retiredAt": null
@@ -1998,7 +1998,7 @@
   "version": "2026.05.1",
   "contentHash": "sha256:...",
   "status": "DRAFT",
-  "createdByAdminId": 2,
+  "createdByAdminId": null,
   "createdAt": "2026-05-17T10:00:00+09:00",
   "activatedAt": null,
   "retiredAt": null
@@ -2006,7 +2006,7 @@
 ```
 
 - **서버 저장 정책:** 체크리스트 원문은 외부 문서/파일을 SSoT로 둔다. 서버는 원문 대신 `checklistType`, `version`, `contentHash`, `status`, `createdAt`, `activatedAt`, `retiredAt`과 등록자 참조 `createdByAdminId`만 version/hash registry로 저장하고, 원문 항목은 저장하지 않는다.
-- **등록 주체:** `createdByAdminId`는 `admin_users.id`를 의미하며 nullable이다. 관리자 직접 등록이면 해당 관리자 ID를 기록하고, 시스템 이관·초기 적재처럼 관리자 주체가 없으면 `null`일 수 있다.
+- **등록 주체:** `createdByAdminId`는 `admin_users.id`를 의미하며 nullable이다. 관리자 계정 매핑이 확정되기 전 단계, 시스템 이관, 초기 적재처럼 관리자 주체를 연결하지 못하면 `null`일 수 있다.
 - **상태 전이:** `DRAFT -> ACTIVE -> RETIRED`
 - **활성화 정책:** activate 시 같은 `checklistType`의 기존 `ACTIVE` 버전은 자동으로 `RETIRED` 처리하고 대상 버전을 `ACTIVE`로 전환한다. 동일 `checklistType`+`version` 등록은 `409 DUPLICATE_CHECKLIST_VERSION`, 존재하지 않는 버전 조회·활성화·폐기는 `404 CHECKLIST_NOT_FOUND`, 허용되지 않는 상태 전이는 `409 INVALID_STATUS_TRANSITION`을 반환한다.
 - **감사 로그:** 생성/활성화/폐기 모두 `audit_logs.action_type=CHECKLIST_*`로 기록한다.
