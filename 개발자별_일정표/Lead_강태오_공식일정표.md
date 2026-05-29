@@ -117,6 +117,8 @@ git checkout dev
 git pull origin dev
 ./gradlew -p qtai-server test
 rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .
+rg -n "domain\.[a-z]+\.(application|dao|domain|dto|exception)\." qtai-server/src
+rg -n "관리자.*Flutter 앱|Flutter.*admin" qtai-server flutter-app
 ```
 
 문서 저장소에서는 Markdown 표, 코드펜스, API JSON, 금지 기준 문구를 확인한다.
