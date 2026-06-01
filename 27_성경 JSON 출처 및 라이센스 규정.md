@@ -4,6 +4,19 @@
 > 기준 저장소: https://github.com/scrollmapper/bible_databases
 > 목적: QT-AI에서 사용할 성경 본문 데이터의 출처, 라이센스, 사용 가능 범위를 실제 본문 적재 전에 정리한다.
 
+## 0. 기준 파일 경로
+
+QT-AI에서 우선 검토하는 성경 본문 데이터는 `scrollmapper/bible_databases` 저장소의 아래 파일을 기준으로 한다.
+
+| 번역본 | 실제 JSON 데이터 | 라이선스 확인 위치 | SQL 상단 라이선스 표기 |
+| --- | --- | --- | --- |
+| KorRV | `formats/json/KorRV.json` | `formats/sql/KorRV.sql` | `Public Domain` |
+| KJV | `formats/json/KJV.json` | `formats/sql/KJV.sql` | `GPL` |
+
+KorRV는 `formats/json/KorRV.json`의 실제 JSON 데이터를 사용 후보로 검토하며, 라이선스 규칙은 `formats/sql/KorRV.sql` 상단의 `License: Public Domain` 표기를 기준으로 확인한다.
+
+KJV는 `formats/json/KJV.json`의 실제 JSON 데이터를 사용 후보로 검토하며, 라이선스 규칙은 `formats/sql/KJV.sql` 상단의 `License: GPL` 표기를 기준으로 확인한다. GPL 데이터는 상업 서비스에서 사용할 수 있더라도 사용자에게 원본/수정본 접근과 재배포 권리를 보장해야 하므로, 실제 앱 적재 전 Lead 검토가 필요하다.
+
 ## 1. 사용 방향 요약
 
 QT-AI 프로젝트의 v1 성경 본문 데이터는 다음 번역본을 우선 검토한다.
