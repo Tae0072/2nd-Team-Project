@@ -2,10 +2,10 @@
 
 > **문서 버전:** v2.2  
 > **작성일:** 2026-05-17  
-> **최종 갱신일:** 2026-05-19  
+> **최종 갱신일:** 2026-05-27
 > **v2.1 보강 범위:** `members.nickname_last_changed_at` 컬럼 추가(닉네임 7일 변경 잠금 정책 계산 기준). `07_요구사항_정의서.md` v3.3 §F-10 / `04_API_명세서.md` v1.5 §4.1.5 정합화. 2026-05-18 바이블서버 회의록 §5 결정.  
 > **v2.2 보강 범위:** `bible_verses` 절에 "클라이언트 로컬 복제 정책" 메모 추가. 한글 본문은 서버 마스터 + 클라이언트 로컬 SQLite 복제 보관, 영어 본문은 서버 마스터 + 온라인 조회만. 스키마 변경 없음. `07_요구사항_정의서.md` v3.4 §F-01 / `04_API_명세서.md` v1.6 §4.2.2.1 정합화. 2026-05-18 바이블서버 회의록 §1·§3·§4 결정.  
-> **연관 문서:** 01.요구사항명세서_현재완성v1.md, 04_API_명세서.md, 07_요구사항_정의서.md
+> **연관 문서:** `07_요구사항_정의서.md` v3.5, `03_아키텍처_정의서.md` v1.3, `04_API_명세서.md` v1.7, `06_화면_기능_정의서.md` v1.5, `23_도메인_용어사전.md` v1.1
 
 ---
 
@@ -50,6 +50,7 @@ erDiagram
 
     notes ||--o{ note_verses : "선택 구절"
     bible_verses ||--o{ note_verses : "노트 연결"
+    notes ||--o{ journal_events : "이벤트 이력"
     notes ||--o| sharing_posts : "나눔 게시"
     sharing_posts ||--o{ comments : "댓글"
     sharing_posts ||--o{ likes : "좋아요"
@@ -71,7 +72,7 @@ erDiagram
 
     admin_users ||--o{ notices : "공지 발행"
     admin_users ||--o{ reports : "신고 처리"
-    admin_users ||--o{ ai_validation_checklist_versions : "체크리스트 작성"
+    admin_users ||--o{ ai_validation_checklist_versions : "체크리스트 등록"
     admin_users ||--o{ ai_evaluation_cases : "평가 케이스 검토"
     admin_users ||--o{ audit_logs : "관리자 감사"
     service_accounts ||--o{ audit_logs : "시스템 감사"
@@ -170,6 +171,12 @@ erDiagram
         BIGINT note_id FK
         BIGINT bible_verse_id FK
         SMALLINT display_order
+    }
+    journal_events {
+        BIGINT id PK
+        BIGINT note_id FK
+        VARCHAR event_type
+        DATETIME occurred_at
     }
     sharing_posts {
         BIGINT id PK
@@ -304,6 +311,10 @@ erDiagram
         VARCHAR version
         VARCHAR content_hash
         VARCHAR status
+        BIGINT created_by_admin_id FK
+        DATETIME created_at
+        DATETIME activated_at
+        DATETIME retired_at
     }
     ai_evaluation_sets {
         BIGINT id PK
@@ -635,6 +646,22 @@ erDiagram
 - `uk_notes_active_qt_meditation` UNIQUE ON (member_id, qt_passage_id, category, active_unique_key)
 
 > 묵상 노트는 `category = MEDITATION`, `qt_passage_id IS NOT NULL`, `status != DELETED`, `active_unique_key = 'ACTIVE'` 상태에서만 사용자별 QT 1건을 허용한다. 기본값은 `NULL`이며, Service는 저장 확정된 활성 묵상 노트에만 `active_unique_key = 'ACTIVE'`를 세팅한다. 소프트 삭제 시 `deleted_at`을 세팅하고 `active_unique_key = NULL`로 변경하여 같은 QT 본문에 새 묵상 노트를 다시 작성할 수 있게 한다. 설교 노트와 개인 노트는 `active_unique_key = NULL`을 유지해 이 유니크 정책의 대상이 되지 않는다.
+
+---
+
+### 2.13-1 journal_events — 묵상 이벤트 이력
+
+| 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
+| --- | --- | --- | --- | --- | --- |
+| id | BIGINT | N | AUTO_INCREMENT | PK | 이벤트 ID |
+| note_id | BIGINT | N | - | FK | notes.id |
+| event_type | VARCHAR(50) | N | - | | NOTE_SAVED, NOTE_DELETED 등 |
+| occurred_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | 발생 시각 |
+
+**인덱스**
+- `idx_journal_events_note` ON (note_id)
+
+> 노트 상태 변화(저장 확정, 삭제 등)를 이력으로 남겨 감사 추적에 활용한다. `note_id`는 `notes.id`를 FK로 참조하며 노트 삭제 시 CASCADE DELETE한다.
 
 ---
 
@@ -1079,14 +1106,16 @@ erDiagram
 
 ### 2.33 ai_validation_checklist_versions — AI 검증 체크리스트 버전
 
+이 테이블은 체크리스트 원문 저장 테이블이 아니라 외부 문서/파일 SSoT의 `checklist_type`, `version`, `content_hash`, `status`, 상태 시각과 등록자 참조를 추적하는 version/hash/status registry다. 체크리스트 원문 항목은 서버 DB에 저장하지 않는다.
+
 | 컬럼 | 타입 | NULL | 기본값 | PK/FK/UK | 설명 |
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | 체크리스트 버전 ID |
 | checklist_type | VARCHAR(30) | N | - | | EXPLANATION, SIMULATOR, QA |
 | version | VARCHAR(30) | N | - | | 예: 2026.05.17-1 |
-| content_hash | VARCHAR(100) | N | - | | 체크리스트 원문 해시 |
+| content_hash | VARCHAR(100) | N | - | | 외부 SSoT 체크리스트 원문/파일 해시 |
 | status | VARCHAR(20) | N | 'DRAFT' | | DRAFT, ACTIVE, RETIRED |
-| created_by_admin_id | BIGINT | Y | NULL | FK | 생성 관리자 |
+| created_by_admin_id | BIGINT | Y | NULL | FK | 생성 관리자 ID(`admin_users.id`). 시스템 이관·초기 적재 등 관리자 주체가 없으면 NULL 가능 |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | 생성 시각 |
 | activated_at | DATETIME(6) | Y | NULL | | 활성화 시각 |
 | retired_at | DATETIME(6) | Y | NULL | | 폐기 시각 |
@@ -1230,7 +1259,7 @@ erDiagram
 | simulator_component_library_versions | simulator_clips | 1:N | 클립 생성 기준 라이브러리 버전 |
 | admin_users | notices | 1:N | 공지 발행 |
 | admin_users | reports | 1:N | 신고 처리 |
-| admin_users | ai_validation_checklist_versions | 1:N | 체크리스트 작성 |
+| admin_users | ai_validation_checklist_versions | 1:N | 체크리스트 등록. 관리자 주체가 없으면 `created_by_admin_id`는 NULL |
 | admin_users | ai_evaluation_cases | 1:N | 평가 케이스 검토 |
 | admin_users | audit_logs | 1:N | 관리자 감사 로그 |
 | service_accounts | audit_logs | 1:N | 시스템 주체 감사 로그 |
@@ -1517,6 +1546,7 @@ stateDiagram-v2
 | 35 | ai_evaluation_cases | AI 평가 케이스 | evaluation_set_id, reviewed_by_admin_id |
 | 36 | service_accounts | 시스템 계정 | - |
 | 37 | simulator_component_library_versions | 시뮬레이터 컴포넌트 라이브러리 버전 | - |
+| 38 | journal_events | 묵상 이벤트 이력 | note_id |
 ---
 
 ## 8. BaseEntity 및 삭제 전략
