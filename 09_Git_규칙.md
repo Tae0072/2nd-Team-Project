@@ -13,12 +13,12 @@
 
 아래 기준은 이 문서 전체에 우선한다. 기능·비기능·화면 요구사항이 충돌하면 `07_요구사항_정의서.md` v3.5를 따른다. 문서 역할과 충돌 처리 방식은 `00_문서_역할_분리표.md`를 따른다.
 
-- 백엔드는 단일 `qtai-server` Modular Monolith로 운영한다.
+- 백엔드는 v1에서 단일 `qtai-server` Modular Monolith로 운영하고, v2에서 MSA(서비스 분리)로 전환한다(2026-06-08 Lead 결정).
 - 도메인 간 Entity/Service/Repository 직접 import를 금지하고 DTO/Interface로만 통신한다.
 - `note`, `sharing`, `praise`는 별도 도메인으로 두며 독립 서비스로 분리하지 않는다.
 - 외부 공개 API는 `/api/v1/**` HTTP API이고, 내부 도메인 인터페이스는 Java Interface다.
 - RAG, ChromaDB, 벡터 DB, Elasticsearch는 v1에서 사용하지 않는다.
-- Kafka, Kubernetes, Helm은 v1에서 도입하지 않는다. v1은 Spring `ApplicationEventPublisher`와 Docker Compose 기준이다.
+- Kafka, Kubernetes, Helm은 v1에서 도입하지 않으며 v2 MSA 분리 단계에서 도입한다(2026-06-08 Lead 결정). v1은 Spring `ApplicationEventPublisher`와 Docker Compose 기준이다.
 - AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` 엔드포인트는 만들지 않는다.
 - 해설·시뮬레이터 생성은 04:00 KST 배치 또는 관리자 트리거에서만 실행하고, F-15 사실 기반 Q&A는 단발·검증 흐름으로만 실행한다.
 - QT 본문은 성서 유니온 00:00 KST 공개, 우리 시스템 04:00 KST 수집 배치 기준으로 처리한다.
@@ -117,8 +117,8 @@ master        ← 최종 배포 브랜치 (Lead 수동 머지)
 | `note-service` | 독립 Note Service 없음. `domain.note`에서 처리 |
 | `ai-chat` | 세션형 AI 자유 챗봇 없음. F-15 사실 기반 Q&A는 `domain.ai` 단발 흐름 |
 | `rag` | RAG·벡터 DB 제외 |
-| `kafka` | Kafka는 v1 보류 |
-| `k8s`, `helm` | Kubernetes/Helm은 v1 보류 |
+| `kafka` | Kafka v1 보류 · v2 MSA 허용 |
+| `k8s`, `helm` | Kubernetes/Helm v1 보류 · v2 MSA 허용 |
 
 **예시**
 
@@ -281,13 +281,13 @@ PR 오픈 (base: dev)
 - [ ] `07_요구사항_정의서.md` v3.1과 충돌하지 않음
 - [ ] `00_문서_역할_분리표.md`의 문서 책임과 충돌하지 않음
 - [ ] 아키텍처 변경은 `03_아키텍처_정의서.md`, API 변경은 `04_API_명세서.md`, 품질 게이트 변경은 `18_코드_품질_게이트.md`, 용어 변경은 `23_도메인_용어사전.md`와 정합함
-- [ ] 단일 `qtai-server` Modular Monolith 기준을 지킴
+- [ ] 백엔드 구조 기준 준수(v1 모놀리식 / v2 MSA 분리 트랙)
 - [ ] `note`, `sharing`, `praise`는 별도 도메인으로 유지하고 독립 서비스로 분리하지 않음
 - [ ] 다른 도메인의 Entity/Service/Repository 직접 import 없음
 - [ ] 도메인 간 호출은 DTO/Interface로만 처리
 - [ ] 외부 공개 API는 `/api/v1/**`, 내부 도메인 인터페이스는 Java Interface로 분리됨
 - [ ] RAG, ChromaDB, 벡터 DB, Elasticsearch 코드/의존성 없음
-- [ ] Kafka, Kubernetes, Helm v1 도입 없음
+- [ ] Kafka, Kubernetes, Helm: v1 단일배포 도입 없음 (v2 MSA 분리 PR은 예외 — 2026-06-08)
 - [ ] AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` 엔드포인트 없음
 - [ ] 해설·시뮬레이터는 사용자 요청 경로에서 즉시 생성하지 않음
 - [ ] F-15 사실 기반 Q&A는 단발·검증 흐름으로만 제공
@@ -345,9 +345,9 @@ PR 오픈 (base: dev)
 ```text
 타 팀원 담당 범위 파일을 사전 설명 없이 수정
 하드코딩된 API Key / 비밀번호 / private key 발견
-독립 서비스 디렉토리 생성 (auth-service, bible-service, ai-service 등)
+독립 서비스 디렉토리 생성은 v2 MSA 분리 트랙에 한해 허용(2026-06-08 Lead 결정). v1 단일배포 임의 생성은 금지
 RAG, ChromaDB, 벡터 DB, Elasticsearch 코드/의존성 추가
-Kafka, Kubernetes, Helm v1 코드/설정 추가
+Kafka, Kubernetes, Helm을 v1 단일배포에 추가 (v2 MSA 분리 트랙은 허용 — 2026-06-08)
 사용자용 AI Q&A/SSE/API 경로 추가
 성경 데이터에 개역개정, ESV, NIV 포함
 성서 유니온·두란노 본문 텍스트 저장

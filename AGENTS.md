@@ -66,7 +66,7 @@ Do not add or scaffold these, even temporarily:
 
 - AI free chatbot, multi-turn conversation, SSE, or `/ai/sessions/**`
 - RAG, ChromaDB, vector DB, Elasticsearch
-- Kafka, Kubernetes, Helm for v1
+- Kafka, Kubernetes, Helm for v1 (v2 MSA 분리 단계에서 허용 — 2026-06-08)
 - Church verification screens, buttons, APIs, or DB fields
 - AI worship-song recommendations
 - Lyrics, audio files, or direct YouTube URL input/storage

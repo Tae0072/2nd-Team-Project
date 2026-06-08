@@ -31,7 +31,7 @@
 | --- | --- |
 | PR 우선 | 모든 기능 변경은 `dev` 대상 PR에서 CI를 통과해야 한다. |
 | 빠른 실패 | 금지 기술, 금지 API, 금지 데이터는 빌드보다 먼저 검사한다. |
-| 단일 백엔드 | v1 백엔드는 단일 `qtai-server` 기준으로 빌드한다. |
+| 단일 백엔드 | v1은 단일 `qtai-server` 기준 빌드 · v2 MSA는 서비스별 빌드(2026-06-08) |
 | Docker Compose | 배포 후보 빌드는 Docker Compose 기준으로 검증한다. |
 | 단계적 도입 | W1은 build/test/guard, W2는 API/domain, W3는 coverage/integration, W4는 E2E/deploy 후보로 확장한다. |
 | 가짜 성공 금지 | 구현 저장소에서 실제로 실행 가능한 명령만 CI에 넣는다. |
@@ -111,13 +111,13 @@ done
 
 [ ${#scan_paths[@]} -eq 0 ] && exit 0
 
-! rg -n "Kafka|KafkaTemplate|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|vector DB|Elasticsearch|개역개정|ESV|NIV" "${scan_paths[@]}"
+! rg -n "/ai/sessions|SSE|RAG|ChromaDB|vector DB|Elasticsearch|개역개정|ESV|NIV" "${scan_paths[@]}"   # Kafka/Kubernetes/Helm은 v2 MSA 허용(2026-06-08)으로 제외
 ```
 
 | 검사 대상 | 금지 기준 | 허용 대안 |
 | --- | --- | --- |
-| Kafka, KafkaTemplate | v1 MVP 금지 | Spring `ApplicationEventPublisher` |
-| Kubernetes, Helm | v1 MVP 금지 | Docker Compose |
+| Kafka, KafkaTemplate | v1 금지 · v2 MSA 허용(2026-06-08) | v1: ApplicationEventPublisher / v2: Kafka |
+| Kubernetes, Helm | v1 금지 · v2 MSA 허용(2026-06-08) | v1: Docker Compose / v2: K8s·Helm |
 | AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` | MVP 금지 | F-15 사실 기반 Q&A는 단발·검증 흐름 |
 | RAG, ChromaDB, vector DB, Elasticsearch | 사용 금지 | MySQL 8.0 + RDB 인덱스 |
 | 개역개정, ESV, NIV | 저장·응답 금지 | 라이선스 확인된 GitHub 공개 JSON |
@@ -216,7 +216,7 @@ flutter test
 
 ## 11. Docker Compose 후보 빌드
 
-v1 배포 기준은 Docker Compose다. Kubernetes/Helm은 CI/CD 목표에 넣지 않는다.
+v1 배포 기준은 Docker Compose다. Kubernetes/Helm은 v2 MSA 분리 단계의 CI/CD 목표로 둔다(2026-06-08 Lead 결정).
 
 ```powershell
 docker compose config

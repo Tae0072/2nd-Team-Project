@@ -34,7 +34,7 @@
 | 핵심 가치 | 초심자가 오늘 본문을 바로 읽고, 필요한 해설만 열람하며, 묵상 기록까지 이어갈 수 있게 한다. |
 | 핵심 차별점 | 자유 챗봇이 아니라 사전 생성·검증된 AI 해설, 시뮬레이터 상태, 단발·검증형 사실 기반 Q&A를 제공한다. |
 | MVP 기준 | Today QT, 성경 본문, 승인 해설, 묵상, 찬양 큐레이션, 관리자 운영, 시뮬레이터 상태 |
-| Out-Scope | AI 자유 챗봇, 다중 턴 대화, SSE, Kafka, Kubernetes, Helm, RAG, vector DB, AI 찬양 추천, 교회 인증 |
+| Out-Scope(v1) | AI 자유 챗봇, 다중 턴 대화, SSE, RAG, vector DB, AI 찬양 추천, 교회 인증 (Kafka·Kubernetes·Helm은 v2 MSA 분리로 이관 — 2026-06-08) |
 
 ---
 
@@ -45,7 +45,7 @@
 | 개발 기간 | 2026-05-12 ~ 2026-06-17 |
 | 팀 구성 | 6명 |
 | 개발 방식 | 주차별 게이트, PR 검증, 문서 기준 우선, AI 에이전트 보조 |
-| 백엔드 구조 | 단일 `qtai-server` Modular Monolith |
+| 백엔드 구조 | 단일 `qtai-server` Modular Monolith(v1) · v2 MSA 분리(2026-06-08) |
 | 프론트엔드 | Flutter 앱, 관리자 화면은 Flutter Web 또는 별도 웹 화면 |
 | 데이터베이스 | MySQL 8.0 |
 | 배포 기준 | Docker Compose |
@@ -73,7 +73,7 @@
 | 영역 | 스택 |
 | --- | --- |
 | Backend | Java 21, Spring Boot 3.3, Spring Security, Spring Data JPA |
-| Architecture | 단일 `qtai-server` Modular Monolith, 도메인 패키지 격리, 내부 Java Interface |
+| Architecture | 단일 `qtai-server` Modular Monolith(v1)→MSA(v2, 2026-06-08), 도메인 패키지 격리, 내부 Java Interface |
 | Database | MySQL 8.0 |
 | Cache | Caffeine 1차, Redis 검토 |
 | Event | Spring `ApplicationEventPublisher` |
@@ -86,8 +86,8 @@
 
 | 금지 항목 | README 표기 방식 |
 | --- | --- |
-| Kafka | v1에서는 사용하지 않음. Spring `ApplicationEventPublisher` 사용 |
-| Kubernetes, Helm | v1에서는 사용하지 않음. Docker Compose 사용 |
+| Kafka | v1 미사용(Spring `ApplicationEventPublisher`) · v2 MSA에서 도입(2026-06-08) |
+| Kubernetes, Helm | v1 미사용(Docker Compose) · v2 MSA에서 도입(2026-06-08) |
 | RAG, ChromaDB, vector DB, Elasticsearch | 사용하지 않음. RDB 인덱스 기반 조회 |
 | AI 자유 챗봇, 다중 턴 대화, SSE, `/ai/sessions/**` | 제공하지 않음. F-15 사실 기반 Q&A는 단발·검증 흐름 |
 | 개역개정, ESV, NIV | 사용 금지 데이터로 명시 |

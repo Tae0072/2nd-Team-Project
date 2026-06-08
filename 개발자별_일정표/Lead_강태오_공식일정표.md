@@ -15,7 +15,7 @@
 | --- | --- |
 | 담당자 | 강태오 |
 | 주 역할 | Lead / platform / member / qt / admin / DevOps / 전체 조율 |
-| 구현 기준 | 단일 `qtai-server` Modular Monolith |
+| 구현 기준 | v1: 단일 `qtai-server` Modular Monolith · v2: MSA 분리(2026-06-08) |
 | 협업 기준 | 인증·Today QT·외부 API 계약은 Lead 단독 소유가 아니라 Bible·Flutter 담당자와 API 계약을 맞춰 구현한다. 관리자 UI는 Flutter 앱이 아니라 별도 웹 프런트엔드다(2026-05-19 강사님 직강 결정). |
 | 산출물 기준 | 구현 PR, 검증 로그, 회고 메모, 문서 정합성 수정 내역을 남긴다. |
 
@@ -28,7 +28,7 @@
 | 백엔드 구조 | 단일 `qtai-server` 안에 `domain.member`, `domain.bible`, `domain.qt`, `domain.study`, `domain.note`, `domain.sharing`, `domain.report`, `domain.notification`, `domain.praise`, `domain.mission`, `domain.ai`, `domain.admin`, `domain.audit` 패키지를 둔다. |
 | 도메인 패키지 구조 | 각 도메인은 `api/internal/client/web` 5층 구조를 따른다. `internal/`은 외부 접근 절대 금지, 다른 도메인은 `api/UseCase`만 호출, Mock은 호출자의 `client/{타도메인}/...UseCaseMock.java`(03 v1.3 §3.1). |
 | 관리자 UI 플랫폼 | 관리자 UI는 사용자 Flutter 앱과 분리된 별도 웹 프런트엔드다(2026-05-19 강사님 직강). 사용자 앱(`/api/v1/**` 관리자 제외)과 관리자 웹(`/api/v1/admin/**`)이 같은 `qtai-server`를 호출(03 v1.3 §4.9 / §13.6). |
-| 배포 기준 | v1은 Docker Compose 기준이다. Kubernetes와 Helm은 MVP 작업 목표에 넣지 않는다. |
+| 배포 기준 | v1은 Docker Compose. Kubernetes·Helm은 v2 MSA 분리 단계에서 도입(2026-06-08). |
 | 인증 경로 | Flutter SDK가 카카오 토큰을 직접 받아 `POST /api/v1/auth/kakao`로 서버에 전달한다. 서버사이드 `/oauth2/**` 경로는 사용하지 않는다. |
 | 사용자 설정 API | `GET /api/v1/me/settings`(설정 조회), `PATCH /api/v1/me/settings`(설정 변경) — 절 선택 방식(단일 선택 v1, 범위 선택 v2에서 활성화), 글쓰기 방식 포함. 화면 M-06(마이페이지 설정, 신규). |
 | 이벤트 | v1은 Spring `ApplicationEventPublisher`를 사용한다. Kafka는 v2 이후 검토 대상이다. |
@@ -56,7 +56,7 @@ W1은 2026-05-18부터 2026-05-22까지 진행한다. 이 기간의 목표는 �
 | 2026-05-18 | 구현 저장소 골격 고정 | `qtai-server`, Flutter 앱, OpenAPI 위치, 브랜치/PR 흐름 확인 | `dev` 기준 PR 흐름과 기본 빌드 위치가 문서와 맞다. |
 | 2026-05-19 | 도메인 패키지 경계 준비 | `domain.member`, `domain.bible`, `domain.qt`, `domain.study`, `domain.note`, `domain.sharing`, `domain.report`, `domain.notification`, `domain.praise`, `domain.mission`, `domain.ai`, `domain.admin`, `domain.audit` 패키지 구조와 import 금지 기준 정리 | 도메인 간 Entity/Service/Repository 직접 import 금지 기준을 검증할 수 있다. |
 | 2026-05-20 | DB/API 계약 정리 | 외부 공개 API `/api/v1/**`와 내부 도메인 Java Interface를 분리해 표기 | ERD 주요 테이블과 API 초안이 서로 충돌하지 않는다. |
-| 2026-05-21 | 품질 게이트 자동화 | 금지 기술, 금지 API, 금지 데이터, 문서 용어 검사 기준 준비 | Kafka/K8s/Helm/SSE/RAG/금지 번역본이 PR에서 검출 가능하다. |
+| 2026-05-21 | 품질 게이트 자동화 | 금지 기술, 금지 API, 금지 데이터, 문서 용어 검사 기준 준비 | SSE/RAG/금지 번역본이 PR에서 검출 가능하다. (Kafka/K8s/Helm은 v2 MSA 허용 — 2026-06-08) |
 | 2026-05-22 | Foundation 5/5 판정 | 저장소 운영, 백엔드 골격, 도메인 경계, DB/API 계약, 품질 게이트 최종 확인 | `Foundation 5/5`가 모두 통과해야 W2로 넘어간다. |
 
 ### W1 완료 체크리스트
@@ -116,7 +116,7 @@ W1은 2026-05-18부터 2026-05-22까지 진행한다. 이 기간의 목표는 �
 git checkout dev
 git pull origin dev
 ./gradlew -p qtai-server test
-rg -n "Kafka|Kubernetes|Helm|/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .
+rg -n "/ai/sessions|SSE|RAG|ChromaDB|Elasticsearch|개역개정|ESV|NIV" .   # Kafka/Kubernetes/Helm은 v2 MSA 허용(2026-06-08)
 rg -n "domain\.[a-z]+\.(application|dao|domain|dto|exception)\." qtai-server/src
 rg -n "관리자.*Flutter 앱|Flutter.*admin" qtai-server flutter-app
 ```

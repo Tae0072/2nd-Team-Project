@@ -72,16 +72,14 @@ QT-AI의 AI는 사용자와 실시간으로 대화하는 챗봇이 아닙니다.
 
 ## 기술 방향
 
-> **2026-06-06 갱신(강사 직강 피드백):** 프론트엔드(Flutter) 정비 5단계(①국제화 ②Riverpod 일관화 ③치수 변수화 ④컴포넌트화 ⑤데드코드 정리)를 MSA(v2) 분리 선행 준비로 먼저 진행한다. 아래 v1 백엔드 기준(Modular Monolith 등)은 변경 없음. 상세는 `27_프론트엔드_정비_로드맵.md` 참고.
-
 | 영역 | v1 확정 기준 | v1에서 하지 않는 것 |
 | --- | --- | --- |
-| 백엔드 | Java 21, Spring Boot 3.3, 단일 `qtai-server` Modular Monolith | 독립 마이크로서비스 4종 운영 |
+| 백엔드 | Java 21, Spring Boot 3.3, 단일 `qtai-server` Modular Monolith(v1) | 독립 마이크로서비스 분리는 v2 MSA에서 진행(2026-06-08) |
 | 도메인 통신 | 도메인 간 Entity/Service 직접 import 금지, DTO/Interface 통신 | 도메인 내부 구현 직접 참조 |
 | DB | MySQL 8.0 | PostgreSQL |
 | 검색 | RDB 인덱스 | RAG, ChromaDB, vector DB, Elasticsearch |
-| 이벤트 | Spring `ApplicationEventPublisher` | Kafka |
-| 인프라 | Docker Compose | Kubernetes, Helm |
+| 이벤트 | Spring `ApplicationEventPublisher` (v1) | Kafka (v2 MSA) |
+| 인프라 | Docker Compose (v1) | Kubernetes, Helm (v2 MSA) |
 | LLM | DeepSeek API, 배치·관리자 트리거 전용 | 사용자 요청 경로 LLM 호출 |
 | 앱 | Flutter Android/디버그 빌드 시연 | iOS 정식 배포 |
 
@@ -104,7 +102,7 @@ QT-AI의 AI는 사용자와 실시간으로 대화하는 챗봇이 아닙니다.
 - 직접 YouTube URL 입력
 - 교회 인증 화면, 버튼, API, DB 필드
 - RAG, ChromaDB, vector DB, Elasticsearch
-- Kafka, Kubernetes, Helm
+- Kafka, Kubernetes, Helm (v2 MSA 분리 단계에서 도입 — 2026-06-08)
 - 인기 구절 Top N 통계
 - 개역개정, ESV, NIV 데이터 저장·응답·테스트
 - 계정 탈퇴, 세분화된 공개 범위, 팔로우, 실시간 댓글 피드

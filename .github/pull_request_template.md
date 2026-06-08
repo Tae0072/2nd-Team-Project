@@ -20,7 +20,7 @@
 - [ ] 금지 표현을 사용하지 않음: "저작권 문제 없음", "이벤트 유실률 0% 보장", "내부 API 경로"
 
 ## 구현 저장소 기준 변경 시 확인
-- [ ] 단일 `qtai-server` Modular Monolith 기준을 유지함
+- [ ] 백엔드 구조 기준 준수 (v1 단일 `qtai-server` Modular Monolith / v2 MSA 분리 트랙은 서비스 경계 기준 — 2026-06-08)
 - [ ] 외부 공개 API는 `/api/v1/**`, 내부 도메인 인터페이스는 Java Interface로 분리됨
 - [ ] 사용자용 AI Q&A, 챗봇, SSE, `/ai/sessions/**`를 다시 추가하지 않음
 - [ ] AI 호출은 04:00 KST 배치 또는 관리자 트리거 전용임
