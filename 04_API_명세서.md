@@ -1427,7 +1427,7 @@
 
 ### 4.7.2 QT 본문 관리
 
-- **Method + URL:** `GET /api/v1/admin/qt-passages?status=PUBLISHED&from=2026-05-01&to=2026-05-31&page=0&size=20`
+- **Method + URL:** `GET /api/v1/admin/qt-passages?status=active&from=2026-05-01&to=2026-05-31&page=0&size=20`
 - **Method + URL:** `POST /api/v1/admin/qt-passages`
 - **Method + URL:** `PATCH /api/v1/admin/qt-passages/{id}`
 - **Method + URL:** `POST /api/v1/admin/qt-passages/{id}/publish`
@@ -1438,12 +1438,20 @@
 ```json
 {
   "qtDate": "2026-05-17",
+  "bookId": 19,
+  "chapter": 23,
+  "startVerse": 1,
+  "endVerse": 6,
   "title": "오늘의 QT",
-  "startVerseId": 1001,
-  "endVerseId": 1005,
-  "status": "DRAFT"
+  "mainVerseRef": "시편 23:1-6",
+  "status": "pending_review"
 }
 ```
+
+- **상태값:** `active`, `hidden`, `pending_review`, `deletion_notified`, `removed`
+  - 상태값은 관리자 콘텐츠 워크플로우 상태이며, 실제 사용자 노출 갱신은 04:00 KST Today QT cache 배치가 결정한다(QT 범위 공개 00:00 KST·사용자 노출 04:00 KST 기준).
+
+> 2026-06-10 팀 결정 반영: 요청 본문을 `startVerseId/endVerseId` → `bookId`+`chapter`+`startVerse`+`endVerse`(+`mainVerseRef`)로 변경(이지윤 admin-server 구현 기준). 상태값은 5종(`active/hidden/pending_review/deletion_notified/removed`)으로 정렬하며, 3종 매핑(`DRAFT→pending_review`·`PUBLISHED→active`·`HIDDEN→hidden`)은 admin-web qt-passages 계약 참조. (본 04_API_명세서가 SSoT이며, 구현 저장소 QT-AI dev #462와 2026-06-10 동기화 완료)
 
 ### 4.7.3 AI 산출물 검증
 
