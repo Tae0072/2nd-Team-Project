@@ -294,6 +294,8 @@ erDiagram
     admin_users {
         BIGINT id PK
         BIGINT member_id FK_UK
+        VARCHAR username UK
+        VARCHAR password_hash
         VARCHAR admin_role
         VARCHAR status
     }
@@ -1070,6 +1072,8 @@ erDiagram
 | --- | --- | --- | --- | --- | --- |
 | id | BIGINT | N | AUTO_INCREMENT | PK | 관리자 ID |
 | member_id | BIGINT | N | - | FK/UK | 연결 회원 |
+| username | VARCHAR(100) | Y | NULL | UK | 관리자 웹 로그인 아이디(자체 아이디/비밀번호 로그인). 카카오 대체(2026-06-11). 기존 행 호환 위해 NULL 허용 |
+| password_hash | VARCHAR(255) | Y | NULL | | 비밀번호 BCrypt 해시(평문 저장 금지). 기존 행은 NULL일 수 있음 |
 | admin_role | VARCHAR(30) | N | 'OPERATOR' | | SUPER_ADMIN, OPERATOR, REVIEWER, CONTENT_CREATOR |
 | status | VARCHAR(20) | N | 'ACTIVE' | | ACTIVE, DISABLED |
 | created_at | DATETIME(6) | N | CURRENT_TIMESTAMP(6) | | 생성 시각 |

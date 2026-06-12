@@ -191,6 +191,51 @@
 - **처리:** Refresh Token 폐기
 - **Response:** `204 No Content`
 
+#### 2.3.4 관리자 로그인 (아이디/비밀번호)
+
+> 2026-06-11 결정: 관리자 웹 로그인은 카카오가 아니라 자체 아이디/비밀번호 방식을 사용한다. 사용자 앱 카카오 로그인(2.3.1)은 그대로 유지한다. 관리자 인증은 admin-server(8090)가 직접 처리한다.
+
+- **Method + URL:** `POST /api/v1/admin/auth/login`
+- **인증:** 불필요(permitAll)
+- **설명:** `username`/`password`를 받아 `admin_users`에서 BCrypt로 검증한 뒤 ADMIN Access/Refresh Token을 발급한다. 미존재 아이디·비밀번호 불일치는 동일하게 `401 ADMIN_LOGIN_FAILED`로 응답해 계정 존재 여부 노출(enumeration)을 막는다. 비활성 관리자는 `403 ADMIN_USER_DISABLED`.
+- **Request Body:**
+
+```json
+{
+  "username": "admin",
+  "password": "<redacted>"
+}
+```
+
+- **Response 예시:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ...",
+    "admin": {
+      "memberId": 1,
+      "nickname": "개발관리자",
+      "role": "ADMIN",
+      "adminRole": "OPERATOR",
+      "status": "ACTIVE"
+    }
+  },
+  "error": null
+}
+```
+
+- **에러 코드:** `ADMIN_LOGIN_FAILED`(AD0004, 401), `ADMIN_USER_DISABLED`(AD0002, 403)
+
+#### 2.3.5 관리자 토큰 재발급
+
+- **Method + URL:** `POST /api/v1/admin/auth/refresh`
+- **인증:** 불필요(permitAll, Refresh Token을 body로 전달)
+- **Request Body:** `{ "refreshToken": "eyJ..." }`
+- **Response:** 2.3.4와 동일한 형태(신규 access/refresh + admin 요약). 유효하지 않은 토큰은 `401 ADMIN_LOGIN_FAILED`.
+
 ---
 
 ## 3. 화면별 필요 API 목록
